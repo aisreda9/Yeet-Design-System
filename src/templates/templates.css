@@ -7,6 +7,9 @@
   box-shadow: 0 0 0 10px #111, 0 30px 80px rgb(0 0 0 / 0.25);
   font-family: var(--font-text);
 }
+/* Фон экрана: сплэш на цвете бренда, фото на весь экран. Текст и статус-бар белые */
+.y-screen--accent { background: var(--color-accent); color: var(--color-text-on-accent); }
+.y-screen--photo { background: center / cover var(--screen-photo); color: var(--color-text-on-photo); }
 .y-screen__content {
   flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   /* Figma (флоу): контент начинается на 20 ниже шапки, блоки идут с шагом 20 */
@@ -17,6 +20,8 @@
 /* Контент скроллится, а не сжимается: иначе segment-control и кнопки сплющиваются по высоте */
 .y-screen__content > * { flex-shrink: 0; }
 .y-screen__content--center { justify-content: center; }
+/* Контент прижат к низу: кнопка поверх фото в 20 от края экрана (Search / Photo / Crop) */
+.y-screen__content--end { justify-content: flex-end; padding-bottom: var(--space-20); }
 .y-screen__content--flush { padding-left: 0; padding-right: 0; }
 .y-screen__floating { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 4; display: flex; justify-content: center; }
 
@@ -29,6 +34,7 @@
 /* Layout primitives */
 .y-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8) 7px; }
 .y-row { display: flex; }
+.y-stack { display: flex; flex-direction: column; }
 
 /* Липкая полоса фильтров (Sticky): прижимается под шапку; content padding-top 8 → top −8 */
 .y-sticky {
@@ -49,21 +55,8 @@
 /* Раздел экрана или панели (флоу): заголовок H3 и контент через 16, до раздела 24 */
 .y-section { display: flex; flex-direction: column; gap: var(--space-16); }
 * + .y-section { margin-top: var(--space-4); }
-/* Подвал Настроек (Figma: логотип 40 серым, ссылки и версия Caption, «Удалить аккаунт») */
-.y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
-.y-settings-footer .y-caption { margin: 0; }
-.y-settings-footer .y-button { margin-top: var(--space-20); }
-/* Юридическая подпись внизу экрана входа: 3 строки по центру, ссылки подчёркнуты */
-.y-legal { margin: auto 0 -4px; text-align: center; } /* флоу: 20 от низа экрана */
-.y-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; }
 /* Панель последним блоком на flush-экране доходит до низа экрана */
 .y-screen__content--flush:has(> .y-sheet--panel:last-child) { padding-bottom: 0; }
 .y-screen__content:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
-/* Профиль: аккаунты слева, период справа (флоу Profile / Overview: ряд 40 на y122) */
-.y-profile-bar { display: flex; align-items: center; justify-content: space-between; margin-top: calc(var(--space-4) * -1); }
-/* Панель профиля: блоки аналитики через 32, сводка (счётчик + плитки) → лента 24 */
-.y-sheet--panel.y-profile-panel { gap: var(--space-32); }
-.y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
-.y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */
