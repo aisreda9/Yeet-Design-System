@@ -5,7 +5,7 @@ description: Оркестрация команды агентов дизайн-�
 
 # Команда дизайн-системы
 
-Ты — ведущий (lead). Сам код не пишешь: разбиваешь задачу, запускаешь агентов через `Agent`, сводишь результаты и держишь критерии готовности.
+Ты — ведущий (lead). Общие правила переноса Figma → код, движения и лучшие практики — `design/FIGMA-RULES.md`; передавай агентам ссылки на нужные разделы. Сам код не пишешь: разбиваешь задачу, запускаешь агентов через `Agent`, сводишь результаты и держишь критерии готовности.
 
 ## Состав
 
@@ -14,6 +14,7 @@ description: Оркестрация команды агентов дизайн-�
 | `ds-figma-auditor` | Находит и доказывает расхождения Figma ↔ код | ничего (только отчёт) |
 | `ds-token-engineer` | `tokens.json`, три слоя токенов, тёмная тема, контраст, iOS/Android | `tokens/`, `src/tokens/` |
 | `ds-component-engineer` | Компоненты, stories, registry, спеки | `src/` (кроме tokens, docs MDX) |
+| `ds-motion-engineer` | Анимации, переходы, изинги, пружины, жесты, хаптика | `tokens.json → motion`, `src/motion/`, CSS переходов |
 | `ds-figma-builder` | Компоненты и экраны в Figma DS 2.0 / Flow 2.0 | Figma, `design/figma-specs.json` |
 | `ds-content-editor` | Тексты: «ты», гендерно-нейтрально | тексты в `src/`, `DESIGN.md` §8 |
 | `ds-qa` | typecheck, contrast, qa, flow-diff, эталон | ничего (отчёт + baseline) |
@@ -38,6 +39,7 @@ description: Оркестрация команды агентов дизайн-�
 | Изменение токена / темы | auditor (`get_variable_defs`) → token-engineer → qa → figma-builder (если меняется Figma) → docs-keeper |
 | Экран флоу на компонентах 2.0 | auditor (узел флоу) → figma-builder (Flow 2.0) ∥ component-engineer (`src/pages`) ∥ content-editor → qa (`flow-diff`) → docs-keeper |
 | Итерация QA | qa → auditor (подтвердить спеки) → component-engineer / token-engineer → qa → docs-keeper (журнал) |
+| Анимация / переход / жест | auditor (`get_motion_context`) → motion-engineer → component-engineer (если меняется разметка) → qa → docs-keeper |
 | Аудит текстов | content-editor → component-engineer (если меняются stories) → qa (`flow-diff`) |
 
 ## Бриф агенту
@@ -52,4 +54,5 @@ description: Оркестрация команды агентов дизайн-�
 ## Готово, когда
 - `npm run typecheck`, `npm run contrast`, `npm run qa`, `npm run flow-diff -- --strict` — 0 ошибок.
 - Компонент есть в Figma DS 2.0 и в коде, Light и Dark, строка в `registry.ts`, замер в `figma-specs.json`, story с «В флоу».
+- Анимации — только через `--motion-*`/`--gesture-*`, проверены с `prefers-reduced-motion`.
 - Тексты по §8, документация обновлена, решения дизайна перечислены человеку.

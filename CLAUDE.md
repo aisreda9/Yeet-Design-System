@@ -6,8 +6,14 @@
 - Источник правды — Figma `1LAkot5WySMWhwiiFJqJ0e`, страница **Design System 2.0 (Claude)** `942:5666`, коллекция **«Yeet DS 2.0»**. Оригинальные страницы и коллекция «Yeet Design System» — только чтение.
 - Значения токенов — только в `tokens/tokens.json` → `npm run tokens`. Сгенерированные файлы руками не правятся.
 - Слои `tokens → atoms → molecules → organisms → templates → pages`; импорт только вниз и через `index.tsx` слоя. В компонентах — только семантические и компонентные токены, без hex и `--yeet-*`.
+- Анимации — только переходы `--motion-*` и `--gesture-*`; ease-out для движения за пальцем, пружина — ответ системы, bouncy — только штамп.
 - Тексты — на «ты», без родовых окончаний (`DESIGN.md` §8).
 - Любой компонент: Figma + код + story (Playground, варианты, «В флоу») + `src/docs/registry.ts` + `design/figma-specs.json` + Light/Dark.
+
+## Правила Figma → код
+Токены, компоненты, иконки, ассеты, стили, движение (изинги, пружины, жесты, хаптика), процесс и лучшие практики:
+
+@design/FIGMA-RULES.md
 
 ## Figma MCP
 Подключается из `.mcp.json` (сервер `Figma`, `https://mcp.figma.com/mcp`). Первый раз: `/mcp` → `Figma` → вход в браузере. В облачных сессиях — коннектор Figma на claude.ai/customize/connectors.
