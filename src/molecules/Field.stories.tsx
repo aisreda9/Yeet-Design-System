@@ -35,17 +35,17 @@ export const Multiline: Story = { name: 'Многострочное', args: { la
 
 export const Password: Story = { name: 'Пароль', args: { label: 'Пароль', value: undefined, trailingIcon: undefined, input: { type: 'password', defaultValue: 'yeet-2026' } } };
 
-/** Фокус с клавиатуры: кольцо по строке. Вверху — поле ввода, внизу — строка-выбор (Tab, Enter / пробел). */
+/** Фокус: кольцо 1.5 `text-accent` по строке. Без фокуса вид прежний. */
 export const Focus: Story = {
   name: 'Фокус',
   args: { label: 'Название', value: undefined, trailingIcon: undefined, input: { defaultValue: 'Кожаная сумка' } },
   play: async ({ canvasElement }) => { canvasElement.querySelector('input')?.focus(); },
 };
 
-export const FocusSelect: Story = {
-  name: 'Фокус · выбор',
+/** Строка-выбор с `onClick`: Tab доводит до неё (кольцо как у поля), Enter и пробел открывают выбор. */
+export const SelectRow: Story = {
+  name: 'Выбор с клавиатуры',
   args: { label: 'Страна', value: 'Россия', trailingIcon: 'chevron-up-down', onClick: () => {} },
-  play: async ({ canvasElement }) => { canvasElement.querySelector<HTMLElement>('[role="button"]')?.focus({ focusVisible: true } as FocusOptions); },
 };
 
 export const InFlow: Story = {
