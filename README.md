@@ -58,6 +58,13 @@ npm run tokens   # → src/tokens/tokens.generated.css, tokens/ios/YeetTokens.sw
                  #   native/ios (токены, иконки → SwiftUI Path, шрифты, иконки погоды)
 ```
 
+Таблицы токенов в `DESIGN.md` генерируются из того же файла:
+
+```bash
+npm run docs-tokens              # обновить блоки <!-- gen:… --> в DESIGN.md
+npm run docs-tokens -- --check   # только сверить: код выхода 1, если DESIGN.md отстал от tokens.json
+```
+
 Как подключить в приложения — Storybook → «Процессы / iOS и Android».
 
 ## iOS: библиотека компонентов (SwiftUI)
