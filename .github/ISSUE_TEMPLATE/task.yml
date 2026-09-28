@@ -1,0 +1,48 @@
+name: Задача
+description: Одна задача для одной сессии Claude или бота (TEAM.md)
+title: "[зона] "
+labels: [task]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Одна задача = одна сессия = одна ветка. Взять задачу — комментарий `🔒 Беру. Роль: …. Ветка: …. Зоны: ….` и метка `status:in-progress`.
+  - type: dropdown
+    id: role
+    attributes:
+      label: Роль
+      options: [Компоненты, Экраны, Токены и платформы, Figma-синхронизация, Документация, QA и ревью, Инфраструктура]
+    validations:
+      required: true
+  - type: checkboxes
+    id: zones
+    attributes:
+      label: Зоны (.github/team.json)
+      description: Чем меньше зон, тем меньше конфликтов. Больше двух — разбей на несколько задач.
+      options:
+        - label: tokens
+        - label: atoms
+        - label: molecules
+        - label: organisms
+        - label: screens
+        - label: motion
+        - label: docs
+        - label: qa
+        - label: infra
+        - label: Figma (нужен замок)
+  - type: textarea
+    id: goal
+    attributes:
+      label: Что сделать и зачем
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Готово, когда
+      placeholder: "- истории X в Storybook\n- QA зелёный\n- Figma и код совпадают"
+  - type: textarea
+    id: deps
+    attributes:
+      label: Зависит от / блокирует
+      placeholder: "#12 должен влиться раньше"
