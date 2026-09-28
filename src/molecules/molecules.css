@@ -20,6 +20,14 @@
 .y-field--error .y-field__input,
 .y-field--error .y-field__value { color: var(--color-text-danger); }
 .y-field__trailing { display: inline-flex; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
+span.y-field__trailing { cursor: inherit; }
+/* Фокус (WCAG 2.4.7): кольцо 1.5 акцентом по строке, как у InputBar · State=Focus; без фокуса вид прежний */
+.y-field[role='button'] { cursor: pointer; }
+.y-field[role='button']:focus-visible,
+.y-field:has(.y-field__input:focus-visible) { outline: 0; border-radius: var(--radius-lg); box-shadow: inset 0 0 0 1.5px var(--color-text-accent); } /* text-accent: ≥ 4.5 : 1 к input-bg во всех брендах (accent у lime/butter — 1.4 : 1) */
+.y-field:is([role='button']:focus-visible, :has(.y-field__input:focus-visible))::before,
+.y-field:is([role='button']:focus-visible, :has(.y-field__input:focus-visible)) + .y-field::before { opacity: 0; } /* линия-разделитель не режет кольцо */
+.y-field__trailing:focus-visible { outline: 2px solid var(--color-text-accent); outline-offset: 2px; border-radius: var(--radius-full); }
 /* Multiline (Figma: input · Multiline): 104, текст сверху, паддинг 16/20 — «Комментарий» */
 .y-field--multiline { align-items: stretch; height: 104px; padding: var(--space-16) var(--space-20); }
 .y-field--multiline .y-field__input { resize: none; height: 100%; }
@@ -44,9 +52,10 @@
   flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -12px;
   padding: 0; border: 0; background: none; color: var(--color-text-secondary); cursor: pointer;
 }
-/* Focus (Figma: input-bar · State=Focus): обводка 1.5 акцентом внутри поля */
-.y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-accent); }
-.y-input-bar--chat .y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-accent), var(--shadow-floating); }
+/* Focus (Figma: input-bar · State=Focus): обводка 1.5 акцентом внутри поля (text-accent — виден во всех брендах) */
+.y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-text-accent); }
+.y-input-bar--chat .y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-text-accent), var(--shadow-floating); }
+.y-input-bar__clear:focus-visible { outline: 2px solid var(--color-text-accent); outline-offset: -8px; border-radius: var(--radius-full); }
 /* Превью фото справа (поиск по фото): круг 48 (L — 52) с картинкой на light-grey */
 .y-input-bar__photo {
   flex: none; width: 48px; height: 48px; padding: 0; border: 0; border-radius: var(--radius-full); overflow: hidden;

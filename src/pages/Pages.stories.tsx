@@ -39,7 +39,7 @@ export const SignIn: Story = {
     <Screen header={<Header type="back" title="Вход и регистрация" />}>
       <InputGroup>
         <Field label="E-mail" input={{ type: 'email' }} />
-        <Field label="Пароль" input={{ type: 'password' }} trailingIcon="eye" />
+        <Field label="Пароль" input={{ type: 'password' }} />
       </InputGroup>
       <Button size="L" fullWidth>Войти</Button>
       <Button variant="ghost" size="L" style={{ alignSelf: 'center', marginTop: -12 }}>Забыли пароль?</Button>
