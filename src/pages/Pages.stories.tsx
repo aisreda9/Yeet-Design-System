@@ -657,9 +657,9 @@ export const CurrencySheet: Story = {
 export const PasswordRecovery: Story = {
   name: 'Auth / Password Recovery',
   render: () => (
-    <Screen header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}>
+    <Screen header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём код для сброса пароля" />}>
       <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
-      <Button size="L" fullWidth>Отправить ссылку</Button>
+      <Button size="L" fullWidth>Отправить код</Button>
     </Screen>
   ),
 };
@@ -668,11 +668,11 @@ export const PasswordRecoverySent: Story = {
   name: 'Auth / Password Recovery / Dialog / Sent',
   render: () => (
     <Screen
-      header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}
-      overlay={<Overlay><Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" /></Overlay>}
+      header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём код для сброса пароля" />}
+      overlay={<Overlay><Dialog title="Готово!" description="Мы отправили код для сброса пароля на sima@space.com" confirm="Ок!" /></Overlay>}
     >
       <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
-      <Button size="L" fullWidth>Отправить ссылку</Button>
+      <Button size="L" fullWidth>Отправить код</Button>
     </Screen>
   ),
 };
