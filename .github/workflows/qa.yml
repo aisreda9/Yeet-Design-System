@@ -36,7 +36,8 @@ jobs:
           fi
       - run: npm ci
       - run: npm run typecheck
-      - run: npm run build-storybook
+      - id: build
+        run: npm run build-storybook
       - name: Версия Playwright
         id: pw
         run: echo "version=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -55,7 +56,8 @@ jobs:
       - name: QA (тени, края, спеки Figma, доступность, скриншоты)
         run: npm run qa
       - name: Сверка экранов с флоу Figma (тексты, позиции, шрифты, цвета)
-        if: always()
+        # И после падения QA, но не когда сборка не дошла до конца — иначе ошибка сборки тонет в ERR_MODULE_NOT_FOUND
+        if: always() && steps.build.outcome == 'success'
         run: npm run flow-diff -- --strict
       - if: always()
         run: cat qa/out/report.md qa/out/flow-diff.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
