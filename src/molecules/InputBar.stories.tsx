@@ -24,7 +24,7 @@ export const InFlow: Story = {
     <UsageGrid min={353}>
       <Usage screen="Search / Text" note="назад + поле + поиск по фото"><InputBar placeholder="Уточните текстом" value="Белые кроссовки" fieldIcon="search" leading={{ icon: 'chevron-left', label: 'Назад' }} trailing={{ icon: 'search-by-image', label: 'Поиск по фото' }} /></Usage>
       <Usage screen="Wardrobe / Item Search"><InputBar placeholder="Название вещи" fieldIcon="search" leading={{ icon: 'chevron-left', label: 'Назад' }} /></Usage>
-      <Usage screen="Stylist" note="сообщение стилисту"><InputBar placeholder="Спроси у стилиста" trailing={{ icon: 'arrow-up', label: 'Отправить', variant: 'primary' }} /></Usage>
+      <Usage screen="Stylist" note="чат: белое поле 52 с тенью, «отправить» внутри"><InputBar placeholder="Спроси у стилиста" send={{ label: 'Отправить' }} /></Usage>
     </UsageGrid>
   ),
 };

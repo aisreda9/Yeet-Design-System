@@ -6,7 +6,7 @@ const meta = {
   title: 'Molecules/Snackbar',
   component: Snackbar,
   tags: ['autodocs'],
-  args: { children: 'Перемещено в архив' },
+  args: { children: 'Вещь перемещена в архив' },
   argTypes: { children: { control: 'text', name: 'text' } },
   decorators: [unlessBare(withWidth(353))],
   parameters: { docs: { description: { component: 'Тост 56, радиус 16, inverse, текст Body + крестик. Figma: `snackbar` · Text, Icon.' } } },
@@ -22,9 +22,9 @@ export const InFlow: Story = {
   tags: ['bare'],
   render: () => (
     <UsageGrid min={353}>
-      <Usage screen="Wardrobe / Item"><Snackbar onClose={() => {}}>Перемещено в архив</Snackbar></Usage>
-      <Usage screen="Search / Result"><Snackbar onClose={() => {}}>Добавлено в вишлист</Snackbar></Usage>
-      <Usage screen="Trash / Item"><Snackbar onClose={() => {}}>Удалено навсегда</Snackbar></Usage>
+      <Usage screen="Wardrobe / Item"><Snackbar onClose={() => {}}>Вещь перемещена в архив</Snackbar></Usage>
+      <Usage screen="Search / Result"><Snackbar onClose={() => {}}>Вещь перемещена в вишлист</Snackbar></Usage>
+      <Usage screen="Trash / Item"><Snackbar onClose={() => {}}>Вещь удалена навсегда</Snackbar></Usage>
     </UsageGrid>
   ),
 };

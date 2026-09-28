@@ -224,7 +224,7 @@ export const Stylist: Story = {
       {/* как во флоу: чат в белой панели с хэндлом, сообщения внизу над полем */}
       <Sheet type="panel">
         <div style={{ flex: 1, minHeight: 180 }} />
-        <ChatBubble avatar={<span className="y-stylist-avatar"><Icon name="ai" /></span>}>Привет! Я твой ИИ-стилист. Спрашивай про образы, сочетания и что надеть сегодня</ChatBubble>
+        <ChatBubble avatar={<span className="y-stylist-avatar"><Icon name="ai" /></span>}>Привет! Я твой ИИ стилист. Спрашивай про образы, сочетания и что надеть сегодня</ChatBubble>
         <ChatBubble from="user">Приветы</ChatBubble>
         <InputBar placeholder="Спроси у стилиста" send={{ label: 'Отправить' }} />
       </Sheet>
@@ -345,7 +345,7 @@ export const TripDetails: Story = {
   parameters: { controls: { disable: true } },
   name: 'Stylist / Trip Details / Outfits Tab',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Бразилиа" titleChipSub="8–13 сент · 5 ночей" actions={[{ icon: 'more', label: 'Ещё' }]} />}>
+    <Screen header={<Header type="bar" titleChip="Бразилиа" titleChipSub="8-13 сент · 5 ночей" actions={[{ icon: 'more', label: 'Ещё' }]} />}>
       <SegmentControl value="outfits" segments={[{ value: 'outfits', label: 'Образы · 1' }, { value: 'items', label: 'Вещи · 4' }]} />
       <div className="y-stack-8">
       <OutfitCollage label="Прогулка" items={[{ kind: 'accessories', x: 34, y: 18, size: 56 }, { kind: 'top', x: 66, y: 34, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 130, color: 'green' }, { kind: 'shoe', x: 72, y: 76, size: 72, color: 'brown' }]} />

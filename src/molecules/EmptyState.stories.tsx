@@ -22,7 +22,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={300}>
       <Usage screen="Wardrobe / Items / Empty"><EmptyState title="Гардероб пуст" description="Добавь первую вещь, чтобы начать создавать образы" /></Usage>
-      <Usage screen="Archive / Empty"><EmptyState title="Архив пуст" description="Сюда попадают вещи, убранные из гардероба" /></Usage>
+      <Usage screen="Archive / Empty"><EmptyState title="Архив пуст" description="Архивировав вещь, она будет храниться здесь в течение указанного времени" /></Usage>
       <Usage screen="Search / No Results" note="с действием"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск' }} /></Usage>
     </UsageGrid>
   ),
