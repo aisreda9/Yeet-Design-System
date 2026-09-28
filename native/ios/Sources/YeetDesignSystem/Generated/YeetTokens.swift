@@ -1,6 +1,6 @@
 // Сгенерировано scripts/build-tokens.mjs из tokens/tokens.json — не редактировать вручную.
 // SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически (UIColor с dynamicProvider, без asset-каталога).
-// Шрифты: добавьте в приложение tokens/fonts/RobotoSlab-Variable.ttf, Inter-Variable.ttf — они регистрируются из Bundle.main при первом использовании (или перечислите их в Info.plist → UIAppFonts).
+// Шрифты лежат в ресурсах пакета YeetDesignSystem и регистрируются при первом использовании (YeetFonts.register()).
 
 import CoreText
 import SwiftUI
@@ -210,7 +210,7 @@ public enum YeetFonts {
     /// Google Fonts · ofl/inter
     public static let text = "Inter"
     private static let files = ["RobotoSlab-Variable", "Inter-Variable"]
-    private static var bundle: Bundle { .main }
+    private static var bundle: Bundle { .module }
     private static let registration: Void = {
         for name in files {
             guard let url = bundle.url(forResource: name, withExtension: "ttf") ?? bundle.url(forResource: name, withExtension: "ttf", subdirectory: "Fonts") else { continue }

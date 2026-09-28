@@ -1,6 +1,7 @@
 // Генератор токенов: tokens/tokens.json → CSS (Storybook), Swift (iOS), Kotlin (Android).
 // Запуск: npm run tokens. Сгенерированные файлы не правятся руками.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { buildIosPackage } from './build-ios.mjs';
 
 const root = new URL('../', import.meta.url);
 const t = JSON.parse(readFileSync(new URL('tokens/tokens.json', root), 'utf8'));
@@ -30,6 +31,8 @@ function rgba(value) {
 const cssColor = (v) => { const c = rgba(v); return c.a === 1 ? `#${c.hex.toLowerCase()}` : `rgb(${c.r} ${c.g} ${c.b} / ${c.a})`; };
 const camel = (s) => s.replace(/-(\w)/g, (_, c) => c.toUpperCase());
 const num = (x) => (Number.isInteger(x) ? String(x) : String(+x.toFixed(4)));
+/** Имена токенов, совпадающие с ключевыми словами Swift, пишутся в обратных кавычках (`return`). */
+const swiftKeywords = new Set(['return', 'default', 'case', 'switch', 'class', 'struct', 'enum', 'func', 'var', 'let', 'in', 'is', 'as', 'if', 'else', 'for', 'while', 'repeat', 'do', 'try', 'throw', 'import', 'init', 'self', 'super', 'protocol', 'extension', 'operator', 'where', 'guard', 'defer', 'break', 'continue', 'fallthrough', 'static', 'public', 'private', 'internal', 'true', 'false', 'nil']);
 
 /** Пружина (mass, stiffness, damping) → CSS linear() по 37 точкам за её длительность. */
 function springLinear({ mass, stiffness, damping, duration }) {
@@ -101,53 +104,116 @@ function css() {
 
 /* ─── Swift (SwiftUI) ─────────────────────────────────────────────────── */
 
-function swift() {
+/** Font.TextStyle, по кривой которого масштабируется стиль при Dynamic Type. */
+const iosTextStyle = { h1: 'largeTitle', h2: 'title', h3: 'title3', body: 'body', caption: 'caption' };
+
+/**
+ * `bundle` — откуда регистрировать шрифты: `main` для копии tokens/ios (файлы добавлены в приложение),
+ * `module` для Swift Package native/ios (шрифты лежат в ресурсах пакета).
+ */
+function swift({ bundle = 'main' } = {}) {
   const hexA = (v) => { const c = rgba(v); return `0x${c.hex}, alpha: ${num(c.a)}`; };
-  const L = [`// ${HEADER}`, '// SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически.', `// Шрифты: добавьте в проект tokens/fonts/${Object.values(t.font).map((f) => f.file).join(', ')} и перечислите их в Info.plist → UIAppFonts.`, '', 'import SwiftUI', 'import UIKit', ''];
+  const fontFiles = Object.values(t.font).map((f) => f.file);
+  const L = [`// ${HEADER}`, '// SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически (UIColor с dynamicProvider, без asset-каталога).'];
+  L.push(bundle === 'module'
+    ? '// Шрифты лежат в ресурсах пакета YeetDesignSystem и регистрируются при первом использовании (YeetFonts.register()).'
+    : `// Шрифты: добавьте в приложение tokens/fonts/${fontFiles.join(', ')} — они регистрируются из Bundle.main при первом использовании (или перечислите их в Info.plist → UIAppFonts).`);
+  L.push('', 'import CoreText', 'import SwiftUI', 'import UIKit', '');
   L.push('private extension UIColor {', '    convenience init(hex: UInt32, alpha: CGFloat = 1) {', '        self.init(red: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: alpha)', '    }', '}', '');
   L.push('private func dynamic(_ light: UIColor, _ dark: UIColor) -> Color {', '    Color(UIColor { $0.userInterfaceStyle == .dark ? dark : light })', '}', '');
+
+  L.push('/// Примитивы палитры. В компонентах не используются — только через семантические `YeetColor`.', 'public enum YeetPrimitive {');
+  for (const [k, v] of Object.entries(t.primitive)) L.push(`    public static let ${camel(k)} = Color(UIColor(hex: ${hexA(v)}))`);
+  L.push('}', '');
+
   L.push('public enum YeetColor {');
   for (const [group, entries] of Object.entries(t.color)) {
     L.push(`    // ${group}`);
     for (const [k, v] of Object.entries(entries))
       L.push(`    /// ${v.role} · Figma ${v.figma}`, `    public static let ${camel(k)} = dynamic(UIColor(hex: ${hexA(resolve(v.light, 'light'))}), UIColor(hex: ${hexA(resolve(v.dark, 'dark'))}))`);
   }
-  L.push('}', '', '/// Цвет вещи — атрибут одежды, не интерфейс.', 'public enum YeetItemColor: String, CaseIterable {');
+  L.push('}', '', '/// Цвет вещи — атрибут одежды, не интерфейс.', 'public enum YeetItemColor: String, CaseIterable, Identifiable {');
   for (const k of Object.keys(t.item)) L.push(`    case ${k}`);
-  L.push('    public var color: Color {', '        switch self {');
+  L.push('    public var id: String { rawValue }', '    public var color: Color {', '        switch self {');
   for (const [k, v] of Object.entries(t.item)) L.push(`        case .${k}: return Color(UIColor(hex: ${hexA(v.value)}))`);
   L.push('        }', '    }', '    public var title: String {', '        switch self {');
   for (const [k, v] of Object.entries(t.item)) L.push(`        case .${k}: return "${v.name}"`);
   L.push('        }', '    }', '}', '');
+
+  L.push('/// Компонентные токены: ссылки на семантические цвета и радиусы (tokens.json → component).', 'public enum YeetComponent {');
+  for (const [k, v] of Object.entries(t.component)) {
+    const m = /^\{(\w+)\.([\w-]+)\}$/.exec(v);
+    if (v === 'transparent') L.push(`    public static let ${camel(k)}: Color = .clear`);
+    else if (m?.[1] === 'color') L.push(`    public static let ${camel(k)}: Color = YeetColor.${camel(m[2])}`);
+    else if (m?.[1] === 'radius') L.push(`    public static let ${camel(k)}: CGFloat = YeetRadius.${m[2]}`);
+    else throw new Error(`Unsupported component token ${k}: ${v}`);
+  }
+  L.push('}', '');
+
   L.push('public enum YeetSpace {');
   for (const s of t.space) L.push(`    public static let s${s}: CGFloat = ${s}`);
   L.push(`    public static let screenGutter: CGFloat = ${t.layout['screen-gutter']}`, '}', '', 'public enum YeetRadius {');
   for (const [k, v] of Object.entries(t.radius)) L.push(`    /// ${v.use}`, `    public static let ${k}: CGFloat = ${v.value}`);
+  L.push('}', '', '/// Макет: iPhone 393 × 852, поля 20.', 'public enum YeetLayout {');
+  for (const [k, v] of Object.entries(t.layout)) L.push(`    public static let ${camel(k)}: CGFloat = ${v}`);
   L.push('}', '');
-  L.push('public struct YeetTextStyle {', '    public let font: Font', '    public let lineHeight: CGFloat', '    public let tracking: CGFloat', '    public let size: CGFloat', '}', '', 'public enum YeetType {');
+
+  // Шрифты
+  L.push('/// Семейства и регистрация переменных шрифтов (Inter, Roboto Slab).', 'public enum YeetFonts {');
+  for (const [k, f] of Object.entries(t.font)) L.push(`    /// ${f.source}`, `    public static let ${k} = "${f.family}"`);
+  L.push(`    private static let files = [${fontFiles.map((f) => `"${f.replace(/\.ttf$/, '')}"`).join(', ')}]`);
+  L.push(`    private static var bundle: Bundle { .${bundle} }`);
+  L.push('    private static let registration: Void = {', '        for name in files {', '            guard let url = bundle.url(forResource: name, withExtension: "ttf") ?? bundle.url(forResource: name, withExtension: "ttf", subdirectory: "Fonts") else { continue }', '            // Уже зарегистрирован (UIAppFonts) — ошибка игнорируется.', '            _ = CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)', '        }', '    }()');
+  L.push('    /// Регистрирует шрифты один раз за процесс. Вызывается автоматически из `yeetText` и `YeetTextStyle.font`.', '    public static func register() { _ = registration }', '}', '');
+
+  // Типографика
+  L.push('/// Текстовый стиль. `weight` — значение оси wght переменного шрифта (как font-weight в CSS).', 'public struct YeetTextStyle {',
+    '    public let family: String', '    public let size: CGFloat', '    public let lineHeight: CGFloat', '    public let tracking: CGFloat', '    public let weight: CGFloat', '    /// Кривая Dynamic Type, по которой масштабируется стиль.', '    public let textStyle: Font.TextStyle', '',
+    '    public init(family: String, size: CGFloat, lineHeight: CGFloat, tracking: CGFloat, weight: CGFloat, textStyle: Font.TextStyle) {',
+    '        self.family = family', '        self.size = size', '        self.lineHeight = lineHeight', '        self.tracking = tracking', '        self.weight = weight', '        self.textStyle = textStyle', '    }', '',
+    '    /// Тот же стиль с другим весом (например, Caption 460 в карточке погоды).', '    public func withWeight(_ weight: CGFloat) -> YeetTextStyle {', '        YeetTextStyle(family: family, size: size, lineHeight: lineHeight, tracking: tracking, weight: weight, textStyle: textStyle)', '    }', '',
+    '    /// SwiftUI-шрифт с Dynamic Type; вес округлён до ближайшего системного. Точный вес и межстрочный интервал — `yeetText(_:)`.', '    public var font: Font {', '        YeetFonts.register()', '        return .custom(family, size: size, relativeTo: textStyle).weight(Font.Weight(css: weight))', '    }', '',
+    '    /// UIFont с точным значением оси wght.', '    public func uiFont(size pointSize: CGFloat? = nil) -> UIFont {', '        YeetFonts.register()',
+    "        let wght = NSNumber(value: 0x7767_6874 as UInt32) // 'wght'",
+    '        let variation = UIFontDescriptor.AttributeName(rawValue: kCTFontVariationAttribute as String)',
+    '        let descriptor = UIFontDescriptor(fontAttributes: [.family: family, variation: [wght: weight] as [NSNumber: CGFloat]])',
+    '        return UIFont(descriptor: descriptor, size: pointSize ?? size)', '    }', '}', '');
+  L.push('public enum YeetType {');
   for (const [k, s] of Object.entries(t.typography)) {
     const f = t.font[s.font];
-    L.push(`    /// ${s.use}`, `    public static let ${k} = YeetTextStyle(font: .custom("${f.family}", size: ${s.size}).weight(Font.Weight(${s.weight})), lineHeight: ${s.lineHeight}, tracking: ${s.letterSpacing}, size: ${s.size})`);
+    L.push(`    /// ${s.use}`, `    public static let ${k} = YeetTextStyle(family: "${f.family}", size: ${s.size}, lineHeight: ${s.lineHeight}, tracking: ${s.letterSpacing}, weight: ${s.weight}, textStyle: .${iosTextStyle[k] ?? 'body'})`);
   }
-  L.push('}', '', 'private extension Font.Weight {', '    init(_ css: Int) {', '        switch css {', '        case ..<350: self = .light', '        case ..<450: self = .regular', '        case ..<550: self = .medium', '        default: self = .semibold', '        }', '    }', '}', '');
-  L.push('public extension View {', '    /// Применяет текстовый стиль: шрифт, межстрочный интервал и трекинг.', '    func yeetText(_ style: YeetTextStyle) -> some View {', '        font(style.font).lineSpacing(style.lineHeight - style.size).tracking(style.tracking)', '    }', '}', '');
-  L.push('public enum YeetMotion {');
+  L.push('}', '', 'extension Font.Weight {', '    init(css: CGFloat) {', '        switch css {', '        case ..<350: self = .light', '        case ..<450: self = .regular', '        case ..<550: self = .medium', '        default: self = .semibold', '        }', '    }', '}', '');
+  L.push('/// Шрифт, трекинг и межстрочный интервал стиля; размер масштабируется Dynamic Type по `textStyle`.', 'public struct YeetTextModifier: ViewModifier {', '    private let style: YeetTextStyle', '    @ScaledMetric private var scaledSize: CGFloat', '',
+    '    public init(_ style: YeetTextStyle) {', '        self.style = style', '        _scaledSize = ScaledMetric(wrappedValue: style.size, relativeTo: style.textStyle)', '    }', '',
+    '    public func body(content: Content) -> some View {', '        let ratio = scaledSize / style.size', '        let uiFont = style.uiFont(size: scaledSize)', '        let extra = max(0, style.lineHeight * ratio - uiFont.lineHeight)',
+    '        return content', '            .font(Font(uiFont as CTFont))', '            .tracking(style.tracking * ratio)', '            .lineSpacing(extra)', '            .padding(.vertical, extra / 2)', '    }', '}', '');
+  L.push('public extension View {', '    /// Применяет текстовый стиль: шрифт (точный вес), межстрочный интервал и трекинг, с Dynamic Type.', '    func yeetText(_ style: YeetTextStyle) -> some View {', '        modifier(YeetTextModifier(style))', '    }', '}', '');
+
+  // Анимации
+  L.push('/// Пружина Figma Smart Animate: та же физика (масса, жёсткость, демпфирование), что в прототипе и в CSS linear().', 'public struct YeetSpring {', '    public let mass: Double', '    public let stiffness: Double', '    public let damping: Double', '    /// Время успокоения, с (для web linear()).', '    public let duration: TimeInterval', '',
+    '    public var dampingRatio: Double { damping / (2 * (stiffness * mass).squareRoot()) }', '    public var animation: Animation { .interpolatingSpring(mass: mass, stiffness: stiffness, damping: damping, initialVelocity: 0) }',
+    '    /// SwiftUI.Spring с той же физикой (iOS 17+).', '    @available(iOS 17.0, *)', '    public var spring: Spring { Spring(mass: mass, stiffness: stiffness, damping: damping) }', '');
+  for (const [k, s] of Object.entries(t.motion.spring)) L.push(`    /// Figma ${s.figma}`, `    public static let ${k} = YeetSpring(mass: ${s.mass}, stiffness: ${s.stiffness}, damping: ${s.damping}, duration: ${s.duration / 1000})`);
+  L.push('}', '', 'public enum YeetMotion {');
   for (const [k, tr] of Object.entries(t.motion.transition)) {
-    if (tr.spring) { const s = t.motion.spring[tr.spring]; L.push(`    /// ${tr.use} · Figma Smart Animate ${s.figma}`, `    public static let ${k} = Animation.interpolatingSpring(mass: ${s.mass}, stiffness: ${s.stiffness}, damping: ${s.damping})`); }
-    else { const e = t.motion.easing[tr.easing], d = t.motion.duration[tr.duration]; L.push(`    /// ${tr.use}`, `    public static let ${k} = Animation.timingCurve(${e.join(', ')}, duration: ${d / 1000})`); }
+    const name = swiftKeywords.has(k) ? `\`${k}\`` : k;
+    if (tr.spring) { const s = t.motion.spring[tr.spring]; L.push(`    /// ${tr.use} · Figma Smart Animate ${s.figma}`, `    public static let ${name} = YeetSpring.${tr.spring}.animation`); }
+    else { const e = t.motion.easing[tr.easing], d = t.motion.duration[tr.duration]; L.push(`    /// ${tr.use}`, `    public static let ${name} = Animation.timingCurve(${e.join(', ')}, duration: ${d / 1000})`); }
   }
   L.push('}', '', '/// Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации).', 'public enum YeetGesture {');
   for (const [k, g] of Object.entries(t.motion.gesture))
     L.push(`    /// ${g.use}`, g.unit === 'ms' ? `    public static let ${camel(k)}: TimeInterval = ${g.value / 1000}` : `    public static let ${camel(k)}: CGFloat = ${g.value}`);
-  L.push('}', '', '/// Хаптика: вызывать при смене состояния, не на каждое касание. Для подъёма вызывать prepare() на touch-down.', 'public enum YeetHaptic {');
+  L.push('}', '', '/// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.', 'public enum YeetHaptic {');
   for (const [k, h] of Object.entries(t.motion.haptic)) {
     const [kind, style] = h.ios.split(':');
     const call = kind === 'selection' ? 'UISelectionFeedbackGenerator().selectionChanged()' : kind === 'impact' ? `UIImpactFeedbackGenerator(style: .${style}).impactOccurred()` : `UINotificationFeedbackGenerator().notificationOccurred(.${style})`;
-    L.push(`    /// ${h.when}. ${h.use}`, `    public static func ${k}() { ${call} }`);
+    L.push(`    /// ${h.when}. ${h.use}`, `    public static func ${swiftKeywords.has(k) ? `\`${k}\`` : k}() { DispatchQueue.main.async { ${call} } }`);
   }
   L.push('}', '');
   const sh = t.shadow.floating;
-  L.push('public extension View {', `    /// ${sh.use}`, '    func yeetFloatingShadow() -> some View {', `        shadow(color: dynamic(UIColor(hex: ${hexA(sh.light.color)}), UIColor(hex: ${hexA(sh.dark.color)})), radius: ${sh.light.blur / 2}, x: ${sh.light.x}, y: ${sh.light.y})`, '    }', '}');
+  L.push('public enum YeetShadow {', `    /// ${sh.use}`, `    public static let floatingColor = dynamic(UIColor(hex: ${hexA(sh.light.color)}), UIColor(hex: ${hexA(sh.dark.color)}))`, `    public static let floatingRadius: CGFloat = ${sh.light.blur / 2}`, `    public static let floatingX: CGFloat = ${sh.light.x}`, `    public static let floatingY: CGFloat = ${sh.light.y}`, '}', '');
+  L.push('public extension View {', `    /// ${sh.use}`, '    func yeetFloatingShadow() -> some View {', '        shadow(color: YeetShadow.floatingColor, radius: YeetShadow.floatingRadius, x: YeetShadow.floatingX, y: YeetShadow.floatingY)', '    }', '}');
   return L.join('\n') + '\n';
 }
 
@@ -208,6 +274,8 @@ const out = {
   'src/tokens/tokens.generated.css': css(),
   'tokens/ios/YeetTokens.swift': swift(),
   'tokens/android/YeetTokens.kt': kotlin(),
+  // Swift Package native/ios: те же токены, шрифты регистрируются из ресурсов пакета (Bundle.module)
+  'native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift': swift({ bundle: 'module' }),
 };
 for (const [path, body] of Object.entries(out)) {
   const url = new URL(path, root);
@@ -215,3 +283,6 @@ for (const [path, body] of Object.entries(out)) {
   writeFileSync(url, body);
   console.log(`✓ ${path}`);
 }
+
+// Swift Package native/ios: иконки → SwiftUI Path, шрифты и погодные иконки → ресурсы пакета
+buildIosPackage(root, { header: HEADER, swiftKeywords });
