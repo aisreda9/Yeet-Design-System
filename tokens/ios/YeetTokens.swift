@@ -40,6 +40,8 @@ public enum YeetColor {
     public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1))
     /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent
     public static let textOnDanger = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
+    /// Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white
+    public static let textOnPhoto = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
     public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1))
     /// Ошибки, деструктивные действия · Figma ui-colors/red-text

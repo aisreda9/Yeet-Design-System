@@ -10,7 +10,8 @@
 .y-input-group--L .y-field { min-height: 52px; }
 .y-field__label { color: var(--color-text-secondary); flex: none; }
 .y-field__main { flex: 1; display: flex; align-items: center; gap: var(--space-12); min-width: 0; }
-.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 20 */
+.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); min-width: 0; } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 20 */
+.y-field__value-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } /* длинное значение — «…» */
 .y-field__input {
   flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 0;
   font: inherit; color: var(--color-text-primary); caret-color: var(--color-accent);
@@ -19,6 +20,10 @@
 .y-field--error .y-field__input,
 .y-field--error .y-field__value { color: var(--color-text-danger); }
 .y-field__trailing { display: inline-flex; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
+/* Multiline (Figma: input · Multiline): 104, текст сверху, паддинг 16/20 — «Комментарий» */
+.y-field--multiline { align-items: stretch; height: 104px; padding: var(--space-16) var(--space-20); }
+.y-field--multiline .y-field__input { resize: none; height: 100%; }
+.y-input-group--M .y-field--multiline, .y-input-group--L .y-field--multiline { min-height: 104px; }
 .y-field + .y-field::before {
   content: ''; position: absolute; top: 0; left: var(--space-16); right: var(--space-16); height: 1px; background: var(--color-divider);
 }
@@ -39,6 +44,18 @@
   flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -12px;
   padding: 0; border: 0; background: none; color: var(--color-text-secondary); cursor: pointer;
 }
+/* Focus (Figma: input-bar · State=Focus): обводка 1.5 акцентом внутри поля */
+.y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-accent); }
+.y-input-bar--chat .y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-accent), var(--shadow-floating); }
+/* Превью фото справа (поиск по фото): круг 48 (L — 52) с картинкой на light-grey */
+.y-input-bar__photo {
+  flex: none; width: 48px; height: 48px; padding: 0; border: 0; border-radius: var(--radius-full); overflow: hidden;
+  background: var(--color-bg-subtle); cursor: pointer; transition: transform var(--motion-press); -webkit-tap-highlight-color: transparent;
+}
+.y-input-bar__photo--l { width: 52px; height: 52px; }
+.y-input-bar__photo:active { transform: scale(var(--gesture-press-scale)); }
+.y-input-bar__photo:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.y-input-bar__photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .y-input-bar--l .y-input-bar__field { height: 52px; padding-left: var(--space-16); }
 .y-input-bar--chat .y-input-bar__field { height: 52px; padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
 .y-input-bar--chat .y-input-bar__send { width: 44px; height: 44px; margin-left: auto; }
@@ -68,6 +85,15 @@
 .y-chip-group > .y-chip--trailing { padding: 0 var(--space-12) 0 var(--space-16); }
 .y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; }
 .y-chip-group .y-chip--removable > .y-icon:last-child { color: var(--color-text-secondary); }
+/* Chip · State=Editing: поле по ширине текста внутри капсулы S, плейсхолдер серым, каретка акцентом */
+.y-chip--editing { padding: 0 var(--space-16); cursor: text; }
+.y-chip--editing:active { transform: none; }
+.y-chip__input {
+  width: auto; min-width: 1ch; field-sizing: content; padding: 0; border: 0; outline: 0; background: transparent;
+  font: inherit; color: var(--color-text-primary); caret-color: var(--color-accent);
+}
+.y-chip__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
+.y-chip--editing:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; } /* «+» перед тегами */
 
 /* ListItem & List */
@@ -79,6 +105,7 @@
 }
 div.y-list-item { cursor: default; }
 .y-list-item__label { flex: 1; }
+.y-list-item__trailing { flex: none; color: var(--color-text-secondary); white-space: nowrap; } /* текстовый trailing: «₽ · RUB» */
 .y-list-item__text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .y-radio {
   width: 24px; height: 24px; border-radius: var(--radius-full); flex: none;
@@ -101,14 +128,19 @@ div.y-list-item { cursor: default; }
 
 /* StatTile */
 .y-stat { flex: 1; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-16) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); }
+.y-stat--L { min-height: 88px; } /* Figma stat-tile · Size=L: 16 + Caption 16 + 4 + H1 36 + 16 */
 .y-stat__row { display: flex; gap: var(--space-8); width: 100%; }
 
-/* Hint */
+/* Note (Figma: note): текст Body на light-grey — 20 со всех сторон, радиус 20, по ширине контейнера */
+.y-note { width: 100%; margin: 0; padding: var(--space-20); border-radius: var(--radius-lg); background: var(--card-bg); color: var(--color-text-primary); }
+
+/* Hint: Body 14 + иконка 16; On Photo — без подложки, белым поверх фото */
 .y-hint {
   display: inline-flex; align-items: center; gap: 6px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   background: var(--color-bg-elevated); color: var(--color-text-primary); border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-floating); font: 400 12px/16px var(--font-text);
+  box-shadow: var(--shadow-floating); font: var(--font-weight-body) 14px/20px var(--font-text);
 }
+.y-hint--on-photo { padding: 0; background: none; box-shadow: none; border-radius: 0; color: var(--color-text-on-photo); }
 
 /* Snackbar: флоу — 52, радиус 12; появление снизу */
 .y-snackbar {
@@ -117,6 +149,7 @@ div.y-list-item { cursor: default; }
   background: var(--color-bg-inverse); color: var(--color-text-inverse); font: var(--font-weight-body) 14px/20px var(--font-text);
   animation: y-appear var(--motion-appear) both;
 }
+.y-snackbar--S { height: 48px; padding: 0 var(--space-16); } /* подсказка на холсте: 313 × 48, паддинг 16, радиус 12 */
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
 @keyframes y-appear { from { transform: translateY(16px); opacity: 0; } }
 

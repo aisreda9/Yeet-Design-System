@@ -39,7 +39,7 @@ export const InFlow: Story = {
       <Usage screen="Outfits / Everyday" note="главное действие"><Stamp label="Надеть" /></Usage>
       <Usage screen="Outfits / Everyday" note="после нажатия — отменить"><Stamp label="Надеть" done /></Usage>
       <Usage screen="Stylist / С чем носить" note="сохранить образ"><Stamp label="Сохранить" /></Usage>
-      <Usage screen="Stylist / С чем носить" note="не нравится, secondary S"><Stamp label="Не нравится" tone="secondary" /></Usage>
+      <Usage screen="Stylist / С чем носить" note="не нравится, secondary 64"><Stamp label="Не нравится" tone="secondary" /></Usage>
     </UsageGrid>
   ),
 };

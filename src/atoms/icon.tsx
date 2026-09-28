@@ -29,7 +29,7 @@ export function Icon({ name, size = 24, className, title, strokeWidth = 1.3 }: I
 
 /**
  * Словесный знак yeet. Цвет наследуется: на акцентном фоне (Splash) — `--color-text-on-accent`,
- * в подвале настроек — `--color-text-secondary`.
+ * поверх фото — `--color-text-on-photo`, в подвале настроек — `--color-text-secondary`.
  */
 export function Logo({ height = 32, className }: { height?: number; className?: string }) {
   return (
@@ -75,7 +75,7 @@ export const languages = [
   { code: 'ja', flag: 'jp', name: '日本語' },
   { code: 'zh', flag: 'cn', name: '中文' },
 ] as const;
-export type FlagCode = 'ru' | 'gb' | 'us' | 'ge' | 'ua' | 'kz' | 'am' | 'de' | 'fr' | 'it' | 'tr' | 'jp' | 'cn';
+export type FlagCode = 'ru' | 'by' | 'gb' | 'us' | 'ge' | 'ua' | 'kz' | 'am' | 'de' | 'fr' | 'it' | 'tr' | 'jp' | 'cn';
 
 export function Flag({ code, size = 24, className }: { code: FlagCode; size?: number; className?: string }) {
   return <img className={cx('y-flag', className)} src={flagFiles[`../icons/flags/${code}.svg`]} width={size} height={size} alt="" aria-hidden />;

@@ -166,16 +166,16 @@
       }
     },
     {
-      "figma": "hint",
+      "figma": "hint (Body 14)",
       "story": "molecules-hint--playground",
       "selector": ".y-hint",
       "expect": {
-        "height": 24,
+        "height": 28,
         "paddingLeft": 8,
         "paddingRight": 12,
         "gap": 6,
         "borderRadius": 32,
-        "fontSize": 12
+        "fontSize": 14
       }
     },
     {
@@ -537,12 +537,12 @@
       }
     },
     {
-      "figma": "stamp · Tone=Secondary (48, иконка)",
+      "figma": "stamp · Tone=Secondary (64, иконка 29 −15°)",
       "story": "atoms-stamp--in-flow",
       "selector": ".y-stamp--S",
       "expect": {
-        "width": 48,
-        "height": 48
+        "width": 64,
+        "height": 64
       }
     },
     {
@@ -582,6 +582,124 @@
       "selector": ".y-divider-label",
       "expect": {
         "gap": 12
+      }
+    },
+    {
+      "figma": "input · Multiline («Комментарий»: 104, паддинг 16/20)",
+      "story": "molecules-field-inputgroup--multiline",
+      "selector": ".y-field--multiline",
+      "expect": {
+        "height": 104,
+        "paddingTop": 16,
+        "paddingLeft": 20
+      }
+    },
+    {
+      "figma": "input · иконка справа 20",
+      "story": "molecules-field-inputgroup--playground",
+      "selector": ".y-field__trailing .y-icon",
+      "expect": {
+        "width": 20,
+        "height": 20
+      }
+    },
+    {
+      "figma": "input-bar · Right=Photo (превью 48)",
+      "story": "molecules-inputbar--photo-preview",
+      "selector": ".y-input-bar__photo",
+      "expect": {
+        "width": 48,
+        "height": 48,
+        "borderRadius": 24
+      }
+    },
+    {
+      "figma": "snackbar · Size=S (подсказка на холсте: 313×48, паддинг 16, r12)",
+      "story": "molecules-snackbar--small",
+      "selector": ".y-snackbar--S",
+      "expect": {
+        "width": 313,
+        "height": 48,
+        "paddingLeft": 16,
+        "borderRadius": 12
+      }
+    },
+    {
+      "figma": "stat-tile · Size=L (H1 32, 88)",
+      "story": "molecules-stattile--large",
+      "selector": ".y-stat--L",
+      "expect": {
+        "height": 88,
+        "paddingTop": 16,
+        "paddingLeft": 20
+      }
+    },
+    {
+      "figma": "stat-tile · Size=L · значение H1",
+      "story": "molecules-stattile--large",
+      "selector": ".y-stat--L .y-h1",
+      "expect": {
+        "fontSize": 32
+      }
+    },
+    {
+      "figma": "note (описание: p20, r20)",
+      "story": "molecules-note--playground",
+      "selector": ".y-note",
+      "expect": {
+        "width": 353,
+        "paddingTop": 20,
+        "paddingLeft": 20,
+        "borderRadius": 20,
+        "fontSize": 14
+      }
+    },
+    {
+      "figma": "photo-area · Photo · «×» 24 в 20 от угла",
+      "story": "organisms-photoarea--photo",
+      "selector": ".y-photo-area__close .y-icon",
+      "expect": {
+        "width": 24,
+        "height": 24
+      }
+    },
+    {
+      "figma": "photo-area · Photo · кнопка «×» (44, 10 от края)",
+      "story": "organisms-photoarea--photo",
+      "selector": ".y-photo-area__close",
+      "expect": {
+        "top": 10,
+        "width": 44
+      }
+    },
+    {
+      "figma": "trip-card · art 141×120 (16 от боков, 20 от низа)",
+      "story": "organisms-tripcard--playground",
+      "selector": ".y-trip-card__art",
+      "expect": {
+        "width": 141,
+        "height": 120,
+        "left": 16,
+        "top": 80
+      }
+    },
+    {
+      "figma": "header · Back · action Tertiary M, паддинг 20",
+      "story": "organisms-header--in-flow",
+      "selector": ".y-header__text-action",
+      "expect": {
+        "height": 48,
+        "paddingLeft": 20,
+        "paddingRight": 20
+      }
+    },
+    {
+      "figma": "dialog · одна кнопка (Tertiary на всю ширину)",
+      "story": "organisms-dialog--single-action",
+      "selector": ".y-sheet__footer .y-button",
+      "expect": {
+        "width": 337,
+        "height": 52
       }
     }
   ]

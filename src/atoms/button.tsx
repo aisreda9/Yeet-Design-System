@@ -89,7 +89,7 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
   label: string;
   /**
    * Как в Figma (stamp · Tone): размер задаётся тоном.
-   * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 48 с иконкой («Не нравится»).
+   * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 64 с белой иконкой 29, повёрнутой как подпись (rotation −15 в Figma), — «Не нравится».
    */
   tone?: 'primary' | 'secondary';
   /** Иконка малого штампа (`secondary`), по умолчанию `thumb-down`. */
@@ -117,7 +117,7 @@ export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, clas
       <svg className="y-stamp__shape" viewBox="0 0 144 144" aria-hidden>
         <path d={stampStar} fill="currentColor" />
       </svg>
-      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={20} /> : label}</span>
+      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={29} /> : label}</span>
       <span className="y-stamp__done" aria-hidden><Icon name="undo" /></span>
     </button>
   );

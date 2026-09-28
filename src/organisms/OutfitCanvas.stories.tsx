@@ -28,7 +28,7 @@ const meta: Meta<Args> = {
         onChange={setItems}
         selectedId={selected}
         onSelect={setSelected}
-        hint={showHint && hint ? <Snackbar onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined}
+        hint={showHint && hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined}
       />
     );
   },

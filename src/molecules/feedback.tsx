@@ -3,13 +3,17 @@ import { Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
 import photoCamera from '../icons/art/photo-camera.png';
 import photoGallery from '../icons/art/photo-gallery.png';
+import { cx } from '../utils/cx';
 
 /* ─── Hint ──────────────────────────────────────────────────────────── */
 
-/** Подсказка поверх холста или фото: пилюля `elevated` с тенью. */
-export function Hint({ icon = 'fingers-pinch', children }: { icon?: IconName; children: ReactNode }) {
+/**
+ * Подсказка поверх холста или фото, Body 14 с иконкой 16.
+ * `default` — пилюля `elevated` с тенью; `onPhoto` — без подложки, белый текст и иконка поверх фото (Figma: hint · On Photo, флоу Search / Photo / Crop).
+ */
+export function Hint({ icon = 'fingers-pinch', tone = 'default', children }: { icon?: IconName; tone?: 'default' | 'onPhoto'; children: ReactNode }) {
   return (
-    <span className="y-hint" role="note">
+    <span className={cx('y-hint', tone === 'onPhoto' && 'y-hint--on-photo')} role="note">
       <Icon name={icon} size={16} />
       {children}
     </span>
@@ -18,10 +22,13 @@ export function Hint({ icon = 'fingers-pinch', children }: { icon?: IconName; ch
 
 /* ─── Snackbar ──────────────────────────────────────────────────────── */
 
-/** Тост-подтверждение над нижней навигацией. Инвертированный фон, исчезает сам. */
-export function Snackbar({ children, onClose, onUndo }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void }) {
+/**
+ * Тост-подтверждение над нижней навигацией. Инвертированный фон, исчезает сам.
+ * `size`: **M** — 52, паддинг 20 (тост над таб-баром); **S** — 48, паддинг 16 (подсказка на холсте образа, 313 при отступах 20).
+ */
+export function Snackbar({ children, onClose, onUndo, size = 'M' }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void; size?: 'M' | 'S' }) {
   return (
-    <div className="y-snackbar" role="status">
+    <div className={cx('y-snackbar', size === 'S' && 'y-snackbar--S')} role="status">
       <span>{children}</span>
       {onUndo && (
         <button type="button" aria-label="Отменить" onClick={onUndo}>
