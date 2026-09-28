@@ -224,7 +224,7 @@ public enum YeetMotion {
     /// Бросок в цель: вещь встаёт на место, соседи раздвигаются · Figma Smart Animate Quick
     public static let drop = Animation.interpolatingSpring(mass: 1, stiffness: 300, damping: 20)
     /// Отмена перетаскивания: вещь возвращается туда, откуда взяли · Figma Smart Animate Gentle
-    public static let return = Animation.interpolatingSpring(mass: 1, stiffness: 100, damping: 15)
+    public static let `return` = Animation.interpolatingSpring(mass: 1, stiffness: 100, damping: 15)
     /// Появление: snackbar, подсказка, диалог
     public static let appear = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Исчезновение: быстрее появления, чтобы не мешать

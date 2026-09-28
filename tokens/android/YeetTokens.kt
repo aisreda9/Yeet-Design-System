@@ -217,7 +217,7 @@ object YeetMotion {
     /** Бросок в цель: вещь встаёт на место, соседи раздвигаются · Figma Smart Animate Quick */
     fun <T> drop(): FiniteAnimationSpec<T> = spring(dampingRatio = 0.5774f, stiffness = 300f)
     /** Отмена перетаскивания: вещь возвращается туда, откуда взяли · Figma Smart Animate Gentle */
-    fun <T> return(): FiniteAnimationSpec<T> = spring(dampingRatio = 0.75f, stiffness = 100f)
+    fun <T> `return`(): FiniteAnimationSpec<T> = spring(dampingRatio = 0.75f, stiffness = 100f)
     /** Появление: snackbar, подсказка, диалог */
     fun <T> appear(): FiniteAnimationSpec<T> = tween(durationMillis = 240, easing = CubicBezierEasing(0.2f, 0f, 0f, 1f))
     /** Исчезновение: быстрее появления, чтобы не мешать */
