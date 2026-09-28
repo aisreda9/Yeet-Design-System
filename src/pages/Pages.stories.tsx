@@ -397,16 +397,16 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
   const [open, setOpen] = useState<ProfileOverlay>(initial);
   const [period, setPeriod] = useState('За всё время');
   const overlay =
-    open === 'accounts' ? <AccountsSheet accounts={accounts} /> :
+    open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
     open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); setOpen(undefined); }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
-    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay>{overlay}</Overlay>} flush>
+    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
       <div className="y-gutter y-profile-bar">
-        <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} />
+        <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
         <ChipGroup wrap chips={[{ label: period, dropdown: true }]} onToggle={() => setOpen('period')} />
       </div>
       <Sheet type="panel" className="y-profile-panel">
-        <div className="y-stack-8">
+        <div className="y-stack-8 y-profile-summary">
           <UsageMeter percent={11} />
           <StatRow>
             <StatTile label="Вещи" value={43} />
@@ -621,7 +621,7 @@ export const CountrySheet: Story = {
   render: () => (
     <Screen
       header={<Header type="bar" title="Настройки" />}
-      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиска по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked /><ListItem type="radio" label="Беларусь" /><ListItem type="radio" label="Казахстан" /><ListItem type="radio" label="Грузия" /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked /><ListItem type="radio" label="Беларусь" /><ListItem type="radio" label="Казахстан" /><ListItem type="radio" label="Грузия" /></List></Sheet></Overlay>}
     >
       <AccountCard account={sima} kind="settings" />
     </Screen>

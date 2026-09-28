@@ -20,6 +20,7 @@ export type AccountsSheetProps = {
  */
 export function AccountsSheet({ accounts, onEdit, onSettings, onSwitch, onAdd }: AccountsSheetProps) {
   const [current, ...others] = accounts;
+  if (!current) return null;
   return (
     <Sheet title="Аккаунты">
       <div className="y-stack-8">

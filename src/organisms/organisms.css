@@ -101,8 +101,8 @@
 .y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--color-bg-subtle); }
 .y-sheet__footer { display: flex; gap: 7px; }
 .y-sheet__footer > .y-button { flex: 1; }
-.y-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 24px; }
-.y-sheet__head > .y-icon-button { margin: -8px -8px -8px 0; }
+.y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; }
+.y-sheet__head > .y-icon-button { margin: -8px -8px -8px auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--space-12); }
 /* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
    радиус 32 сверху и 48 снизу — концентрично углу экрана 56; хэндл → 16 → заголовок → 12 → контент */
@@ -123,9 +123,9 @@
 }
 .y-overlay .y-sheet { animation: y-sheet-in var(--motion-nav); }
 .y-overlay.is-leaving { opacity: 0; transition: opacity var(--motion-exit); }
-.y-overlay.is-leaving .y-sheet { transform: translateY(100%); transition: transform var(--motion-exit); }
+.y-overlay.is-leaving .y-sheet { transform: translateY(calc(100% + var(--space-8))); transition: transform var(--motion-exit); }
 @keyframes y-overlay-in { from { opacity: 0; } }
-@keyframes y-sheet-in { from { transform: translateY(100%); } }
+@keyframes y-sheet-in { from { transform: translateY(calc(100% + var(--space-8))); } } /* плавающая шторка уходит за край целиком, с отступом 8 */
 
 /* ─── Cards ─── */
 /* Нажатие карточки: сжатие меньше, чем у кнопки — объект крупнее */

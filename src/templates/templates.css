@@ -68,4 +68,4 @@
 /* Панель профиля: блоки аналитики через 32, сводка (счётчик + плитки) → лента 24 */
 .y-sheet--panel.y-profile-panel { gap: var(--space-32); }
 .y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
-.y-profile-panel > .y-stack-8:first-of-type { margin-bottom: calc(var(--space-8) * -1); }
+.y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */

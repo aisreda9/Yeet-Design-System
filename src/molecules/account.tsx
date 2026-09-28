@@ -1,12 +1,11 @@
 import { Avatar, Icon, IconButton } from '../atoms';
 import type { ItemColor } from '../tokens/tokens';
-import { cx } from '../utils/cx';
 
 /* ─── Account ───────────────────────────────────────────────────────── */
 
 export type Account = { id: string; name: string; email: string; initial?: string; photo?: string; color?: ItemColor };
 
-const avatarOf = (a: Account, className?: string) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color} alt={a.name} className={className} />;
+const avatarOf = (a: Account) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color} alt={a.name} />;
 
 export type AccountCardProps = {
   account: Account;
@@ -67,7 +66,7 @@ export function AvatarStack({ accounts, onOpen, onAdd }: { accounts: Account[]; 
       <button type="button" className="y-avatar-stack__people" onClick={onOpen} aria-label={`Аккаунты: ${accounts.map((a) => a.name).join(', ')}`}>
         {accounts.map((a) => <span key={a.id} className="y-avatar-stack__item">{avatarOf(a)}</span>)}
       </button>
-      <IconButton className={cx('y-avatar-stack__item')} icon="plus" label="Добавить аккаунт" variant="tertiary" size="S" onClick={onAdd} />
+      <IconButton className="y-avatar-stack__item" icon="plus" label="Добавить аккаунт" variant="tertiary" size="S" onClick={onAdd} />
     </div>
   );
 }

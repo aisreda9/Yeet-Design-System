@@ -44,7 +44,7 @@ export function Sheet({ title, type = 'modal', footer, onClose, className, child
       {!onClose && <span className="y-sheet__handle" aria-hidden />}
       {onClose ? (
         <div className="y-sheet__head">
-          <h2 className={cx(heading, 'y-sheet__title')}>{title}</h2>
+          {title && <h2 className={cx(heading, 'y-sheet__title')}>{title}</h2>}
           <IconButton icon="cross" label="Закрыть" variant="ghost" size="S" onClick={onClose} />
         </div>
       ) : (
@@ -96,7 +96,11 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
   );
 }
 
-/** Модальный слой: затемнение `--color-bg-overlay` и прижатая к низу плавающая шторка. */
-export function Overlay({ children }: { children: ReactNode }) {
-  return <div className="y-overlay">{children}</div>;
+/** Модальный слой: затемнение `--color-bg-overlay` и прижатая к низу плавающая шторка. Тап по затемнению — `onClose`. */
+export function Overlay({ children, onClose }: { children: ReactNode; onClose?: () => void }) {
+  return (
+    <div className="y-overlay" onClick={onClose && ((e) => e.target === e.currentTarget && onClose())}>
+      {children}
+    </div>
+  );
 }
