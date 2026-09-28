@@ -2,7 +2,7 @@
 
 /* Field (Figma: input + input-value) */
 .y-field {
-  display: flex; align-items: center; gap: var(--space-8);
+  display: flex; align-items: center; gap: var(--space-12);
   min-height: 56px; padding: var(--space-12) var(--space-20);
   position: relative; font: var(--font-weight-body) 14px/20px var(--font-text); color: var(--color-text-primary);
 }
@@ -10,7 +10,7 @@
 .y-input-group--L .y-field { min-height: 52px; }
 .y-field__label { color: var(--color-text-secondary); flex: none; }
 .y-field__main { flex: 1; display: flex; align-items: center; gap: var(--space-12); min-width: 0; }
-.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-8); }
+.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 20 */
 .y-field__input {
   flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 0;
   font: inherit; color: var(--color-text-primary); caret-color: var(--color-accent);
@@ -195,12 +195,13 @@ button.y-account { cursor: pointer; transition: transform var(--motion-press); -
 button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 .y-account__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .y-account__text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.y-account__actions { display: flex; gap: var(--space-4); margin-right: calc(var(--space-8) * -1); }
+.y-account__actions { display: flex; gap: var(--space-4); } /* флоу: кнопки 40 заканчиваются на паддинге 20 */
 .y-account__actions .y-icon { width: 24px; height: 24px; }
 
 /* AvatarStack — аватары 40 внахлёст −8 с кольцом цвета фона 2, «+» Tertiary S */
 .y-avatar-stack { display: inline-flex; align-items: center; }
 .y-avatar-stack__people { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; }
-.y-avatar-stack__item { border-radius: var(--radius-full); box-shadow: 0 0 0 2px var(--color-bg-canvas); }
+.y-avatar-stack__item { border-radius: var(--radius-full); position: relative; }
+.y-avatar-stack__item::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--color-bg-canvas); pointer-events: none; z-index: 1; } /* Figma: кольцо 2 внутри аватара 40 */
 .y-avatar-stack__item + .y-avatar-stack__item, .y-avatar-stack__people + .y-avatar-stack__item { margin-left: -8px; }
 .y-avatar-stack__item > .y-avatar { display: flex; }

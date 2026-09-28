@@ -80,7 +80,7 @@
 .y-tab-bar__tab[aria-current='page'] { color: var(--color-text-primary); } /* флоу: неактивные иконки серые */
 .y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
-.y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 450 14px/20px var(--font-display); }
+.y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */
 
 /* Нижняя панель стилиста: хэндл, поле, таб-бар */
 .y-dock {
@@ -152,7 +152,7 @@
 
 .y-product-card { display: flex; flex-direction: column; gap: var(--space-16); color: var(--color-text-primary); }
 .y-product-card__meta { display: flex; flex-direction: column; gap: 2px; }
-.y-product-card__like { position: absolute; top: var(--space-16); right: var(--space-16); color: var(--color-text-primary); }
+.y-product-card__like { position: absolute; top: var(--space-16); right: var(--space-16); width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--color-text-primary); } /* Figma: 24 в 16 от угла, зона нажатия 44 — ::after */
 .y-product-card__like.is-on { color: var(--color-text-accent); } /* тёмная тема: accent на card-bg 2,7 : 1, text-accent — 5 : 1 */
 .y-product-card__like.is-on .y-icon path { fill: currentColor; } /* лайкнутое — залитое сердце */
 
@@ -179,7 +179,7 @@
   position: relative; width: 100%; aspect-ratio: 1; border-radius: var(--card-radius); background: var(--card-bg);
   display: grid; place-items: center; overflow: hidden; color: var(--color-text-primary);
 }
-.y-photo-area__add { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); font: var(--font-weight-body) 14px/20px var(--font-text); background: none; border: 0; color: inherit; cursor: pointer; }
+.y-photo-area__add { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); font: var(--font-weight-body) 14px/20px var(--font-text); background: none; border: 0; color: inherit; cursor: pointer; }
 .y-photo-area__close { position: absolute; top: var(--space-12); right: var(--space-12); }
 
 /* Погода: Figma — Inter 460 12/16, #A7B3BF; предупреждение — белым второй строкой */
@@ -187,7 +187,7 @@
   display: inline-flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16) var(--space-20);
   background: var(--color-bg-inverse); color: var(--color-text-inverse); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8);
 }
-.y-weather__temp { display: flex; align-items: center; gap: var(--space-8); font: 400 24px/24px var(--font-display); }
+.y-weather__temp { display: flex; align-items: center; gap: var(--space-8); font: 400 24px/24px var(--font-display); letter-spacing: -0.4px; }
 .y-weather__desc { font-weight: var(--font-weight-body); color: var(--color-text-inverse-secondary); }
 .y-weather__alert { display: block; color: var(--color-text-inverse); }
 .y-weather--tilt { transform: rotate(-10deg); transform-origin: left top; }

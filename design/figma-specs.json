@@ -89,7 +89,7 @@
       "expect": {
         "height": 56,
         "paddingLeft": 20,
-        "gap": 8,
+        "gap": 12,
         "fontSize": 14
       }
     },

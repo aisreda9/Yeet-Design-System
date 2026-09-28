@@ -131,8 +131,8 @@ export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: {
           </>
         ) : (
           <button type="button" className="y-photo-area__add" onClick={onAdd} disabled={loading}>
-            <IconButton icon="camera" label="Добавить фотографию" variant="primary" size="M" floating decorative />
-            Добавить фотографию
+            <IconButton icon="plus" label="Добавить фотографию" variant="primary" size="M" floating decorative />
+            <span>Добавить<br />фотографию</span>
           </button>
         ))}
     </div>

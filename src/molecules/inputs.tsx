@@ -37,14 +37,14 @@ export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, i
         )}
         {value && (
           <span className="y-field__value">
-            {colorDot && <ColorDot color={colorDot} />}
+            {colorDot && <ColorDot color={colorDot} size={16} />}
             {value}
           </span>
         )}
       </div>
       {trailingIcon && (
         <button type="button" className="y-field__trailing" onClick={onTrailingClick} tabIndex={onTrailingClick ? 0 : -1} aria-hidden={!onTrailingClick}>
-          <Icon name={trailingIcon} />
+          <Icon name={trailingIcon} size={trailingIcon === 'chevron-up-down' ? 20 : 24} />
         </button>
       )}
     </div>
@@ -83,7 +83,7 @@ export type InputBarProps = {
 export function InputBar({ placeholder, value, onChange, fieldIcon, leading, trailing, send, size = 'M' }: InputBarProps) {
   return (
     <div className={cx('y-input-bar', send && 'y-input-bar--chat', size === 'L' && 'y-input-bar--l')}>
-      {leading && <IconButton icon={leading.icon} label={leading.label} variant={leading.variant ?? 'tertiary'} onClick={leading.onClick} />}
+      {leading && <IconButton icon={leading.icon} label={leading.label} variant={leading.variant ?? 'tertiary'} size={size === 'L' ? 'L' : 'M'} onClick={leading.onClick} />}
       <label className="y-input-bar__field">
         {fieldIcon && <Icon name={fieldIcon} />}
         <input className="y-field__input" placeholder={placeholder} value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={!onChange} />
@@ -91,7 +91,7 @@ export function InputBar({ placeholder, value, onChange, fieldIcon, leading, tra
         {value && !send && <button type="button" className="y-input-bar__clear" aria-label="Очистить" onClick={() => onChange?.('')}><Icon name="cross" size={20} /></button>}
         {send && <IconButton className="y-input-bar__send" icon="arrow-up" label={send.label} variant={value ? 'primary' : 'tertiary'} size="S" onClick={send.onClick} disabled={!value} />}
       </label>
-      {trailing && <IconButton icon={trailing.icon} label={trailing.label} variant={trailing.variant ?? 'tertiary'} onClick={trailing.onClick} />}
+      {trailing && <IconButton icon={trailing.icon} label={trailing.label} variant={trailing.variant ?? 'tertiary'} size={size === 'L' ? 'L' : 'M'} onClick={trailing.onClick} />}
     </div>
   );
 }
