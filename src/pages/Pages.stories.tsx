@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Avatar, Button, Divider, Icon, IconButton, Logo, Stamp } from '../atoms';
-import { AccountCard, AvatarStack, type Account, BarChart, Carousel, ChipGroup, EmptyState, Field, InputBar, InputGroup, List, ListGroup, ListItem, LoadingState, PhotoTile, RangeSlider, SegmentControl, Snackbar, StatRow, StatTile, UsageMeter } from '../molecules';
+import { Avatar, Button, Divider, Flag, Icon, IconButton, Logo, Stamp } from '../atoms';
+import { demoAvatar, demoPhoto } from '../docs/helpers';
+import { AccountCard, AvatarStack, type Account, BarChart, Carousel, ChipGroup, EmptyState, Field, Hint, InputBar, InputGroup, List, ListGroup, ListItem, LoadingState, Note, PhotoTile, RangeSlider, SegmentControl, Snackbar, StatRow, StatTile, UsageMeter } from '../molecules';
 import { AccountsSheet, BottomBar, BottomNav, type CanvasItem, ChatBubble, Dialog, OutfitCanvas, type Garment, Header, ItemArt, ItemCard, OutfitCollage, OutfitThumbnail, Overlay, PhotoArea, ProductCard, Sheet, StatusBar, StylistDock, StylistPromptCard, TripCard, WeatherCard } from '../organisms';
 import { Grid, Row, Screen, Sticky } from '../templates';
 import type { ItemColor } from '../tokens/tokens';
+import { motionMs } from '../utils/gesture';
 
 const meta = {
   title: 'Pages/Экраны флоу',
@@ -107,7 +109,7 @@ export const ItemDetails: Story = {
       <div className="y-gutter"><PhotoArea kind="container" /></div>
       <Sheet type="panel" title="Сумка">
         <p className="y-body y-text--secondary">10 000 ₽ · Sander · Черный<br />Аксессуары · Все сезоны</p>
-        <p className="y-body y-note">Мягкая сумка округлой формы с логотипом и кожаным ремешком</p>
+        <Note>Мягкая сумка округлой формы с логотипом и кожаным ремешком</Note>
         <section className="y-section" style={{ gap: 20 }}>
           <h3 className="y-h3">Образы с этой вещью</h3>
           <OutfitCollage items={[{ kind: 'bottom', x: 28, y: 56, size: 150, color: 'black' }, { kind: 'top', x: 64, y: 36, size: 120, color: 'brown' }, { kind: 'container', x: 76, y: 70, size: 64, color: 'black' }]} />
@@ -199,7 +201,7 @@ function CanvasScreen() {
       header={<Header type="bar" center={<SegmentControl size="M" fit value="canvas" segments={[{ value: 'items', icon: 'wardrobe' }, { value: 'canvas', icon: 'collage' }, { value: 'info', icon: 'info' }]} />} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
       bottom={<BottomBar label="Далее" />}
     >
-      <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
+      <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
       <div style={{ margin: '0 calc(var(--screen-gutter) * -1)' }}>
         <Sheet type="panel" title="Гардероб">
           <ChipGroup chips={[{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }]} />
@@ -398,7 +400,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
   const [period, setPeriod] = useState('За всё время');
   const overlay =
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
-    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); setOpen(undefined); }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
+    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
     <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
       <div className="y-gutter y-profile-bar">
@@ -439,6 +441,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
         <section className="y-section">
           <h2 className="y-h3">Лучшая инвестиция</h2>
           <OutfitCollage
+            plain
             label="Аксессуары"
             items={[{ kind: 'container', x: 50, y: 42, size: 180, color: 'black' }]}
             footer={<><span><span className="y-h2" style={{ display: 'block' }}>32 640 ₽</span><span className="y-caption y-text--secondary">5 образов</span></span><Icon name="chevron-right" /></>}
@@ -593,7 +596,7 @@ export const DeleteAccount: Story = {
         <Overlay>
           <Dialog tone="danger" title="Аккаунт будет удалён" description="Сима, твой аккаунт sima@space.com будет деактивирован." cancel="Отменить" confirm="Удалить">
             <p className="y-body y-text--secondary">Ты потеряешь:</p>
-            <StatRow><StatTile label="Вещи" value={43} /><StatTile label="Образы" value={12} /><StatTile label="Вишлист" value={12} /></StatRow>
+            <StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow>
             <p className="y-body y-text--secondary">У тебя будет возможность восстановить аккаунт, войдя с тем же паролем в течение 14 дней.<br /><br />После этого все данные будут удалены навсегда.</p>
           </Dialog>
         </Overlay>
@@ -621,7 +624,7 @@ export const CountrySheet: Story = {
   render: () => (
     <Screen
       header={<Header type="bar" title="Настройки" />}
-      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked /><ListItem type="radio" label="Беларусь" /><ListItem type="radio" label="Казахстан" /><ListItem type="radio" label="Грузия" /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked trailing={<Flag code="ru" />} /><ListItem type="radio" label="Беларусь" trailing={<Flag code="by" />} /><ListItem type="radio" label="Казахстан" trailing={<Flag code="kz" />} /><ListItem type="radio" label="Грузия" trailing={<Flag code="ge" />} /></List></Sheet></Overlay>}
     >
       <AccountCard account={sima} kind="settings" />
     </Screen>
@@ -633,6 +636,82 @@ export const RecommendationsEmpty: Story = {
   render: () => (
     <Screen bottom={<BottomNav active="today" />} center>
       <EmptyState title="Полный шкаф, а надеть нечего?" description="Добавь больше вещей, чтобы ИИ смог тебе подбирать образы под погоду и повод" action={{ label: 'Добавить вещь', variant: 'primary' }} />
+    </Screen>
+  ),
+};
+
+export const CurrencySheet: Story = {
+  name: 'Settings / Currency / Sheet / Default',
+  render: () => (
+    <Screen
+      header={<Header type="bar" title="Настройки" />}
+      overlay={<Overlay><Sheet title="Валюта"><List><ListItem type="radio" label="Российский рубль" checked trailing="₽ · RUB" /><ListItem type="radio" label="Белорусский рубль" trailing="Br · BYN" /><ListItem type="radio" label="Казахстанский тенге" trailing="₸ · KZT" /><ListItem type="radio" label="Доллар США" trailing="$ · USD" /></List></Sheet></Overlay>}
+    >
+      <AccountCard account={{ ...sima, photo: demoAvatar }} kind="settings" />
+    </Screen>
+  ),
+};
+
+/* ─── Добавлено по сверке DS 2.0 с экранами: подзаголовок шапки, диалог с одной кнопкой, поиск по фото ─── */
+
+export const PasswordRecovery: Story = {
+  name: 'Auth / Password Recovery',
+  render: () => (
+    <Screen header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}>
+      <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
+      <Button size="L" fullWidth>Отправить ссылку</Button>
+    </Screen>
+  ),
+};
+
+export const PasswordRecoverySent: Story = {
+  name: 'Auth / Password Recovery / Dialog / Sent',
+  render: () => (
+    <Screen
+      header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}
+      overlay={<Overlay><Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" /></Overlay>}
+    >
+      <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
+      <Button size="L" fullWidth>Отправить ссылку</Button>
+    </Screen>
+  ),
+};
+
+export const FirstItemPrompt: Story = {
+  name: 'Onboarding / First Item Prompt',
+  render: () => (
+    <Screen header={<Header type="back" title="Добавь первую вещь" subtitle="Сфотографируй вещь — фон удалим сами" textAction={{ label: 'Пропустить' }} />}>
+      <Row gap={7}>
+        <PhotoTile source="gallery" />
+        <PhotoTile source="camera" />
+      </Row>
+    </Screen>
+  ),
+};
+
+export const PhotoCrop: Story = {
+  name: 'Search / Photo / Crop',
+  render: () => (
+    <div style={{ position: 'relative', width: 'var(--screen-width)', height: 'var(--screen-height)', borderRadius: 56, overflow: 'hidden', background: `center / cover url("${demoPhoto}")`, display: 'flex', flexDirection: 'column' }}>
+      {/* поверх фото всё белое: статус-бар, подсказка без подложки */}
+      <StatusBar onPhoto />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 20, padding: '0 var(--screen-gutter) var(--space-20)' }}>
+        <Hint tone="onPhoto" icon="fingers-pinch">Выдели вещь, которую ищем</Hint>
+        <Button size="L" fullWidth>Найти похожие</Button>
+      </div>
+    </div>
+  ),
+};
+
+export const PhotoResults: Story = {
+  name: 'Search / Photo / Results',
+  render: () => (
+    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />} bottom={<BottomNav active="search" avatarSrc={demoAvatar} />}>
+      <Grid rowGap={16}>
+        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', 'Adidas Samba', 'New Balance 550'].map((n, i) => (
+          <ProductCard key={n} kind="shoe" name={n} price={`${[10400, 14300, 11900, 13500][i].toLocaleString('ru-RU')} ₽`} />
+        ))}
+      </Grid>
     </Screen>
   ),
 };

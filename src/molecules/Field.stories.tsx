@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component: `**Field** — строка поля 56 (Figma: \`input\` + \`input-value\`), всегда внутри **InputGroup** (карточка light-grey, радиус 20, слот Inputs).
-Паттерны: ввод текста (\`input\`) · «ключ — значение» (\`value\` + \`chevron-up-down\`, выбор открывает sheet) · пароль (\`eye\`). Ошибка — красный текст, без рамок.`,
+Паттерны: ввод текста (\`input\`) · «ключ — значение» (\`value\` + \`chevron-up-down\`, выбор открывает sheet; длинное значение обрезается «…») · пароль (\`eye\`) · многострочное поле (\`multiline\`, 104, текст сверху, паддинг 16/20 — «Комментарий»). Иконка справа — 20. Ошибка — красный текст, без рамок.`,
       },
     },
   },
@@ -30,6 +30,8 @@ export const Playground: Story = {};
 
 export const TextInput: Story = { name: 'Ввод текста', args: { label: 'Название', value: undefined, trailingIcon: undefined, input: { placeholder: 'Название' } } };
 
+export const Multiline: Story = { name: 'Многострочное', args: { label: 'Комментарий', value: undefined, trailingIcon: undefined, multiline: {} } };
+
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
   name: 'В флоу',
@@ -40,6 +42,7 @@ export const InFlow: Story = {
       <Usage screen="New Item / Details" note="ввод"><InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup></Usage>
       <Usage screen="New Item / Details" note="ключ — значение, выбор в sheet"><InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /></InputGroup></Usage>
       <Usage screen="Settings" note="страна и валюта"><InputGroup><Field label="Страна" value="Россия" trailingIcon="chevron-up-down" /><Field label="Валюта" value="₽ · RUB" trailingIcon="chevron-up-down" /></InputGroup></Usage>
+      <Usage screen="Outfit Creation / Info" note="многострочное, 104"><InputGroup><Field label="Название" input={{}} /><Field label="Комментарий" multiline={{}} /></InputGroup></Usage>
       <Usage screen="Auth / Sign In" note="ошибка"><InputGroup><Field label="Пароль" input={{ type: 'password', defaultValue: '12345' }} error /></InputGroup></Usage>
     </UsageGrid>
   ),

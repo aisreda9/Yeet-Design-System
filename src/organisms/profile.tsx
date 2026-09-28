@@ -1,5 +1,6 @@
 import { Button } from '../atoms';
 import { AccountCard, type Account } from '../molecules';
+import { haptic } from '../utils/haptic';
 import { Sheet } from './overlays';
 
 /* ─── Profile ───────────────────────────────────────────────────────── */
@@ -25,7 +26,7 @@ export function AccountsSheet({ accounts, onEdit, onSettings, onSwitch, onAdd }:
     <Sheet title="Аккаунты">
       <div className="y-stack-8">
         <AccountCard account={current} kind="current" onEdit={onEdit} onSettings={onSettings} />
-        {others.map((a) => <AccountCard key={a.id} account={a} kind="other" onClick={() => onSwitch?.(a.id)} />)}
+        {others.map((a) => <AccountCard key={a.id} account={a} kind="other" onClick={() => { haptic('select'); onSwitch?.(a.id); }} />)}
         <Button variant="tertiary" size="L" fullWidth onClick={onAdd}>Добавить аккаунт</Button>
       </div>
     </Sheet>
