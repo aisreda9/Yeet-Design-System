@@ -28,6 +28,7 @@ export type SheetProps = {
   footer?: [FooterAction, FooterAction];
   /** Крестик справа от заголовка вместо хэндла: высокая шторка со своим скроллом (Outfit Creation / Item Filter). */
   onClose?: () => void;
+  className?: string;
   children?: ReactNode;
 };
 
@@ -36,10 +37,10 @@ export type SheetProps = {
  * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
-export function Sheet({ title, type = 'modal', footer, onClose, children }: SheetProps) {
+export function Sheet({ title, type = 'modal', footer, onClose, className, children }: SheetProps) {
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
   return (
-    <section className={cx('y-sheet', `y-sheet--${type}`)} role={type === 'modal' ? 'dialog' : undefined} aria-label={title}>
+    <section className={cx('y-sheet', `y-sheet--${type}`, className)} role={type === 'modal' ? 'dialog' : undefined} aria-label={title}>
       {!onClose && <span className="y-sheet__handle" aria-hidden />}
       {onClose ? (
         <div className="y-sheet__head">

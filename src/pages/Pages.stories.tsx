@@ -405,7 +405,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
         <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} />
         <ChipGroup wrap chips={[{ label: period, dropdown: true }]} onToggle={() => setOpen('period')} />
       </div>
-      <Sheet type="panel">
+      <Sheet type="panel" className="y-profile-panel">
         <div className="y-stack-8">
           <UsageMeter percent={11} />
           <StatRow>

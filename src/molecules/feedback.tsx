@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
+import photoCamera from '../icons/art/photo-camera.png';
+import photoGallery from '../icons/art/photo-gallery.png';
 
 /* ─── Hint ──────────────────────────────────────────────────────────── */
 
@@ -66,12 +68,19 @@ export function LoadingState({ label }: { label: string }) {
 
 /* ─── PhotoTile ─────────────────────────────────────────────────────── */
 
-/** Плитка выбора источника фото в Photo sheet. */
+/** 3D-иллюстрации из Figma (photo-tile · Source): рисунок выходит за рамку art 63 — смещение как в макете. */
+const photoArt = {
+  gallery: { src: photoGallery, size: 128, top: -27 },
+  camera: { src: photoCamera, size: 95, top: -14 },
+};
+
+/** Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): 173×173, 3D-иллюстрация и подпись в две строки. */
 export function PhotoTile({ source, label, onClick }: { source: 'gallery' | 'camera'; label?: string; onClick?: () => void }) {
+  const art = photoArt[source];
   return (
     <button type="button" className="y-photo-tile" onClick={onClick}>
       <span className="y-photo-tile__art" aria-hidden>
-        <Icon name={source === 'camera' ? 'camera' : 'collage'} size={48} strokeWidth={1} />
+        <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top, left: (63 - art.size) / 2 }} />
       </span>
       {label ?? (source === 'camera' ? <>Сделать<br />фото</> : <>Выбрать<br />из галереи</>)}
     </button>
