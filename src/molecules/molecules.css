@@ -89,7 +89,8 @@
 .y-chip__toggle,
 .y-chip__remove { display: inline-flex; align-items: center; align-self: stretch; padding: 0; border: 0; border-radius: var(--radius-xl); background: none; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .y-chip__toggle { gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-16); }
-.y-chip__remove { padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
+.y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
+.y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */
 .y-chip__remove > .y-icon { width: 20px; height: 20px; }
 .y-chip__toggle:focus-visible,
 .y-chip__remove:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
