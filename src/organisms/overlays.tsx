@@ -1,19 +1,29 @@
-import { useCallback, useContext, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Button, IconButton, type ButtonStyle } from '../atoms';
 import { cx } from '../utils/cx';
 import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
-import { LeavingContext } from '../utils/usePresence';
+import { LeavingContext, usePresence } from '../utils/usePresence';
 
 /* ─── Sheet & Dialog ────────────────────────────────────────────────── */
 
 type FooterAction = { label: string; variant?: ButtonStyle; onClick?: () => void };
 
-function Footer({ actions }: { actions: FooterAction[] }) {
+/** Модальный слой вокруг шторки: закрыть его с анимацией ухода (`Overlay` с `onClose` / `onOpenChange`). */
+const OverlayContext = createContext<{ dismiss?: () => void } | null>(null);
+
+/** Escape внутри шторки: закрывает её и не даёт закрыть слой второй раз. */
+const onEscape = (close?: () => void) => (e: KeyboardEvent) => {
+  if (e.key !== 'Escape' || !close || e.defaultPrevented) return;
+  e.preventDefault();
+  close();
+};
+
+function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: boolean }) {
   return (
     <div className="y-sheet__footer">
       {actions.map((a, i) => (
-        <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick}>
+        <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick} data-autofocus={(focusLast && i === actions.length - 1) || undefined}>
           {a.label}
         </Button>
       ))}
@@ -29,8 +39,13 @@ export type SheetProps = {
    */
   type?: 'modal' | 'panel';
   footer?: [FooterAction, FooterAction];
-  /** Крестик справа от заголовка вместо хэндла: высокая шторка со своим скроллом (Outfit Creation / Item Filter). */
+  /**
+   * Крестик справа от заголовка вместо хэндла: высокая шторка со своим скроллом (Outfit Creation / Item Filter).
+   * Escape тоже закрывает; внутри `Overlay` с `onClose` / `onOpenChange` Escape закрывает слой с анимацией ухода.
+   */
   onClose?: () => void;
+  /** Имя для скринридера, если у шторки нет заголовка. С `title` имя берётся из заголовка. */
+  label?: string;
   /**
    * Показывать хэндл (Figma: sheet · Show Handle). По умолчанию — да, если нет крестика.
    * `false` — панель без хэндла (Outfit Creation / Item Selection).
@@ -45,18 +60,29 @@ export type SheetProps = {
  * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
-export function Sheet({ title, type = 'modal', footer, onClose, handle = !onClose, className, children }: SheetProps) {
+export function Sheet({ title, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
+  const layer = useContext(OverlayContext);
+  const titleId = useId();
+  const modal = type === 'modal';
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
+  const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
   return (
-    <section className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)} role={type === 'modal' ? 'dialog' : undefined} aria-label={title}>
+    <section
+      className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)}
+      role={modal ? 'dialog' : undefined}
+      aria-modal={(modal && !!layer) || undefined} // модальна только в слое Overlay; в документации — обычный блок
+      aria-labelledby={title ? titleId : undefined}
+      aria-label={title ? undefined : label}
+      onKeyDown={modal ? onEscape(layer?.dismiss ?? onClose) : undefined}
+    >
       {handle && <span className="y-sheet__handle" aria-hidden />}
       {onClose ? (
         <div className="y-sheet__head">
-          {title && <h2 className={cx(heading, 'y-sheet__title')}>{title}</h2>}
+          {h2}
           <IconButton icon="cross" label="Закрыть" variant="ghost" size="S" onClick={onClose} />
         </div>
       ) : (
-        title && <h2 className={cx(heading, 'y-sheet__title')}>{title}</h2>
+        h2
       )}
       {children}
       {footer && <Footer actions={footer} />}
@@ -76,6 +102,7 @@ export type DialogProps = {
   /** Без `cancel` — диалог-уведомление с одной кнопкой `confirm` Tertiary на всю ширину («Ок!»). */
   cancel?: string;
   confirm: string;
+  /** Отмена: кнопка `cancel` и Escape. Без неё Escape закрывает слой `Overlay`, если тот закрываемый. */
   onCancel?: () => void;
   onConfirm?: () => void;
   children?: ReactNode;
@@ -84,18 +111,29 @@ export type DialogProps = {
 /**
  * Подтверждение в той же плавающей форме, что и sheet. **Безопасное действие всегда синее справа.**
  * Одна кнопка (нет `cancel`) — уведомление: Tertiary L на всю ширину.
+ * В слое `Overlay` фокус при открытии — на безопасном действии (правая кнопка), Escape — `onCancel`.
  */
 export function Dialog({ tone = 'default', title, description, cancel, confirm, onCancel, onConfirm, children }: DialogProps) {
+  const layer = useContext(OverlayContext);
+  const id = useId();
   const risky = tone !== 'default';
   return (
-    <section className="y-sheet y-sheet--modal" role="alertdialog" aria-label={title}>
+    <section
+      className="y-sheet y-sheet--modal"
+      role="alertdialog"
+      aria-modal={!!layer || undefined}
+      aria-labelledby={`${id}-title`}
+      aria-describedby={description ? `${id}-text` : undefined}
+      onKeyDown={onEscape(onCancel ?? layer?.dismiss)}
+    >
       <span className="y-sheet__handle" aria-hidden />
       <div className="y-dialog__text">
-        <h2 className="y-h3">{title}</h2>
-        {description && <p className="y-body y-text--secondary">{description}</p>}
+        <h2 id={`${id}-title`} className="y-h3">{title}</h2>
+        {description && <p id={`${id}-text`} className="y-body y-text--secondary">{description}</p>}
       </div>
       {children}
       <Footer
+        focusLast // безопасное действие всегда справа
         actions={
           !cancel
             ? [{ label: confirm, variant: 'tertiary', onClick: onConfirm }]
@@ -108,6 +146,16 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
   );
 }
 
+export type OverlayProps = {
+  /** Показан ли слой. Без `open` — показан, пока смонтирован. */
+  open?: boolean;
+  /** Запрос закрыть: смахивание, тап по затемнению, Escape. Вызывается сразу, уход доигрывает сам слой. */
+  onOpenChange?: (open: boolean) => void;
+  /** Без `open`: вызывается после анимации ухода. С `open` — сразу, вместе с `onOpenChange(false)`. */
+  onClose?: () => void;
+  children: ReactNode;
+};
+
 /**
  * Модальный слой: затемнение `--color-bg-overlay` и прижатая к низу плавающая шторка.
  *
@@ -115,13 +163,39 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
  * `--motion-exit`, шторка уезжает целиком за край: 100 % + отступ 8. Всё на transition — появление и уход прерываются
  * и разворачиваются из текущего положения.
  *
- * **Смахивание** (если есть `onClose`): тянется за пальцем 1 : 1 вниз и с сопротивлением `--gesture-rubber-band` вверх,
+ * **Смахивание** (если есть `onClose` или `onOpenChange`): тянется за пальцем 1 : 1 вниз и с сопротивлением `--gesture-rubber-band` вверх,
  * затемнение гаснет вместе с ней. Закрывается, если протянута дальше 30 % высоты (`--gesture-swipe-distance`, хаптика
  * `threshold` в момент пересечения) или брошена быстрее 500 pt/с; иначе возвращается на пружине quick.
  * Жест начинается только после сдвига на `--gesture-touch-slop` — кнопки и строки в шторке нажимаются как обычно.
  * Закрывают также тап по затемнению и Escape.
+ *
+ * **Модальность.** При открытии фокус переходит в шторку: на `[data-autofocus]` (в `Dialog` — безопасное действие),
+ * иначе на первый интерактивный элемент, кроме полей и ползунков (на телефоне поле подняло бы клавиатуру), иначе на саму шторку. Tab и Shift+Tab ходят по кругу внутри слоя, фон (соседи слоя: шапка,
+ * контент `Screen`, низ) получает `inert`. После закрытия фокус возвращается туда, откуда слой открыли.
+ *
+ * **Открытие.** `open` / `onOpenChange` — слой сам доигрывает уход (`is-leaving`, `--motion-exit`) и убирается из DOM:
+ * `<Overlay open={open} onOpenChange={setOpen}>`. Без `open` слой показан всегда, а уход доигрывает `Screen`
+ * (или `onClose` — вызывается после анимации ухода).
  */
-export function Overlay({ children, onClose }: { children: ReactNode; onClose?: () => void }) {
+export function Overlay({ open, ...props }: OverlayProps) {
+  const presence = usePresence(open === false ? undefined : true);
+  if (open === undefined) return <OverlayLayer {...props} />;
+  return presence.node ? <OverlayLayer {...props} controlled leaving={presence.leaving} /> : null;
+}
+
+/** Последний ввод — клавиатура? Слой, открытый мышью, пальцем или сразу на экране, не рисует кольцо фокуса при открытии. */
+let keyboardInput = false;
+if (typeof document !== 'undefined') {
+  document.addEventListener('keydown', (e) => { if (!e.metaKey && !e.altKey && !e.ctrlKey) keyboardInput = true; }, true);
+  document.addEventListener('pointerdown', () => { keyboardInput = false; }, true);
+}
+
+const TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FIELD = 'input, textarea, select, [role=slider], [contenteditable]';
+const tabbables = (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>(TABBABLE)].filter((el) => el.tabIndex >= 0 && !el.closest('[inert]') && el.getClientRects().length > 0);
+
+function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: leavingProp }: Omit<OverlayProps, 'open'> & { controlled?: boolean; leaving?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const leavingFromScreen = useContext(LeavingContext);
   const [closing, setClosing] = useState(false);
@@ -129,22 +203,66 @@ export function Overlay({ children, onClose }: { children: ReactNode; onClose?: 
   const drag = useRef<{ id: number; x0: number; y0: number; h: number; offset: number; active: boolean; crossed: boolean } | null>(null);
   const speed = useRef(velocityTracker());
   const dragged = useRef(false);
-  const leaving = closing || leavingFromScreen;
+  const leaving = closing || leavingFromScreen || !!leavingProp;
+  const closable = !!(onClose || onOpenChange);
   const sheet = () => ref.current?.querySelector<HTMLElement>('.y-sheet') ?? null;
 
   const close = useCallback(() => {
+    if (controlled) {
+      // уход доигрывает сам слой (open → false); если родитель оставил слой открытым — ничего не происходит
+      onOpenChange?.(false);
+      onClose?.();
+      return;
+    }
     if (!onClose) return;
     setClosing(true);
     // родитель убирает слой; если оставил (закрытие отклонено) — шторка возвращается
     window.setTimeout(() => { onClose(); setClosing(false); }, motionMs('--motion-exit'));
-  }, [onClose]);
+  }, [controlled, onClose, onOpenChange]);
 
+  // Модальность: фокус внутрь, фон inert; при уходе — фон обратно и фокус туда, откуда открыли
   useEffect(() => {
-    if (!onClose) return;
-    const key = (e: KeyboardEvent) => e.key === 'Escape' && close();
-    window.addEventListener('keydown', key);
-    return () => window.removeEventListener('keydown', key);
-  }, [onClose, close]);
+    const o = ref.current;
+    if (!o || leaving) return;
+    const opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
+    const background = [...(o.parentElement?.children ?? [])].filter((el): el is HTMLElement => el !== o && el instanceof HTMLElement && !el.inert);
+    background.forEach((el) => { el.inert = true; });
+    if (!o.contains(document.activeElement)) {
+      const s = sheet() ?? o;
+      // поле и ползунок не берут фокус при открытии: на телефоне поле подняло бы клавиатуру
+      const target = s.querySelector<HTMLElement>('[data-autofocus]') ?? tabbables(s).find((el) => !el.closest(FIELD)) ?? s;
+      if (target === s && !s.hasAttribute('tabindex')) s.tabIndex = -1;
+      if (!keyboardInput) {
+        // кольцо фокуса — только когда пользователь идёт с клавиатуры (focus({ focusVisible }) Chromium пока не умеет)
+        target.dataset.focusQuiet = '';
+        const loud = () => { delete target.dataset.focusQuiet; target.removeEventListener('blur', loud); o.removeEventListener('keydown', loud); };
+        target.addEventListener('blur', loud);
+        o.addEventListener('keydown', loud);
+      }
+      target.focus({ preventScroll: true });
+    }
+    return () => {
+      background.forEach((el) => { el.inert = false; });
+      const active = document.activeElement;
+      if (opener?.isConnected && (!active || active === document.body || o.contains(active))) opener.focus({ preventScroll: true });
+    };
+  }, [leaving]);
+
+  const keys = (e: KeyboardEvent<HTMLDivElement>) => {
+    const o = ref.current;
+    if (!o || leaving) return;
+    if (e.key === 'Escape' && !e.defaultPrevented && closable) {
+      e.preventDefault();
+      close();
+    } else if (e.key === 'Tab') {
+      // фокус-ловушка: по кругу внутри слоя
+      const list = tabbables(o);
+      const first = list[0], last = list[list.length - 1], active = document.activeElement;
+      if (!first) { e.preventDefault(); return; }
+      if (e.shiftKey && (active === first || !list.includes(active as HTMLElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (active === last || !list.includes(active as HTMLElement))) { e.preventDefault(); first.focus(); }
+    }
+  };
 
   const place = (offset: number) => {
     const s = sheet(), o = ref.current, d = drag.current;
@@ -163,7 +281,7 @@ export function Overlay({ children, onClose }: { children: ReactNode; onClose?: 
   const down = (e: PointerEvent<HTMLDivElement>) => {
     dragged.current = false;
     const s = sheet(), t = e.target as Element;
-    if (!onClose || leaving || !s || !s.contains(t) || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (!closable || leaving || !s || !s.contains(t) || (e.pointerType === 'mouse' && e.button !== 0)) return;
     if (t.closest('input, textarea, select, [role=slider]')) return; // поле и ползунок — свои жесты
     // внутренний скролл, прокрученный вниз, сначала докручивается к началу
     for (let a: Element | null = t; a && a !== s; a = a.parentElement) if (a.scrollTop > 0) return;
@@ -206,15 +324,16 @@ export function Overlay({ children, onClose }: { children: ReactNode; onClose?: 
     <div
       ref={ref}
       className={cx('y-overlay', leaving && 'is-leaving', dragging && 'is-dragging')}
+      onKeyDown={keys}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
       // после смахивания отпускание пальца не должно стать нажатием
       onClickCapture={(e) => { if (dragged.current) { e.stopPropagation(); dragged.current = false; } }}
-      onClick={onClose && ((e) => e.target === e.currentTarget && close())}
+      onClick={closable ? (e) => e.target === e.currentTarget && close() : undefined}
     >
-      {children}
+      <OverlayContext.Provider value={{ dismiss: closable ? close : undefined }}>{children}</OverlayContext.Provider>
     </div>
   );
 }

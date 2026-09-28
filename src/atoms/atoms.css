@@ -136,9 +136,11 @@
 
 /* Зона нажатия ≥ 44 без изменения вида (HIG 44 pt, Material 48 dp): невидимый ::after выходит за края мелкого элемента.
    :where — нулевая специфичность, собственное position компонента (absolute у лайка) не перебивается. */
-:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a) { position: relative; }
-:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a)::after {
+:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-avatar-stack__people, .y-tab-bar__tab) { position: relative; }
+:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-avatar-stack__people, .y-tab-bar__tab)::after {
   content: ''; position: absolute;
   top: min(0px, calc((100% - 44px) / 2)); bottom: min(0px, calc((100% - 44px) / 2));
   left: min(0px, calc((100% - 44px) / 2)); right: min(0px, calc((100% - 44px) / 2));
 }
+/* Соседи без зазора не делят зону: вкладки таб-бара на 320 (gap 0) растут только по вертикали — ширина ячейки и есть её зона */
+@container (max-width: 300px) { .y-tab-bar__tab::after { left: 0; right: 0; } }

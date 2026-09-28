@@ -21,7 +21,7 @@ export const semanticColors: { group: string; tokens: SemanticToken[] }[] = Obje
   tokens: Object.entries(entries).map(([k, v]) => ({ token: `--color-${k}`, role: v.role, light: show(v.light, 'light'), dark: show(v.dark, 'dark'), figma: v.figma })),
 }));
 
-export const itemColors = Object.entries(tokens.item).map(([id, v]) => [id as ItemColor, v.name, v.value] as const);
+export const itemColors = Object.entries(tokens.item).map(([id, v]) => [id as ItemColor, v.name, show(v.value, 'light')] as const);
 
 export const spaces = tokens.space;
 

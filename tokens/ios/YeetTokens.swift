@@ -20,7 +20,6 @@ private func dynamic(_ light: UIColor, _ dark: UIColor) -> Color {
 public enum YeetPrimitive {
     public static let blue500 = Color(UIColor(hex: 0x0100F4, alpha: 1))
     public static let blue400 = Color(UIColor(hex: 0x4B4BFF, alpha: 1))
-    public static let blue300 = Color(UIColor(hex: 0x5B5BFF, alpha: 1))
     public static let blue200 = Color(UIColor(hex: 0x8A8AFF, alpha: 1))
     public static let red600 = Color(UIColor(hex: 0xCC291B, alpha: 1))
     public static let red500 = Color(UIColor(hex: 0xFF4230, alpha: 1))
@@ -178,7 +177,6 @@ public enum YeetComponent {
 
 public enum YeetSpace {
     public static let s0: CGFloat = 0
-    public static let s1: CGFloat = 1
     public static let s2: CGFloat = 2
     public static let s4: CGFloat = 4
     public static let s8: CGFloat = 8
@@ -192,8 +190,6 @@ public enum YeetSpace {
     public static let s48: CGFloat = 48
     public static let s52: CGFloat = 52
     public static let s56: CGFloat = 56
-    public static let s64: CGFloat = 64
-    public static let s72: CGFloat = 72
     public static let screenGutter: CGFloat = 20
 }
 
