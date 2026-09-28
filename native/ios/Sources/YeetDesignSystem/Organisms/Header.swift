@@ -114,6 +114,7 @@ public struct YeetHeader: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(YeetPressStyle())
+            .yeetHitArea(height: YeetType.h1.lineHeight)
             .padding(.top, -YeetSpace.s8)
         }
         if let subtitle {
