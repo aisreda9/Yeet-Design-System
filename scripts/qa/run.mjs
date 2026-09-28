@@ -96,6 +96,8 @@ function audit() {
           if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
           const hit = document.elementFromPoint(x, y);
           if (!hit || hit === el || el.contains(hit) || hit.contains(el) || !root.contains(hit)) continue;
+          // модальный слой нарочно закрывает экран вместе с тенями навигации под ним
+          if (hit.closest('.y-overlay') && !el.closest('.y-overlay')) continue;
           for (let h = hit; h && h !== root && !h.contains(el); h = h.parentElement) {
             const hs = getComputedStyle(h);
             // соседняя «плавающая» поверхность с собственной тенью (поле над таб-баром в панели) — так задумано

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.YeetSample" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/yeet_canvas</item>
+    </style>
+    <color name="yeet_canvas">#0F0F11</color>
+</resources>

@@ -34,3 +34,13 @@ export const textStyles = Object.entries(tokens.typography).map(([k, s]) => [
   `${fontName[s.font as keyof typeof fontName]} ${s.weight} · ${s.size}/${s.lineHeight}${s.letterSpacing ? ` · ${s.letterSpacing}` : ''}`,
   s.use,
 ] as const);
+
+/** Цвета аккаунтов (tokens.avatar.palette): фон аватара, буква — `--yeet-on-item-*`, контраст ≥ 4.5 : 1. */
+export const avatarPalette = tokens.avatar.palette as ItemColor[];
+
+/** Стабильный цвет аккаунта по id: один и тот же id — всегда один цвет. */
+export function avatarColor(id: string): ItemColor {
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return avatarPalette[h % avatarPalette.length];
+}

@@ -101,6 +101,15 @@ for (const s of sets) {
   }
 }
 
+// Цвета аккаунтов: буква on-item на фоне цвета вещи (аватары), не зависит от темы
+for (const [k, v] of Object.entries(t.item)) {
+  if (!v.on) throw new Error(`item.${k}: нет on`);
+  const r = ratio(parse(v.on), parse(v.value));
+  const ok = r >= MIN;
+  if (!ok) failures++;
+  rows.push({ set: 'item · буква', pair: `on-item-${k} / item-${k}`, ratio: r.toFixed(2), ok: ok ? 'ok' : 'FAIL' });
+}
+
 const w = { set: Math.max(...rows.map((r) => r.set.length), 5), pair: Math.max(...rows.map((r) => r.pair.length), 4) };
 console.log(`${'Набор'.padEnd(w.set)}  ${'Пара'.padEnd(w.pair)}  Контраст  Итог`);
 console.log(`${'-'.repeat(w.set)}  ${'-'.repeat(w.pair)}  --------  ----`);

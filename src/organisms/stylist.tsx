@@ -40,7 +40,8 @@ export type TripCardProps =
   | { add?: false; city: string; items: number; outfits: number; art?: CollageItem[]; onClick?: () => void };
 
 /**
- * Карточка поездки в сетке 2 колонки: город H3, счётчики вещей и образов, вещи снизу.
+ * Карточка поездки в сетке 2 колонки: город H3, счётчики вещей и образов Body серым,
+ * вещи снизу — поле 141×120 в 16 от боков и 20 от низа (Figma: trip-card · art).
  * `add` — первая карточка «Собрать новый чемодан» с Primary-кнопкой «+».
  * **Контексты:** Стилист / Поездки.
  */
@@ -62,7 +63,7 @@ export function TripCard(props: TripCardProps) {
       </span>
       {props.art && (
         <span className="y-trip-card__art">
-          <CollageLayer items={props.art} defaultSize={64} base={173} />
+          <CollageLayer items={props.art} defaultSize={64} base={141} />
         </span>
       )}
     </button>

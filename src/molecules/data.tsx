@@ -6,17 +6,30 @@ import { cx } from '../utils/cx';
 
 /* ─── StatTile ──────────────────────────────────────────────────────── */
 
-/** Плитка статистики: Caption grey + число H2. Ставится в `StatRow` по 3. */
-export function StatTile({ label, value }: { label: string; value: string | number }) {
+/**
+ * Плитка статистики: Caption grey + число H2, высота 80. Ставится в `StatRow` по 3 и тянется по ширине.
+ * `size="L"` — число H1 32, высота 88 (Figma: stat-tile · Size=L): «Ты потеряешь» в диалоге удаления аккаунта.
+ */
+export function StatTile({ label, value, size = 'M' }: { label: string; value: string | number; size?: 'M' | 'L' }) {
   return (
-    <div className="y-stat">
+    <div className={cx('y-stat', size === 'L' && 'y-stat--L')}>
       <span className="y-caption y-text--secondary">{label}</span>
-      <span className="y-h2 y-text--primary">{value}</span>
+      <span className={cx(size === 'L' ? 'y-h1' : 'y-h2', 'y-text--primary')}>{value}</span>
     </div>
   );
 }
 export function StatRow({ children }: { children: ReactNode }) {
   return <div className="y-stat__row">{children}</div>;
+}
+
+/* ─── Note ──────────────────────────────────────────────────────────── */
+
+/**
+ * Заметка — текст Body на карточке light-grey: паддинг 20 со всех сторон, радиус 20, ширина FILL (Figma: `note`).
+ * **Контексты:** описание вещи в панели деталей (Wishlist / Item Details, Wardrobe / Item Details), комментарий к образу.
+ */
+export function Note({ children, className }: { children: ReactNode; className?: string }) {
+  return <p className={cx('y-body', 'y-note', className)}>{children}</p>;
 }
 
 /* ─── Carousel ──────────────────────────────────────────────────────── */

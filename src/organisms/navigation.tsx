@@ -4,6 +4,7 @@ import { Button, Icon, IconButton, ScrollEdge } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { ChipGroup, InputBar, type Chip } from '../molecules';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 import { StatusBar } from './system';
 
 /* ─── Header ────────────────────────────────────────────────────────── */
@@ -13,8 +14,8 @@ type Action = { icon: IconName; label: string; onClick?: () => void };
 export type HeaderProps =
   | { type: 'large'; title: string; subtitle?: ReactNode; /** Вторая строка H1 акцентом с раскрывашкой: «на каждый день ⌃» (выбор повода на главной). */ accent?: { label: string; onClick?: () => void }; action?: Action }
   | { type: 'bar'; /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8-13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] }
-  | { type: 'back'; title: string; onBack?: () => void; textAction?: { label: string; onClick?: () => void } }
-  | { type: 'search'; query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[] };
+  | { type: 'back'; title: string; /** Подзаголовок Body серым через 12 под заголовком (Password Recovery, First Item Prompt). */ subtitle?: ReactNode; onBack?: () => void; /** Текстовое действие справа — Tertiary M с отступами 20: «Пропустить». */ textAction?: { label: string; onClick?: () => void } }
+  | { type: 'search'; query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string };
 
 /**
  * Закреплённая шапка экрана со статус-баром. Сплошная подложка + полоса затухания снизу:
@@ -24,7 +25,7 @@ export type HeaderProps =
  * |---|---|
  * | `large` | Корневые вкладки: Гардероб, Стилист, Профиль, Поиск |
  * | `bar` | Новая вещь, Архив, Корзина, детали вещи и образа, создание образа |
- * | `back` | Вход, восстановление пароля, онбординг |
+ * | `back` | Вход, восстановление пароля (с подзаголовком), онбординг («Пропустить» — Tertiary M) |
  * | `search` | Поиск, результаты, поиск по гардеробу |
  */
 export function Header(props: HeaderProps) {
@@ -69,12 +70,17 @@ export function Header(props: HeaderProps) {
               <IconButton icon="chevron-left" label="Назад" onClick={props.onBack} />
               <span className="y-header__pill" aria-hidden>{props.title}</span>
               {props.textAction && (
-                <Button variant="ghost" size="M" onClick={props.textAction.onClick}>
+                <Button variant="tertiary" size="M" className="y-header__text-action" onClick={props.textAction.onClick}>
                   {props.textAction.label}
                 </Button>
               )}
             </div>
-            <div className="y-header__collapse"><h1 className="y-h1 y-header__back-title">{props.title}</h1></div>
+            <div className="y-header__collapse">
+              <div className="y-header__back-text">
+                <h1 className="y-h1 y-header__back-title">{props.title}</h1>
+                {props.subtitle && <p className="y-body y-text--secondary">{props.subtitle}</p>}
+              </div>
+            </div>
           </>
         )}
         {props.type === 'search' && (
@@ -85,7 +91,7 @@ export function Header(props: HeaderProps) {
               onChange={props.onQueryChange}
               fieldIcon="search"
               leading={{ icon: 'chevron-left', label: 'Назад', onClick: props.onBack }}
-              trailing={{ icon: 'image-add', label: 'Поиск по фото' }}
+              trailing={props.photo ? { icon: 'image-add', label: 'Выбранное фото', image: props.photo } : { icon: 'image-add', label: 'Поиск по фото' }}
             />
             {props.filters && <ChipGroup chips={props.filters.map((f) => ({ ...f, dropdown: true }))} />}
           </>
@@ -108,15 +114,18 @@ const tabs: { id: Tab; label: string; icon?: IconName }[] = [
   { id: 'profile', label: 'Профиль' },
 ];
 
-/** Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`. */
-export function TabBar({ active, initial = 'С', onChange }: { active: Tab; initial?: string; onChange?: (t: Tab) => void }) {
+/**
+ * Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`; она переезжает к новой вкладке на пружине quick (`--motion-nav`).
+ * Вкладка «Профиль» — буква в кружке 20 или фото профиля (`avatarSrc`, Figma: avatar · Content=Photo).
+ */
+export function TabBar({ active, initial = 'С', avatarSrc, onChange }: { active: Tab; initial?: string; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string; onChange?: (t: Tab) => void }) {
   const [ref, pill] = useSlidingPill<HTMLElement>(tabs.findIndex((t) => t.id === active));
   return (
     <nav ref={ref} className="y-tab-bar" aria-label="Основная навигация">
       <span className="y-tab-bar__pill" style={pill} aria-hidden />
       {tabs.map((t) => (
-        <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => onChange?.(t.id)}>
-          {t.icon ? <Icon name={t.icon} /> : <span className="y-tab-bar__avatar">{initial}</span>}
+        <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => { if (t.id !== active) haptic('select'); onChange?.(t.id); }}>
+          {t.icon ? <Icon name={t.icon} /> : avatarSrc ? <span className="y-tab-bar__avatar y-tab-bar__avatar--photo"><img src={avatarSrc} alt="" /></span> : <span className="y-tab-bar__avatar">{initial}</span>}
         </button>
       ))}
     </nav>
@@ -128,11 +137,11 @@ export function TabBar({ active, initial = 'С', onChange }: { active: Tab; init
  * **Контексты:** все корневые вкладки; FAB — Гардероб и Вишлист.
  * При переходе на вкладку с FAB таб-бар сжимается и уступает место кнопке — `--motion-nav` (quick, 744 мс).
  */
-export function BottomNav({ active, fab, onFab, onTabChange }: { active: Tab; fab?: boolean; onFab?: () => void; onTabChange?: (t: Tab) => void }) {
+export function BottomNav({ active, fab, onFab, onTabChange, avatarSrc }: { active: Tab; fab?: boolean; onFab?: () => void; onTabChange?: (t: Tab) => void; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string }) {
   return (
     <div className="y-bottom-nav">
       <ScrollEdge position="bottom" size={40} />
-      <TabBar active={active} onChange={onTabChange} />
+      <TabBar active={active} avatarSrc={avatarSrc} onChange={onTabChange} />
       <span className={cx('y-bottom-nav__fab', fab && 'is-open')} aria-hidden={!fab}>
         <IconButton icon="plus" label="Добавить" variant="primary" size="XL" floating onClick={onFab} tabIndex={fab ? undefined : -1} />
       </span>

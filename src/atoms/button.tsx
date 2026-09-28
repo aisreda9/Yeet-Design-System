@@ -1,7 +1,8 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { useEffect, useRef, type ButtonHTMLAttributes } from 'react';
 import type { IconName } from '../icons/icons';
 import { stampStar } from '../icons/brand';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 import { Icon } from './icon';
 
 /* ─── Button ────────────────────────────────────────────────────────── */
@@ -89,36 +90,48 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
   label: string;
   /**
    * Как в Figma (stamp · Tone): размер задаётся тоном.
-   * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 48 с иконкой («Не нравится»).
+   * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 64 с белой иконкой 29, повёрнутой как подпись (rotation −15 в Figma), — «Не нравится».
    */
   tone?: 'primary' | 'secondary';
   /** Иконка малого штампа (`secondary`), по умолчанию `thumb-down`. */
   icon?: IconName;
-  /** Действие выполнено: штамп сжимается, поворачивается на −60° и становится «×» (отменить). */
+  /** Действие выполнено: штамп сжимается до 78, поворачивается на −60°, чернеет и показывает «отменить» (флоу: Wear Action Active). */
   done?: boolean;
 };
 
 /**
  * Штамп — фирменная кнопка главного действия поверх коллажа. Одна на экран.
- * Нажатие анимируется пружиной `--motion-stamp` (bouncy, 958 мс).
+ * Нажатие: сжатие 0.94 (`--gesture-press-scale-stamp`, press). Переход в «выполнено» — пружина `--motion-stamp`
+ * (bouncy, 958 мс): звезда 148 → 78, −60°, чернеет, «Надеть» гаснет, появляется «отменить»; хаптика `stamp`
+ * в пик пружины (~120 мс). Малый штамп — хаптика `skip` на нажатии.
  *
  * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + малый чёрный штамп «Не нравится» (палец вниз).
  */
-export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, ...rest }: StampProps) {
+export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, onClick, ...rest }: StampProps) {
   const size = tone === 'secondary' ? 'S' : 'L';
+  const was = useRef(done);
+  useEffect(() => {
+    if (done && !was.current) {
+      const t = window.setTimeout(() => haptic('stamp'), 120); // пик пружины bouncy, а не касание
+      was.current = done;
+      return () => window.clearTimeout(t);
+    }
+    was.current = done;
+  }, [done]);
   return (
     <button
       type="button"
       aria-label={done ? `Отменить: ${label}` : label}
       aria-pressed={done}
       className={cx('y-stamp', `y-stamp--${size}`, `y-stamp--${tone}`, done && 'y-stamp--done', className)}
+      onClick={(e) => { if (tone === 'secondary') haptic('skip'); onClick?.(e); }}
       {...rest}
     >
       <svg className="y-stamp__shape" viewBox="0 0 144 144" aria-hidden>
         <path d={stampStar} fill="currentColor" />
       </svg>
-      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={20} /> : label}</span>
-      <span className="y-stamp__done" aria-hidden><Icon name="cross" /></span>
+      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={29} /> : label}</span>
+      <span className="y-stamp__done" aria-hidden><Icon name="undo" /></span>
     </button>
   );
 }

@@ -11,7 +11,7 @@ const config: StorybookConfig = {
   ],
   framework: { name: '@storybook/react-vite', options: {} },
   // Шрифты Google Fonts (Inter, Roboto Slab) раздаются из репозитория — без внешнего CDN.
-  staticDirs: [{ from: '../tokens/fonts', to: '/fonts' }],
+  staticDirs: [{ from: '../tokens/fonts', to: '/fonts' }, { from: '../.downloads', to: '/downloads' }], // .downloads — npm run assets (раздел «Ресурсы»)
   core: { disableTelemetry: true },
   docs: { defaultName: 'Документация' },
 };
