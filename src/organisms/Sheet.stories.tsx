@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Sheet } from '.';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Header, Overlay, Sheet } from '.';
 import { Button } from '../atoms';
 import { onOverlay, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 import { ChipGroup, InputBar, List, ListItem, PhotoTile } from '../molecules';
-import { Grid } from '../templates';
+import { Grid, Screen } from '../templates';
 import { ItemCard } from '.';
 import { Flag } from '../atoms';
 
@@ -43,4 +45,52 @@ export const InFlow: Story = {
       <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p></Sheet></div></Usage>
     </UsageGrid>
   ),
+};
+
+function KeyboardDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Screen
+      header={<Header type="large" title="Гардероб" />}
+      overlay={<Overlay open={open} onOpenChange={setOpen}><Sheet title="Сезон" footer={[{ label: 'Сбросить', onClick: () => setOpen(false) }, { label: 'Применить', onClick: () => setOpen(false) }]}>{content.chips}</Sheet></Overlay>}
+    >
+      <Button variant="tertiary" size="S" rightIcon="chevron-up-down" onClick={() => setOpen(true)} aria-haspopup="dialog">Сезон</Button>
+    </Screen>
+  );
+}
+
+/** Модальность с клавиатуры: фокус в шторку, Tab по кругу внутри, фон inert, Escape закрывает с анимацией ухода, фокус возвращается. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: '`<Overlay open onOpenChange>`: при открытии фокус на первом интерактивном элементе шторки, Tab и Shift+Tab не уходят за шторку, фон `inert`, Escape и тап по затемнению закрывают с анимацией ухода, фокус возвращается на кнопку, открывшую шторку.' } } },
+  render: () => <KeyboardDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const opener = canvas.getByRole('button', { name: 'Сезон' });
+    await step('Открыть: фокус в шторке, фон inert', async () => {
+      await userEvent.click(opener);
+      const sheet = await canvas.findByRole('dialog', { name: 'Сезон' });
+      await expect(sheet).toHaveAttribute('aria-modal', 'true');
+      await waitFor(() => expect(sheet).toContainElement(document.activeElement as HTMLElement));
+      await expect(canvasElement.querySelector('.y-screen__content')).toHaveProperty('inert', true);
+    });
+    await step('Tab и Shift+Tab не уходят за шторку', async () => {
+      const sheet = canvas.getByRole('dialog', { name: 'Сезон' });
+      for (let i = 0; i < 8; i++) {
+        await userEvent.tab();
+        await expect(sheet).toContainElement(document.activeElement as HTMLElement);
+      }
+      for (let i = 0; i < 8; i++) {
+        await userEvent.tab({ shift: true });
+        await expect(sheet).toContainElement(document.activeElement as HTMLElement);
+      }
+    });
+    await step('Escape закрывает, фокус возвращается', async () => {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+      await expect(opener).toHaveFocus();
+      await expect(canvasElement.querySelector('.y-screen__content')).toHaveProperty('inert', false);
+    });
+  },
 };

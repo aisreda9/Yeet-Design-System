@@ -198,7 +198,6 @@ enum class YeetItemColor(val color: Color, val title: String, /** Буква / �
 
 object YeetSpace {
     val s0 = 0.dp
-    val s1 = 1.dp
     val s2 = 2.dp
     val s4 = 4.dp
     val s8 = 8.dp
@@ -212,8 +211,6 @@ object YeetSpace {
     val s48 = 48.dp
     val s52 = 52.dp
     val s56 = 56.dp
-    val s64 = 64.dp
-    val s72 = 72.dp
     val screenGutter = 20.dp
 }
 
