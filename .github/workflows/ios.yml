@@ -27,14 +27,20 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # Новый пуш в PR отменяет устаревший прогон; прогоны main доигрывают до конца
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
       # Генератор использует только встроенные модули Node — npm ci не нужен
       - name: Сгенерированные файлы актуальны (npm run tokens)
         run: |

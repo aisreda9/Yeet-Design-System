@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
+import { useState, type InputHTMLAttributes, type KeyboardEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { ColorDot, Icon, IconButton, type ButtonStyle } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
@@ -16,6 +16,8 @@ export type FieldProps = {
   /** Иконка справа 20: `chevron-up-down` — выбор, `eye` / `eye-off` — пароль, `external-link` — ссылка. */
   trailingIcon?: IconName;
   onTrailingClick?: () => void;
+  /** Имя кнопки-иконки для скринридера («Открыть ссылку»). Без `onTrailingClick` иконка декоративная и не озвучивается. */
+  trailingLabel?: string;
   /** Поле ввода вместо статичного лейбла. */
   input?: InputHTMLAttributes<HTMLInputElement>;
   /**
@@ -30,19 +32,32 @@ export type FieldProps = {
 /**
  * Строка поля (Figma: `input` + `input-value`). Живёт внутри `InputGroup`.
  * Три паттерна: ввод текста, «ключ — значение» с выбором в sheet, пароль с глазом.
+ * - `onClick` — строка-выбор: фокусируется по Tab, срабатывает на Enter и пробел.
+ * - `type="password"` — глаз справа встроен: показывает и скрывает пароль (`eye` ↔ `eye-off`, `aria-pressed`).
+ * - Фокус виден: кольцо 1.5 акцентом по строке (как у InputBar в Figma · State=Focus).
  */
-export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, input, multiline, error, onClick }: FieldProps) {
+export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, trailingLabel, input, multiline, error, onClick }: FieldProps) {
+  const [shown, setShown] = useState(false);
   if (multiline)
     return (
       <div className={cx('y-field', 'y-field--multiline', error && 'y-field--error')}>
         <textarea className="y-field__input" placeholder={label} aria-label={label} aria-invalid={error || undefined} rows={4} {...multiline} />
       </div>
     );
+  // Пароль: свой переключатель, если потребитель не повесил на иконку свой обработчик
+  const password = input?.type === 'password' && !onTrailingClick;
+  const onKeyDown = onClick
+    ? (e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        onClick();
+      }
+    : undefined;
   return (
-    <div className={cx('y-field', error && 'y-field--error')} onClick={onClick} role={onClick ? 'button' : undefined}>
+    <div className={cx('y-field', error && 'y-field--error')} onClick={onClick} onKeyDown={onKeyDown} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined}>
       <div className="y-field__main">
         {input ? (
-          <input className="y-field__input" placeholder={label} aria-label={label} aria-invalid={error || undefined} {...input} />
+          <input className="y-field__input" placeholder={label} aria-label={label} aria-invalid={error || undefined} {...input} type={password && shown ? 'text' : input.type} />
         ) : (
           <span className="y-field__label">{label}</span>
         )}
@@ -53,11 +68,19 @@ export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, i
           </span>
         )}
       </div>
-      {trailingIcon && (
-        <button type="button" className="y-field__trailing" onClick={onTrailingClick} tabIndex={onTrailingClick ? 0 : -1} aria-hidden={!onTrailingClick}>
+      {password ? (
+        <button type="button" className="y-field__trailing" aria-label={shown ? 'Скрыть пароль' : 'Показать пароль'} aria-pressed={shown} onClick={(e) => { e.stopPropagation(); setShown((v) => !v); }}>
+          <Icon name={shown ? 'eye-off' : 'eye'} size={20} />
+        </button>
+      ) : trailingIcon && onTrailingClick ? (
+        <button type="button" className="y-field__trailing" aria-label={trailingLabel ?? label} onClick={(e) => { e.stopPropagation(); onTrailingClick(); }}>
           <Icon name={trailingIcon} size={20} />
         </button>
-      )}
+      ) : trailingIcon ? (
+        <span className="y-field__trailing" aria-hidden>
+          <Icon name={trailingIcon} size={20} />
+        </span>
+      ) : null}
     </div>
   );
 }

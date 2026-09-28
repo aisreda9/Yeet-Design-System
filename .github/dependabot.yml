@@ -1,0 +1,30 @@
+# Обновления зависимостей раз в неделю, сгруппированно — чтобы не заваливать команду мелкими PR.
+# PR от Dependabot проходят обычный CI (QA Storybook); мержит координатор (TEAM.md §6).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: [dependencies, zone:infra]
+    groups:
+      storybook:
+        patterns: ['storybook', '@storybook/*']
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+      build:
+        patterns: ['vite', '@vitejs/*', 'typescript']
+      qa:
+        patterns: ['playwright-core', 'axe-core', 'pixelmatch', 'pngjs', '@types/pixelmatch', '@types/pngjs']
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies, zone:infra]
+    groups:
+      actions:
+        patterns: ['*']

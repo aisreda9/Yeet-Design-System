@@ -1,5 +1,5 @@
 import { useSlidingPill } from '../utils/useSlidingPill';
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Button, ColorDot, Icon, IconButton, type ControlSize } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
@@ -8,24 +8,53 @@ import { haptic } from '../utils/haptic';
 
 /* ─── SegmentControl ────────────────────────────────────────────────── */
 
-export type Segment = { value: string; label?: string; icon?: IconName };
+export type Segment = {
+  value: string;
+  label?: string;
+  icon?: IconName;
+  /** Имя для скринридера у сегмента-иконки без `label`: «Гардероб», «Коллаж». Без него озвучивается `value`. */
+  ariaLabel?: string;
+};
+
+const segmentKeys: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
 
 /**
  * Переключатель вкладок: под активным сегментом — пилюля `inverse`, которая переезжает между пунктами (`--motion-nav`).
+ * Для скринридера — `radiogroup`: стрелки (и Home / End) переключают сегмент, Tab попадает только в выбранный (roving tabindex).
  * **Контексты:** «Вещи / Образы / Вишлист» в Гардеробе, «Образы · 1 / Вещи» в поездке, режимы создания образа (иконки).
  */
-export function SegmentControl({ segments, value, onChange, size = 'L', fit }: { segments: Segment[]; value: string; onChange?: (v: string) => void; size?: ControlSize; /** По ширине содержимого (вложенный переключатель «Вещи / Образы» в Вишлисте). */ fit?: boolean }) {
-  const [ref, pill] = useSlidingPill<HTMLDivElement>(segments.findIndex((s) => s.value === value));
+export function SegmentControl({ segments, value, onChange, size = 'L', fit, label }: {
+  segments: Segment[];
+  value: string;
+  onChange?: (v: string) => void;
+  size?: ControlSize;
+  /** По ширине содержимого (вложенный переключатель «Вещи / Образы» в Вишлисте). */ fit?: boolean;
+  /** Имя группы для скринридера: «Раздел гардероба». */ label?: string;
+}) {
+  const index = segments.findIndex((s) => s.value === value);
+  const [ref, pill] = useSlidingPill<HTMLDivElement>(index);
+  const select = (s: Segment) => { if (s.value !== value) haptic('select'); onChange?.(s.value); };
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const items = Array.from(ref.current?.querySelectorAll<HTMLElement>(':scope > [data-pill-item]') ?? []);
+    const from = items.indexOf(e.target as HTMLElement);
+    if (from < 0) return;
+    const n = items.length;
+    const to = e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : e.key in segmentKeys ? (from + segmentKeys[e.key] + n) % n : -1;
+    if (to < 0) return;
+    e.preventDefault();
+    items[to].focus();
+    select(segments[to]);
+  };
   return (
-    <div ref={ref} className={cx('y-segment', `y-segment--${size}`, fit && 'y-segment--fit')} role="tablist">
+    <div ref={ref} className={cx('y-segment', `y-segment--${size}`, fit && 'y-segment--fit')} role="radiogroup" aria-label={label} onKeyDown={onKeyDown}>
       <span className="y-segment__pill" style={pill} aria-hidden />
-      {segments.map((s) => {
+      {segments.map((s, i) => {
         const active = s.value === value;
-        const common = { key: s.value, role: 'tab', 'aria-selected': active, 'data-pill-item': true, onClick: () => { if (!active) haptic('select'); onChange?.(s.value); } } as const;
+        const common = { role: 'radio', 'aria-checked': active, tabIndex: i === Math.max(index, 0) ? 0 : -1, 'data-pill-item': true, onClick: () => select(s) } as const;
         return s.icon && !s.label ? (
-          <IconButton {...common} icon={s.icon} label={s.value} size={size} variant="ghost" />
+          <IconButton key={s.value} {...common} icon={s.icon} label={s.ariaLabel ?? s.value} size={size} variant="ghost" />
         ) : (
-          <Button {...common} size={size} variant="ghost" leftIcon={s.icon}>
+          <Button key={s.value} {...common} size={size} variant="ghost" leftIcon={s.icon}>
             {s.label}
           </Button>
         );
@@ -38,6 +67,8 @@ export function SegmentControl({ segments, value, onChange, size = 'L', fit }: {
 
 export type Chip = {
   label: string;
+  /** Идентичность чипса для `onToggle` / `onRemove` и ключа; по умолчанию — `label`. */
+  value?: string;
   selected?: boolean;
   removable?: boolean;
   /** Свотч цвета вещи 16 перед текстом (Figma: chip · Show Color Dot). */
@@ -54,10 +85,14 @@ export type Chip = {
 /**
  * Группа чипсов на базе `Button S`: не выбран — `tertiary`, выбран — `soft`.
  * `wrap` — перенос строк (теги, цвета), иначе горизонтальный скролл (фильтры, поводы).
+ * С `onToggle` чипс — переключатель (`aria-pressed`); крестик у `removable` — отдельная кнопка «Удалить: …».
  */
-export function ChipGroup({ chips, onToggle, onAdd, onEdit, onEditDone, wrap = false, center }: {
+export function ChipGroup({ chips, onToggle, onRemove, onAdd, onEdit, onEditDone, wrap = false, center }: {
   chips: Chip[];
-  onToggle?: (label: string) => void;
+  /** Нажатие на чипс: приходит `value` (или `label`). */
+  onToggle?: (value: string) => void;
+  /** Крестик у `removable`: приходит `value` (или `label`). */
+  onRemove?: (value: string) => void;
   onAdd?: () => void;
   /** Ввод в редактируемом чипсе (`editing`). */
   onEdit?: (value: string) => void;
@@ -69,34 +104,52 @@ export function ChipGroup({ chips, onToggle, onAdd, onEdit, onEditDone, wrap = f
   return (
     <div className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center')}>
       {onAdd && <IconButton icon="plus" label="Добавить" variant="primary" size="S" onClick={onAdd} />}
-      {chips.map((c) => c.editing ? (
-        <label key="editing" className="y-button y-button--S y-style--tertiary y-chip--editing">
-          <input
-            className="y-chip__input"
-            value={c.label}
-            placeholder={c.placeholder}
-            aria-label={c.placeholder ?? 'Название'}
-            size={Math.max(c.label.length, c.placeholder?.length ?? 0, 1)}
-            onChange={(e) => onEdit?.(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && onEditDone?.(e.currentTarget.value)}
-            onBlur={(e) => onEditDone?.(e.currentTarget.value)}
-            readOnly={!onEdit}
-          />
-        </label>
-      ) : (
-        <Button
-          key={c.label}
-          size="S"
-          variant={c.selected ? 'soft' : 'tertiary'}
-          rightIcon={c.removable ? 'cross' : c.dropdown ? 'chevron-up-down' : undefined}
-          className={cx((c.removable || c.dropdown) && 'y-chip--trailing', c.removable && 'y-chip--removable')}
-          aria-pressed={c.selected}
-          onClick={() => { haptic('select'); onToggle?.(c.label); }}
-        >
-          {c.colorDot && <ColorDot color={c.colorDot} size={16} />}
-          {c.label}
-        </Button>
-      ))}
+      {chips.map((c) => {
+        if (c.editing)
+          return (
+            <label key="editing" className="y-button y-button--S y-style--tertiary y-chip--editing">
+              <input
+                className="y-chip__input"
+                value={c.label}
+                placeholder={c.placeholder}
+                aria-label={c.placeholder ?? 'Название'}
+                size={Math.max(c.label.length, c.placeholder?.length ?? 0, 1)}
+                onChange={(e) => onEdit?.(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && onEditDone?.(e.currentTarget.value)}
+                onBlur={(e) => onEditDone?.(e.currentTarget.value)}
+                readOnly={!onEdit}
+              />
+            </label>
+          );
+        const id = c.value ?? c.label;
+        const toggle = () => { haptic('select'); onToggle?.(id); };
+        // Фильтр-дропдаун открывает sheet, это не переключатель
+        const pressed = onToggle && !c.dropdown ? !!c.selected : undefined;
+        const content = <>{c.colorDot && <ColorDot color={c.colorDot} size={16} />}{c.label}</>;
+        // Две кнопки в одной капсуле: вложить «удалить» в кнопку чипса нельзя
+        if (c.removable)
+          return (
+            <span key={id} className={cx('y-button y-button--S', `y-style--${c.selected ? 'soft' : 'tertiary'}`, 'y-chip--trailing y-chip--removable')}>
+              <button type="button" className="y-chip__toggle" aria-pressed={pressed} onClick={toggle}>{content}</button>
+              <button type="button" className="y-chip__remove" aria-label={`Удалить: ${c.label}`} onClick={() => onRemove?.(id)}>
+                <Icon name="cross" />
+              </button>
+            </span>
+          );
+        return (
+          <Button
+            key={id}
+            size="S"
+            variant={c.selected ? 'soft' : 'tertiary'}
+            rightIcon={c.dropdown ? 'chevron-up-down' : undefined}
+            className={cx(c.dropdown && 'y-chip--trailing')}
+            aria-pressed={pressed}
+            onClick={toggle}
+          >
+            {content}
+          </Button>
+        );
+      })}
     </div>
   );
 }
