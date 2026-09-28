@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Dialog } from '.';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Dialog, Header, Overlay } from '.';
+import { Button } from '../atoms';
+import { Screen } from '../templates';
 import { onOverlay, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 import { StatRow, StatTile } from '../molecules';
 
@@ -30,4 +34,47 @@ export const InFlow: Story = {
       <Usage screen="Auth / Password Recovery / Dialog / Sent" note="одна кнопка">{onOverlay(() => <Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" />)}</Usage>
     </UsageGrid>
   ),
+};
+
+function KeyboardDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Screen
+      header={<Header type="bar" titleChip="Корзина вещей" />}
+      overlay={<Overlay open={open} onOpenChange={setOpen}><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отмена" confirm="Очистить" onCancel={() => setOpen(false)} onConfirm={() => setOpen(false)} /></Overlay>}
+    >
+      <Button variant="destructive" fullWidth onClick={() => setOpen(true)} aria-haspopup="dialog">Очистить корзину</Button>
+    </Screen>
+  );
+}
+
+/** Модальность с клавиатуры: фокус на безопасном действии, Tab по кругу, Escape = «Отмена», фокус возвращается. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: '`<Overlay open onOpenChange>` с `Dialog`: при открытии фокус на безопасном действии (синяя кнопка справа), Tab не уходит за диалог, Escape вызывает `onCancel`, фокус возвращается на кнопку, открывшую диалог.' } } },
+  render: () => <KeyboardDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const opener = canvas.getByRole('button', { name: 'Очистить корзину' });
+    await step('Открыть: фокус на «Отмена»', async () => {
+      await userEvent.click(opener);
+      const dialog = await canvas.findByRole('alertdialog', { name: 'Очистить корзину?' });
+      await expect(dialog).toHaveAttribute('aria-modal', 'true');
+      await expect(dialog).toHaveAccessibleDescription('Все вещи из корзины удаляются навсегда, их уже не вернуть');
+      await waitFor(() => expect(canvas.getByRole('button', { name: 'Отмена' })).toHaveFocus());
+    });
+    await step('Tab по кругу внутри диалога', async () => {
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name: 'Очистить' })).toHaveFocus();
+      await userEvent.tab({ shift: true });
+      await userEvent.tab({ shift: true });
+      await expect(canvas.getByRole('button', { name: 'Очистить' })).toHaveFocus();
+    });
+    await step('Escape = «Отмена», фокус возвращается', async () => {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => expect(canvas.queryByRole('alertdialog')).toBeNull());
+      await expect(opener).toHaveFocus();
+    });
+  },
 };

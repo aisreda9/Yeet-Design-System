@@ -165,6 +165,8 @@ const levels: { level: string; what: string; rule: string; items: string[] }[] =
   { level: 'Pages', what: 'Экраны флоу с реальными данными', rule: 'Шаблон + содержимое', items: ['Splash', 'Onboarding', 'Auth', 'Сегодня', 'Гардероб', 'Поиск', 'Стилист', 'Поездки', 'Профиль', 'Настройки', '…'] },
 ];
 
+const figmaNode = (id: string) => `https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=${id.replace(':', '-')}`;
+
 /** Таблица соответствия Figma ↔ код из `registry.ts`. */
 export function ComponentRegistry() {
   return (
@@ -173,7 +175,13 @@ export function ComponentRegistry() {
       rows={registry.map((e) => [
         <Muted>{e.level}</Muted>,
         <Code>{`<${e.code}>`}</Code>,
-        <span style={mono}>{e.figma ?? '—'}{e.note && <div style={cap}>{e.note}</div>}</span>,
+        <span style={mono}>
+          {e.figma ?? '—'}
+          {e.figmaId ? (
+            <> · <a href={figmaNode(e.figmaId)} target="_blank" rel="noreferrer">{e.figmaId}</a></>
+          ) : e.figmaWhy && <div style={cap}>нет компонента: {e.figmaWhy}</div>}
+          {e.note && <div style={cap}>{e.note}</div>}
+        </span>,
         <Muted>{e.section}</Muted>,
         <Muted>{e.story}</Muted>,
       ])}

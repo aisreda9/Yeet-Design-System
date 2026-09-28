@@ -89,7 +89,7 @@ span.y-field__trailing { cursor: inherit; }
 .y-chip-group--wrap { flex-wrap: wrap; }
 .y-chip-group--center { justify-content: center; }
 .y-chip-group--scroll { overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--screen-gutter)); padding: 0 var(--screen-gutter); }
-.y-chip-group--scroll::-webkit-scrollbar { display: none; }
+.y-chip-group--scroll::-webkit-scrollbar { display: none; } /* выход за край = --screen-gutter: это и поля экрана, и поля Sheet, поэтому в шторке лента упирается в её край */
 .y-row > .y-chip-group--scroll { flex: 1; min-width: 0; margin-left: 0; padding-left: 0; } /* в ряду с кнопками выход за край только справа */
 .y-chip-group > .y-button:not(.y-chip--trailing) { padding: 0 var(--space-16); }
 .y-chip-group > .y-chip--trailing { padding: 0 var(--space-12) 0 var(--space-16); }
@@ -125,7 +125,6 @@ span.y-field__trailing { cursor: inherit; }
 div.y-list-item { cursor: default; }
 .y-list-item__label { flex: 1; }
 .y-list-item__trailing { flex: none; color: var(--color-text-secondary); white-space: nowrap; } /* текстовый trailing: «₽ · RUB» */
-.y-list-item__text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .y-radio {
   width: 24px; height: 24px; border-radius: var(--radius-full); flex: none;
   display: inline-flex; align-items: center; justify-content: center; background: var(--color-bg-subtle);
@@ -139,10 +138,8 @@ div.y-list-item { cursor: default; }
 /* ListGroup — строки на карточке. Figma Settings: разделитель с отступом 16, иконки справа 20, одиночная строка — капсула 52 / r32 */
 .y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
 .y-list-group:has(> .y-list-item:only-child) { border-radius: var(--radius-xl); }
-.y-list-group:has(> .y-list-item:only-child .y-list-item__text) { border-radius: var(--radius-lg); }
 .y-list-group > .y-list-item { position: relative; min-height: 56px; padding: var(--space-16) var(--space-20); }
-.y-list-group > .y-list-item:has(.y-list-item__text) { min-height: 72px; }
-.y-list-group > .y-list-item:only-child:not(:has(.y-list-item__text)) { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
+.y-list-group > .y-list-item:only-child { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
 .y-list-group > .y-list-item + .y-list-item::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px; background: var(--color-divider); }
 .y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; }
 /* Строка не сжимается при нажатии — подсвечивается фоном */

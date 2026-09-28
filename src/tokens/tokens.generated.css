@@ -6,7 +6,6 @@
 :root {
   --yeet-blue-500: #0100f4;
   --yeet-blue-400: #4b4bff;
-  --yeet-blue-300: #5b5bff;
   --yeet-blue-200: #8a8aff;
   --yeet-red-600: #cc291b;
   --yeet-red-500: #ff4230;
@@ -23,7 +22,7 @@
   --yeet-graphite-950: #0f0f11;
   --yeet-item-black: #1a1a2e;
   --yeet-on-item-black: #ffffff; /* буква / иконка на этом цвете */
-  --yeet-item-grey: #777777;
+  --yeet-item-grey: var(--yeet-neutral-500);
   --yeet-on-item-grey: #000000; /* буква / иконка на этом цвете */
   --yeet-item-white: #ffffff;
   --yeet-on-item-white: #000000; /* буква / иконка на этом цвете */
@@ -39,7 +38,7 @@
   --yeet-on-item-yellow: #000000; /* буква / иконка на этом цвете */
   --yeet-item-orange: #ff8800;
   --yeet-on-item-orange: #000000; /* буква / иконка на этом цвете */
-  --yeet-item-red: #ff4230;
+  --yeet-item-red: var(--yeet-red-500);
   --yeet-on-item-red: #000000; /* буква / иконка на этом цвете */
   --yeet-item-beige: #ffe1c7;
   --yeet-on-item-beige: #000000; /* буква / иконка на этом цвете */
@@ -47,7 +46,6 @@
   --yeet-on-item-brown: #000000; /* буква / иконка на этом цвете */
 
   --space-0: 0px;
-  --space-1: 1px;
   --space-2: 2px;
   --space-4: 4px;
   --space-8: 8px;
@@ -61,8 +59,6 @@
   --space-48: 48px;
   --space-52: 52px;
   --space-56: 56px;
-  --space-64: 64px;
-  --space-72: 72px;
   --radius-xs: 4px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -387,8 +383,8 @@
   --input-bg: var(--color-bg-subtle);
 }
 
-.y-h1 { font: 380 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }
-.y-h2 { font: 400 24px/28px var(--font-display); letter-spacing: -0.4px; margin: 0; }
-.y-h3 { font: 400 19px/24px var(--font-display); letter-spacing: -0.3px; margin: 0; }
-.y-body { font: 460 14px/20px var(--font-text); letter-spacing: 0px; margin: 0; }
-.y-caption { font: 400 12px/16px var(--font-text); letter-spacing: 0px; margin: 0; }
+.y-h1 { font: var(--font-weight-h1) 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }
+.y-h2 { font: var(--font-weight-h2) 24px/28px var(--font-display); letter-spacing: -0.4px; margin: 0; }
+.y-h3 { font: var(--font-weight-h3) 19px/24px var(--font-display); letter-spacing: -0.3px; margin: 0; }
+.y-body { font: var(--font-weight-body) 14px/20px var(--font-text); letter-spacing: 0px; margin: 0; }
+.y-caption { font: var(--font-weight-caption) 12px/16px var(--font-text); letter-spacing: 0px; margin: 0; }

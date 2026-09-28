@@ -154,6 +154,7 @@
 .y-overlay.is-leaving { pointer-events: none; }
 .y-overlay.is-leaving::before { opacity: 0; transition: opacity var(--motion-exit); }
 .y-overlay.is-leaving .y-sheet { transform: translateY(calc(100% + var(--space-8))); transition: transform var(--motion-exit); }
+.y-overlay [data-focus-quiet]:focus-visible { outline: none; } /* фокус при открытии не с клавиатуры — без кольца, до первой клавиши */
 
 /* ─── Cards ─── */
 /* Нажатие карточки: сжатие меньше, чем у кнопки — объект крупнее */
