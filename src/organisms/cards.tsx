@@ -1,9 +1,10 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Badge, ColorDot, Icon, IconButton, WeatherIcon, type Weather } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
 import { cx } from '../utils/cx';
 import { useFitScale } from '../utils/useFitScale';
+import { haptic } from '../utils/haptic';
 
 /* ─── Cards ─────────────────────────────────────────────────────────── */
 
@@ -53,7 +54,7 @@ export function ItemCard({ kind, color, image, name, discount, label, selected, 
   const ref = useRef<HTMLButtonElement>(null);
   const k = useFitScale(ref, 173);
   const card = (
-    <button ref={ref} type="button" className={cx('y-item-card', selected && 'y-item-card--selected')} onClick={onClick} aria-pressed={selected} aria-label={a11y}>
+    <button ref={ref} type="button" className={cx('y-item-card', selected && 'y-item-card--selected')} onClick={() => { if (selected !== undefined) haptic('toggle'); onClick?.(); }} aria-pressed={selected} aria-label={a11y}>
       <ItemArt kind={kind} color={color} src={image} size={(image ? 138 : 88) * k} />
       {discount && <Badge variant="danger" className="y-item-card__badge">{discount}</Badge>}
       {label && !discount && <Badge variant="secondary" className="y-item-card__badge">{label}</Badge>}
@@ -72,12 +73,15 @@ export function ItemCard({ kind, color, image, name, discount, label, selected, 
 
 /** Карточка товара в поиске: фото + название, цена, магазин. */
 export function ProductCard({ kind, image, name, price, discount, liked, showLike = true, onLike }: { kind: Garment; image?: string; name: string; price: string; discount?: string; liked?: boolean; showLike?: boolean; onLike?: () => void }) {
+  // сердце подпрыгивает только от нажатия «лайк», а не при загрузке уже лайкнутого товара
+  const [pop, setPop] = useState(false);
+  const like = () => { haptic('toggle'); setPop(!liked); onLike?.(); };
   return (
     <article className="y-product-card">
       <div style={{ position: 'relative' }}>
         <ItemCard kind={kind} image={image} name={name} discount={discount} />
         {showLike && (
-          <button type="button" className={cx('y-product-card__like', 'y-icon-button', liked && 'is-on')} aria-label={liked ? 'Убрать из вишлиста' : 'В вишлист'} aria-pressed={liked} onClick={onLike}>
+          <button type="button" className={cx('y-product-card__like', 'y-icon-button', liked && 'is-on', pop && liked && 'is-popping')} aria-label={liked ? 'Убрать из вишлиста' : 'В вишлист'} aria-pressed={liked} onClick={like} onAnimationEnd={() => setPop(false)}>
             <Icon name="heart" />
           </button>
         )}
@@ -122,7 +126,7 @@ export function OutfitCollage({ items, label, footer }: { items: CollageItem[]; 
 /** Область фото 353×353. Пусто — «Добавить фотографию»; с фото — вещь и кнопка удаления. */
 export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: { kind?: Garment; /** Фото вещи после удаления фона. */ image?: string; loading?: boolean; onAdd?: () => void; onRemove?: () => void; children?: ReactNode }) {
   return (
-    <div className="y-photo-area">
+    <div className={cx('y-photo-area', loading && 'is-loading')} aria-busy={loading || undefined}>
       {children ??
         (kind || image ? (
           <>

@@ -1,6 +1,9 @@
-import type { ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
+import { cx } from '../utils/cx';
+import { gesture, motionMs } from '../utils/gesture';
+import { LeavingContext } from '../utils/usePresence';
 import photoCamera from '../icons/art/photo-camera.png';
 import photoGallery from '../icons/art/photo-gallery.png';
 
@@ -18,18 +21,38 @@ export function Hint({ icon = 'fingers-pinch', children }: { icon?: IconName; ch
 
 /* ─── Snackbar ──────────────────────────────────────────────────────── */
 
-/** Тост-подтверждение над нижней навигацией. Инвертированный фон, исчезает сам. */
-export function Snackbar({ children, onClose, onUndo }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void }) {
+/**
+ * Тост-подтверждение над нижней навигацией. Инвертированный фон.
+ *
+ * **Движение:** появляется снизу на 16 pt + прозрачность (`--motion-appear`, 240 мс), уходит вниз на 8 pt быстрее
+ * (`--motion-exit`, 150 мс). С `autoHide` закрывается сам через `--gesture-snackbar` 4 с, с «Отменить» — 6 с;
+ * пока на тосте курсор или фокус, таймер стоит (успеть прочитать и нажать — WCAG 2.2.1).
+ * «Отменить» и «×» сначала доигрывают уход, потом вызывают `onClose`.
+ */
+export function Snackbar({ children, onClose, onUndo, autoHide }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void; /** Закрыться самому через 4 с (с «Отменить» — 6 с). Нужен `onClose`. */ autoHide?: boolean }) {
+  const [closing, setClosing] = useState(false);
+  const leaving = useContext(LeavingContext) || closing;
+  const [paused, setPaused] = useState(false);
+  const leave = useCallback((then?: () => void) => {
+    setClosing(true);
+    window.setTimeout(() => { then?.(); onClose?.(); }, motionMs('--motion-exit'));
+  }, [onClose]);
+  useEffect(() => {
+    if (!autoHide || !onClose || paused || leaving) return;
+    const t = window.setTimeout(() => leave(), onUndo ? gesture.snackbarAction : gesture.snackbar);
+    return () => window.clearTimeout(t);
+  }, [autoHide, onClose, onUndo, paused, leaving, leave]);
+  const hold = { onPointerEnter: () => setPaused(true), onPointerLeave: () => setPaused(false), onFocus: () => setPaused(true), onBlur: () => setPaused(false) };
   return (
-    <div className="y-snackbar" role="status">
+    <div className={cx('y-snackbar', leaving && 'is-leaving')} role="status" {...(autoHide ? hold : {})}>
       <span>{children}</span>
       {onUndo && (
-        <button type="button" aria-label="Отменить" onClick={onUndo}>
+        <button type="button" aria-label="Отменить" onClick={() => leave(onUndo)}>
           <Icon name="undo" />
         </button>
       )}
       {onClose && (
-        <button type="button" aria-label="Закрыть" onClick={onClose}>
+        <button type="button" aria-label="Закрыть" onClick={() => leave()}>
           <Icon name="cross" />
         </button>
       )}

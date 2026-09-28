@@ -4,6 +4,7 @@ import { Button, ColorDot, Icon, IconButton, type ControlSize } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 
 /* ─── SegmentControl ────────────────────────────────────────────────── */
 
@@ -20,7 +21,7 @@ export function SegmentControl({ segments, value, onChange, size = 'L', fit }: {
       <span className="y-segment__pill" style={pill} aria-hidden />
       {segments.map((s) => {
         const active = s.value === value;
-        const common = { key: s.value, role: 'tab', 'aria-selected': active, 'data-pill-item': true, onClick: () => onChange?.(s.value) } as const;
+        const common = { key: s.value, role: 'tab', 'aria-selected': active, 'data-pill-item': true, onClick: () => { if (!active) haptic('select'); onChange?.(s.value); } } as const;
         return s.icon && !s.label ? (
           <IconButton {...common} icon={s.icon} label={s.value} size={size} variant="ghost" />
         ) : (
@@ -53,7 +54,7 @@ export function ChipGroup({ chips, onToggle, onAdd, wrap = false, center }: { ch
           rightIcon={c.removable ? 'cross' : c.dropdown ? 'chevron-up-down' : undefined}
           className={cx((c.removable || c.dropdown) && 'y-chip--trailing', c.removable && 'y-chip--removable')}
           aria-pressed={c.selected}
-          onClick={() => onToggle?.(c.label)}
+          onClick={() => { haptic('select'); onToggle?.(c.label); }}
         >
           {c.colorDot && <ColorDot color={c.colorDot} />}
           {c.label}
@@ -106,7 +107,7 @@ export function ListItem({ type = 'action', label, description, icon, leading, e
     <button
       type="button"
       className="y-list-item"
-      onClick={onClick}
+      onClick={() => { if (type === 'radio' && !checked) haptic('select'); onClick?.(); }}
       role={type === 'radio' ? 'radio' : undefined}
       aria-checked={type === 'radio' ? !!checked : undefined}
       aria-expanded={type === 'expandable' ? !!expanded : undefined}

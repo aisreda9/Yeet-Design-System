@@ -5,6 +5,7 @@ import { AccountCard, AvatarStack, type Account, BarChart, Carousel, ChipGroup, 
 import { AccountsSheet, BottomBar, BottomNav, type CanvasItem, ChatBubble, Dialog, OutfitCanvas, type Garment, Header, ItemArt, ItemCard, OutfitCollage, OutfitThumbnail, Overlay, PhotoArea, ProductCard, Sheet, StatusBar, StylistDock, StylistPromptCard, TripCard, WeatherCard } from '../organisms';
 import { Grid, Row, Screen, Sticky } from '../templates';
 import type { ItemColor } from '../tokens/tokens';
+import { motionMs } from '../utils/gesture';
 
 const meta = {
   title: 'Pages/Экраны флоу',
@@ -398,7 +399,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
   const [period, setPeriod] = useState('За всё время');
   const overlay =
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
-    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); setOpen(undefined); }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
+    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
     <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
       <div className="y-gutter y-profile-bar">

@@ -1,0 +1,24 @@
+import { createContext, useEffect, useReducer, useRef, type ReactNode } from 'react';
+import { motionMs } from './gesture';
+
+/**
+ * Уход со сцены: когда родитель убирает элемент (`overlay` → undefined), он ещё `--motion-exit` остаётся в DOM
+ * с флагом `leaving`, чтобы CSS доиграл исчезновение. Если во время ухода элемент вернули — уход прерывается
+ * и идёт обратно из текущего положения (переходы на transition, а не на keyframes).
+ */
+export function usePresence(node: ReactNode, token = '--motion-exit') {
+  const last = useRef<ReactNode>(node);
+  const [, rerender] = useReducer((n: number) => n + 1, 0);
+  const present = !!node;
+  if (present) last.current = node;
+  useEffect(() => {
+    if (present || !last.current) return;
+    // запас на кадр; transitionend не ждём — его не будет, если элемент уже в конечном положении (закрыт жестом)
+    const t = window.setTimeout(() => { last.current = undefined; rerender(); }, motionMs(token) + 34);
+    return () => window.clearTimeout(t);
+  }, [present, token]);
+  return { node: present ? node : last.current, leaving: !present && !!last.current } as const;
+}
+
+/** Слой уходит (Screen → overlay / floating убраны): Overlay и Snackbar доигрывают исчезновение. */
+export const LeavingContext = createContext(false);
