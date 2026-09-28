@@ -4,7 +4,7 @@ import { icons, type IconName } from '../icons/icons';
 import { itemColors, radii, semanticColors, spaces, textStyles } from '../tokens/tokens';
 import tokenSource from '../../tokens/tokens.json';
 import { registry, type Level } from './registry';
-import { motions } from '../motion/motion';
+import { mechanics, motions } from '../motion/motion';
 import '../tokens/tokens.css';
 
 const mono: CSSProperties = { font: '400 12px/16px ui-monospace, SFMono-Regular, Menlo, monospace' };
@@ -215,6 +215,23 @@ export function MotionTable() {
         m.what,
         <Muted>{m.where}</Muted>,
         <Muted>{m.figma}</Muted>,
+      ])}
+    />
+  );
+}
+
+/** Механики экранов: токен, длительность, хаптика, поведение при «Уменьшении движения» (motion.ts → mechanics). */
+export function MechanicsTable() {
+  return (
+    <DocTable
+      head={['Механика', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
+      rows={mechanics.map((m) => [
+        <span style={{ fontWeight: 500 }}>{m.name}<div style={cap}>{m.group} · {m.where}</div></span>,
+        m.what,
+        <Code>{m.token}</Code>,
+        <Muted>{m.duration}</Muted>,
+        m.haptic === '—' ? <Muted>—</Muted> : <span>{m.haptic}</span>,
+        <Muted>{m.reduced}</Muted>,
       ])}
     />
   );

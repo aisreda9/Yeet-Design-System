@@ -4,6 +4,7 @@ import { Button, Icon, IconButton, ScrollEdge } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { ChipGroup, InputBar, type Chip } from '../molecules';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 import { StatusBar } from './system';
 
 /* ─── Header ────────────────────────────────────────────────────────── */
@@ -108,14 +109,14 @@ const tabs: { id: Tab; label: string; icon?: IconName }[] = [
   { id: 'profile', label: 'Профиль' },
 ];
 
-/** Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`. */
+/** Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`; она переезжает к новой вкладке на пружине quick (`--motion-nav`), хаптика `select`. */
 export function TabBar({ active, initial = 'С', onChange }: { active: Tab; initial?: string; onChange?: (t: Tab) => void }) {
   const [ref, pill] = useSlidingPill<HTMLElement>(tabs.findIndex((t) => t.id === active));
   return (
     <nav ref={ref} className="y-tab-bar" aria-label="Основная навигация">
       <span className="y-tab-bar__pill" style={pill} aria-hidden />
       {tabs.map((t) => (
-        <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => onChange?.(t.id)}>
+        <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => { if (t.id !== active) haptic('select'); onChange?.(t.id); }}>
           {t.icon ? <Icon name={t.icon} /> : <span className="y-tab-bar__avatar">{initial}</span>}
         </button>
       ))}

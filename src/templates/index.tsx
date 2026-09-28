@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
+import { LeavingContext, usePresence } from '../utils/usePresence';
 import './templates.css';
 
 export type ScreenProps = {
@@ -30,34 +31,49 @@ export type ScreenProps = {
 export function Screen({ header, bottom, overlay, floating, floatingOffset = 132, center, flush, children }: ScreenProps) {
   const ref = useRef<HTMLElement>(null);
   const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false });
+  const frame = useRef(0);
   const update = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    // collapsed — большой заголовок уехал: шапка показывает его пилюлей по центру, липкие фильтры прижаты к шапке
-    setEdges({ top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed: el.scrollTop > 24 });
+    setEdges((prev) => {
+      // collapsed — большой заголовок уехал: шапка показывает его пилюлей по центру, липкие фильтры прижаты к шапке.
+      // Гистерезис 24 / 8: шапка при сворачивании меняет высоту, и без запаса заголовок дрожал бы на границе
+      const collapsed = prev.collapsed ? el.scrollTop > 8 : el.scrollTop > 24;
+      const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed };
+      // тот же объект — React не перерисовывает экран на каждое событие скролла
+      return next.top === prev.top && next.bottom === prev.bottom && next.collapsed === prev.collapsed ? prev : next;
+    });
   }, []);
+  // скролл читается раз в кадр: чтение scrollTop / scrollHeight — после отрисовки, без дёрганья layout
+  const onScroll = useCallback(() => {
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(update);
+  }, [update]);
   useEffect(() => {
     update();
     const el = ref.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); cancelAnimationFrame(frame.current); };
   }, [update]);
+  // убранные overlay и floating доигрывают уход (--motion-exit), а не исчезают мгновенно
+  const layer = usePresence(overlay);
+  const toast = usePresence(floating);
 
   return (
     <div className="y-screen" data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={edges.collapsed || undefined}>
       {header ?? <StatusBar />}
-      <main ref={ref} onScroll={update} tabIndex={0} /* прокрутка с клавиатуры */ className={cx('y-screen__content', center && 'y-screen__content--center', flush && 'y-screen__content--flush')}>
+      <main ref={ref} onScroll={onScroll} tabIndex={0} /* прокрутка с клавиатуры */ className={cx('y-screen__content', center && 'y-screen__content--center', flush && 'y-screen__content--flush')}>
         {children}
       </main>
       {bottom}
-      {floating && (
-        <div className="y-screen__floating" style={{ bottom: floatingOffset }}>
-          {floating}
+      {toast.node && (
+        <div className="y-screen__floating" style={{ bottom: floatingOffset }} data-leaving={toast.leaving || undefined}>
+          <LeavingContext.Provider value={toast.leaving}>{toast.node}</LeavingContext.Provider>
         </div>
       )}
-      {overlay}
+      {layer.node && <LeavingContext.Provider value={layer.leaving}>{layer.node}</LeavingContext.Provider>}
     </div>
   );
 }

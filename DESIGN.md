@@ -166,6 +166,14 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 
 Правила: пружина — ответ на действие пользователя; ease-out — движение, которое ведёт палец (не пружинит против руки); bouncy — только штамп. `prefers-reduced-motion` делает все переходы мгновенными.
 
+Механики экранов (сводная таблица — Storybook «Анимации», источник `src/motion/motion.ts → mechanics`):
+анимируются только transform / opacity; уход быстрее появления (`exit` 150 < `appear` 240); слои появляются
+и уходят на `transition` + `@starting-style`, поэтому прерываются и разворачиваются из текущего положения.
+`Overlay` с `onClose` — появление, уход, смахивание (порог 30 % / 500 pt/с, резинка 0.55, хаптика `threshold`);
+`Screen` доигрывает уход убранных `overlay` и `floating` (`usePresence`); `Snackbar autoHide` — 4 / 6 с с паузой
+под курсором и фокусом. Хаптика вызывается в компонентах через `haptic('<событие>')` (`src/utils/haptic.ts`),
+числа жестов — из `tokens.json` (`src/utils/gesture.ts`), а не константами в коде.
+
 **Штамп (`stamp` / `<Stamp>`)** — фирменная 12-лучевая звезда главного действия поверх коллажа: Primary L 148 («Надеть», «Сохранить»), Secondary S 48 (иконка «Перемешать»). В Figma — интерактивный компонент: клик переключает `State=Default ↔ Done` через Smart Animate Bouncy.
 
 ---

@@ -85,6 +85,10 @@ div.y-list-item { cursor: default; }
   display: inline-flex; align-items: center; justify-content: center; background: var(--color-bg-subtle);
 }
 .y-radio--on { background: var(--color-accent); color: var(--color-text-on-accent); } /* флоу: синий круг с галочкой, не точка */
+.y-radio { transition: background-color var(--motion-select), color var(--motion-select); }
+/* Строка в шторке (без карточки): нажатие — лёгкое затухание, без сжатия и без смены фона (фона у строки нет) */
+.y-list > button.y-list-item { transition: opacity var(--motion-press); -webkit-tap-highlight-color: transparent; }
+.y-list > button.y-list-item:active { opacity: 0.64; }
 
 /* ListGroup — строки на карточке. Figma Settings: разделитель с отступом 16, иконки справа 20, одиночная строка — капсула 52 / r32 */
 .y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
@@ -108,17 +112,21 @@ div.y-list-item { cursor: default; }
   display: inline-flex; align-items: center; gap: 6px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   background: var(--color-bg-elevated); color: var(--color-text-primary); border-radius: var(--radius-xl);
   box-shadow: var(--shadow-floating); font: 400 12px/16px var(--font-text);
+  transition: translate var(--motion-appear), opacity var(--motion-appear);
 }
+@starting-style { .y-hint { translate: 0 8px; opacity: 0; } } /* появление: прозрачность + сдвиг 8 pt */
 
 /* Snackbar: флоу — 52, радиус 12; появление снизу */
 .y-snackbar {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
   width: 100%; height: 52px; padding: 0 var(--space-20); border-radius: var(--radius-sm);
   background: var(--color-bg-inverse); color: var(--color-text-inverse); font: var(--font-weight-body) 14px/20px var(--font-text);
-  animation: y-appear var(--motion-appear) both;
+  transition: translate var(--motion-appear), opacity var(--motion-appear);
 }
+@starting-style { .y-snackbar { translate: 0 16px; opacity: 0; } }
+/* уход быстрее появления и короче по пути: 8 pt вниз за 150 мс */
+.y-snackbar.is-leaving { translate: 0 8px; opacity: 0; pointer-events: none; transition: translate var(--motion-exit), opacity var(--motion-exit); }
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
-@keyframes y-appear { from { transform: translateY(16px); opacity: 0; } }
 
 /* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
 .y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; }
@@ -128,7 +136,12 @@ div.y-list-item { cursor: default; }
 .y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--font-weight-body) 14px/20px var(--font-text); }
 .y-loading .y-icon { width: 24px; height: 24px; color: var(--color-text-primary); animation: y-spin 1.2s linear infinite; }
 @keyframes y-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: none; } }
+/* Меньше движения: вместо вращения — медленная пульсация прозрачности (загрузка всё равно видна) */
+@media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
+@keyframes y-pulse { to { opacity: 0.4; } }
+/* Появление подписи загрузки — без мигания на быстрых операциях: показываем через 120 мс */
+.y-loading { animation: y-loading-in var(--motion-appear) 120ms backwards; }
+@keyframes y-loading-in { from { opacity: 0; } }
 
 /* PhotoTile: строго квадрат 173, как в Figma, даже с подписью в две строки */
 .y-photo-tile {
@@ -146,6 +159,7 @@ div.y-list-item { cursor: default; }
 .y-carousel__track {
   display: grid; grid-auto-flow: column; grid-auto-columns: var(--carousel-item); gap: var(--space-8);
   overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--screen-gutter); padding: 0 var(--screen-gutter);
+  overscroll-behavior-x: contain; /* листание ленты не уводит экран «назад» жестом браузера */
   scrollbar-width: none;
 }
 .y-carousel__track::-webkit-scrollbar { display: none; }

@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
-import { ChipGroup, List, ListGroup, ListItem } from '../molecules';
-import { BottomNav, ItemCard, OutfitCollage, Sheet, StatusBar, type CollageItem, type Tab } from '../organisms';
+import { Carousel, ChipGroup, List, ListGroup, ListItem } from '../molecules';
+import { BottomNav, ItemCard, OutfitCollage, Overlay, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
+import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
+import { haptic } from '../utils/haptic';
+import { LeavingContext, usePresence } from '../utils/usePresence';
 import { DragGrid } from './DragGrid';
+import { CanvasDemo, FeedbackDemo, HapticChip, HeaderScrollDemo, PageStackDemo, ProfileDemo, SelectDemo, SheetDemo } from './Mechanics';
 import { curves, sample } from './motion';
 import './motion.css';
 
@@ -61,12 +65,16 @@ export const Curves: Story = {
 
 function StampDemo() {
   const [done, setDone] = useState(false);
-  const [spin, setSpin] = useState(0);
+  const [skips, setSkips] = useState(0);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
       <Stamp label="Надеть" done={done} onClick={() => setDone((v) => !v)} />
-      <Stamp label="Не нравится" tone="secondary" onClick={() => setSpin((s) => s + 1)} style={{ transform: `translateX(${spin % 2 ? -12 : 0}px)`, transition: 'transform var(--motion-exit)' }} />
-      <p className="y-caption y-text--secondary" style={{ maxWidth: 200 }}>Нажми на штамп: сжатие, поворот −60° и «×» на пружине bouncy. Повторное нажатие отменяет.</p>
+      <Stamp label="Не нравится" tone="secondary" onClick={() => setSkips((s) => s + 1)} />
+      <div className="y-motion-column" style={{ alignItems: 'flex-start' }}>
+        <p className="y-caption y-text--secondary" style={{ maxWidth: 220 }}>Нажми на штамп: сжатие 0.94, затем пружина bouncy — звезда 148 → 78, −60°, чернеет, «отменить». Повторное нажатие отменяет. Нажатие на выполненный штамп не сбрасывает поворот.</p>
+        <span className="y-caption y-text--secondary">«Не нравится»: {skips}</span>
+        <HapticChip />
+      </div>
     </div>
   );
 }
@@ -78,7 +86,8 @@ function NavDemo() {
   const [tab, setTab] = useState<Tab>('today');
   return (
     <div className="y-motion-phone y-motion-phone--short">
-      <p className="y-caption y-text--secondary" style={{ padding: '24px 20px' }}>Переключай вкладки: на «Гардеробе» таб-бар уступает место кнопке «+».</p>
+      <p className="y-caption y-text--secondary" style={{ padding: '24px 20px 8px' }}>Переключай вкладки: пилюля переезжает на пружине quick; на «Гардеробе» таб-бар уступает место кнопке «+», уход «+» быстрее появления.</p>
+      <div style={{ padding: '0 20px' }}><HapticChip /></div>
       <div style={{ marginTop: 'auto' }}>
         <BottomNav active={tab} fab={tab === 'wardrobe'} onTabChange={setTab} />
       </div>
@@ -90,94 +99,93 @@ export const NavFab: Story = { name: 'Таб-бар и FAB', render: () => <NavD
 /* ─── Главная: смена образа свайпом, штамп, выбор повода ───────────────── */
 
 const occasionList = ['На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Спорт'];
-const SWIPE = 0.3 * 353; // --gesture-swipe-distance × высота коллажа
-const VELOCITY = 0.5; // --gesture-swipe-velocity 500 pt/с → px/мс
-const RUBBER = 0.55; // --gesture-rubber-band
-
-/** Какая хаптика сработала: в вебе вибрации нет, поэтому показываем токен. */
-function useHaptic() {
-  const [last, setLast] = useState<{ name: string; n: number } | null>(null);
-  return [last, (name: string) => setLast((l) => ({ name, n: (l?.n ?? 0) + 1 }))] as const;
-}
-function HapticChip({ last }: { last: { name: string; n: number } | null }) {
-  return <span key={last?.n} className="y-haptic-chip" aria-live="polite">{last ? <>хаптика <b>{last.name}</b></> : 'хаптика появится здесь'}</span>;
-}
+const LOOK = 353; // высота коллажа: от неё порог свайпа и резинка
 
 function TodayDemo() {
   const [occ, setOcc] = useState(0);
   const [i, setI] = useState(0);
   const [done, setDone] = useState<Record<string, boolean>>({});
-  const [sheet, setSheet] = useState<'closed' | 'open' | 'leaving'>('closed');
-  const [drag, setDrag] = useState(0);
-  const [haptic, fire] = useHaptic();
-  const g = useRef<{ y: number; t: number; crossed: boolean } | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const [drag, setDrag] = useState<number | null>(null);
+  const g = useRef<{ y: number; crossed: boolean } | null>(null);
+  const speed = useRef(velocityTracker());
   // у каждого повода свой порядок образов
   const order = looks.map((_, k) => (k + occ) % looks.length);
   const n = order.length;
   const id = `${occ}-${i}`;
 
-  const down = (e: PointerEvent) => { (e.currentTarget as Element).setPointerCapture(e.pointerId); g.current = { y: e.clientY, t: e.timeStamp, crossed: false }; };
+  const down = (e: PointerEvent) => {
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    g.current = { y: e.clientY, crossed: false };
+    speed.current.reset();
+    speed.current.add(e.clientX, e.clientY, e.timeStamp);
+  };
   const move = (e: PointerEvent) => {
     if (!g.current) return;
-    let dy = e.clientY - g.current.y;
+    speed.current.add(e.clientX, e.clientY, e.timeStamp);
+    const dy = e.clientY - g.current.y;
+    if (drag === null && Math.abs(dy) < gesture.slop) return;
     const edge = (dy < 0 && i === n - 1) || (dy > 0 && i === 0);
-    if (edge) dy *= RUBBER; // сопротивление на первом и последнем образе
-    const crossed = !edge && Math.abs(dy) > SWIPE;
-    if (crossed && !g.current.crossed) fire('threshold'); // один раз при пересечении порога
+    const crossed = !edge && Math.abs(dy) > LOOK * gesture.swipeDistance;
+    if (crossed && !g.current.crossed) haptic('threshold'); // один раз при пересечении порога
     g.current.crossed = crossed;
-    setDrag(dy);
+    setDrag(edge ? rubberBand(dy, LOOK) : dy); // на первом и последнем образе — сопротивление
   };
   const up = (e: PointerEvent) => {
     if (!g.current) return;
-    const dy = e.clientY - g.current.y, v = Math.abs(dy) / Math.max(1, e.timeStamp - g.current.t);
+    const dy = e.clientY - g.current.y, v = speed.current.get().y;
     g.current = null;
-    setDrag(0);
-    const dir = dy < 0 ? 1 : -1;
-    const target = i + dir;
-    if ((Math.abs(dy) > SWIPE || (v > VELOCITY && Math.abs(dy) > 10)) && target >= 0 && target < n) { setI(target); fire('skip'); }
+    setDrag(null); // стопка отпускается из текущего положения на пружине gentle
+    const target = i + (dy < 0 ? 1 : -1);
+    const flick = Math.abs(v) > gesture.swipeVelocity && Math.abs(dy) > gesture.slop && Math.sign(v) === Math.sign(dy);
+    if ((Math.abs(dy) > LOOK * gesture.swipeDistance || flick) && target >= 0 && target < n) { setI(target); haptic('skip'); }
   };
   const pick = (k: number) => {
-    fire('select');
     setOcc(k); setI(0);
-    setTimeout(() => setSheet('leaving'), 150); // выбор успевает отрисоваться
-    setTimeout(() => setSheet('closed'), 150 + 150);
+    window.setTimeout(() => setSheet(false), motionMs('--motion-select')); // выбор успевает отрисоваться, потом шторка уходит
   };
+  // шторка «Повод» уходит и когда её закрыли жестом, и когда закрыл выбор повода
+  const layer = usePresence(sheet ? (
+    <Overlay onClose={() => setSheet(false)}>
+      <Sheet title="Повод">
+        <List>{occasionList.map((o, k) => <ListItem key={o} type="radio" label={o} checked={k === occ} onClick={() => pick(k)} />)}</List>
+      </Sheet>
+    </Overlay>
+  ) : undefined);
   const cls = (k: number) => (k === i ? 'is-current' : k === i + 1 ? 'is-next' : k === i - 1 ? 'is-prev' : k > i ? 'is-below' : 'is-above');
-  const live: CSSProperties | undefined = drag ? { transform: `translateY(${drag}px) scale(${1 - Math.min(0.3, Math.abs(drag) / 1200)})`, transition: 'none' } : undefined;
 
   return (
     <div className="y-motion-phone y-today-demo">
       <StatusBar />
       <div className="y-today-demo__head">
         <h2 className="y-h1">Твои образы</h2>
-        <button type="button" className="y-header__accent y-h1" onClick={() => setSheet('open')} aria-haspopup="dialog">
+        <button type="button" className="y-header__accent y-h1" onClick={() => setSheet(true)} aria-haspopup="dialog">
           <span key={occ} className="y-today-demo__occ">{occasionList[occ].toLowerCase()}</span>
           <Icon name="chevron-up-down" size={20} />
         </button>
       </div>
-      <div className="y-swap y-swap--drag" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} role="group" aria-label="Образы: свайп вверх — следующий, вниз — предыдущий">
+      <div
+        className="y-swap y-swap--drag"
+        data-dragging={drag !== null || undefined}
+        style={{ ['--drag' as string]: `${drag ?? 0}px`, ['--turn' as string]: `${i * 180}deg` }}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+        role="group" aria-label="Образы: свайп вверх — следующий, вниз — предыдущий"
+      >
         {order.map((look, k) => (
-          <div key={look} className={`y-swap__look ${cls(k)}`} style={k === i ? live : undefined}>
+          <div key={look} className={`y-swap__look ${cls(k)}`}>
             <OutfitCollage items={looks[look]} />
           </div>
         ))}
+        <div className="y-today__weather" onPointerDown={(e) => e.stopPropagation()}><WeatherCard temperature="20°" description="Солнечно, ветер 14 км/ч" tilt /></div>
         <span className="y-swap__stamp" onPointerDown={(e) => e.stopPropagation()}>
-          <Stamp label="Надеть" done={!!done[id]} onClick={() => { setDone((d) => ({ ...d, [id]: !d[id] })); if (!done[id]) fire('stamp'); }} />
+          <Stamp label="Надеть" done={!!done[id]} onClick={() => setDone((d) => ({ ...d, [id]: !d[id] }))} />
         </span>
       </div>
       <div className="y-today-demo__foot">
-        <HapticChip last={haptic} />
+        <HapticChip />
         <span className="y-caption y-text--secondary">Свайп вверх или вниз по коллажу · образ {i + 1} из {n}</span>
       </div>
-      {sheet !== 'closed' && (
-        <div className={`y-overlay${sheet === 'leaving' ? ' is-leaving' : ''}`} onClick={() => setSheet('leaving')}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: '100%' }}>
-            <Sheet title="Повод">
-              <List>{occasionList.map((o, k) => <ListItem key={o} type="radio" label={o} checked={k === occ} onClick={() => pick(k)} />)}</List>
-            </Sheet>
-          </div>
-        </div>
-      )}
+      {layer.node && <LeavingContext.Provider value={layer.leaving}>{layer.node}</LeavingContext.Provider>}
     </div>
   );
 }
@@ -214,6 +222,7 @@ export const PhotoCollapse: Story = { name: 'Сворачивание фото',
 function PressDemo() {
   const [chips, setChips] = useState(['Офис']);
   const [check, setCheck] = useState(true);
+  const [liked, setLiked] = useState(false);
   return (
     <div className="y-press-grid">
       <figure><Button size="M">Кнопка</Button><figcaption>scale 0.97 · press</figcaption></figure>
@@ -228,6 +237,8 @@ function PressDemo() {
         <figcaption>строка — подсветка фона, без сжатия</figcaption>
       </figure>
       <figure><Stamp label="Не нравится" tone="secondary" /><figcaption>штамп 0.94 · stamp</figcaption></figure>
+      <figure style={{ width: 173 }}><ProductCard kind="outerwear" name="Пальто" price="12 990 ₽" liked={liked} onLike={() => setLiked((v) => !v)} /><figcaption>лайк — прыжок на пружине drop · toggle</figcaption></figure>
+      <figure><HapticChip /><figcaption>хаптика последнего действия</figcaption></figure>
     </div>
   );
 }
@@ -241,31 +252,72 @@ const occasions = ['Офис', 'На каждый день', 'Свидание',
 
 function PagerDemo() {
   const [i, setI] = useState(1);
-  const start = useRef<number | null>(null);
-  const go = (d: number) => setI((v) => Math.min(occasions.length - 1, Math.max(0, v + d)));
-  const down = (e: PointerEvent) => (start.current = e.clientX);
-  const up = (e: PointerEvent) => {
-    if (start.current === null) return;
-    const dx = e.clientX - start.current;
-    start.current = null;
-    if (Math.abs(dx) > 30) go(dx < 0 ? 1 : -1);
+  const [drag, setDrag] = useState<number | null>(null);
+  const g = useRef<{ x: number; y: number; crossed: boolean; axis?: 'x' | 'y' } | null>(null);
+  const speed = useRef(velocityTracker());
+  const PAGE = 353 + 20;
+  const last = occasions.length - 1;
+  const go = (k: number) => { if (k !== i) haptic('select'); setI(Math.min(last, Math.max(0, k))); };
+  const down = (e: PointerEvent) => {
+    g.current = { x: e.clientX, y: e.clientY, crossed: false };
+    speed.current.reset();
+    speed.current.add(e.clientX, e.clientY, e.timeStamp);
   };
-  const track: CSSProperties = { transform: `translateX(calc(${-i} * (353px + 20px)))` };
+  const move = (e: PointerEvent) => {
+    const s = g.current;
+    if (!s) return;
+    speed.current.add(e.clientX, e.clientY, e.timeStamp);
+    const dx = e.clientX - s.x, dy = e.clientY - s.y;
+    if (!s.axis) {
+      if (Math.hypot(dx, dy) < gesture.slop) return;
+      s.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; // вертикальный жест — скролл страницы, не листание
+      if (s.axis === 'x') (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    }
+    if (s.axis !== 'x') return;
+    const edge = (dx > 0 && i === 0) || (dx < 0 && i === last);
+    const crossed = !edge && Math.abs(dx) > 353 * gesture.swipeDistance;
+    if (crossed && !s.crossed) haptic('threshold');
+    s.crossed = crossed;
+    setDrag(edge ? rubberBand(dx, 353) : dx);
+  };
+  const up = (e: PointerEvent) => {
+    const s = g.current;
+    g.current = null;
+    setDrag(null);
+    if (!s || s.axis !== 'x') return;
+    const dx = e.clientX - s.x, v = speed.current.get().x;
+    if (Math.abs(dx) > 353 * gesture.swipeDistance || (Math.abs(v) > gesture.swipeVelocity && Math.sign(v) === Math.sign(dx))) go(i + (dx < 0 ? 1 : -1));
+  };
+  const track: CSSProperties = { transform: `translateX(${-i * PAGE + (drag ?? 0)}px)`, transition: drag === null ? undefined : 'none' };
   return (
     <div className="y-motion-phone">
       <StatusBar />
-      <div className="y-pager" onPointerDown={down} onPointerUp={up}>
+      <div className="y-pager" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <div className="y-pager__track" style={track}>
           {occasions.map((o, k) => (
             <div key={o} className="y-pager__page"><OutfitCollage items={looks[k % looks.length]} /></div>
           ))}
         </div>
       </div>
-      <div className="y-pager__chips" style={{ transform: `translateX(${80 - i * 110}px)` }}>
-        <ChipGroup chips={occasions.map((label, k) => ({ label, selected: k === i }))} onToggle={(label) => setI(occasions.indexOf(label))} />
+      <div className="y-pager__chips" style={{ transform: `translateX(${80 - i * 110 + (drag ?? 0) * (110 / PAGE)}px)`, transition: drag === null ? undefined : 'none' }}>
+        <ChipGroup chips={occasions.map((label, k) => ({ label, selected: k === i }))} onToggle={(label) => go(occasions.indexOf(label))} />
       </div>
-      <p className="y-caption y-text--secondary" style={{ padding: '16px 20px', textAlign: 'center' }}>Свайпни образ или выбери повод.</p>
+      <p className="y-caption y-text--secondary" style={{ padding: '16px 20px 8px', textAlign: 'center' }}>Свайпни образ или выбери повод: лента едет за пальцем, дальше 30 % или бросок — следующий, на краях — резинка.</p>
+      <div style={{ display: 'flex', justifyContent: 'center' }}><HapticChip /></div>
+      <div style={{ marginTop: 'auto', padding: '0 20px 24px' }}>
+        <Carousel title="Давно не надевалось" itemWidth={138}>{looks.flat().slice(0, 7).map((it, k) => <ItemCard key={k} kind={it.kind} color={it.color} />)}</Carousel>
+      </div>
     </div>
   );
 }
-export const OccasionPager: Story = { name: 'Листание поводов', render: () => <PagerDemo /> };
+export const OccasionPager: Story = { name: 'Листание поводов и карусель', render: () => <PagerDemo /> };
+
+/* ─── Механики экранов ──────────────────────────────────────────────── */
+
+export const SheetDismiss: Story = { name: 'Шторка: появление, уход, смахивание', render: () => <SheetDemo /> };
+export const HeaderScroll: Story = { name: 'Шапка и липкие фильтры при скролле', render: () => <HeaderScrollDemo /> };
+export const Selection: Story = { name: 'Микро: сегмент и радио', render: () => <SelectDemo /> };
+export const Feedback: Story = { name: 'Snackbar, подсказка, загрузка', render: () => <FeedbackDemo /> };
+export const CanvasGesture: Story = { name: 'Холст: подъём, бросок, щипок', render: () => <CanvasDemo /> };
+export const ProfileAccounts: Story = { name: 'Профиль: аккаунты и период', render: () => <ProfileDemo /> };
+export const PushPop: Story = { name: 'Переход между экранами', render: () => <PageStackDemo /> };

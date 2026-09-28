@@ -1,7 +1,8 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { useEffect, useRef, type ButtonHTMLAttributes } from 'react';
 import type { IconName } from '../icons/icons';
 import { stampStar } from '../icons/brand';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 import { Icon } from './icon';
 
 /* ─── Button ────────────────────────────────────────────────────────── */
@@ -100,18 +101,30 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
 
 /**
  * Штамп — фирменная кнопка главного действия поверх коллажа. Одна на экран.
- * Нажатие анимируется пружиной `--motion-stamp` (bouncy, 958 мс).
+ * Нажатие: сжатие 0.94 (`--gesture-press-scale-stamp`, press). Переход в «выполнено» — пружина `--motion-stamp`
+ * (bouncy, 958 мс): звезда 148 → 78, −60°, чернеет, «Надеть» гаснет, появляется «отменить»; хаптика `stamp`
+ * в пик пружины (~120 мс). Малый штамп — хаптика `skip` на нажатии.
  *
  * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + малый чёрный штамп «Не нравится» (палец вниз).
  */
-export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, ...rest }: StampProps) {
+export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, onClick, ...rest }: StampProps) {
   const size = tone === 'secondary' ? 'S' : 'L';
+  const was = useRef(done);
+  useEffect(() => {
+    if (done && !was.current) {
+      const t = window.setTimeout(() => haptic('stamp'), 120); // пик пружины bouncy, а не касание
+      was.current = done;
+      return () => window.clearTimeout(t);
+    }
+    was.current = done;
+  }, [done]);
   return (
     <button
       type="button"
       aria-label={done ? `Отменить: ${label}` : label}
       aria-pressed={done}
       className={cx('y-stamp', `y-stamp--${size}`, `y-stamp--${tone}`, done && 'y-stamp--done', className)}
+      onClick={(e) => { if (tone === 'secondary') haptic('skip'); onClick?.(e); }}
       {...rest}
     >
       <svg className="y-stamp__shape" viewBox="0 0 144 144" aria-hidden>
