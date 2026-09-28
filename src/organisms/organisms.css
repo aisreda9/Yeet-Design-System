@@ -362,3 +362,58 @@
 .y-outfit-pager__nav:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 .y-outfit-pager__nav [aria-disabled='true'] { opacity: 0.4; cursor: default; }
 .y-outfit-pager__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; } /* только для скринридера */
+
+/* ─── Sheet · описание (#27) ─── */
+/* Settings / Currency 513:6256: Body серым 12 под заголовком (через правило title + *), 20 до контента */
+.y-sheet__description + * { margin-top: var(--space-4); }
+
+/* ─── Аватар стилиста (#27) ─── */
+.y-stylist-face { display: block; object-fit: contain; user-select: none; }
+
+/* ─── ItemSlots (#27) ─── */
+/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель во всю ширину; заголовок H2 → 16 → ряд карточек 173 × 172 */
+.y-item-slots {
+  display: flex; flex-direction: column; padding-top: var(--space-20);
+  background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
+}
+.y-item-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter) var(--space-20); }
+.y-item-slot + .y-item-slot { border-top: 1px solid var(--color-divider); padding-top: var(--space-20); }
+/* ряд выходит на поля экрана; поля ряда (50 % секции + 20 − 86.5 = 110 при 393) дают первой и последней вещи встать по центру */
+.y-item-slot__row {
+  --slot-card: 173px;
+  position: relative; display: flex; gap: var(--space-8); margin-inline: calc(-1 * var(--screen-gutter));
+  padding-inline: calc(50% + var(--screen-gutter) - var(--slot-card) / 2); scroll-padding-inline: calc(50% - var(--slot-card) / 2);
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+}
+.y-item-slot__row::-webkit-scrollbar { display: none; }
+.y-item-slot__row:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--card-radius); }
+.y-item-slot__item { flex: none; width: var(--slot-card); scroll-snap-align: center; }
+/* «+»: карточка той же ширины без фона, кнопка в 22 от края рядом с последней вещью; в пустой секции — по центру */
+.y-item-slot__add { flex: none; width: var(--slot-card); aspect-ratio: 173 / 172; display: grid; place-items: center start; padding-left: 21px; }
+.y-item-slot__row--empty .y-item-slot__add { place-items: center; padding-left: 0; }
+
+/* ─── CropFrame (#27) ─── */
+/* Search / Photo / Crop 261:1590: рамка 353 × 226, радиус 20; снаружи — затемнение overlay, по углам — белые уголки 2 px */
+.y-crop { position: relative; overflow: hidden; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.y-crop__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.y-crop__frame {
+  position: absolute; z-index: 1; cursor: move; touch-action: none;
+  left: calc(var(--crop-x) * 100%); top: calc(var(--crop-y) * 100%); width: calc(var(--crop-w) * 100%); height: calc(var(--crop-h) * 100%);
+  border-radius: var(--radius-lg); box-shadow: 0 0 0 100vmax var(--color-bg-overlay);
+  transition: box-shadow var(--motion-fade);
+}
+.y-crop.is-active .y-crop__frame { box-shadow: 0 0 0 100vmax var(--color-bg-overlay), inset 0 0 0 1px rgb(255 255 255 / 0.4); }
+.y-crop__frame:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+/* уголок 32 видимый, зона захвата 44 (углы выходят за рамку на 10) */
+.y-crop__corner { position: absolute; width: 44px; height: 44px; touch-action: none; }
+.y-crop__corner::before { content: ''; position: absolute; width: 32px; height: 32px; border: 2px solid var(--color-text-on-photo); }
+.y-crop__corner--nw { left: -10px; top: -10px; cursor: nwse-resize; }
+.y-crop__corner--ne { right: -10px; top: -10px; cursor: nesw-resize; }
+.y-crop__corner--sw { left: -10px; bottom: -10px; cursor: nesw-resize; }
+.y-crop__corner--se { right: -10px; bottom: -10px; cursor: nwse-resize; }
+.y-crop__corner--nw::before { left: 10px; top: 10px; border-width: 2px 0 0 2px; border-top-left-radius: var(--radius-lg); }
+.y-crop__corner--ne::before { right: 10px; top: 10px; border-width: 2px 2px 0 0; border-top-right-radius: var(--radius-lg); }
+.y-crop__corner--sw::before { left: 10px; bottom: 10px; border-width: 0 0 2px 2px; border-bottom-left-radius: var(--radius-lg); }
+.y-crop__corner--se::before { right: 10px; bottom: 10px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius-lg); }
+/* подсказка в 20 над кнопкой L внизу экрана: 20 + 52 + 20 */
+.y-crop__hint { position: absolute; left: 0; right: 0; bottom: var(--crop-hint-bottom, 92px); z-index: 2; display: flex; justify-content: center; pointer-events: none; }

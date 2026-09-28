@@ -93,4 +93,7 @@ export const registry: Entry[] = [
 
   // Волна 2 · organisms (#25)
   { code: 'OutfitPager', figma: 'стопка / лента образов (флоу Outfits, Stylist)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 232:1355, 798:1741 (стопка), 463:1534 (лента); Animations «scale» 354:17678', level: 'Organisms', section: '07 Content', story: 'Organisms/OutfitPager', note: 'axis y / x, превью 96 / 150, слоты weather, stamp, skip' },
+  { code: 'ItemSlots', figma: 'выбор вещей в образ (флоу Outfit Creation)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 414:1459 (ряды 414:1476, 414:1499, пустой 414:1491), 414:1541', level: 'Organisms', section: '07 Content', story: 'Organisms/ItemSlots', note: 'ItemSlots + ItemSlot: ряд со снапом, «+» в конце' },
+  { code: 'CropFrame', figma: 'рамка обрезки (флоу Search / Photo / Crop)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, кадр 261:1590 — плоская картинка', level: 'Organisms', section: '07 Content', story: 'Organisms/CropFrame', note: 'затемнение, уголки, перемещение, углы, щипок' },
+  { code: 'StylistAvatar', figma: 'аватар стилиста 64 (флоу Stylist)', figmaId: null, figmaWhy: 'иллюстрация в макетах 413:846 (слой 699:2534), 699:2858; не компонент', level: 'Organisms', section: '07 Content', story: 'Organisms/ChatBubble', note: 'ChatBubble avatar={true}' },
 ];
