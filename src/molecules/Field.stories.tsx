@@ -18,7 +18,8 @@ const meta = {
     docs: {
       description: {
         component: `**Field** — строка поля 56 (Figma: \`input\` + \`input-value\`), всегда внутри **InputGroup** (карточка light-grey, радиус 20, слот Inputs).
-Паттерны: ввод текста (\`input\`) · «ключ — значение» (\`value\` + \`chevron-up-down\`, выбор открывает sheet; длинное значение обрезается «…») · пароль (\`eye\`) · многострочное поле (\`multiline\`, 104, текст сверху, паддинг 16/20 — «Комментарий»). Иконка справа — 20. Ошибка — красный текст, без рамок.`,
+Паттерны: ввод текста (\`input\`) · «ключ — значение» (\`value\` + \`chevron-up-down\`, выбор открывает sheet; длинное значение обрезается «…») · пароль (\`type: 'password'\` — глаз встроен: показывает и скрывает пароль, \`eye\` ↔ \`eye-off\`) · многострочное поле (\`multiline\`, 104, текст сверху, паддинг 16/20 — «Комментарий»). Иконка справа — 20; с \`onTrailingClick\` это кнопка с именем \`trailingLabel\`, без обработчика — декоративная. Ошибка — красный текст, без рамок.
+**Доступность:** строка с \`onClick\` фокусируется по Tab и срабатывает на Enter и пробел; фокус — кольцо 1.5 \`text-accent\` по строке (виден в Light/Dark и во всех брендах).`,
       },
     },
   },
@@ -32,13 +33,28 @@ export const TextInput: Story = { name: 'Ввод текста', args: { label: 
 
 export const Multiline: Story = { name: 'Многострочное', args: { label: 'Комментарий', value: undefined, trailingIcon: undefined, multiline: {} } };
 
+export const Password: Story = { name: 'Пароль', args: { label: 'Пароль', value: undefined, trailingIcon: undefined, input: { type: 'password', defaultValue: 'yeet-2026' } } };
+
+/** Фокус: кольцо 1.5 `text-accent` по строке. Без фокуса вид прежний. */
+export const Focus: Story = {
+  name: 'Фокус',
+  args: { label: 'Название', value: undefined, trailingIcon: undefined, input: { defaultValue: 'Кожаная сумка' } },
+  play: async ({ canvasElement }) => { canvasElement.querySelector('input')?.focus(); },
+};
+
+/** Строка-выбор с `onClick`: Tab доводит до неё (кольцо как у поля), Enter и пробел открывают выбор. */
+export const SelectRow: Story = {
+  name: 'Выбор с клавиатуры',
+  args: { label: 'Страна', value: 'Россия', trailingIcon: 'chevron-up-down', onClick: () => {} },
+};
+
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
   name: 'В флоу',
   tags: ['bare'],
   render: () => (
     <UsageGrid min={353}>
-      <Usage screen="Auth / Sign In"><InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /><Field label="Пароль" input={{ type: 'password', defaultValue: 'yeet-2026' }} trailingIcon="eye" /></InputGroup></Usage>
+      <Usage screen="Auth / Sign In"><InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /><Field label="Пароль" input={{ type: 'password', defaultValue: 'yeet-2026' }} /></InputGroup></Usage>
       <Usage screen="New Item / Details" note="ввод"><InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup></Usage>
       <Usage screen="New Item / Details" note="ключ — значение, выбор в sheet"><InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /></InputGroup></Usage>
       <Usage screen="Settings" note="страна и валюта"><InputGroup><Field label="Страна" value="Россия" trailingIcon="chevron-up-down" /><Field label="Валюта" value="₽ · RUB" trailingIcon="chevron-up-down" /></InputGroup></Usage>

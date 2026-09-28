@@ -2,31 +2,62 @@ name: QA Storybook
 
 on:
   push:
-    branches: [main, claude/figma-access-ara4o8]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  # Новый пуш в PR отменяет устаревший прогон; прогоны main доигрывают до конца
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   qa:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
+      # До build-storybook: он сам перегенерирует токены и скроет ручную правку
+      - name: Сгенерированные токены совпадают с tokens/tokens.json (npm run tokens)
+        run: |
+          node scripts/build-tokens.mjs
+          if [ -n "$(git status --porcelain -- src/tokens tokens native)" ]; then
+            git status --porcelain -- src/tokens tokens native
+            git diff --stat -- src/tokens tokens native
+            echo '::error::Сгенерированные файлы не совпадают с генератором. Правь tokens/tokens.json или scripts/build-tokens.mjs, затем `npm run tokens` и закоммить результат.'
+            exit 1
+          fi
       - run: npm ci
       - run: npm run typecheck
-      - run: npm run build-storybook
-      - run: npx playwright-core install --with-deps chromium
+      - id: build
+        run: npm run build-storybook
+      - name: Версия Playwright
+        id: pw
+        run: echo "version=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Кэш браузеров Playwright
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright-core install --with-deps chromium
+      # Браузер из кэша, но системные библиотеки на чистом раннере ставить всё равно нужно
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright-core install-deps chromium
       - run: npm run contrast
       - name: QA (тени, края, спеки Figma, доступность, скриншоты)
         run: npm run qa
       - name: Сверка экранов с флоу Figma (тексты, позиции, шрифты, цвета)
-        if: always()
+        # И после падения QA, но не когда сборка не дошла до конца — иначе ошибка сборки тонет в ERR_MODULE_NOT_FOUND
+        if: always() && steps.build.outcome == 'success'
         run: npm run flow-diff -- --strict
       - if: always()
         run: cat qa/out/report.md qa/out/flow-diff.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true

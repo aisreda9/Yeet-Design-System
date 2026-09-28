@@ -2,7 +2,7 @@ name: Storybook → GitHub Pages
 
 on:
   push:
-    branches: [main, claude/figma-access-ara4o8]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -17,11 +17,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run typecheck
@@ -34,6 +35,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

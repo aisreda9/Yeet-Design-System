@@ -39,7 +39,7 @@ export const SignIn: Story = {
     <Screen header={<Header type="back" title="Вход и регистрация" />}>
       <InputGroup>
         <Field label="E-mail" input={{ type: 'email' }} />
-        <Field label="Пароль" input={{ type: 'password' }} trailingIcon="eye" />
+        <Field label="Пароль" input={{ type: 'password' }} />
       </InputGroup>
       <Button size="L" fullWidth>Войти</Button>
       <Button variant="ghost" size="L" style={{ alignSelf: 'center', marginTop: -12 }}>Забыли пароль?</Button>
@@ -198,7 +198,7 @@ function CanvasScreen() {
     setItems((cur) => (cur.some((c) => c.id === w.id) ? cur.filter((c) => c.id !== w.id) : [...cur, { ...w, ...spots[w.id] }]));
   return (
     <Screen
-      header={<Header type="bar" center={<SegmentControl size="M" fit value="canvas" segments={[{ value: 'items', icon: 'wardrobe' }, { value: 'canvas', icon: 'collage' }, { value: 'info', icon: 'info' }]} />} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
+      header={<Header type="bar" center={<SegmentControl size="M" fit value="canvas" segments={[{ value: 'items', icon: 'wardrobe', ariaLabel: 'Гардероб' }, { value: 'canvas', icon: 'collage', ariaLabel: 'Коллаж' }, { value: 'info', icon: 'info', ariaLabel: 'Описание' }]} />} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
       bottom={<BottomBar label="Далее" />}
     >
       <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
@@ -657,9 +657,9 @@ export const CurrencySheet: Story = {
 export const PasswordRecovery: Story = {
   name: 'Auth / Password Recovery',
   render: () => (
-    <Screen header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}>
+    <Screen header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём код для сброса пароля" />}>
       <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
-      <Button size="L" fullWidth>Отправить ссылку</Button>
+      <Button size="L" fullWidth>Отправить код</Button>
     </Screen>
   ),
 };
@@ -668,11 +668,11 @@ export const PasswordRecoverySent: Story = {
   name: 'Auth / Password Recovery / Dialog / Sent',
   render: () => (
     <Screen
-      header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём ссылку для сброса пароля" />}
-      overlay={<Overlay><Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" /></Overlay>}
+      header={<Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём код для сброса пароля" />}
+      overlay={<Overlay><Dialog title="Готово!" description="Мы отправили код для сброса пароля на sima@space.com" confirm="Ок!" /></Overlay>}
     >
       <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
-      <Button size="L" fullWidth>Отправить ссылку</Button>
+      <Button size="L" fullWidth>Отправить код</Button>
     </Screen>
   ),
 };
