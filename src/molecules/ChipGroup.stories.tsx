@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useArgs } from 'storybook/preview-api';
 import { ChipGroup, type Chip } from '.';
-import { unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
+import { onOverlay, unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
+import { ItemCard, Sheet } from '../organisms';
+import { Grid } from '../templates';
 
 const meta = {
   title: 'Molecules/ChipGroup',
@@ -51,4 +53,21 @@ export const InFlow: Story = {
       <Usage screen="Search / Discover" note="подсказки запросов"><ChipGroup wrap chips={['Nike', 'Crocs', 'Marine Serre', 'Обувь для бега'].map((label) => ({ label }))} /></Usage>
     </UsageGrid>
   ),
+};
+
+/**
+ * Лента без `wrap` в шторке (Figma: Outfit Creation / Item Filter / Sheet, `414:1842`): первый чипс на полях шторки, как заголовок,
+ * а лента уходит под край шторки, не экрана, — последний чипс обрезан краем шторки и прокручивается.
+ */
+export const InSheet: Story = {
+  name: 'В шторке',
+  parameters: { controls: { disable: true } },
+  tags: ['bare'],
+  render: () =>
+    onOverlay(() => (
+      <Sheet title="Низ" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}>
+        <ChipGroup chips={[{ label: 'Все' }, { label: 'Джинсы', selected: true }, { label: 'Брюки' }, { label: 'Легинсы' }, { label: 'Шорты' }, { label: 'Юбки' }]} />
+        <Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="grey" /></Grid>
+      </Sheet>
+    )),
 };
