@@ -60,11 +60,14 @@ const axeSource = readFileSync(join(root, 'node_modules/axe-core/axe.min.js'), '
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(join(outDir, 'screens'), { recursive: true });
 mkdirSync(join(outDir, 'diff'), { recursive: true });
-if (args['update-baseline']) {
-  // полный прогон переписывает эталоны целиком: удалённые истории не оставляют сирот
-  if (!args.only) rmSync(baseDir, { recursive: true, force: true });
-  mkdirSync(baseDir, { recursive: true });
+if (args['update-baseline']) mkdirSync(baseDir, { recursive: true });
+
+/** Число пикселей, отличающихся сильнее threshold 0.1, или null, если размер другой. */
+function pixelDiff(a, b, out) {
+  if (a.width !== b.width || a.height !== b.height) return null;
+  return pixelmatch(a.data, b.data, out?.data ?? null, a.width, a.height, { threshold: 0.1 });
 }
+let rewritten = 0;
 
 /** @type {{level:'error'|'warn', check:string, story:string, theme:string, detail:string}[]} */
 const issues = [];
@@ -234,6 +237,8 @@ for (const story of stories) {
   for (const theme of THEMES) {
     current = { story: story.id, theme };
     await page.goto(`${origin}/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story&globals=theme:${theme}`, { waitUntil: 'networkidle' });
+    // рендер и play-функция (фокус, ввод) доиграли — иначе скриншот ловит промежуточное состояние
+    await page.waitForFunction(() => ['finished', 'errored', 'aborted'].includes(window.__STORYBOOK_PREVIEW__?.currentRender?.phase ?? 'finished'), null, { timeout: 10_000 }).catch(() => add('error', 'история не доиграла', current.story, current.theme, 'play-функция не завершилась за 10 с'));
     await page.evaluate(() => document.fonts.ready);
     await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' });
     await page.waitForTimeout(80);
@@ -275,15 +280,20 @@ for (const story of stories) {
     screens++;
     shotFiles.add(file);
     if (!visual) continue;
-    if (args['update-baseline']) writeFileSync(join(baseDir, file), shot);
+    if (args['update-baseline']) {
+      // эталон переписывается, только если картинка действительно другая: субпороговый шум (затемнение, панели)
+      // иначе давал бы бинарные правки PNG и конфликты между параллельными PR
+      const prev = existsSync(join(baseDir, file)) ? pixelDiff(PNG.sync.read(readFileSync(join(baseDir, file))), PNG.sync.read(shot)) : null;
+      if (prev === null || prev > DIFF_MAX_PX) { writeFileSync(join(baseDir, file), shot); rewritten++; }
+    }
     else if (!existsSync(join(baseDir, file))) { add('error', 'нет эталона', story.id, theme, `qa/baseline/${file} — новая история? \`npm run qa -- --update-baseline\``); diffs++; }
     else {
       compared++;
       const a = PNG.sync.read(readFileSync(join(baseDir, file)));
       const b = PNG.sync.read(shot);
-      if (a.width !== b.width || a.height !== b.height) { add('error', 'визуальная разница', story.id, theme, `размер ${a.width}×${a.height} → ${b.width}×${b.height}`); diffs++; continue; }
       const diff = new PNG({ width: a.width, height: a.height });
-      const n = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0.1 });
+      const n = pixelDiff(a, b, diff);
+      if (n === null) { add('error', 'визуальная разница', story.id, theme, `размер ${a.width}×${a.height} → ${b.width}×${b.height}`); diffs++; continue; }
       if (n > DIFF_MAX_PX) {
         writeFileSync(join(outDir, 'diff', file), PNG.sync.write(diff));
         add('error', 'визуальная разница', story.id, theme, `${n} px (${(100 * n / (a.width * a.height)).toFixed(3)} %) — qa/out/diff/${file}`);
@@ -294,8 +304,11 @@ for (const story of stories) {
 }
 
 // эталон без истории (история удалена или переименована) — эталоны должны отражать ровно текущий Storybook
-if (visual && !args['update-baseline'] && !args.only && existsSync(baseDir)) {
-  for (const f of readdirSync(baseDir).filter((f) => f.endsWith('.png') && !shotFiles.has(f))) add('error', 'лишний эталон', f.replace(/--(light|dark)\.png$/, ''), f.match(/--(\w+)\.png$/)?.[1] ?? '', `qa/baseline/${f} — истории нет; \`npm run qa -- --update-baseline\``);
+if (visual && !args.only && existsSync(baseDir)) {
+  for (const f of readdirSync(baseDir).filter((f) => f.endsWith('.png') && !shotFiles.has(f))) {
+    if (args['update-baseline']) { rmSync(join(baseDir, f)); rewritten++; continue; }
+    add('error', 'лишний эталон', f.replace(/--(light|dark)\.png$/, ''), f.match(/--(\w+)\.png$/)?.[1] ?? '', `qa/baseline/${f} — истории нет; \`npm run qa -- --update-baseline\``);
+  }
 }
 
 /* ─── Резиновая вёрстка: экраны на 320 и 430 (края, вылезший текст, зоны нажатия; без эталона и спек) ── */
@@ -328,7 +341,7 @@ const knownList = list.filter((i) => i.level === 'known');
 // запись в KNOWN, которая больше ничего не гасит, — ошибка: исключения не должны переживать починку
 if (!args.only) for (const k of Object.keys(KNOWN)) if (!knownList.some((i) => `${i.check}|${i.story}` === k)) errors.push({ level: 'error', check: 'устаревшее исключение', story: k.split('|')[1], theme: '', detail: `уберите из KNOWN в run.mjs: ${k}` });
 const visualLine = visual
-  ? args['update-baseline'] ? `эталоны обновлены: ${screens}` : `визуальная регрессия: сравнено ${compared}/${screens}, расхождений ${diffs}`
+  ? args['update-baseline'] ? `эталоны: снято ${screens}, изменено и удалено ${rewritten}` : `визуальная регрессия: сравнено ${compared}/${screens}, расхождений ${diffs}`
   : `визуальная регрессия: **не проверялась** (нет закреплённого образа${process.env.CI ? '' : ', локальный прогон'})`;
 if (!visual && process.env.CI) errors.push({ level: 'error', check: 'визуальная регрессия не проверена', story: '—', theme: '', detail: `в CI нужен Docker для ${IMAGE.split('@')[0]}` });
 const specOk = specResults.filter((s) => s.ok).length;
