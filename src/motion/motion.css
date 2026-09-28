@@ -81,3 +81,21 @@
 .y-press-grid { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; max-width: 880px; }
 .y-press-grid figure { margin: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .y-press-grid figcaption { font: 400 12px/16px var(--font-text); color: var(--color-text-secondary); }
+
+/* ─── Главная: жест смены образа и шторка повода (TodayDemo) ────────── */
+.y-today-demo { height: var(--screen-height); }
+.y-today-demo__head { display: flex; flex-direction: column; padding: 8px 20px 0; }
+.y-today-demo__head .y-header__accent { margin-top: 0; }
+.y-today-demo__occ { display: inline-block; animation: y-occ-in var(--motion-appear); }
+@keyframes y-occ-in { from { opacity: 0; transform: translateY(8px); } }
+.y-swap--drag { touch-action: none; cursor: grab; user-select: none; }
+.y-swap--drag:active { cursor: grabbing; }
+.y-today-demo .y-swap__look { top: 120px; }
+.y-today-demo .y-swap__look.is-prev { transform: translateY(-116px) scale(0.27); opacity: 1; }
+.y-today-demo .y-swap__look.is-next { transform: translateY(373px) scale(0.27); }
+.y-today-demo .y-swap__look.is-above { transform: translateY(-160px) scale(0.2); opacity: 0; }
+.y-today-demo .y-swap__look.is-below { transform: translateY(460px) scale(0.2); opacity: 0; }
+.y-today-demo .y-swap__stamp { right: 20px; top: 400px; transition: none; }
+.y-today-demo__foot { position: absolute; left: 0; right: 0; bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 3; }
+.y-haptic-chip { font: 400 12px/16px var(--font-text); padding: 6px 12px; border-radius: var(--radius-full); background: var(--color-bg-inverse); color: var(--color-text-inverse); animation: y-occ-in var(--motion-appear); }
+.y-haptic-chip b { font-weight: 600; }

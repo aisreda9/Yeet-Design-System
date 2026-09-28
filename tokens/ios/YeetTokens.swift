@@ -258,8 +258,8 @@ public enum YeetHaptic {
     public static func threshold() { UIImpactFeedbackGenerator(style: .rigid).impactOccurred() }
     /// Штамп «Надеть» — образ отмечен. В пик пружины bouncy (~120 мс после нажатия)
     public static func stamp() { UINotificationFeedbackGenerator().notificationOccurred(.success) }
-    /// Штамп «Перемешать», смена образа. На нажатии
-    public static func shuffle() { UIImpactFeedbackGenerator(style: .soft).impactOccurred() }
+    /// «Не нравится» (малый штамп), смена образа свайпом. На нажатии штампа или при перелистывании образа
+    public static func skip() { UIImpactFeedbackGenerator(style: .soft).impactOccurred() }
     /// Вещь брошена в корзину, подтверждено удаление. На отпускании над корзиной
     public static func delete() { UINotificationFeedbackGenerator().notificationOccurred(.warning) }
     /// Ошибка: неверный пароль, не загрузилось фото. Вместе с появлением текста ошибки

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
-import { ChipGroup, ListGroup, ListItem } from '../molecules';
-import { BottomNav, ItemCard, OutfitCollage, StatusBar, type CollageItem, type Tab } from '../organisms';
+import { ChipGroup, List, ListGroup, ListItem } from '../molecules';
+import { BottomNav, ItemCard, OutfitCollage, Sheet, StatusBar, type CollageItem, type Tab } from '../organisms';
 import { DragGrid } from './DragGrid';
 import { curves, sample } from './motion';
 import './motion.css';
@@ -65,7 +65,7 @@ function StampDemo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
       <Stamp label="Надеть" done={done} onClick={() => setDone((v) => !v)} />
-      <Stamp label="Перемешать" tone="secondary" size="S" icon="arrows-shuffle" onClick={() => setSpin((s) => s + 1)} style={{ transform: `rotate(${spin * 180}deg)`, transition: 'transform var(--motion-swap)' }} />
+      <Stamp label="Не нравится" tone="secondary" size="S" icon="thumb-down" onClick={() => setSpin((s) => s + 1)} style={{ transform: `translateX(${spin % 2 ? -12 : 0}px)`, transition: 'transform var(--motion-exit)' }} />
       <p className="y-caption y-text--secondary" style={{ maxWidth: 200 }}>Нажми на штамп: сжатие, поворот −60° и «×» на пружине bouncy. Повторное нажатие отменяет.</p>
     </div>
   );
@@ -87,32 +87,101 @@ function NavDemo() {
 }
 export const NavFab: Story = { name: 'Таб-бар и FAB', render: () => <NavDemo /> };
 
-/* ─── Смена образа ──────────────────────────────────────────────────── */
+/* ─── Главная: смена образа свайпом, штамп, выбор повода ───────────────── */
 
-function SwapDemo() {
+const occasionList = ['На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Спорт'];
+const SWIPE = 0.3 * 353; // --gesture-swipe-distance × высота коллажа
+const VELOCITY = 0.5; // --gesture-swipe-velocity 500 pt/с → px/мс
+const RUBBER = 0.55; // --gesture-rubber-band
+
+/** Какая хаптика сработала: в вебе вибрации нет, поэтому показываем токен. */
+function useHaptic() {
+  const [last, setLast] = useState<{ name: string; n: number } | null>(null);
+  return [last, (name: string) => setLast((l) => ({ name, n: (l?.n ?? 0) + 1 }))] as const;
+}
+function HapticChip({ last }: { last: { name: string; n: number } | null }) {
+  return <span key={last?.n} className="y-haptic-chip" aria-live="polite">{last ? <>хаптика <b>{last.name}</b></> : 'хаптика появится здесь'}</span>;
+}
+
+function TodayDemo() {
+  const [occ, setOcc] = useState(0);
   const [i, setI] = useState(0);
-  const n = looks.length;
-  const pos = (k: number) => ((k - i) % n + n) % n; // 0 текущий, 1 следующий, 2 предыдущий
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  const [sheet, setSheet] = useState<'closed' | 'open' | 'leaving'>('closed');
+  const [drag, setDrag] = useState(0);
+  const [haptic, fire] = useHaptic();
+  const g = useRef<{ y: number; t: number; crossed: boolean } | null>(null);
+  // у каждого повода свой порядок образов
+  const order = looks.map((_, k) => (k + occ) % looks.length);
+  const n = order.length;
+  const id = `${occ}-${i}`;
+
+  const down = (e: PointerEvent) => { (e.currentTarget as Element).setPointerCapture(e.pointerId); g.current = { y: e.clientY, t: e.timeStamp, crossed: false }; };
+  const move = (e: PointerEvent) => {
+    if (!g.current) return;
+    let dy = e.clientY - g.current.y;
+    const edge = (dy < 0 && i === n - 1) || (dy > 0 && i === 0);
+    if (edge) dy *= RUBBER; // сопротивление на первом и последнем образе
+    const crossed = !edge && Math.abs(dy) > SWIPE;
+    if (crossed && !g.current.crossed) fire('threshold'); // один раз при пересечении порога
+    g.current.crossed = crossed;
+    setDrag(dy);
+  };
+  const up = (e: PointerEvent) => {
+    if (!g.current) return;
+    const dy = e.clientY - g.current.y, v = Math.abs(dy) / Math.max(1, e.timeStamp - g.current.t);
+    g.current = null;
+    setDrag(0);
+    const dir = dy < 0 ? 1 : -1;
+    const target = i + dir;
+    if ((Math.abs(dy) > SWIPE || (v > VELOCITY && Math.abs(dy) > 10)) && target >= 0 && target < n) { setI(target); fire('skip'); }
+  };
+  const pick = (k: number) => {
+    fire('select');
+    setOcc(k); setI(0);
+    setTimeout(() => setSheet('leaving'), 150); // выбор успевает отрисоваться
+    setTimeout(() => setSheet('closed'), 150 + 150);
+  };
+  const cls = (k: number) => (k === i ? 'is-current' : k === i + 1 ? 'is-next' : k === i - 1 ? 'is-prev' : k > i ? 'is-below' : 'is-above');
+  const live: CSSProperties | undefined = drag ? { transform: `translateY(${drag}px) scale(${1 - Math.min(0.3, Math.abs(drag) / 1200)})`, transition: 'none' } : undefined;
+
   return (
-    <div className="y-motion-phone">
+    <div className="y-motion-phone y-today-demo">
       <StatusBar />
-      {/* нажатие на экран мышью; с клавиатуры — штамп (кнопка) */}
-      <div className="y-swap" onClick={() => setI((v) => v + 1)}>
-        {looks.map((items, k) => (
-          <div key={k} className={cx3(pos(k))}>
-            <OutfitCollage items={items} />
+      <div className="y-today-demo__head">
+        <h2 className="y-h1">Твои образы</h2>
+        <button type="button" className="y-header__accent y-h1" onClick={() => setSheet('open')} aria-haspopup="dialog">
+          <span key={occ} className="y-today-demo__occ">{occasionList[occ].toLowerCase()}</span>
+          <Icon name="chevron-up-down" size={20} />
+        </button>
+      </div>
+      <div className="y-swap y-swap--drag" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} role="group" aria-label="Образы: свайп вверх — следующий, вниз — предыдущий">
+        {order.map((look, k) => (
+          <div key={look} className={`y-swap__look ${cls(k)}`} style={k === i ? live : undefined}>
+            <OutfitCollage items={looks[look]} />
           </div>
         ))}
-        <span className="y-swap__stamp" style={{ transform: `rotate(${i * 180}deg)` }}>
-          <Stamp label="Надеть" aria-label="Следующий образ" />
+        <span className="y-swap__stamp" onPointerDown={(e) => e.stopPropagation()}>
+          <Stamp label="Надеть" done={!!done[id]} onClick={() => { setDone((d) => ({ ...d, [id]: !d[id] })); if (!done[id]) fire('stamp'); }} />
         </span>
       </div>
-      <p className="y-caption y-text--secondary" style={{ padding: '0 20px 20px', textAlign: 'center' }}>Нажми на экран: следующий образ вырастает из превью снизу.</p>
+      <div className="y-today-demo__foot">
+        <HapticChip last={haptic} />
+        <span className="y-caption y-text--secondary">Свайп вверх или вниз по коллажу · образ {i + 1} из {n}</span>
+      </div>
+      {sheet !== 'closed' && (
+        <div className={`y-overlay${sheet === 'leaving' ? ' is-leaving' : ''}`} onClick={() => setSheet('leaving')}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: '100%' }}>
+            <Sheet title="Повод">
+              <List>{occasionList.map((o, k) => <ListItem key={o} type="radio" label={o} checked={k === occ} onClick={() => pick(k)} />)}</List>
+            </Sheet>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-const cx3 = (p: number) => `y-swap__look ${p === 0 ? 'is-current' : p === 1 ? 'is-next' : 'is-prev'}`;
-export const OutfitSwap: Story = { name: 'Смена образа', render: () => <SwapDemo /> };
+export const OutfitSwap: Story = { name: 'Главная: смена образа и повод', render: () => <TodayDemo /> };
 
 /* ─── Сворачивание фото ─────────────────────────────────────────────── */
 

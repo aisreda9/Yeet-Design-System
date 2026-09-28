@@ -268,8 +268,8 @@ object YeetHaptic {
     val threshold: Int get() = if (Build.VERSION.SDK_INT >= 34) HapticFeedbackConstants.GESTURE_THRESHOLD_ACTIVATE else HapticFeedbackConstants.CLOCK_TICK
     /** Штамп «Надеть» — образ отмечен. В пик пружины bouncy (~120 мс после нажатия) */
     val stamp: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
-    /** Штамп «Перемешать», смена образа. На нажатии */
-    val shuffle: Int get() = HapticFeedbackConstants.CONTEXT_CLICK
+    /** «Не нравится» (малый штамп), смена образа свайпом. На нажатии штампа или при перелистывании образа */
+    val skip: Int get() = HapticFeedbackConstants.CONTEXT_CLICK
     /** Вещь брошена в корзину, подтверждено удаление. На отпускании над корзиной */
     val delete: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
     /** Ошибка: неверный пароль, не загрузилось фото. Вместе с появлением текста ошибки */

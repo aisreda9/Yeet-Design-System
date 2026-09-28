@@ -257,3 +257,10 @@
 /* Узкий экран (320) с «+»: вкладки без зазора, чтобы каждая была ≥ 40 по ширине */
 .y-bottom-nav { container-type: inline-size; }
 @container (max-width: 300px) { .y-tab-bar { gap: 0; } }
+/* Шторка: затемнение проявляется (fade), шторка выезжает снизу на пружине quick; уход — быстрее (exit) */
+.y-overlay { animation: y-overlay-in var(--motion-fade); }
+.y-overlay .y-sheet { animation: y-sheet-in var(--motion-nav); }
+.y-overlay.is-leaving { opacity: 0; transition: opacity var(--motion-exit); }
+.y-overlay.is-leaving .y-sheet { transform: translateY(100%); transition: transform var(--motion-exit); }
+@keyframes y-overlay-in { from { opacity: 0; } }
+@keyframes y-sheet-in { from { transform: translateY(100%); } }

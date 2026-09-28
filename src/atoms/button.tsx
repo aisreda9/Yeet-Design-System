@@ -87,7 +87,7 @@ export function IconButton({ icon, label, variant = 'tertiary', size = 'M', floa
 export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
   /** Текст действия: «Надеть», «Сохранить». Для `size="S"` не показывается — нужен `icon`. */
   label: string;
-  /** `primary` — главное действие экрана (синий), `secondary` — вспомогательное (чёрный, «Перемешать»). */
+  /** `primary` — главное действие экрана (синий), `secondary` — вспомогательное (чёрный малый, «Не нравится»). */
   tone?: 'primary' | 'secondary';
   /** L 148 — на коллаже образа; S 48 — вспомогательный штамп с иконкой. */
   size?: 'L' | 'S';
@@ -100,7 +100,7 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
  * Штамп — фирменная кнопка главного действия поверх коллажа. Одна на экран.
  * Нажатие анимируется пружиной `--motion-stamp` (bouncy, 958 мс).
  *
- * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + чёрный штамп «Перемешать».
+ * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + малый чёрный штамп «Не нравится» (палец вниз).
  */
 export function Stamp({ label, tone = 'primary', size = 'L', icon, done, className, ...rest }: StampProps) {
   return (
