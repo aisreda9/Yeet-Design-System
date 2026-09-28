@@ -164,10 +164,6 @@ export type ListItemProps = {
   expanded?: boolean;
   /** radio: выбрана ли строка */
   checked?: boolean;
-  /** Вторая строка Caption: почта в профиле. */
-  description?: string;
-  /** Элемент слева вместо иконки: аватар 40. */
-  leading?: ReactNode;
   /** Элемент справа: флаг страны (`Flag`), счётчик. Строка — текст Body серым: валюта «₽ · RUB» (Figma: list-item · Trailing=Text). */
   trailing?: ReactNode;
   onClick?: () => void;
@@ -178,18 +174,14 @@ export type ListItemProps = {
  * **action** — действие с вещью (создать образ, редактировать, удалить), **expandable** — категории одежды,
  * **radio** — одиночный выбор (год рождения, пол; страна — с флагом, валюта — с кодом серым справа).
  */
-export function ListItem({ type = 'action', label, description, icon, leading, expanded, checked, trailing, onClick }: ListItemProps) {
+export function ListItem({ type = 'action', label, icon, expanded, checked, trailing, onClick }: ListItemProps) {
   const end = typeof trailing === 'string' ? <span className="y-list-item__trailing">{trailing}</span> : trailing;
-  const text = description ? (
-    <span className="y-list-item__text"><span className="y-list-item__label">{label}</span><span className="y-caption y-text--secondary">{description}</span></span>
-  ) : (
-    <span className="y-list-item__label">{label}</span>
-  );
+  const text = <span className="y-list-item__label">{label}</span>;
   // Строка без действия (например, с кнопкой «Выйти» в trailing) — не кнопка: вложенный интерактив ломает скринридеры
   if (type === 'action' && !onClick)
     return (
       <div className="y-list-item">
-        {leading ?? (icon && <Icon name={icon} />)}
+        {icon && <Icon name={icon} />}
         {text}
         {end}
       </div>
@@ -203,7 +195,7 @@ export function ListItem({ type = 'action', label, description, icon, leading, e
       aria-checked={type === 'radio' ? !!checked : undefined}
       aria-expanded={type === 'expandable' ? !!expanded : undefined}
     >
-      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')}>{checked && <Icon name="check" size={16} />}</span> : leading ?? (icon && <Icon name={icon} />)}
+      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')}>{checked && <Icon name="check" size={16} />}</span> : icon && <Icon name={icon} />}
       {text}
       {type === 'expandable' ? <Icon name={expanded ? 'chevron-up' : 'chevron-down'} /> : end}
     </button>
