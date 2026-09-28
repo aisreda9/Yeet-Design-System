@@ -16,7 +16,8 @@
     "contrast": "node scripts/check-contrast.mjs",
     "flow-diff": "node scripts/qa/flow-diff.mjs",
     "assets": "node scripts/build-assets.mjs",
-    "team": "node scripts/team/status.mjs"
+    "team": "node scripts/team/status.mjs",
+    "docs-tokens": "node scripts/docs/design-md.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

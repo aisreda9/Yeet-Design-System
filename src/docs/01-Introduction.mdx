@@ -22,7 +22,7 @@ import * as Pages from '../pages/Pages.stories';
   <Stat value="3" label="слоя токенов: примитивы → семантика → компоненты" />
   <Stat value="2" label="темы: светлая и тёмная из одних компонентов" />
   <Stat value={levelCounts()} label="атомов · молекул · организмов" />
-  <Stat value="28" label="экранов флоу собраны из компонентов" />
+  <Stat value={Object.keys(Pages).filter((k) => k !== 'default' && k !== '__namedExportsOrder').length} label="экранов флоу собраны из компонентов" />
 </Stats>
 
 ## Что это даёт
