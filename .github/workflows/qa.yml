@@ -2,7 +2,7 @@ name: QA Storybook
 
 on:
   push:
-    branches: [main, claude/figma-access-ara4o8]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

@@ -2,7 +2,7 @@ name: Storybook → GitHub Pages
 
 on:
   push:
-    branches: [main, claude/figma-access-ara4o8]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
