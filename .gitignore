@@ -5,3 +5,4 @@ storybook-static
 qa/out
 .claude/worktrees
 qa/baseline
+.downloads/

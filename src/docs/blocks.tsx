@@ -140,6 +140,20 @@ export function IconGallery() {
   );
 }
 
+/** «Ресурсы»: каждая иконка — ссылка на SVG из .downloads (npm run assets). */
+export function ResourceIcons() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 12 }}>
+      {(Object.keys(icons) as IconName[]).map((n) => (
+        <a key={n} href={`./downloads/icons/ui/${n}.svg`} download style={{ display: 'grid', justifyItems: 'center', gap: 8, padding: '16px 4px', background: 'var(--color-bg-subtle)', borderRadius: 16, color: 'var(--color-text-primary)', textDecoration: 'none' }}>
+          <Icon name={n} />
+          <span style={{ ...mono, color: 'var(--color-text-secondary)' }}>{n}.svg</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
 const byLevel = (l: Level) => registry.filter((e) => e.level === l).map((e) => e.code);
 
 const levels: { level: string; what: string; rule: string; items: string[] }[] = [
