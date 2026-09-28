@@ -26,49 +26,79 @@
 /* InputGroup */
 .y-input-group { background: var(--input-bg); border-radius: var(--radius-lg); overflow: hidden; width: 100%; }
 
-/* InputBar */
+/* InputBar: [кнопка] поле [кнопка]. Поле 48 (в шапке), L — 52 (на экране), чат — 52 на подложке с тенью */
 .y-input-bar { display: flex; align-items: center; gap: var(--space-8); width: 100%; }
 .y-input-bar__field {
   flex: 1; display: flex; align-items: center; gap: var(--space-8); height: 48px; padding: 0 var(--space-20); /* флоу: иконка 24 + 8 до текста */
   background: var(--input-bg); border-radius: var(--radius-xl); min-width: 0; color: var(--color-text-primary);
 }
+.y-input-bar__field > .y-icon:first-child { color: var(--color-text-secondary); }
 .y-input-bar__field .y-field__input { font: var(--font-weight-body) 14px/20px var(--font-text); min-width: 0; text-overflow: ellipsis; } /* длинный запрос — «…», как в макете */
+/* Очистка «×» 20 серым; зона нажатия 44, отрицательные поля сохраняют вид */
+.y-input-bar__clear {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -12px;
+  padding: 0; border: 0; background: none; color: var(--color-text-secondary); cursor: pointer;
+}
+.y-input-bar--l .y-input-bar__field { height: 52px; padding-left: var(--space-16); }
+.y-input-bar--chat .y-input-bar__field { height: 52px; padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
+.y-input-bar--chat .y-input-bar__send { width: 44px; height: 44px; margin-left: auto; }
+.y-input-bar--chat .y-input-bar__send:disabled { opacity: 1; color: var(--color-text-secondary); }
 
-/* SegmentControl */
-.y-segment { flex-shrink: 0;
-  display: flex; gap: var(--space-4); padding: var(--space-4); width: 100%;
+/* SegmentControl: пилюля активного сегмента (inverse) переезжает между пунктами */
+.y-segment {
+  position: relative; flex-shrink: 0; display: flex; gap: var(--space-4); padding: var(--space-4); width: 100%;
   background: var(--color-bg-subtle); border-radius: var(--radius-xl);
 }
 .y-segment--S { height: 40px; } .y-segment--M { height: 48px; } .y-segment--L { height: 52px; } .y-segment--XL { height: 56px; }
 .y-segment > .y-button,
-.y-segment > .y-icon-button { flex: 1; width: auto; height: 100%; }
+.y-segment > .y-icon-button { position: relative; z-index: 1; flex: 1; width: auto; height: 100%; }
+.y-segment > .y-icon-button:not([aria-selected='true']) { color: var(--color-text-secondary); }
 .y-segment--fit { width: auto; align-self: flex-start; }
 .y-segment--fit > .y-button { flex: none; }
-.y-segment { position: relative; }
-.y-segment > .y-button, .y-segment > .y-icon-button { position: relative; z-index: 1; }
-/* Пилюля активного сегмента (inverse) переезжает влево-вправо */
 .y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--button-inverse-bg); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 
-/* ChipGroup */
+/* ChipGroup: чипс — Button S, боковой отступ 16; с иконкой справа 16 / 12 и иконка 20 */
 .y-chip-group { display: flex; gap: var(--space-4); align-items: center; }
 .y-chip-group--wrap { flex-wrap: wrap; }
+.y-chip-group--center { justify-content: center; }
 .y-chip-group--scroll { overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--screen-gutter)); padding: 0 var(--screen-gutter); }
 .y-chip-group--scroll::-webkit-scrollbar { display: none; }
+.y-row > .y-chip-group--scroll { flex: 1; min-width: 0; margin-left: 0; padding-left: 0; } /* в ряду с кнопками выход за край только справа */
+.y-chip-group > .y-button:not(.y-chip--trailing) { padding: 0 var(--space-16); }
+.y-chip-group > .y-chip--trailing { padding: 0 var(--space-12) 0 var(--space-16); }
+.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; }
+.y-chip-group .y-chip--removable > .y-icon:last-child { color: var(--color-text-secondary); }
+.y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; } /* «+» перед тегами */
 
-/* ListItem */
+/* ListItem & List */
 .y-list { display: flex; flex-direction: column; gap: var(--space-20); }
 .y-list-item {
   display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 24px;
   background: none; border: 0; padding: 0; text-align: left; cursor: pointer;
   font: var(--font-weight-body) 14px/20px var(--font-text); color: var(--color-text-primary);
 }
+div.y-list-item { cursor: default; }
 .y-list-item__label { flex: 1; }
+.y-list-item__text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .y-radio {
   width: 24px; height: 24px; border-radius: var(--radius-full); flex: none;
   display: inline-flex; align-items: center; justify-content: center; background: var(--color-bg-subtle);
 }
 .y-radio--on { background: var(--color-accent); }
 .y-radio--on::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-on-accent); }
+
+/* ListGroup — строки на карточке. Figma Settings: разделитель с отступом 16, иконки справа 20, одиночная строка — капсула 52 / r32 */
+.y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
+.y-list-group:has(> .y-list-item:only-child) { border-radius: var(--radius-xl); }
+.y-list-group:has(> .y-list-item:only-child .y-list-item__text) { border-radius: var(--radius-lg); }
+.y-list-group > .y-list-item { position: relative; min-height: 56px; padding: var(--space-16) var(--space-20); }
+.y-list-group > .y-list-item:has(.y-list-item__text) { min-height: 72px; }
+.y-list-group > .y-list-item:only-child:not(:has(.y-list-item__text)) { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
+.y-list-group > .y-list-item + .y-list-item::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px; background: var(--color-divider); }
+.y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; }
+/* Строка не сжимается при нажатии — подсвечивается фоном */
+.y-list-group > button.y-list-item { transition: background-color var(--motion-select); }
+.y-list-group > button.y-list-item:active { background-color: var(--color-border-subtle); }
 
 /* StatTile */
 .y-stat { flex: 1; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-16) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); }
@@ -81,33 +111,36 @@
   box-shadow: var(--shadow-floating); font: 400 12px/16px var(--font-text);
 }
 
-/* Snackbar */
+/* Snackbar: флоу — 52, радиус 12; появление снизу */
 .y-snackbar {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
-  width: 100%; height: 52px; padding: 0 var(--space-20); border-radius: var(--radius-sm); /* флоу: 52, радиус 12 */
+  width: 100%; height: 52px; padding: 0 var(--space-20); border-radius: var(--radius-sm);
   background: var(--color-bg-inverse); color: var(--color-text-inverse); font: var(--font-weight-body) 14px/20px var(--font-text);
+  animation: y-appear var(--motion-appear) both;
 }
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
+@keyframes y-appear { from { transform: translateY(16px); opacity: 0; } }
 
-/* EmptyState / LoadingState */
-.y-row > .y-chip-group--scroll { flex: 1; min-width: 0; margin-left: 0; padding-left: 0; } /* в ряду с кнопками выход за край только справа */
-.y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); /* флоу: заголовок H1, отступ 16 */ max-width: 353px; margin: 0 auto; }
-.y-empty > .y-button { margin-top: var(--space-16); } /* флоу: кнопка через 32 от текста */
+/* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
+.y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; }
+.y-empty > .y-button { margin-top: var(--space-16); }
+
+/* LoadingState */
 .y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--font-weight-body) 14px/20px var(--font-text); }
 .y-loading .y-icon { width: 24px; height: 24px; color: var(--color-text-primary); animation: y-spin 1.2s linear infinite; }
 @keyframes y-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: none; } }
 
-/* PhotoTile */
+/* PhotoTile: строго квадрат 173, как в Figma, даже с подписью в две строки */
 .y-photo-tile {
   flex: 1; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: var(--space-24);
   padding: 28px var(--space-20) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); border: 0; cursor: pointer;
-  min-height: 0; overflow: hidden; /* строго квадрат 173, как в Figma, даже с подписью в две строки */
+  min-height: 0; overflow: hidden;
   color: var(--color-text-primary); font: var(--font-weight-body) 14px/20px var(--font-text); text-align: center;
 }
 .y-photo-tile__art { width: 63px; height: 63px; display: grid; place-items: center; color: var(--color-text-primary); }
 
-/* Carousel */
+/* Carousel: лента выходит за поля экрана (bleed) */
 .y-carousel { flex: none; display: flex; flex-direction: column; gap: var(--space-12); margin: 0 calc(var(--screen-gutter) * -1); }
 .y-carousel > .y-h3 { padding: 0 var(--screen-gutter); }
 .y-carousel__track {
@@ -133,20 +166,6 @@
 .y-usage-meter__dots span { aspect-ratio: 1; border-radius: 50%; background: var(--color-border-subtle); }
 .y-usage-meter__dots span.is-on { background: var(--color-accent); }
 
-/* ListGroup — rows on a card */
-.y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
-div.y-list-item { cursor: default; }
-.y-list-group > .y-list-item { min-height: 56px; padding: var(--space-16) var(--space-20); }
-/* Figma Settings: разделитель с отступом 16 с обеих сторон, иконки справа 20, одиночная строка — капсула 52 / r32 */
-.y-list-group > .y-list-item { position: relative; }
-.y-list-group > .y-list-item + .y-list-item::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px; background: var(--color-divider); }
-.y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; }
-.y-list-group:has(> .y-list-item:only-child) { border-radius: var(--radius-xl); }
-.y-list-group > .y-list-item:only-child:not(:has(.y-list-item__text)) { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
-.y-list-group > .y-list-item:has(.y-list-item__text) { min-height: 72px; }
-.y-list-group:has(> .y-list-item:only-child .y-list-item__text) { border-radius: var(--radius-lg); }
-.y-list-item__text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-
 /* RangeSlider */
 .y-range { position: relative; width: 100%; display: flex; flex-direction: column; gap: var(--space-8); }
 .y-range__hist { width: 100%; height: 64px; display: block; margin-bottom: -12px; }
@@ -166,27 +185,3 @@ div.y-list-item { cursor: default; }
 .y-range__track input::-moz-range-thumb { pointer-events: auto; width: 24px; height: 24px; border: 0; cursor: grab; }
 .y-range__track:focus-within { outline: 2px solid var(--color-accent); outline-offset: 6px; border-radius: 12px; }
 .y-range__labels { display: flex; justify-content: space-between; color: var(--color-text-primary); }
-
-/* Флоу: чипс с иконкой справа (раскрывашка, удалить) — отступы 16 / 12, иконка 20 */
-.y-chip-group > .y-chip--trailing { padding: 0 var(--space-12) 0 var(--space-16); }
-.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; }
-/* Очистка поля поиска: крестик 20 серым внутри поля */
-.y-input-bar__clear { flex: none; display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; background: none; color: var(--color-text-secondary); cursor: pointer; }
-
-/* Поле чата со стилистом (флоу Stylist): 52, белое с тенью, паддинг 20/4, кнопка отправки 44 внутри */
-.y-input-bar--chat .y-input-bar__field { height: 52px; padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
-.y-input-bar--chat .y-input-bar__send { width: 44px; height: 44px; margin-left: auto; }
-.y-input-bar--chat .y-input-bar__send:disabled { opacity: 1; color: var(--color-text-secondary); }
-/* Флоу Outfit Creation: крестик удаления тега серый, кнопка «+» перед тегами 36 */
-.y-chip-group .y-chip--removable > .y-icon:last-child { color: var(--color-text-secondary); }
-.y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; }
-/* Сегмент из иконок: неактивные иконки серые, активная — основным цветом */
-.y-segment > .y-icon-button:not([aria-selected='true']) { color: var(--color-text-secondary); }
-/* Флоу: у чипсов боковой отступ 16 (Nike, Тег #1, Категория); ряд подсказок в поиске — по центру */
-.y-chip-group > .y-button:not(.y-chip--trailing) { padding: 0 var(--space-16); }
-.y-chip-group--center { justify-content: center; }
-/* Поле поиска на экране (не в шапке) — 52, иконка серая */
-.y-input-bar--l .y-input-bar__field { height: 52px; padding-left: var(--space-16); }
-.y-input-bar__field > .y-icon:first-child { color: var(--color-text-secondary); }
-/* Зона нажатия 44 при иконке 20: видимый размер прежний, отрицательные поля компенсируют */
-.y-input-bar__clear { width: 44px; height: 44px; margin: -12px; }
