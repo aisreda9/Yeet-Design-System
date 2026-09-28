@@ -2,9 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { IconButton, Stamp } from '../atoms';
 import { ChipGroup, EmptyState, List, ListItem, Note, SegmentControl, Snackbar, StatRow, StatTile } from '../molecules';
-import { BottomBar, BottomNav, Dialog, Header, ItemArt, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
-import { Grid, Row, Screen, Sticky } from '../templates';
+import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
+import { DetailsScreen, Grid, Row, Screen, Sticky } from '../templates';
 import { grid, shoes } from './data';
+import { SCROLLED, useScrolled } from './scroll';
 import './pages.css';
 
 /* Раздел: гардероб — вещи, образы, вишлист, архив, корзина. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -93,29 +94,56 @@ export const Toast: Story = {
   ),
 };
 
-export const OutfitDetails: Story = {
-  name: 'Wardrobe / Outfit Details',
-  render: () => (
-    <Screen header={<Header type="bar" actions={[{ icon: 'more', label: 'Ещё' }]} centerOnScroll={<ItemArt kind="top" color="green" size={36} />} />} flush>
-      <div className="y-gutter">
-        <OutfitCollage items={[{ kind: 'accessories', x: 32, y: 20, size: 64 }, { kind: 'top', x: 68, y: 34, size: 120, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 150, color: 'green' }, { kind: 'shoe', x: 72, y: 74, size: 80, color: 'brown' }]} />
-      </div>
-      <Sheet type="panel" title="На каждый день">
-        <p className="y-body y-text--secondary">Все сезоны</p>
-        <StatRow><StatTile label="Надето раз" value={8} /><StatTile label="Д. простоя" value={1} /><StatTile label="Вещи" value={4} /></StatRow>
-        <section className="y-section">
-          <h3 className="y-h3">Теги</h3>
-          <ChipGroup wrap chips={[{ label: 'Тег #1' }, { label: 'Тег #2' }, { label: 'Тег #3' }, { label: 'Тег #4' }]} />
-        </section>
-        <section className="y-section">
-          <h3 className="y-h3">Вещи из образа</h3>
-          <Grid><ItemCard kind="top" color="green" /><ItemCard kind="bottom" color="green" /><ItemCard kind="shoe" color="brown" /><ItemCard kind="accessories" /></Grid>
-        </section>
-        <div className="y-outfit-stamp"><Stamp label="Надеть" /></div>
-      </Sheet>
-    </Screen>
-  ),
-};
+const outfit: CollageItem[] = [{ kind: 'accessories', x: 32, y: 20, size: 64 }, { kind: 'top', x: 68, y: 34, size: 120, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 150, color: 'green' }, { kind: 'shoe', x: 72, y: 74, size: 80, color: 'brown' }];
+
+/** Детали образа (Figma `349:8637 → 349:10430`): в шапке при скролле — мини-коллаж, штамп «Надеть» закреплён поверх. */
+function OutfitDetailsScreen({ scrolled }: { scrolled?: boolean }) {
+  const ref = useScrolled(scrolled ? SCROLLED : 0);
+  return (
+    <DetailsScreen media={<OutfitCollage items={outfit} />} title="На каждый день" stamp={<Stamp label="Надеть" />} scrollRef={ref}>
+      <p className="y-body y-text--secondary">Все сезоны</p>
+      <StatRow><StatTile label="Надето раз" value={8} /><StatTile label="Д. простоя" value={1} /><StatTile label="Вещи" value={4} /></StatRow>
+      <section className="y-section">
+        <h3 className="y-h3">Теги</h3>
+        <ChipGroup wrap chips={[{ label: 'Тег #1' }, { label: 'Тег #2' }, { label: 'Тег #3' }, { label: 'Тег #4' }]} />
+      </section>
+      <section className="y-section">
+        <h3 className="y-h3">Вещи из образа</h3>
+        <Grid><ItemCard kind="top" color="green" /><ItemCard kind="bottom" color="green" /><ItemCard kind="shoe" color="brown" /><ItemCard kind="accessories" /></Grid>
+      </section>
+    </DetailsScreen>
+  );
+}
+
+export const OutfitDetails: Story = { name: 'Wardrobe / Outfit Details', render: () => <OutfitDetailsScreen /> };
+export const OutfitDetailsScrolled: Story = { name: 'Wardrobe / Outfit Details / Scrolled', render: () => <OutfitDetailsScreen scrolled /> };
+
+const bagLooks: CollageItem[][] = [
+  [{ kind: 'bottom', x: 28, y: 56, size: 150, color: 'black' }, { kind: 'top', x: 64, y: 36, size: 120, color: 'brown' }, { kind: 'container', x: 76, y: 70, size: 64, color: 'black' }],
+  [{ kind: 'bottom', x: 30, y: 58, size: 150, color: 'green' }, { kind: 'top', x: 66, y: 34, size: 110, color: 'white' }, { kind: 'container', x: 76, y: 74, size: 64, color: 'black' }],
+];
+
+/** Детали вещи из гардероба (Figma `349:9258 → 349:9976`): статистика, теги, образы с вещью. */
+function WardrobeItemScreen({ scrolled }: { scrolled?: boolean }) {
+  const ref = useScrolled(scrolled ? SCROLLED : 0);
+  return (
+    <DetailsScreen media={<PhotoArea kind="container" />} title="Сумка" scrollRef={ref}>
+      <p className="y-body y-text--secondary">10 000 ₽ · Черный<br />Аксессуары · Все сезоны</p>
+      <StatRow><StatTile label="Надето раз" value={43} /><StatTile label="Д. простоя" value={12} /><StatTile label="Образы" value={7} /></StatRow>
+      <section className="y-section">
+        <h3 className="y-h3">Теги</h3>
+        <ChipGroup wrap chips={[{ label: 'Тег #1' }, { label: 'Тег #2' }, { label: 'Тег #3' }, { label: 'Тег #4' }]} />
+      </section>
+      <section className="y-section">
+        <h3 className="y-h3">Образы с этой вещью</h3>
+        <div className="y-stack-8">{bagLooks.map((items, i) => <OutfitCollage key={i} items={items} />)}</div>
+      </section>
+    </DetailsScreen>
+  );
+}
+
+export const WardrobeItemDetails: Story = { name: 'Wardrobe / Item Details', render: () => <WardrobeItemScreen /> };
+export const WardrobeItemDetailsScrolled: Story = { name: 'Wardrobe / Item Details / Scrolled', render: () => <WardrobeItemScreen scrolled /> };
 
 export const Wishlist: Story = {
   name: 'Wishlist / Items / Populated',
@@ -132,22 +160,28 @@ export const Wishlist: Story = {
   ),
 };
 
-export const ItemDetails: Story = {
-  name: 'Wishlist / Item Details',
-  render: () => (
-    <Screen header={<Header type="bar" actions={[{ icon: 'more', label: 'Ещё' }]} centerOnScroll={<ItemArt kind="container" color="black" size={36} />} />} bottom={<BottomBar label="Переместить в гардероб" secondary={{ icon: 'external-link', label: 'Открыть в магазине' }} />} flush>
-      <div className="y-gutter"><PhotoArea kind="container" /></div>
-      <Sheet type="panel" title="Сумка">
-        <p className="y-body y-text--secondary">10 000 ₽ · Sander · Черный<br />Аксессуары · Все сезоны</p>
-        <Note>Мягкая сумка округлой формы с логотипом и кожаным ремешком</Note>
-        <section className="y-section y-item-looks">
-          <h3 className="y-h3">Образы с этой вещью</h3>
-          <OutfitCollage items={[{ kind: 'bottom', x: 28, y: 56, size: 150, color: 'black' }, { kind: 'top', x: 64, y: 36, size: 120, color: 'brown' }, { kind: 'container', x: 76, y: 70, size: 64, color: 'black' }]} />
-        </section>
-      </Sheet>
-    </Screen>
-  ),
-};
+/** Детали вещи из вишлиста (Figma `503:1150 → 503:1311`): описание, образы, BottomBar закреплён. */
+function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
+  const ref = useScrolled(scrolled ? SCROLLED : 0);
+  return (
+    <DetailsScreen
+      media={<PhotoArea kind="container" />}
+      title="Сумка"
+      bottom={<BottomBar label="Переместить в гардероб" secondary={{ icon: 'external-link', label: 'Открыть в магазине' }} />}
+      scrollRef={ref}
+    >
+      <p className="y-body y-text--secondary">10 000 ₽ · Sander · Черный<br />Аксессуары · Все сезоны</p>
+      <Note>Мягкая сумка округлой формы с логотипом и кожаным ремешком</Note>
+      <section className="y-section y-item-looks">
+        <h3 className="y-h3">Образы с этой вещью</h3>
+        <div className="y-stack-8">{bagLooks.map((items, i) => <OutfitCollage key={i} items={items} />)}</div>
+      </section>
+    </DetailsScreen>
+  );
+}
+
+export const ItemDetails: Story = { name: 'Wishlist / Item Details', render: () => <WishlistItemScreen /> };
+export const ItemDetailsScrolled: Story = { name: 'Wishlist / Item Details / Scrolled', render: () => <WishlistItemScreen scrolled /> };
 
 export const Archive: Story = {
   name: 'Archive / Items / Populated',
