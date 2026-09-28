@@ -129,7 +129,7 @@
   --color-text-inverse: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-600); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
@@ -137,8 +137,8 @@
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 66 48 / 0.1); /* ui-colors/red-10% */
   --color-border-subtle: rgb(0 0 0 / 0.1); /* ui-colors/black-10% */
-  --color-divider: rgb(0 0 0 / 0.05); /* divider (black @5%) */
-  --color-pattern-dot: rgb(0 0 0 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(0 0 0 / 0.05); /* ui-colors/divider */
+  --color-pattern-dot: rgb(0 0 0 / 0.23); /* ui-colors/pattern-dot */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.12);
 }
 
@@ -154,7 +154,7 @@
   --color-text-inverse: var(--yeet-graphite-950); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #5b6470; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-accent: var(--yeet-blue-200); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-400); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-400); /* ui-colors/blue */
@@ -162,8 +162,8 @@
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 107 92 / 0.18); /* ui-colors/red-10% */
   --color-border-subtle: rgb(245 245 247 / 0.12); /* ui-colors/black-10% */
-  --color-divider: rgb(245 245 247 / 0.08); /* divider (black @5%) */
-  --color-pattern-dot: rgb(245 245 247 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(245 245 247 / 0.08); /* ui-colors/divider */
+  --color-pattern-dot: rgb(245 245 247 / 0.23); /* ui-colors/pattern-dot */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.5);
 }
 

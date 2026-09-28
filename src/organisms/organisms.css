@@ -153,7 +153,7 @@
 .y-product-card { display: flex; flex-direction: column; gap: var(--space-16); color: var(--color-text-primary); }
 .y-product-card__meta { display: flex; flex-direction: column; gap: 2px; }
 .y-product-card__like { position: absolute; top: var(--space-16); right: var(--space-16); color: var(--color-text-primary); }
-.y-product-card__like.is-on { color: var(--color-accent); }
+.y-product-card__like.is-on { color: var(--color-text-accent); } /* тёмная тема: accent на card-bg 2,7 : 1, text-accent — 5 : 1 */
 .y-product-card__like.is-on .y-icon path { fill: currentColor; } /* лайкнутое — залитое сердце */
 
 /* Коллаж. Figma pattern: точка 2×2 в клетке 10×10, поле точек с отступом 14 от краёв карточки */

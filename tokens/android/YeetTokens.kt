@@ -44,7 +44,7 @@ data class YeetColorScheme(
     val textOnAccent: Color,
     /** Вторичный текст на inverse-поверхности: подпись в карточке погоды · Figma ui-colors/inverse-secondary */
     val textInverseSecondary: Color,
-    /** Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/white */
+    /** Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent */
     val textOnDanger: Color,
     /** Акцентный текст, выбранное · Figma ui-colors/blue-text */
     val textAccent: Color,
@@ -61,9 +61,9 @@ data class YeetColorScheme(
     val dangerSoft: Color,
     /** Обводки свотчей, гистограмма, фон неактивных точек · Figma ui-colors/black-10% */
     val borderSubtle: Color,
-    /** Разделители строк в input-group и list-group · Figma divider (black @5%) */
+    /** Разделители строк в input-group и list-group · Figma ui-colors/divider */
     val divider: Color,
-    /** Точки фона коллажа и холста (2 px, шаг 10) · Figma pattern (black @23%) */
+    /** Точки фона коллажа и холста (2 px, шаг 10) · Figma ui-colors/pattern-dot */
     val patternDot: Color,
 )
 
@@ -280,7 +280,7 @@ object YeetHaptic {
 
 fun View.yeetHaptic(type: Int): Boolean = performHapticFeedback(type)
 
-/** Tab-bar, FAB, hint, панель sheet: y 8, blur 40. В Compose — Modifier.shadow(elevation = 10.dp, shape, ambientColor / spotColor = цвет ниже). */
+/** Tab-bar, FAB, hint, панель sheet. Figma: стиль shadow/floating, цвет — переменная ui-colors/shadow: y 8, blur 40. В Compose — Modifier.shadow(elevation = 10.dp, shape, ambientColor / spotColor = цвет ниже). */
 object YeetShadow {
     val floatingLight = Color(0x1F000000)
     val floatingDark = Color(0x80000000)

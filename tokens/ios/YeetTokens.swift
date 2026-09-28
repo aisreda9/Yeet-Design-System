@@ -38,7 +38,7 @@ public enum YeetColor {
     public static let textOnAccent = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Вторичный текст на inverse-поверхности: подпись в карточке погоды · Figma ui-colors/inverse-secondary
     public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1))
-    /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/white
+    /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent
     public static let textOnDanger = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
     public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1))
@@ -55,9 +55,9 @@ public enum YeetColor {
     public static let dangerSoft = dynamic(UIColor(hex: 0xFF4230, alpha: 0.1), UIColor(hex: 0xFF6B5C, alpha: 0.18))
     /// Обводки свотчей, гистограмма, фон неактивных точек · Figma ui-colors/black-10%
     public static let borderSubtle = dynamic(UIColor(hex: 0x000000, alpha: 0.1), UIColor(hex: 0xF5F5F7, alpha: 0.12))
-    /// Разделители строк в input-group и list-group · Figma divider (black @5%)
+    /// Разделители строк в input-group и list-group · Figma ui-colors/divider
     public static let divider = dynamic(UIColor(hex: 0x000000, alpha: 0.05), UIColor(hex: 0xF5F5F7, alpha: 0.08))
-    /// Точки фона коллажа и холста (2 px, шаг 10) · Figma pattern (black @23%)
+    /// Точки фона коллажа и холста (2 px, шаг 10) · Figma ui-colors/pattern-dot
     public static let patternDot = dynamic(UIColor(hex: 0x000000, alpha: 0.23), UIColor(hex: 0xF5F5F7, alpha: 0.23))
 }
 
@@ -269,7 +269,7 @@ public enum YeetHaptic {
 }
 
 public extension View {
-    /// Tab-bar, FAB, hint, панель sheet
+    /// Tab-bar, FAB, hint, панель sheet. Figma: стиль shadow/floating, цвет — переменная ui-colors/shadow
     func yeetFloatingShadow() -> some View {
         shadow(color: dynamic(UIColor(hex: 0x000000, alpha: 0.12), UIColor(hex: 0x000000, alpha: 0.5)), radius: 20, x: 0, y: 8)
     }
