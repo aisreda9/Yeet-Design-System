@@ -27,6 +27,8 @@ jobs:
             scripts/team
       - uses: actions/github-script@v7
         with:
+          # 5xx от API повторяются, а не валят проверку
+          retries: 3
           script: |
             const { zonesOf, isHot, isGenerated } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/team/lib.mjs`);
             const { owner, repo } = context.repo;
@@ -48,8 +50,11 @@ jobs:
             const others = (await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 }))
               .filter((p) => p.number !== pr.number);
             const rows = [];
+            const skipped = [];
             for (const p of others) {
-              const shared = (await filesOf(p.number)).filter((f) => mine.includes(f));
+              // Сбой API на чужом PR не должен валить этот: отмечаем и идём дальше
+              const theirs = await filesOf(p.number).catch((e) => { skipped.push(`#${p.number} (${e.status ?? e.message})`); return []; });
+              const shared = theirs.filter((f) => mine.includes(f));
               if (!shared.length) continue;
               const mark = (f) => `\`${f}\`${isGenerated(f) ? ' _(генерируется)_' : isHot(f) ? ' **(горячий)**' : ''}`;
               rows.push(`- #${p.number} «${p.title}» (\`${p.head.ref}\`): ${shared.map(mark).join(', ')}`);
@@ -64,6 +69,7 @@ jobs:
               rows.length
                 ? ['Общие файлы — договоритесь о порядке мержа в PR/issue, второй мержит базу к себе после первого:', ...rows].join('\n')
                 : 'Пересечений с открытыми PR нет.',
+              ...(skipped.length ? ['', `Не удалось проверить: ${skipped.join(', ')} — перезапусти проверку позже.`] : []),
               '',
               `_Сгенерированные файлы при конфликте не склеивать — \`npm run tokens\`. Правила: [TEAM.md](${context.serverUrl}/${owner}/${repo}/blob/HEAD/TEAM.md)._`,
             ].join('\n');
