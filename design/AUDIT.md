@@ -136,15 +136,17 @@ Web-пакет npm — только если появится веб-потре�
 Код не трогаю в этом PR: те же файлы (overlays, inputs, molecules.css, tokens) сейчас правятся в `gallant-wozniak`.
 
 - [x] Документ аудита и план (этот файл)
-- [ ] CI: проверка дрейфа токенов (`npm run tokens && git diff --exit-code`), `concurrency`, `timeout-minutes`; `.nvmrc` и `engines`
-- [ ] `Field`: видимый фокус (`:has(:focus-visible)`), Enter/пробел и `tabIndex` для строки-кнопки, имя у кнопки-иконки, встроенный показ пароля
-- [ ] `ChipGroup` `aria-pressed` у всех чипсов; `SegmentControl` без спреда `key`, имя у иконочных сегментов
-- [ ] `Sheet`/`Dialog`: `aria-modal`, `aria-labelledby` на заголовок, Escape → `onClose`
-- [ ] DESIGN.md §1 и §3.1 — по фактическим `tokens.json` и странице «Ресурсы»
-- [ ] Тап-зона: hit-slop до 44 у кнопок S / иконок-фильтров / чипсов, правило в 12-Spacing.mdx и DESIGN.md §4
-- [ ] Создать ветку `main`, перевести на неё workflows и Pages, сделать QA обязательной проверкой (нужны права владельца репо)
+- [ ] #12 CI: проверка дрейфа токенов (`npm run tokens && git diff --exit-code`), `concurrency`, `timeout-minutes`; `.nvmrc` и `engines`
+- [ ] #7 `Field`: видимый фокус (`:has(:focus-visible)`), Enter/пробел и `tabIndex` для строки-кнопки, имя у кнопки-иконки, встроенный показ пароля
+- [ ] #8 `ChipGroup` `aria-pressed` у всех чипсов; `SegmentControl` без спреда `key`, имя у иконочных сегментов
+- [ ] #9 `Sheet`/`Dialog`: `aria-modal`, `aria-labelledby` на заголовок, Escape → `onClose`
+- [ ] #11 DESIGN.md §1 и §3.1 — по фактическим `tokens.json` и странице «Ресурсы»
+- [ ] #10 Тап-зона: hit-slop до 44 у кнопок S / иконок-фильтров / чипсов, правило в 12-Spacing.mdx и DESIGN.md §4
+- [x] Ветка `main` — основная, защищена правилом (PR + обязательная `qa`); координация — issue #6
 
 ### Фаза 1 · Доверие к проверкам (1 неделя)
+
+Первые три пункта — задача #13.
 
 - Визуальная регрессия, которая реально сравнивает: Chromatic (бесплатный тариф, ревью в PR) **или** Playwright `toHaveScreenshot` в закреплённом Docker-образе с эталонами в git
 - Контраст: пары генерируются из компонентных токенов (`*-fg` × `*-bg`) × все темы × бренды; уровень 3:1 для фокуса, границ, индикаторов; токен `focus-ring`
