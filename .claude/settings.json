@@ -35,5 +35,8 @@
         ]
       }
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "Figma"
+  ]
 }

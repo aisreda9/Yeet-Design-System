@@ -9,6 +9,9 @@
 - Тексты — на «ты», без родовых окончаний (`DESIGN.md` §8).
 - Любой компонент: Figma + код + story (Playground, варианты, «В флоу») + `src/docs/registry.ts` + `design/figma-specs.json` + Light/Dark.
 
+## Figma MCP
+Подключается из `.mcp.json` (сервер `Figma`, `https://mcp.figma.com/mcp`). Первый раз: `/mcp` → `Figma` → вход в браузере. В облачных сессиях — коннектор Figma на claude.ai/customize/connectors.
+
 ## Проверки
 `npm run typecheck` · `npm run contrast` · `npm run build-storybook && npm run qa` · `npm run flow-diff`
 
