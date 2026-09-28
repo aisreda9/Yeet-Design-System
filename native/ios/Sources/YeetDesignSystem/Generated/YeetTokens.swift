@@ -62,6 +62,8 @@ public enum YeetColor {
     public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1))
     /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent
     public static let textOnDanger = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
+    /// Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white
+    public static let textOnPhoto = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
     public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1))
     /// Ошибки, деструктивные действия · Figma ui-colors/red-text
@@ -112,6 +114,23 @@ public enum YeetItemColor: String, CaseIterable, Identifiable {
         case .red: return Color(UIColor(hex: 0xFF4230, alpha: 1))
         case .beige: return Color(UIColor(hex: 0xFFE1C7, alpha: 1))
         case .brown: return Color(UIColor(hex: 0xC26547, alpha: 1))
+        }
+    }
+    /// Цвет буквы / иконки на этом цвете (контраст ≥ 4.5 : 1).
+    public var onColor: Color {
+        switch self {
+        case .black: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .grey: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .white: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .purple: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .pink: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .green: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .blue: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .yellow: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .orange: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .red: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .beige: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .brown: return Color(UIColor(hex: 0x000000, alpha: 1))
         }
     }
     public var title: String {

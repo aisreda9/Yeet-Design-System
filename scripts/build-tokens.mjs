@@ -1,7 +1,9 @@
 // Генератор токенов: tokens/tokens.json → CSS (Storybook), Swift (iOS), Kotlin (Android).
+// Плюс Android-модуль native/android: токены, иконки (ImageVector) и шрифты res/font — см. scripts/android.mjs.
 // Запуск: npm run tokens. Сгенерированные файлы не правятся руками.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildIosPackage } from './build-ios.mjs';
+import { ANDROID_MODULE, androidOutputs, copyAndroidFonts } from './android.mjs';
 
 const root = new URL('../', import.meta.url);
 const t = JSON.parse(readFileSync(new URL('tokens/tokens.json', root), 'utf8'));
@@ -221,14 +223,19 @@ function swift({ bundle = 'main' } = {}) {
 
 /* ─── Kotlin (Jetpack Compose) ────────────────────────────────────────── */
 
+/** Ключевые слова Kotlin, которые не могут быть именами без обратных кавычек (transition `return`). */
+const KT_KEYWORDS = new Set(['return', 'object', 'class', 'fun', 'val', 'var', 'when', 'if', 'else', 'in', 'is', 'as', 'do', 'for', 'while', 'break', 'continue', 'null', 'true', 'false', 'this', 'super', 'throw', 'try', 'typealias', 'typeof', 'package', 'interface']);
+const kt = (s) => (KT_KEYWORDS.has(s) ? `\`${s}\`` : s);
+const pascal = (s) => camel(s).replace(/^\w/, (c) => c.toUpperCase());
+
 function kotlin() {
-  const argb = (v) => { const c = rgba(v); return `Color(0x${Math.round(c.a * 255).toString(16).padStart(2, '0').toUpperCase()}${c.hex})`; };
+  const argb = (v) => { if (v === 'transparent') return 'Color.Transparent'; const c = rgba(v); return `Color(0x${Math.round(c.a * 255).toString(16).padStart(2, '0').toUpperCase()}${c.hex})`; };
   const names = Object.keys(colors).map(camel);
-  const L = [`// ${HEADER}`, '// Jetpack Compose. Схемы light / dark — выбирать по isSystemInDarkTheme().', '', 'package design.yeet.tokens', '',
-    'import androidx.compose.animation.core.CubicBezierEasing', 'import androidx.compose.animation.core.FiniteAnimationSpec', 'import androidx.compose.animation.core.spring', 'import androidx.compose.animation.core.tween',
+  const L = [`// ${HEADER}`, '// Jetpack Compose. Схемы light / dark — выбирать по isSystemInDarkTheme(); в модуле native/android — через YeetTheme.', '', 'package design.yeet.tokens', '',
+    'import androidx.compose.animation.core.CubicBezierEasing', 'import androidx.compose.animation.core.FiniteAnimationSpec', 'import androidx.compose.animation.core.snap', 'import androidx.compose.animation.core.spring', 'import androidx.compose.animation.core.tween',
     'import android.os.Build', 'import android.view.HapticFeedbackConstants', 'import android.view.View',
-    'import androidx.annotation.FontRes', 'import androidx.compose.ui.graphics.Color', 'import androidx.compose.ui.text.ExperimentalTextApi', 'import androidx.compose.ui.text.TextStyle', 'import androidx.compose.ui.text.font.Font', 'import androidx.compose.ui.text.font.FontFamily', 'import androidx.compose.ui.text.font.FontVariation', 'import androidx.compose.ui.text.font.FontWeight', 'import androidx.compose.ui.unit.dp', 'import androidx.compose.ui.unit.sp', ''];
-  L.push('data class YeetColorScheme(');
+    'import androidx.annotation.FontRes', 'import androidx.compose.runtime.Immutable', 'import androidx.compose.ui.graphics.Color', 'import androidx.compose.ui.text.ExperimentalTextApi', 'import androidx.compose.ui.text.TextStyle', 'import androidx.compose.ui.text.font.Font', 'import androidx.compose.ui.text.font.FontFamily', 'import androidx.compose.ui.text.font.FontVariation', 'import androidx.compose.ui.text.font.FontWeight', 'import androidx.compose.ui.unit.dp', 'import androidx.compose.ui.unit.sp', ''];
+  L.push('@Immutable', 'data class YeetColorScheme(');
   for (const [group, entries] of Object.entries(t.color)) { L.push(`    // ${group}`); for (const [k, v] of Object.entries(entries)) L.push(`    /** ${v.role} · Figma ${v.figma} */`, `    val ${camel(k)}: Color,`); }
   L.push(')', '');
   for (const theme of ['light', 'dark']) {
@@ -236,37 +243,78 @@ function kotlin() {
     Object.entries(colors).forEach(([k, v], i) => L.push(`    ${names[i]} = ${argb(resolve(v[theme], theme))},`));
     L.push(')', '');
   }
+  // Бренды: переопределяют часть семантических цветов поверх темы (как data-brand в CSS)
+  L.push('/** Бренд-варианты: переопределяют семантические цвета поверх светлой / тёмной темы (web: data-brand). */', 'enum class YeetBrand(val title: String, val light: YeetColorScheme, val dark: YeetColorScheme) {');
+  for (const [id, b] of Object.entries(t.brand ?? {})) {
+    const over = (theme) => Object.entries(b[theme]).map(([k, v]) => `${camel(k)} = ${argb(v)}`).join(', ');
+    L.push(`    /** ${b.about} */`, `    ${pascal(id)}(`, `        title = "${b.name}",`, `        light = YeetLightColors.copy(${over('light')}),`, `        dark = YeetDarkColors.copy(${over('dark')}),`, '    ),');
+  }
+  L.push('}', '');
+  // Компонентный слой: решения конкретного компонента из семантики
+  L.push('// Компонентные токены (web: --button-*, --card-*, --sheet-*, --tab-bar-*, --input-*)');
+  for (const [k, v] of Object.entries(t.component)) {
+    const m2 = /^\{(\w+)\.([\w-]+)\}$/.exec(v);
+    if (m2?.[1] === 'radius') continue;
+    L.push(`val YeetColorScheme.${camel(k)}: Color get() = ${m2 ? camel(m2[2]) : argb(v)}`);
+  }
+  L.push('', 'object YeetComponent {');
+  for (const [k, v] of Object.entries(t.component)) {
+    const m2 = /^\{(\w+)\.([\w-]+)\}$/.exec(v);
+    if (m2?.[1] === 'radius') L.push(`    val ${camel(k)} = YeetRadius.${m2[2]}`);
+  }
+  L.push('}', '');
   L.push('/** Цвет вещи — атрибут одежды, не интерфейс. */', 'enum class YeetItemColor(val color: Color, val title: String, /** Буква / иконка на этом цвете (≥ 4.5 : 1) */ val onColor: Color) {');
   Object.entries(t.item).forEach(([k, v]) => L.push(`    ${k.toUpperCase()}(${argb(v.value)}, "${v.name}", ${argb(v.on)}),`));
   L.push('}', '', 'object YeetSpace {');
   for (const s of t.space) L.push(`    val s${s} = ${s}.dp`);
   L.push(`    val screenGutter = ${t.layout['screen-gutter']}.dp`, '}', '', 'object YeetRadius {');
   for (const [k, v] of Object.entries(t.radius)) L.push(`    /** ${v.use} */`, `    val ${k} = ${v.value}.dp`);
+  L.push('}', '', '/** Базовый экран макетов (iPhone 15/16), боковые поля. */', 'object YeetLayout {');
+  for (const [k, v] of Object.entries(t.layout)) L.push(`    val ${camel(k)} = ${v}.dp`);
   L.push('}', '');
   L.push('/** Семейство из переменного шрифта (Google Fonts): по одному Font на каждый нужный вес. */', '@OptIn(ExperimentalTextApi::class)', 'fun yeetFontFamily(@FontRes res: Int, vararg weights: Int) = FontFamily(', '    weights.map { Font(res, FontWeight(it), variationSettings = FontVariation.Settings(FontVariation.weight(it))) }', ')', '');
   const fontRes = Object.values(t.font).map((f) => `res/font/${f.android}.ttf ← tokens/fonts/${f.file}`).join(', ');
-  L.push(`/** Шрифты: ${fontRes}. */`, 'class YeetTypography(display: FontFamily, text: FontFamily) {');
+  L.push(`/** Шрифты: ${fontRes}. */`, '@Immutable', 'class YeetTypography(val display: FontFamily, val text: FontFamily) {');
   for (const [k, s] of Object.entries(t.typography))
     L.push(`    /** ${s.use} */`, `    val ${k} = TextStyle(fontFamily = ${s.font}, fontWeight = FontWeight(${s.weight}), fontSize = ${s.size}.sp, lineHeight = ${s.lineHeight}.sp, letterSpacing = (${s.letterSpacing}).sp)`);
   L.push('', '    companion object {', '        /** YeetTypography.fromResources(R.font.' + t.font.display.android + ', R.font.' + t.font.text.android + ') */', '        fun fromResources(@FontRes display: Int, @FontRes text: Int) = YeetTypography(', `            display = yeetFontFamily(display, ${t.font.display.weights.join(', ')}),`, `            text = yeetFontFamily(text, ${t.font.text.weights.join(', ')}),`, '        )', '    }');
+  L.push('}', '', 'object YeetDuration {');
+  for (const [k, v] of Object.entries(t.motion.duration)) L.push(`    const val ${/^\d/.test(k) ? `ms${k}` : k} = ${v}`);
+  L.push('}', '', 'object YeetEasing {');
+  for (const [k, v] of Object.entries(t.motion.easing)) L.push(`    val ${kt(k)} = CubicBezierEasing(${v.map((x) => num(x) + 'f').join(', ')})`);
+  L.push('}', '', '/** Пружины Figma Smart Animate (mass 1): stiffness и доля затухания для spring(). */', 'object YeetSpring {');
+  for (const [k, s] of Object.entries(t.motion.spring)) L.push(`    /** Figma ${s.figma}: k ${s.stiffness}, c ${s.damping}, ~${s.duration} мс */`, `    const val ${k}DampingRatio = ${num(dampingRatio(s))}f`, `    const val ${k}Stiffness = ${s.stiffness}f`);
   L.push('}', '', 'object YeetMotion {');
+  const specOf = (tr) => {
+    if (tr.spring) return `spring(dampingRatio = YeetSpring.${tr.spring}DampingRatio, stiffness = YeetSpring.${tr.spring}Stiffness)`;
+    return `tween(durationMillis = ${t.motion.duration[tr.duration]}, easing = YeetEasing.${kt(tr.easing)})`;
+  };
   for (const [k, tr] of Object.entries(t.motion.transition)) {
-    if (tr.spring) { const s = t.motion.spring[tr.spring]; L.push(`    /** ${tr.use} · Figma Smart Animate ${s.figma} */`, `    fun <T> ${k}(): FiniteAnimationSpec<T> = spring(dampingRatio = ${num(dampingRatio(s))}f, stiffness = ${s.stiffness}f)`); }
-    else { const e = t.motion.easing[tr.easing], d = t.motion.duration[tr.duration]; L.push(`    /** ${tr.use} */`, `    fun <T> ${k}(): FiniteAnimationSpec<T> = tween(durationMillis = ${d}, easing = CubicBezierEasing(${e.map((x) => num(x) + 'f').join(', ')}))`); }
+    const note = tr.spring ? ` · Figma Smart Animate ${t.motion.spring[tr.spring].figma}` : '';
+    L.push(`    /** ${tr.use}${note} */`, `    fun <T> ${kt(k)}(): FiniteAnimationSpec<T> = ${specOf(tr)}`);
   }
-  L.push('}', '', '/** Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации). */', 'object YeetGesture {');
+  L.push('}', '');
+  L.push('/**', ' * Переходы с учётом «уменьшить движение» (web: prefers-reduced-motion; Android: animator duration scale = 0).', ' * `reduced` — все переходы мгновенные, подъём и цель без увеличения.', ' */', '@Immutable', 'class YeetMotionScheme(val reduced: Boolean = false) {');
+  for (const [k, tr] of Object.entries(t.motion.transition)) L.push(`    /** ${tr.use} */`, `    fun <T> ${kt(k)}(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.${kt(k)}()`);
+  L.push(`    val liftScale: Float get() = if (reduced) 1f else YeetGesture.liftScale`, `    val targetScale: Float get() = if (reduced) 1f else YeetGesture.targetScale`, '}', '');
+  L.push('/** Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации). */', 'object YeetGesture {');
   for (const [k, g] of Object.entries(t.motion.gesture)) {
     const name = camel(k);
     L.push(`    /** ${g.use}${g.unit === 'px/s' ? ' (dp/с)' : ''} */`, g.unit === 'ms' ? `    const val ${name}Millis = ${g.value}L` : g.unit === 'px' ? `    val ${name} = ${g.value}.dp` : `    const val ${name} = ${g.value}f`);
   }
   L.push('}', '', '/** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */', 'object YeetHaptic {');
+  const hc = (n) => `HapticFeedbackConstants.${n}`;
   for (const [k, h] of Object.entries(t.motion.haptic)) {
-    const c = (n) => `HapticFeedbackConstants.${n}`;
-    L.push(`    /** ${h.when}. ${h.use} */`, h.androidMin ? `    val ${k}: Int get() = if (Build.VERSION.SDK_INT >= ${h.androidMin}) ${c(h.android)} else ${c(h.androidFallback)}` : `    val ${k}: Int get() = ${c(h.android)}`);
+    L.push(`    /** ${h.when}. ${h.use} */`, h.androidMin ? `    val ${kt(k)}: Int get() = if (Build.VERSION.SDK_INT >= ${h.androidMin}) ${hc(h.android)} else ${hc(h.androidFallback)}` : `    val ${kt(k)}: Int get() = ${hc(h.android)}`);
   }
   L.push('}', '', 'fun View.yeetHaptic(type: Int): Boolean = performHapticFeedback(type)', '');
+  L.push('/** Событие хаптики (tokens.motion.haptic) — для YeetTheme.haptics.perform(...). */', 'enum class YeetHapticEvent(val ios: String) {');
+  for (const [k, h] of Object.entries(t.motion.haptic)) L.push(`    /** ${h.when} */`, `    ${pascal(k)}("${h.ios}"),`);
+  L.push('    ;', '', '    /** HapticFeedbackConstants с запасным вариантом для старых API (androidMin / androidFallback). */', '    val feedbackConstant: Int', '        get() = when (this) {');
+  for (const k of Object.keys(t.motion.haptic)) L.push(`            ${pascal(k)} -> YeetHaptic.${kt(k)}`);
+  L.push('        }', '}', '');
   const sh = t.shadow.floating;
-  L.push(`/** ${sh.use}: y ${sh.light.y}, blur ${sh.light.blur}. В Compose — Modifier.shadow(elevation = ${sh.light.blur / 4}.dp, shape, ambientColor / spotColor = цвет ниже). */`, 'object YeetShadow {', `    val floatingLight = ${argb(sh.light.color)}`, `    val floatingDark = ${argb(sh.dark.color)}`, `    val floatingElevation = ${sh.light.blur / 4}.dp`, '}');
+  L.push(`/** ${sh.use}: y ${sh.light.y}, blur ${sh.light.blur}. В Compose — Modifier.yeetFloatingShadow() из модуля native/android (или Modifier.shadow(elevation = ${sh.light.blur / 4}.dp)). */`, 'object YeetShadow {', `    val floatingLight = ${argb(sh.light.color)}`, `    val floatingDark = ${argb(sh.dark.color)}`, `    val floatingElevation = ${sh.light.blur / 4}.dp`, `    val floatingOffsetX = ${sh.light.x}.dp`, `    val floatingOffsetY = ${sh.light.y}.dp`, `    /** Размытие как в CSS / Figma (blur radius). */`, `    val floatingBlur = ${sh.light.blur}.dp`, '}');
   return L.join('\n') + '\n';
 }
 
@@ -278,6 +326,8 @@ const out = {
   'tokens/android/YeetTokens.kt': kotlin(),
   // Swift Package native/ios: те же токены, шрифты регистрируются из ресурсов пакета (Bundle.module)
   'native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift': swift({ bundle: 'module' }),
+  [`${ANDROID_MODULE}/java/design/yeet/tokens/YeetTokens.kt`]: kotlin(),
+  ...androidOutputs(root),
 };
 for (const [path, body] of Object.entries(out)) {
   const url = new URL(path, root);
@@ -288,3 +338,4 @@ for (const [path, body] of Object.entries(out)) {
 
 // Swift Package native/ios: иконки → SwiftUI Path, шрифты и погодные иконки → ресурсы пакета
 buildIosPackage(root, { header: HEADER, swiftKeywords });
+copyAndroidFonts(root, t.font);
