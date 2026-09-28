@@ -9,6 +9,19 @@
 
 ---
 
+## Статус на 29.09 — после слияния #1 и #2
+
+Уже закрыто (вливанием #1 и #2 в `main`):
+- ✅ **Нативные библиотеки:** Swift Package `YeetDesignSystem` (`native/ios`, SwiftUI, iOS 16+, подключается по URL репозитория) и Compose-модуль `yeet-design-system` (`native/android`, `YeetTheme`, пример-галерея). Компоненты повторяют React API.
+- ✅ **CI для нативных:** `ios.yml` (xcodebuild) и `android.yml` (Gradle assemble + lint) с проверкой дрейфа сгенерированных файлов.
+- ✅ **Swift/Kotlin компилируются:** экранирование ключевых слов (`return`); Dynamic Type через `relativeTo:` + `@ScaledMetric`; Reduce Motion на iOS; `YeetMotionScheme(reduced)` на Android.
+- ✅ **Зона касания 44 pt на iOS** (`Foundation.swift`, `contentShape` без изменения вида).
+- ✅ Dialog `danger`, Sheet `onClose`, тап по затемнению, страница «Ресурсы» с загрузками.
+
+Ниже — исходный аудит; пункты выше в нём уже неактуальны. Работа по оставшимся — issues #7–#13, координация — #6.
+
+---
+
 ## TL;DR
 
 Система **сильная как спецификация**: чистые слои токенов, один `tokens.json` → CSS / Swift / Kotlin, Storybook с «В флоу» и
@@ -164,7 +177,10 @@ Web-пакет npm — только если появится веб-потре�
 - Имена 1:1 с переменными Figma (развести `ui-colors/white` на роли), синхронизация через Variables REST API или Tokens Studio
 - `prefers-color-scheme` и `prefers-contrast` на web; high-contrast режим
 
-### Фаза 3 · Дистрибуция для приложений (1–2 недели)
+### Фаза 3 · Дистрибуция для приложений (1–2 недели) — ✅ в основном сделана в #1
+
+Осталось: версии и релизы (Changesets, теги), asset catalog с High Contrast, публикация AAR в GitHub Packages.
+
 
 - **iOS:** Swift Package `YeetTokens` — asset catalog (Any / Dark / High Contrast), шрифты как ресурсы, `Font.custom(relativeTo:)` + `@ScaledMetric`, `YeetMotion` с Reduce Motion; CI `swift build` на macOS
 - **Android:** Gradle-модуль `yeet-tokens` — `YeetTheme {}`, `CompositionLocal`, маппинг в `MaterialTheme`, учёт `ANIMATOR_DURATION_SCALE`; CI `./gradlew assemble`; публикация в GitHub Packages
