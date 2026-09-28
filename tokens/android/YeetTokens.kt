@@ -469,3 +469,4 @@ object YeetShadow {
     /** Размытие как в CSS / Figma (blur radius). */
     val floatingBlur = 40.dp
 }
+// ручная правка
