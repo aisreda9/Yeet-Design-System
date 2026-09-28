@@ -171,7 +171,8 @@ for (const s of sets) {
 // Цвета аккаунтов: буква on-item на фоне цвета вещи (аватары), не зависит от темы
 for (const [k, v] of Object.entries(t.item)) {
   if (!v.on) throw new Error(`item.${k}: нет on`);
-  const r = ratio(parse(v.on), parse(v.value));
+  const pick = (x) => parse(resolve(x, (c) => base[c]?.light)); // item-цвета ссылаются на примитивы
+  const r = ratio(pick(v.on), pick(v.value));
   rows.push({ set: 'item · буква', kind: 'аватар', pair: `on-item-${k} / item-${k}`, min: TEXT, ratio: r, level: r >= TEXT ? 'ok' : 'error' });
 }
 
