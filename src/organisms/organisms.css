@@ -179,7 +179,8 @@
 .y-item-card__remove { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--color-text-secondary); display: grid; place-items: center; cursor: pointer; }
 .y-item-art { display: grid; place-items: center; position: relative; }
 .y-item-art__dot { position: absolute; right: 4px; bottom: 4px; }
-.y-item-art__img { width: 100%; height: 100%; object-fit: contain; }
+.y-item-art--photo { display: block; } /* фото без фона: размер и сдвиг считает balanceArt (визуальный вес + оптический центр) */
+.y-item-art__img { position: absolute; max-width: none; user-select: none; }
 
 .y-product-card { display: flex; flex-direction: column; gap: var(--space-16); color: var(--color-text-primary); }
 .y-product-card__meta { display: flex; flex-direction: column; gap: 2px; }
