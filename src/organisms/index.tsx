@@ -6,3 +6,4 @@ export * from './overlays';
 export * from './cards';
 export * from './stylist';
 export * from './canvas';
+export * from './profile';

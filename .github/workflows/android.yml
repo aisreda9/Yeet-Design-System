@@ -1,0 +1,42 @@
+name: Android (Compose)
+
+on:
+  push:
+    branches: [main]
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+  pull_request:
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Сгенерированные токены, иконки и шрифты совпадают с источниками (npm run tokens)
+        working-directory: .
+        run: |
+          node scripts/build-tokens.mjs
+          git diff --exit-code -- tokens native/android src/tokens
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Библиотека + sample (debug)
+        run: ./gradlew :yeet-design-system:assembleDebug :sample:assembleDebug --stacktrace
+      - name: Android Lint (библиотека)
+        run: ./gradlew :yeet-design-system:lintDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yeet-sample-debug
+          path: native/android/sample/build/outputs/apk/debug/*.apk

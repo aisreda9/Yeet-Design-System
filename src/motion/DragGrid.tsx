@@ -3,6 +3,8 @@ import { Icon } from '../atoms';
 import { Snackbar } from '../molecules';
 import { ItemCard, type Garment } from '../organisms';
 import type { ItemColor } from '../tokens/tokens';
+import { gesture, motionMs } from '../utils/gesture';
+import { haptic } from '../utils/haptic';
 
 type Cell = { id: string; kind: Garment; color: ItemColor };
 const initial: Cell[] = [
@@ -14,8 +16,8 @@ const initial: Cell[] = [
   { id: 'f', kind: 'accessories', color: 'brown' },
 ];
 
-const LONG_PRESS = 400; // --gesture-long-press
-const SLOP = 10; // --gesture-touch-slop
+const LONG_PRESS = gesture.longPress; // --gesture-long-press
+const SLOP = gesture.slop; // --gesture-touch-slop
 
 /**
  * Демо правил перетаскивания: долгое нажатие → подъём → цель подсвечивается → бросок / возврат / удаление.
@@ -69,7 +71,7 @@ export function DragGrid() {
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     start.current = { x: e.clientX, y: e.clientY };
     setPressed(id);
-    timer.current = window.setTimeout(() => { setLifted(id); setPressed(null); navigator.vibrate?.(10); }, LONG_PRESS);
+    timer.current = window.setTimeout(() => { setLifted(id); setPressed(null); haptic('lift'); }, LONG_PRESS);
   };
   const move = (e: PointerEvent) => {
     const d = { x: e.clientX - start.current.x, y: e.clientY - start.current.y };
@@ -78,7 +80,9 @@ export function DragGrid() {
       return;
     }
     setDelta(d);
-    setOver(targetAt(e.clientX, e.clientY));
+    const t = targetAt(e.clientX, e.clientY);
+    if (t && t !== over) haptic('target'); // только при входе в новую цель, не при движении внутри
+    setOver(t);
   };
   const up = () => {
     clearTimeout(timer.current);
@@ -88,13 +92,15 @@ export function DragGrid() {
     if (over === 'trash') {
       // уходит сжимаясь (exit, 150 мс), потом соседи съезжают на освободившееся место
       setRemoving(id);
+      haptic('delete');
       window.setTimeout(() => {
         snapshot();
         setRemoved(cells.find((c) => c.id === id) ?? null);
         setCells((cs) => cs.filter((c) => c.id !== id));
         setRemoving(null);
-      }, 150);
+      }, motionMs('--motion-exit'));
     } else if (over) {
+      haptic('drop');
       snapshot();
       setCells((cs) => {
         const a = cs.findIndex((c) => c.id === id), b = cs.findIndex((c) => c.id === over);
@@ -143,9 +149,8 @@ export function DragGrid() {
         <Icon name="trash" /> Отпусти, чтобы удалить
       </div>
       {removed && (
-        <Snackbar key={removed.id}>
+        <Snackbar key={removed.id} autoHide onClose={() => setRemoved(null)} onUndo={undo}>
           Вещь удалена
-          <button type="button" className="y-drag__undo" onClick={undo}>Вернуть</button>
         </Snackbar>
       )}
     </div>

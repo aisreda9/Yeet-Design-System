@@ -1,0 +1,62 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { ResourceIcons } from './blocks';
+
+<Meta title="Процессы/Ресурсы" />
+
+# Ресурсы
+
+Всё, что нужно дизайну и разработке, в одном месте. Файлы собираются из репозитория при каждой сборке Storybook
+(`npm run assets`), поэтому здесь всегда актуальная версия.
+
+<p><a className="y-download" href="./downloads/yeet-design-system.zip" download>Скачать всё одним архивом (ZIP)</a></p>
+
+## Figma
+
+| Что | Ссылка |
+|---|---|
+| Компоненты — **источник правды** | [Design System 2.0 (Claude)](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) |
+| Экраны, собранные из компонентов | [Claude · DS 2.0 — экраны](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1168-12824) |
+| Те же экраны в тёмной теме | [Claude · DS 2.0 — Dark](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1173-7887) |
+| Исходные макеты дизайнера (эталон вида) | [New app design](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) |
+| Анимации | [Animations](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) |
+
+Правило: **компонент DS — закон, экран — пример использования.** Правка начинается с компонента в Figma,
+затем тот же компонент в коде (Storybook), затем экраны.
+
+## Токены
+
+| Файл | Для чего |
+|---|---|
+| <a href="./downloads/tokens/tokens.json" download>tokens.json</a> | Единый источник: цвета Light / Dark, отступы, радиусы, шрифты, тени, анимации, хаптика |
+| <a href="./downloads/tokens/tokens.css" download>tokens.css</a> | Web: CSS-переменные для обеих тем и брендов |
+| <a href="./downloads/tokens/ios/YeetTokens.swift" download>YeetTokens.swift</a> | iOS / SwiftUI |
+| <a href="./downloads/tokens/android/YeetTokens.kt" download>YeetTokens.kt</a> | Android / Jetpack Compose |
+
+## Иконки
+
+Линейные иконки 24 × 24, обводка 1.3, цвет `currentColor` — как в Figma (ui-icons).
+<a href="./downloads/icons/ui-sprite.svg" download>SVG-спрайт</a> со всеми иконками или по одной ниже (нажми, чтобы скачать).
+
+<ResourceIcons />
+
+Цветные иконки погоды и флаги — в архиве, папки `icons/weather` и `icons/flags`.
+
+## Иллюстрации и шрифты
+
+| Файл | Где |
+|---|---|
+| <a href="./downloads/images/photo-gallery.png" download>photo-gallery.png</a>, <a href="./downloads/images/photo-camera.png" download>photo-camera.png</a> | Плитки «Выбрать из галереи» и «Сделать фото» (@2x) |
+| <a href="./downloads/fonts/Inter-Variable.woff2" download>Inter</a> (woff2, ttf в архиве) | Текст: Body, Caption, кнопки |
+| <a href="./downloads/fonts/RobotoSlab-Variable.woff2" download>Roboto Slab</a> (woff2, ttf в архиве) | Заголовки H1–H3, числа |
+
+## Готово, если…
+
+Компонент или экран считается готовым, когда выполнено всё:
+
+1. В Figma он собран из компонентов DS 2.0, цвета и тексты привязаны к переменным и стилям (без «сырых» hex).
+2. В Storybook есть история, свойства совпадают с Figma по имени и значениям; строка в реестре «Figma ↔ код».
+3. Расхождение с экраном-эталоном по положению текстов — **не больше 2 px** (`npm run flow-diff`, сверка в Figma).
+4. `npm run qa` — **0 ошибок** в светлой и тёмной теме на всех размерах экрана (320–430); спеки Figma в пределах 1 px.
+5. `npm run contrast` — текст ≥ 4.5 : 1, иконки ≥ 3 : 1 в обеих темах.
+6. Анимация — на токенах `--motion-*`, есть поведение при «уменьшить движение», описана хаптика для iOS и Android.
+7. Токены совпадают в Figma (Light и Dark) и в `tokens.json`; iOS и Android сгенерированы (`npm run tokens`).

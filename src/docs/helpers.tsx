@@ -1,5 +1,11 @@
 import type { Decorator } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
+import demoAvatarUrl from './demo-avatar.svg';
+import demoPhotoUrl from './demo-photo.svg';
+
+/** Демо-фото для историй: снимок вещи (поиск по фото, превью в поле) и фото профиля (аватар). */
+export const demoPhoto = demoPhotoUrl;
+export const demoAvatar = demoAvatarUrl;
 
 /** Карточка «В флоу»: где в приложении встречается вариант компонента. */
 export function Usage({ screen, note, children, width }: { screen: string; note?: string; children: ReactNode; width?: number }) {
@@ -74,5 +80,5 @@ export const withWidth = (width: number) => (Story: () => ReactNode) => <div sty
 
 /** Декоратор: sheet / dialog на затемнении, как на экране. */
 export const onOverlay = (Story: () => ReactNode) => (
-  <div style={{ width: 393, background: 'var(--color-bg-overlay)', paddingTop: 40, borderRadius: 24, overflow: 'hidden' }}><Story /></div>
+  <div style={{ width: 393, background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
 );

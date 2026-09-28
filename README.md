@@ -65,7 +65,14 @@ npm run team   # активные ветки, их зоны и пересече�
 `tokens/tokens.json` — единый источник значений (цвета light/dark, отступы, радиусы, типографика, тени, анимации).
 
 ```bash
-npm run tokens   # → src/tokens/tokens.generated.css, tokens/ios/YeetTokens.swift, tokens/android/YeetTokens.kt
+npm run tokens   # → src/tokens/tokens.generated.css, tokens/ios/YeetTokens.swift, tokens/android/YeetTokens.kt,
+                 #   native/ios (токены, иконки → SwiftUI Path, шрифты, иконки погоды)
 ```
 
 Как подключить в приложения — Storybook → «Процессы / iOS и Android».
+
+## iOS: библиотека компонентов (SwiftUI)
+
+`native/ios` — Swift Package `YeetDesignSystem` (iOS 16+, без зависимостей): те же компоненты и props, что в React.
+Подключение через SPM по URL репозитория, таблица соответствий React ↔ Swift — [native/ios/README.md](native/ios/README.md).
+Сборку проверяет `.github/workflows/ios.yml` (macOS, iOS Simulator).

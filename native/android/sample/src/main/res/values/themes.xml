@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Только платформенная тема: окно без ActionBar, фон = bg-canvas (light). Всё остальное — YeetTheme. -->
+    <style name="Theme.YeetSample" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/yeet_canvas</item>
+    </style>
+    <color name="yeet_canvas">#FFFFFF</color>
+</resources>

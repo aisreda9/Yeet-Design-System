@@ -13,7 +13,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 tokens/tokens.json          ← правим только здесь (или синхронизируем из Figma «Yeet DS 2.0»)
         │  npm run tokens
         ├── src/tokens/tokens.generated.css     web / Storybook
-        ├── tokens/ios/YeetTokens.swift          SwiftUI
+        ├── tokens/ios/YeetTokens.swift          SwiftUI (только токены)
+        ├── native/ios                           SwiftUI-компоненты: Swift Package YeetDesignSystem
         └── tokens/android/YeetTokens.kt         Jetpack Compose
 ```
 
@@ -22,7 +23,11 @@ tokens/tokens.json          ← правим только здесь (или с�
 
 ## iOS · SwiftUI
 
-Скопируйте `YeetTokens.swift` в проект, добавьте шрифты Roboto Slab и Inter в `Info.plist`.
+Компоненты — Swift Package `YeetDesignSystem` в `native/ios` (iOS 16+): `YeetButton(variant: .primary, size: .l)`, `YeetSheet`,
+`YeetHeader(type: .large(...))` и т. д., подключение через SPM по URL репозитория, шрифты внутри пакета.
+Таблица соответствий React ↔ Swift — `native/ios/README.md`.
+
+Только токены: скопируйте `YeetTokens.swift` в проект и добавьте шрифты Roboto Slab и Inter в приложение.
 
 ```swift
 Text("Гардероб")

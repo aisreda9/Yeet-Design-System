@@ -4,6 +4,7 @@ import { Button, ColorDot, Icon, IconButton, type ControlSize } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
 import { cx } from '../utils/cx';
+import { haptic } from '../utils/haptic';
 
 /* ─── SegmentControl ────────────────────────────────────────────────── */
 
@@ -20,7 +21,7 @@ export function SegmentControl({ segments, value, onChange, size = 'L', fit }: {
       <span className="y-segment__pill" style={pill} aria-hidden />
       {segments.map((s) => {
         const active = s.value === value;
-        const common = { key: s.value, role: 'tab', 'aria-selected': active, 'data-pill-item': true, onClick: () => onChange?.(s.value) } as const;
+        const common = { key: s.value, role: 'tab', 'aria-selected': active, 'data-pill-item': true, onClick: () => { if (!active) haptic('select'); onChange?.(s.value); } } as const;
         return s.icon && !s.label ? (
           <IconButton {...common} icon={s.icon} label={s.value} size={size} variant="ghost" />
         ) : (
@@ -35,17 +36,54 @@ export function SegmentControl({ segments, value, onChange, size = 'L', fit }: {
 
 /* ─── ChipGroup ─────────────────────────────────────────────────────── */
 
-export type Chip = { label: string; selected?: boolean; removable?: boolean; colorDot?: ItemColor; dropdown?: boolean };
+export type Chip = {
+  label: string;
+  selected?: boolean;
+  removable?: boolean;
+  /** Свотч цвета вещи 16 перед текстом (Figma: chip · Show Color Dot). */
+  colorDot?: ItemColor;
+  dropdown?: boolean;
+  /**
+   * Chip · State=Editing: чипс превращается в поле ввода по ширине текста — свой повод или тег
+   * (флоу Outfit Creation / Custom Occasion Name). `label` — введённый текст, `placeholder` — подсказка серым.
+   */
+  editing?: boolean;
+  placeholder?: string;
+};
 
 /**
  * Группа чипсов на базе `Button S`: не выбран — `tertiary`, выбран — `soft`.
  * `wrap` — перенос строк (теги, цвета), иначе горизонтальный скролл (фильтры, поводы).
  */
-export function ChipGroup({ chips, onToggle, onAdd, wrap = false, center }: { chips: Chip[]; onToggle?: (label: string) => void; onAdd?: () => void; wrap?: boolean; /** Подсказки по центру (Поиск в сторах). */ center?: boolean }) {
+export function ChipGroup({ chips, onToggle, onAdd, onEdit, onEditDone, wrap = false, center }: {
+  chips: Chip[];
+  onToggle?: (label: string) => void;
+  onAdd?: () => void;
+  /** Ввод в редактируемом чипсе (`editing`). */
+  onEdit?: (value: string) => void;
+  /** Enter или уход фокуса из редактируемого чипса: сохранить введённое. */
+  onEditDone?: (value: string) => void;
+  wrap?: boolean;
+  /** Подсказки по центру (Поиск в сторах). */ center?: boolean;
+}) {
   return (
     <div className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center')}>
       {onAdd && <IconButton icon="plus" label="Добавить" variant="primary" size="S" onClick={onAdd} />}
-      {chips.map((c) => (
+      {chips.map((c) => c.editing ? (
+        <label key="editing" className="y-button y-button--S y-style--tertiary y-chip--editing">
+          <input
+            className="y-chip__input"
+            value={c.label}
+            placeholder={c.placeholder}
+            aria-label={c.placeholder ?? 'Название'}
+            size={Math.max(c.label.length, c.placeholder?.length ?? 0, 1)}
+            onChange={(e) => onEdit?.(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onEditDone?.(e.currentTarget.value)}
+            onBlur={(e) => onEditDone?.(e.currentTarget.value)}
+            readOnly={!onEdit}
+          />
+        </label>
+      ) : (
         <Button
           key={c.label}
           size="S"
@@ -53,9 +91,9 @@ export function ChipGroup({ chips, onToggle, onAdd, wrap = false, center }: { ch
           rightIcon={c.removable ? 'cross' : c.dropdown ? 'chevron-up-down' : undefined}
           className={cx((c.removable || c.dropdown) && 'y-chip--trailing', c.removable && 'y-chip--removable')}
           aria-pressed={c.selected}
-          onClick={() => onToggle?.(c.label)}
+          onClick={() => { haptic('select'); onToggle?.(c.label); }}
         >
-          {c.colorDot && <ColorDot color={c.colorDot} />}
+          {c.colorDot && <ColorDot color={c.colorDot} size={16} />}
           {c.label}
         </Button>
       ))}
@@ -77,7 +115,7 @@ export type ListItemProps = {
   description?: string;
   /** Элемент слева вместо иконки: аватар 40. */
   leading?: ReactNode;
-  /** Элемент справа: флаг страны, счётчик. */
+  /** Элемент справа: флаг страны (`Flag`), счётчик. Строка — текст Body серым: валюта «₽ · RUB» (Figma: list-item · Trailing=Text). */
   trailing?: ReactNode;
   onClick?: () => void;
 };
@@ -85,9 +123,10 @@ export type ListItemProps = {
 /**
  * Строка списка в sheet, высота 24, gap 12.
  * **action** — действие с вещью (создать образ, редактировать, удалить), **expandable** — категории одежды,
- * **radio** — одиночный выбор (год рождения, страна, пол).
+ * **radio** — одиночный выбор (год рождения, пол; страна — с флагом, валюта — с кодом серым справа).
  */
 export function ListItem({ type = 'action', label, description, icon, leading, expanded, checked, trailing, onClick }: ListItemProps) {
+  const end = typeof trailing === 'string' ? <span className="y-list-item__trailing">{trailing}</span> : trailing;
   const text = description ? (
     <span className="y-list-item__text"><span className="y-list-item__label">{label}</span><span className="y-caption y-text--secondary">{description}</span></span>
   ) : (
@@ -99,21 +138,21 @@ export function ListItem({ type = 'action', label, description, icon, leading, e
       <div className="y-list-item">
         {leading ?? (icon && <Icon name={icon} />)}
         {text}
-        {trailing}
+        {end}
       </div>
     );
   return (
     <button
       type="button"
       className="y-list-item"
-      onClick={onClick}
+      onClick={() => { if (type === 'radio' && !checked) haptic('select'); onClick?.(); }}
       role={type === 'radio' ? 'radio' : undefined}
       aria-checked={type === 'radio' ? !!checked : undefined}
       aria-expanded={type === 'expandable' ? !!expanded : undefined}
     >
-      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')} /> : leading ?? (icon && <Icon name={icon} />)}
+      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')}>{checked && <Icon name="check" size={16} />}</span> : leading ?? (icon && <Icon name={icon} />)}
       {text}
-      {type === 'expandable' ? <Icon name={expanded ? 'chevron-up' : 'chevron-down'} /> : trailing}
+      {type === 'expandable' ? <Icon name={expanded ? 'chevron-up' : 'chevron-down'} /> : end}
     </button>
   );
 }

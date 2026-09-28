@@ -22,17 +22,29 @@
   --yeet-graphite-900: #1a1a1e;
   --yeet-graphite-950: #0f0f11;
   --yeet-item-black: #1a1a2e;
+  --yeet-on-item-black: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-grey: #777777;
+  --yeet-on-item-grey: #000000; /* буква / иконка на этом цвете */
   --yeet-item-white: #ffffff;
+  --yeet-on-item-white: #000000; /* буква / иконка на этом цвете */
   --yeet-item-purple: #6a00ff;
+  --yeet-on-item-purple: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-pink: #d900ff;
+  --yeet-on-item-pink: #000000; /* буква / иконка на этом цвете */
   --yeet-item-green: #00d08b;
+  --yeet-on-item-green: #000000; /* буква / иконка на этом цвете */
   --yeet-item-blue: #0100f4;
+  --yeet-on-item-blue: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-yellow: #ffd000;
+  --yeet-on-item-yellow: #000000; /* буква / иконка на этом цвете */
   --yeet-item-orange: #ff8800;
+  --yeet-on-item-orange: #000000; /* буква / иконка на этом цвете */
   --yeet-item-red: #ff4230;
+  --yeet-on-item-red: #000000; /* буква / иконка на этом цвете */
   --yeet-item-beige: #ffe1c7;
+  --yeet-on-item-beige: #000000; /* буква / иконка на этом цвете */
   --yeet-item-brown: #c26547;
+  --yeet-on-item-brown: #000000; /* буква / иконка на этом цвете */
 
   --space-0: 0px;
   --space-1: 1px;
@@ -129,16 +141,17 @@
   --color-text-inverse: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
+  --color-text-on-photo: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-600); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
-  --color-accent-soft: rgb(1 0 244 / 0.1); /* ui-colors/blue-10% */
+  --color-accent-soft: #f1f4ff; /* ui-colors/blue-10% */
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 66 48 / 0.1); /* ui-colors/red-10% */
   --color-border-subtle: rgb(0 0 0 / 0.1); /* ui-colors/black-10% */
-  --color-divider: rgb(0 0 0 / 0.05); /* divider (black @5%) */
-  --color-pattern-dot: rgb(0 0 0 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(0 0 0 / 0.05); /* ui-colors/divider */
+  --color-pattern-dot: rgb(0 0 0 / 0.23); /* ui-colors/pattern-dot */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.12);
 }
 
@@ -154,7 +167,8 @@
   --color-text-inverse: var(--yeet-graphite-950); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #5b6470; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
+  --color-text-on-photo: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-accent: var(--yeet-blue-200); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-400); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-400); /* ui-colors/blue */
@@ -162,8 +176,8 @@
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 107 92 / 0.18); /* ui-colors/red-10% */
   --color-border-subtle: rgb(245 245 247 / 0.12); /* ui-colors/black-10% */
-  --color-divider: rgb(245 245 247 / 0.08); /* divider (black @5%) */
-  --color-pattern-dot: rgb(245 245 247 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(245 245 247 / 0.08); /* ui-colors/divider */
+  --color-pattern-dot: rgb(245 245 247 / 0.23); /* ui-colors/pattern-dot */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.5);
 }
 
@@ -368,6 +382,7 @@
   --card-radius: var(--radius-lg);
   --sheet-bg: var(--color-bg-elevated);
   --sheet-radius: var(--radius-xl);
+  --sheet-radius-bottom: var(--radius-bar);
   --tab-bar-bg: var(--color-bg-elevated);
   --input-bg: var(--color-bg-subtle);
 }
