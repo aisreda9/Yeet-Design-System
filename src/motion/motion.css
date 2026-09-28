@@ -52,7 +52,7 @@
 .y-collapse.is-collapsed .y-collapse__panel { margin-top: 8px; }
 
 /* Листание поводов */
-.y-pager { overflow: hidden; padding: 24px 20px 0; touch-action: pan-y; cursor: grab; }
+.y-pager { overflow: hidden; padding: 24px 20px 0; touch-action: pan-y; cursor: grab; user-select: none; }
 .y-pager__track { display: flex; gap: 20px; transition: transform var(--motion-page); }
 .y-pager__page { flex: none; width: 353px; }
 .y-pager__chips { padding: 16px 0 0; transition: transform var(--motion-page); }

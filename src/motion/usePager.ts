@@ -48,7 +48,8 @@ type Gesture = { x: number; y: number; axis?: 'x' | 'y'; crossed: boolean };
  *   «Уменьшении движения» она мгновенная, а палец по-прежнему ведёт 1 : 1.
  *
  * Хук не рисует ничего сам: отдаёт `drag` и обработчики, раскладку делает вызывающий.
- * Контейнеру нужен `touch-action: pan-y` для оси `x` (или `none` для `y`), иначе браузер заберёт жест под скролл.
+ * Контейнеру нужен `touch-action: pan-y` для оси `x` (или `none` для `y`), иначе браузер заберёт жест под скролл,
+ * и `user-select: none`: иначе мышь выделяет текст, следующий жест становится нативным drag и приходит `pointercancel`.
  */
 export function useSwipePager({ axis, count, index, onChange, size, changeHaptic = 'skip', disabled }: SwipePagerOptions): SwipePager {
   const [drag, setDrag] = useState<number | null>(null);
