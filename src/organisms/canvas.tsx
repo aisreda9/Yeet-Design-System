@@ -13,7 +13,7 @@ export type OutfitCanvasProps = {
   onChange?: (items: CanvasItem[]) => void;
   selectedId?: string;
   onSelect?: (id: string | undefined) => void;
-  /** Подсказка поверх холста: `Snackbar` «Перемещай и масштабируй вещи». */
+  /** Подсказка поверх холста: `Snackbar size="S"` «Перемещай и масштабируй вещи» (313 × 48, 20 от боков). */
   hint?: ReactNode;
 };
 

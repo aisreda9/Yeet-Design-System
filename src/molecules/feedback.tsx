@@ -9,10 +9,13 @@ import photoGallery from '../icons/art/photo-gallery.png';
 
 /* ─── Hint ──────────────────────────────────────────────────────────── */
 
-/** Подсказка поверх холста или фото: пилюля `elevated` с тенью. */
-export function Hint({ icon = 'fingers-pinch', children }: { icon?: IconName; children: ReactNode }) {
+/**
+ * Подсказка поверх холста или фото, Body 14 с иконкой 16.
+ * `default` — пилюля `elevated` с тенью; `onPhoto` — без подложки, белый текст и иконка поверх фото (Figma: hint · On Photo, флоу Search / Photo / Crop).
+ */
+export function Hint({ icon = 'fingers-pinch', tone = 'default', children }: { icon?: IconName; tone?: 'default' | 'onPhoto'; children: ReactNode }) {
   return (
-    <span className="y-hint" role="note">
+    <span className={cx('y-hint', tone === 'onPhoto' && 'y-hint--on-photo')} role="note">
       <Icon name={icon} size={16} />
       {children}
     </span>
@@ -28,8 +31,9 @@ export function Hint({ icon = 'fingers-pinch', children }: { icon?: IconName; ch
  * (`--motion-exit`, 150 мс). С `autoHide` закрывается сам через `--gesture-snackbar` 4 с, с «Отменить» — 6 с;
  * пока на тосте курсор или фокус, таймер стоит (успеть прочитать и нажать — WCAG 2.2.1).
  * «Отменить» и «×» сначала доигрывают уход, потом вызывают `onClose`.
+ * `size`: **M** — 52, паддинг 20 (тост над таб-баром); **S** — 48, паддинг 16 (подсказка на холсте образа, 313 при отступах 20).
  */
-export function Snackbar({ children, onClose, onUndo, autoHide }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void; /** Закрыться самому через 4 с (с «Отменить» — 6 с). Нужен `onClose`. */ autoHide?: boolean }) {
+export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M' }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void; /** Закрыться самому через 4 с (с «Отменить» — 6 с). Нужен `onClose`. */ autoHide?: boolean; /** S — подсказка на холсте образа. */ size?: 'M' | 'S' }) {
   const [closing, setClosing] = useState(false);
   const leaving = useContext(LeavingContext) || closing;
   const [paused, setPaused] = useState(false);
@@ -44,7 +48,7 @@ export function Snackbar({ children, onClose, onUndo, autoHide }: { children: Re
   }, [autoHide, onClose, onUndo, paused, leaving, leave]);
   const hold = { onPointerEnter: () => setPaused(true), onPointerLeave: () => setPaused(false), onFocus: () => setPaused(true), onBlur: () => setPaused(false) };
   return (
-    <div className={cx('y-snackbar', leaving && 'is-leaving')} role="status" {...(autoHide ? hold : {})}>
+    <div className={cx('y-snackbar', size === 'S' && 'y-snackbar--S', leaving && 'is-leaving')} role="status" {...(autoHide ? hold : {})}>
       <span>{children}</span>
       {onUndo && (
         <button type="button" aria-label="Отменить" onClick={() => leave(onUndo)}>

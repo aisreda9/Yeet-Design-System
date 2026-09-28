@@ -61,8 +61,6 @@
 .y-screen__content:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
-/* Заметка: текст на подложке (описание вещи во флоу Item Details) — 20 со всех сторон, радиус 20 */
-.y-note { padding: var(--space-20); border-radius: var(--radius-lg); background: var(--color-bg-subtle); }
 /* Профиль: аккаунты слева, период справа (флоу Profile / Overview: ряд 40 на y122) */
 .y-profile-bar { display: flex; align-items: center; justify-content: space-between; margin-top: calc(var(--space-4) * -1); }
 /* Панель профиля: блоки аналитики через 32, сводка (счётчик + плитки) → лента 24 */

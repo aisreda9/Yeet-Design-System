@@ -46,6 +46,8 @@ data class YeetColorScheme(
     val textInverseSecondary: Color,
     /** Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent */
     val textOnDanger: Color,
+    /** Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white */
+    val textOnPhoto: Color,
     /** Акцентный текст, выбранное · Figma ui-colors/blue-text */
     val textAccent: Color,
     /** Ошибки, деструктивные действия · Figma ui-colors/red-text */
@@ -79,6 +81,7 @@ val YeetLightColors = YeetColorScheme(
     textOnAccent = Color(0xFFFFFFFF),
     textInverseSecondary = Color(0xFFA7B3BF),
     textOnDanger = Color(0xFFFFFFFF),
+    textOnPhoto = Color(0xFFFFFFFF),
     textAccent = Color(0xFF0100F4),
     textDanger = Color(0xFFCC291B),
     accent = Color(0xFF0100F4),
@@ -102,6 +105,7 @@ val YeetDarkColors = YeetColorScheme(
     textOnAccent = Color(0xFFFFFFFF),
     textInverseSecondary = Color(0xFF5B6470),
     textOnDanger = Color(0xFFFFFFFF),
+    textOnPhoto = Color(0xFFFFFFFF),
     textAccent = Color(0xFF8A8AFF),
     textDanger = Color(0xFFFF6B5C),
     accent = Color(0xFF4B4BFF),

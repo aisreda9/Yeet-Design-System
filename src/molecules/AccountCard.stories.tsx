@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AccountCard, AvatarStack, type Account } from '.';
 import { Avatar } from '../atoms';
-import { unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
+import { demoAvatar, unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
 import { avatarPalette, itemColors } from '../tokens/tokens';
 
 const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com', color: 'blue' };
@@ -29,6 +29,7 @@ export const Stack: Story = {
     <UsageGrid min={200}>
       <Usage screen="Profile / Overview" note="один аккаунт"><AvatarStack accounts={[sima]} /></Usage>
       <Usage screen="Profile / Overview" note="мультиаккаунт"><AvatarStack accounts={[sima, tina]} /></Usage>
+      <Usage screen="Profile / Overview" note="с фото"><AvatarStack accounts={[{ ...sima, photo: demoAvatar }, tina]} /></Usage>
     </UsageGrid>
   ),
 };
@@ -41,6 +42,7 @@ export const InFlow: Story = {
     <UsageGrid min={353}>
       <Usage screen="Profile / Accounts / Sheet" note="текущий"><AccountCard account={sima} kind="current" /></Usage>
       <Usage screen="Profile / Accounts / Sheet" note="другой аккаунт"><AccountCard account={tina} kind="other" /></Usage>
+      <Usage screen="Profile / Accounts / Sheet" note="с фото профиля"><AccountCard account={{ ...sima, photo: demoAvatar }} kind="current" /></Usage>
       <Usage screen="Settings / Main" note="с «Выйти»"><AccountCard account={sima} kind="settings" /></Usage>
     </UsageGrid>
   ),

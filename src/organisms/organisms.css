@@ -3,6 +3,7 @@
 /* Status bar (system, mockups only) */
 .y-status-bar { height: var(--status-bar-height); display: flex; align-items: center; justify-content: space-between; padding: 21px 24px 19px; color: var(--color-text-primary); font: 600 17px/22px -apple-system, 'SF Pro Text', var(--font-text); }
 .y-status-bar--on-accent { color: var(--color-text-on-accent); }
+.y-status-bar--on-photo { color: var(--color-text-on-photo); } /* поверх фото: белый в любой теме */
 .y-status-bar__icons { display: inline-flex; gap: 7px; align-items: center; }
 
 /* ─── Header — закреплённая шапка: сплошная подложка + полоса затухания снизу ─── */
@@ -29,6 +30,8 @@
 /* Главная: вторая строка заголовка — повод акцентом с раскрывашкой */
 .y-header__accent { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-8); margin-top: calc(var(--space-8) * -1); padding: 0; border: 0; background: none; color: var(--color-text-accent); cursor: pointer; text-align: left; }
 .y-header__back-title { margin-top: var(--space-12); }
+.y-header__back-text { display: flex; flex-direction: column; gap: var(--space-12); } /* back: подзаголовок Body серым через 12 */
+.y-header__text-action { padding: 0 var(--space-20); } /* «Пропустить»: Tertiary M, отступы 20 (Figma: header · Back, action) */
 
 /* Скролл: большой заголовок уходит в пилюлю по центру (Screen → data-collapsed) */
 .y-header__pill {
@@ -89,6 +92,8 @@
 .y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
 .y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */
+.y-tab-bar__avatar--photo { overflow: hidden; } /* фото профиля в той же обводке 1.3: серой у неактивной вкладки */
+.y-tab-bar__avatar--photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Нижняя панель стилиста: хэндл, поле, таб-бар */
 .y-dock {
@@ -118,6 +123,11 @@
 .y-sheet--modal > .y-sheet__title + *,
 .y-sheet--modal > .y-sheet__head + * { margin-top: calc(var(--space-4) * -1); }
 .y-sheet--modal > .y-sheet__head { margin-top: var(--space-12); } /* без хэндла заголовок на 20 от верха */
+.y-sheet--no-handle { padding-top: var(--space-20); } /* Show Handle=false: контент на 20 от верха */
+.y-sheet--no-handle > .y-sheet__head { margin-top: 0; }
+/* Высокая модальная шторка не выше экрана: контент прокручивается внутри (Item Filter) */
+.y-overlay > .y-sheet--modal { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.y-overlay > .y-sheet--modal::-webkit-scrollbar { display: none; }
 /* Панель деталей (Item / Outfit Details): заголовок H2 → контент 16, → подпись (сезон, цена) 12 */
 .y-sheet--panel { box-shadow: var(--shadow-floating); }
 .y-sheet--panel > .y-sheet__title + * { margin-top: calc(var(--space-4) * -1); }
@@ -189,6 +199,7 @@
   background-size: 10px 10px, auto; background-position: 0 0;
   background-origin: content-box, border-box; background-clip: content-box, border-box;
 }
+.y-collage--plain { background-image: none; } /* Pattern=None: карточка без точек («Лучшая инвестиция») */
 .y-collage__layer { position: absolute; inset: 0; pointer-events: none; } /* слой вещей: по нему считается масштаб (useFitScale) */
 .y-collage__layer > .y-collage__item { pointer-events: auto; }
 .y-collage__item { position: absolute; transform: translate(-50%, -50%); }
@@ -213,7 +224,11 @@
 @keyframes y-shimmer { to { translate: 100% 0; } }
 @media (prefers-reduced-motion: reduce) { .y-photo-area::before { animation: none; } }
 .y-photo-area__add { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); font: var(--font-weight-body) 14px/20px var(--font-text); background: none; border: 0; color: inherit; cursor: pointer; }
-.y-photo-area__close { position: absolute; top: var(--space-12); right: var(--space-12); }
+.y-photo-area__close { /* «×» 24 серым в 20 от угла: кнопка 44 с иконкой по центру → 10 от края */
+  position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; padding: 0; border: 0; background: none;
+  display: grid; place-items: center; color: var(--color-text-secondary); cursor: pointer;
+}
+.y-photo-area__close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--radius-full); }
 
 /* Погода: Figma — Inter 460 12/16, #A7B3BF; предупреждение — белым второй строкой */
 .y-weather {
@@ -259,7 +274,7 @@
   color: var(--color-text-primary); text-align: left; overflow: hidden;
 }
 .y-trip-card--add { align-items: center; justify-content: center; gap: var(--space-12); text-align: center; }
-.y-trip-card__art { position: absolute; left: 0; right: 0; bottom: 0; height: 55%; }
+.y-trip-card__art { position: absolute; left: var(--space-16); right: var(--space-16); bottom: var(--space-20); height: 120px; } /* флоу: вещи 141×120 в 16 от боков и 20 от низа */
 
 /* ─── OutfitCanvas: подъём под пальцем ─── */
 .y-canvas { touch-action: none; user-select: none; }
@@ -271,7 +286,7 @@
    возвращается на пружине quick — анимируется transform, а не width / height */
 .y-canvas__item > .y-item-art { transition: scale var(--motion-drop); }
 .y-canvas__item.is-pinching > .y-item-art { transition: none; }
-.y-canvas__hint { position: absolute; left: var(--space-16); right: var(--space-16); bottom: var(--space-16); }
+.y-canvas__hint { position: absolute; left: var(--space-20); right: var(--space-20); bottom: var(--space-20); } /* Snackbar S 313 × 48 на холсте 353, 20 от краёв */
 
 /* ─── Раскладки экранов ─── */
 /* Главная: превью ↑ коллаж ↓ превью, погода и штамп поверх */

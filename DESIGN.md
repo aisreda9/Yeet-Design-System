@@ -73,6 +73,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 | `ui-colors/red` | `#FF4230` | `#FF5A4A` | Деструктивные действия, ошибки, бейдж-уведомление |
 | `ui-colors/red-10%` | `#FF4230` @ 10% | `#FF5A4A` @ 18% | Фон деструктивной кнопки («Удалить») |
 | `ui-colors/on-accent` | `#FFFFFF` | `#FFFFFF` | Текст и иконки **на** `blue` / `red` — всегда белые |
+| `ui-colors/white` поверх фото → `--color-text-on-photo` | `#FFFFFF` | `#FFFFFF` | Статус-бар, логотип, `hint` и иконки поверх фото и камеры (Splash, Search / Photo / Crop) — белые в любой теме |
 | `ui-colors/elevated` | `#FFFFFF` | `#1A1A1E` | Поднятые поверхности: tab-bar, sheet, dialog, hint |
 | `ui-colors/overlay` | `#000000` @ 40% | `#000000` @ 60% | Затемнение под bottom sheet и диалогом |
 
@@ -174,7 +175,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 под курсором и фокусом. Хаптика вызывается в компонентах через `haptic('<событие>')` (`src/utils/haptic.ts`),
 числа жестов — из `tokens.json` (`src/utils/gesture.ts`), а не константами в коде.
 
-**Штамп (`stamp` / `<Stamp>`)** — фирменная 12-лучевая звезда главного действия поверх коллажа: Primary L 148 («Надеть», «Сохранить»), Secondary S 48 (иконка «Перемешать»). В Figma — интерактивный компонент: клик переключает `State=Default ↔ Done` через Smart Animate Bouncy.
+**Штамп (`stamp` / `<Stamp>`)** — фирменная 12-лучевая звезда главного действия поверх коллажа: Primary L 148 («Надеть», «Сохранить»), Secondary 64 (белая иконка 29 с наклоном −15°, «Не нравится»). В Figma — интерактивный компонент: клик переключает `State=Default ↔ Done` через Smart Animate Bouncy.
 
 ---
 
@@ -228,7 +229,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 |---|---|---|---|
 | Tokens | цвет, шрифт, отступ, радиус, тень | `tokens/` | коллекция «Yeet DS 2.0», стили |
 | Atoms | неделимые элементы | `atoms/` — Icon, Logo, Button, IconButton, Stamp, Badge, Avatar, ColorDot, Divider, Text, ScrollEdge | 01–02 |
-| Molecules | связка атомов с одной задачей | `molecules/` — Field, InputGroup, InputBar, SegmentControl, ChipGroup, ListItem, ListGroup, StatTile, Hint, Snackbar, EmptyState, LoadingState, PhotoTile, Carousel, BarChart, UsageMeter | 03–04, 07–08 |
+| Molecules | связка атомов с одной задачей | `molecules/` — Field, InputGroup, InputBar, SegmentControl, ChipGroup, ListItem, ListGroup, StatTile, Note, Hint, Snackbar, EmptyState, LoadingState, PhotoTile, Carousel, BarChart, UsageMeter | 03–04, 07–08 |
 | Organisms | самостоятельный блок экрана | `organisms/` — Header, TabBar, BottomNav, BottomBar, Sheet, Dialog, карточки (Item, Product, Trip, StylistPrompt), OutfitCollage, OutfitThumbnail, PhotoArea, ChatBubble | 05–07 |
 | Templates | каркас экрана без данных, скролл и края | `templates/` — Screen, Grid, Row | 10 Screen patterns |
 | Pages | экран флоу с реальными текстами | `pages/` | New app design |
@@ -289,8 +290,9 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 | Компонент | Спецификация |
 |---|---|
 | `divider` | Линия 1 px, `black-10%`, ширина контента |
-| `snackbar` | 353 × 56, паддинг 20, радиус 16, фон `black`, текст `Body` `white`; `Show Icon` / `Icon` (по умолчанию `cross`) |
-| `system / status-bar`, `system / keyboard` | Только для макетов |
+| `snackbar` | `Size`: **M** 52, паддинг 20 (тост над таб-баром); **S** 313 × 48, паддинг 16 (подсказка на холсте образа). Радиус 12, фон `black`, текст `Body` `white`; `Show Icon` / `Icon` (`cross` или «Отменить») |
+| `system / status-bar`, `system / keyboard` | Только для макетов. Status-bar `Tone`: Default, On Accent (Splash), On Photo (белый поверх фото — Search / Photo / Crop) |
+| `yeet` (логотип) | Цвет наследуется: `on-accent` на синем, `on-photo` поверх фото, `grey` в подвале Настроек |
 
 ### 6.2 Молекулы
 
@@ -298,6 +300,8 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 
 353 × 56, паддинг 12/20, gap 8. Свойства: `Show Left Icon` / `Left Icon`, `Show Right Icon` / `Right Icon`, `Show Left Value`, `Show Right Value`, `Show Divider`.
 По умолчанию — паттерн «ключ — значение»: лейбл `grey` слева, значение + `chevron-up-down` справа. Другие паттерны: поле ввода (только слева), пароль (справа `eye` / `eye-off`).
+Правая группа: точка 16 → 12 → значение (длинное — «…») → 12 → иконка **20**. Разделитель — с отступом 16 с обеих сторон.
+**Multiline** («Комментарий»): `textarea` высотой 104, текст сверху, паддинг 16/20 (`<Field multiline>`).
 
 #### `input-group` — группа полей
 
@@ -309,11 +313,13 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 
 #### `chip-group` — группа чипсов
 
-Слот с gap 4: `icon-button` Primary S («+») + `button` S (**Tertiary** — не выбран, **Soft** — выбран). `Wrap=true` — перенос строк, `Wrap=false` — одна строка с горизонтальным скроллом. Фильтры, поводы, сезоны, стили, пол.
+Слот с gap 4: `icon-button` Primary («+» 36) + `button` S (**Tertiary** — не выбран, **Soft** — выбран). `Wrap=true` — перенос строк, `Wrap=false` — одна строка с горизонтальным скроллом. Фильтры, поводы, сезоны, стили, пол.
+`chip`: точка цвета 16; Dropdown — отступ справа 12, иконка 20; **State=Editing** — чипс-поле для своего повода или тега (плейсхолдер `grey`, Outfit Creation / Custom Occasion Name) — `editing` в коде.
 
 #### `input-bar` — панель ввода
 
 353 × 48: `icon-button` Tertiary M слева, `input-group` M, `icon-button` Primary M справа (`Show Left Button`, `Show Input`, `Show Right Button`). Чат со стилистом, поиск (в т.ч. поиск по странам в sheet).
+`State`: Default, **Focus** (обводка 1.5 `blue`), Typing (очистка «×» 20 `grey` внутри поля). Правая кнопка **Right=Photo** — превью выбранного фото, круг 48 с картинкой (поиск по фото; `trailing.image` в коде).
 
 #### `list-item` — строка списка
 
@@ -323,7 +329,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 |---|---|---|---|
 | **Action** | Default | иконка + текст | Action sheet (создать образ, редактировать, удалить…) |
 | **Expandable** | Collapsed / Expanded | иконка + текст + `chevron-down` / `chevron-up` | Категории одежды |
-| **Radio** | Off / On | круг `light-grey` / `blue` с точкой `on-accent` + текст | Год рождения, страна (с флагом в `Trailing`) |
+| **Radio** | Off / On | круг `light-grey` / `blue` с галочкой `on-accent` + текст | Год рождения, страна (флаг в `Trailing`), валюта (текст `grey` «₽ · RUB» в `Trailing`) |
 
 #### `list-group` — строки-переходы на карточке
 Карточка `light-grey`, радиус 20, строки 56 с разделителем `black-10%`: «Корзина вещей →», «Язык ↗». Для пар «ключ — значение» — `input-group` + `input`, не этот компонент.
@@ -345,7 +351,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 - **Modal — плавающая карточка** (эталон: New app design → Profile / Accounts / Sheet): ширина 377, **8 от краёв экрана** слева, справа и снизу, радиус **32 сверху и 48 снизу** (концентрично углу экрана 56), паддинг 8 / 20 / 20 / 20; подложка — `ui-colors/overlay`.
 - Состав: хэндл (48 × 4, `light-grey`) → 16 → `body`: заголовок `H3` (`Title`, `Show Title`) → 12 → слот **Content** → 16 → футер.
 - `Footer`: **None** | **Buttons** — пара `button` L 50/50 через **7** (`secondary-action` + `primary-action`, стиль и текст правятся прямо из инстанса).
-- Высокая шторка со своим скроллом (Outfit Creation / Item Filter) — без хэндла, с «×» справа от заголовка (`onClose` в коде).
+- `Show Handle` (`handle` в коде) и `Show Close` (`onClose`: «×» Ghost S справа от заголовка вместо хэндла). Без хэндла контент начинается на 20 от верха (панель выбора вещей). Высокая шторка (Outfit Creation / Item Filter) не выше экрана — контент прокручивается внутри.
 - `Type`: **Modal** — поверх `overlay`; **Panel** — во всю ширину 393, 32 сверху, gap 20; — постоянная панель деталей поверх фото (тень `shadow/floating`), раскрывается скроллом (детали вещи/образа, новая вещь, холст образа).
 - Фон — `elevated`.
 
@@ -364,10 +370,12 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 
 Та же плавающая форма, что у `sheet` Modal (377, 32 / 48, фон `elevated`). `Title`, `Description` / `Show Description`, опциональный слот **Content** (`Show Content`) для сложных случаев (удаление аккаунта: плитки статистики, текст с выделением).
 `Tone`: **Default** — Tertiary + Primary; **Destructive** — необратимое действие Tertiary слева + «Отмена» Primary (очистить корзину, образ); **Danger** — удаление аккаунта: красная Destructive + «Отменить» Primary. **Безопасное действие всегда синее справа.**
+Слот **Content** во всех тонах, ширина FILL (337). Вариант **одной кнопки** — уведомление: Tertiary L на всю ширину («Ок!»); в коде — `Dialog` без `cancel`.
 
 #### Мультиаккаунт: `avatar-stack`, `account-card`
 
 - `avatar-stack` (`Accounts` 1 | 2) — в шапке профиля слева от периода: аватары M 40 с кольцом 2 цвета фона внахлёст −8, в конце «+» Tertiary S. Нажатие — шторка «Аккаунты».
+- Фото профиля (`avatar` · Content=Photo) показывают `account-card`, `avatar-stack` и вкладка «Профиль» `tab-bar` (в коде `Account.photo` и `avatarSrc`).
 - `account-card` (`Kind`): **Current** — текущий аккаунт, «Редактировать профиль» (`edit`) и «Настройки» (`settings`); **Other** — переключение, chevron; **Settings** — строка аккаунта в Настройках с «Выйти». 72, паддинг 16 / 20, радиус 20, `light-grey`.
 - **Цвета аккаунтов:** фон — цвет из `tokens.avatar.palette` (синий, оранжевый, зелёный, фиолетовый, розовый, красный, жёлтый, коричневый, чёрный), буква — `on`-цвет этого цвета (`--yeet-on-item-*`): чёрная или белая, у кого контраст выше, все ≥ 4.5 : 1. Белый, бежевый и серый не используются. Без явного цвета он выбирается по id аккаунта. Есть фото — показывается фото.
 - Один аккаунт: в шапке аватар + «+», в шторке — Current и «Добавить аккаунт». Несколько: все аватары, в шторке Current, затем Other.
@@ -380,8 +388,8 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 |---|---|---|
 | **Large** | H1 + действие справа (+ подзаголовок) | Корневые вкладки: Гардероб, Стилист, Профиль, Поиск |
 | **Bar** | «Назад» + title-chip (`button` M Tertiary) + до 2 действий | Новая вещь, Архив, Корзина, детали вещи/образа, создание образа |
-| **Back** | «Назад» (+ «Пропустить» Ghost) и H1 ниже | Вход, восстановление пароля, онбординг |
-| **Search** | `input-bar` (назад + поле + поиск по фото) + фильтры-дропдауны | Поиск, результаты, поиск по гардеробу |
+| **Back** | «Назад» (+ «Пропустить» — Tertiary M, отступы 20) и H1 ниже; `Subtitle` — Body `grey` через 12 | Вход, восстановление пароля, онбординг |
+| **Search** | `input-bar` (назад + поле + поиск по фото или превью выбранного фото 48) + фильтры-дропдауны через 4 | Поиск, результаты, поиск по фото, поиск по гардеробу |
 
 #### `bottom-nav`
 
@@ -406,7 +414,7 @@ FAB «+» — `icon-button` Primary XL рядом с таб-баром (Гард
 
 #### `hint`
 
-Подсказка поверх холста/фото: пилюля `elevated` + `shadow/floating`, иконка 16 + `Caption` («Перемещай и масштабируй вещи»).
+Подсказка поверх холста/фото: иконка 16 + `Body` 14. **Default** — пилюля 28 `elevated` + `shadow/floating` («Перемещай и масштабируй вещи»); **On Photo** — без подложки, текст и иконка белые (`--color-text-on-photo`), Search / Photo / Crop.
 
 #### Карточки и медиа
 
@@ -415,16 +423,17 @@ FAB «+» — `icon-button` Primary XL рядом с таб-баром (Гард
 | `item-card` | 173 × 172, радиус 20, `light-grey`, вещь без фона; `Show Discount` / `Discount` (бейдж Danger), `Selected` (галочка) |
 | `product-card` | Фото товара + название, цена, магазин (результаты поиска) |
 | `brand-card` | Изображение + текст |
-| `outfit-collage` | 353 × 353, радиус 20, `light-grey` + точечный паттерн, вещи свободно раскладываются |
+| `outfit-collage` | 353 × 353, радиус 20, `light-grey` + точечный паттерн, вещи свободно раскладываются; `Pattern=None` (`plain`) — без точек («Лучшая инвестиция»); футер — плашка `elevated` в 8 от краёв, паддинг 16/20 |
 | `outfit-thumbnail` | Малое превью образа, радиус 20, `light-grey` |
 | `photo-tile` | 173 × 173, иллюстрация + `Label` (галерея / камера) |
 | `stylist-prompt-card` | Подсказка в хабе стилиста, радиус 32 |
 | `chat-bubble` | Сообщение стилиста |
-| `trip-card` | Карточка поездки в карусели |
-| `weather-card` | Фон `black`, радиус 20 (один угол 8), иконка погоды + температура + `Caption` |
-| `photo-area` | 353 × 353, радиус 20, `light-grey`; Empty — «Добавить фотографию», Photo — фото вещи |
-| `stat-tile` | `light-grey`, радиус 20: `Label` (Caption grey) + `Value` (H2); ставится в ряд по 3 с FILL |
-| `avatar` | L 96 / M 40 / S 24, круг; Empty — `light-grey` + camera, Initial — `blue` + буква; фото — заливкой |
+| `trip-card` | Карточка поездки 173 × 220: город H3, счётчики Body `grey`, вещи — поле 141 × 120 в 16 от боков и 20 от низа |
+| `weather-card` | 80: фон `black`, радиус 20 (один угол 8), иконка погоды + температура (lh 24) + описание Inter Medium 460 12/16; предупреждение — в том же тексте новой строкой белым, без зазора |
+| `photo-area` | 353 × 353, радиус 20, `light-grey`; Empty — «+» Primary 48 (иконка `on-accent`) и «Добавить фотографию» в 2 строки; Photo — фото вещи и «×» 24 `grey` в 20 от угла |
+| `stat-tile` | `light-grey`, радиус 20, паддинг 16/20: `Label` (Caption grey) + `Value`. `Size`: **M** 80 (H2), **L** 88 (H1 32, диалог удаления аккаунта); ставится в ряд по 3 с FILL |
+| `note` | Текст `Body` на `light-grey`, паддинг 20, радиус 20, ширина FILL — описание вещи в панели деталей (`<Note>`) |
+| `avatar` | L 96 / M 40 / S 24, круг; Empty — `light-grey` + camera, Initial — `blue` + буква; Photo — фото заливкой (также в `account-card`, `avatar-stack`, вкладке профиля) |
 | Кнопка «Надеть» | Форма-«звезда» `blue` 148 × 148, текст `Body` `on-accent` |
 
 ### 6.4 Состояния

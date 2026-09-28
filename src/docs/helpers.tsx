@@ -1,5 +1,11 @@
 import type { Decorator } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
+import demoAvatarUrl from './demo-avatar.svg';
+import demoPhotoUrl from './demo-photo.svg';
+
+/** Демо-фото для историй: снимок вещи (поиск по фото, превью в поле) и фото профиля (аватар). */
+export const demoPhoto = demoPhotoUrl;
+export const demoAvatar = demoAvatarUrl;
 
 /** Карточка «В флоу»: где в приложении встречается вариант компонента. */
 export function Usage({ screen, note, children, width }: { screen: string; note?: string; children: ReactNode; width?: number }) {

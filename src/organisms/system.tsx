@@ -1,11 +1,15 @@
+import { cx } from '../utils/cx';
 
 
 /* ─── StatusBar (system) ────────────────────────────────────────────── */
 
-/** Статус-бар iOS — только для макетов и Storybook. `onAccent` — светлый текст на акцентном фоне (сплэш). */
-export function StatusBar({ onAccent }: { onAccent?: boolean }) {
+/**
+ * Статус-бар iOS — только для макетов и Storybook (Figma: system / status-bar · Tone).
+ * `onAccent` — светлый текст на акцентном фоне (сплэш); `onPhoto` — белый поверх фото и камеры (Search / Photo / Crop).
+ */
+export function StatusBar({ onAccent, onPhoto }: { onAccent?: boolean; onPhoto?: boolean }) {
   return (
-    <div className={onAccent ? 'y-status-bar y-status-bar--on-accent' : 'y-status-bar'} aria-hidden>
+    <div className={cx('y-status-bar', onAccent && 'y-status-bar--on-accent', onPhoto && 'y-status-bar--on-photo')} aria-hidden>
       <span>9:41</span>
       <span className="y-status-bar__icons">
         <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5.5" width="3" height="6.5" rx="1" /><rect x="10" y="3" width="3" height="9" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>

@@ -9,11 +9,11 @@ import { LeavingContext } from '../utils/usePresence';
 
 type FooterAction = { label: string; variant?: ButtonStyle; onClick?: () => void };
 
-function Footer({ actions }: { actions: [FooterAction, FooterAction] }) {
+function Footer({ actions }: { actions: FooterAction[] }) {
   return (
     <div className="y-sheet__footer">
       {actions.map((a, i) => (
-        <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" onClick={a.onClick}>
+        <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick}>
           {a.label}
         </Button>
       ))}
@@ -31,6 +31,11 @@ export type SheetProps = {
   footer?: [FooterAction, FooterAction];
   /** Крестик справа от заголовка вместо хэндла: высокая шторка со своим скроллом (Outfit Creation / Item Filter). */
   onClose?: () => void;
+  /**
+   * Показывать хэндл (Figma: sheet · Show Handle). По умолчанию — да, если нет крестика.
+   * `false` — панель без хэндла (Outfit Creation / Item Selection).
+   */
+  handle?: boolean;
   className?: string;
   children?: ReactNode;
 };
@@ -40,11 +45,11 @@ export type SheetProps = {
  * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
-export function Sheet({ title, type = 'modal', footer, onClose, className, children }: SheetProps) {
+export function Sheet({ title, type = 'modal', footer, onClose, handle = !onClose, className, children }: SheetProps) {
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
   return (
-    <section className={cx('y-sheet', `y-sheet--${type}`, className)} role={type === 'modal' ? 'dialog' : undefined} aria-label={title}>
-      {!onClose && <span className="y-sheet__handle" aria-hidden />}
+    <section className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)} role={type === 'modal' ? 'dialog' : undefined} aria-label={title}>
+      {handle && <span className="y-sheet__handle" aria-hidden />}
       {onClose ? (
         <div className="y-sheet__head">
           {title && <h2 className={cx(heading, 'y-sheet__title')}>{title}</h2>}
@@ -68,7 +73,8 @@ export type DialogProps = {
   tone?: 'default' | 'destructive' | 'danger';
   title: string;
   description?: ReactNode;
-  cancel: string;
+  /** Без `cancel` — диалог-уведомление с одной кнопкой `confirm` Tertiary на всю ширину («Ок!»). */
+  cancel?: string;
   confirm: string;
   onCancel?: () => void;
   onConfirm?: () => void;
@@ -77,6 +83,7 @@ export type DialogProps = {
 
 /**
  * Подтверждение в той же плавающей форме, что и sheet. **Безопасное действие всегда синее справа.**
+ * Одна кнопка (нет `cancel`) — уведомление: Tertiary L на всю ширину.
  */
 export function Dialog({ tone = 'default', title, description, cancel, confirm, onCancel, onConfirm, children }: DialogProps) {
   const risky = tone !== 'default';
@@ -90,7 +97,9 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
       {children}
       <Footer
         actions={
-          risky
+          !cancel
+            ? [{ label: confirm, variant: 'tertiary', onClick: onConfirm }]
+            : risky
             ? [{ label: confirm, variant: tone === 'danger' ? 'destructive' : 'tertiary', onClick: onConfirm }, { label: cancel, onClick: onCancel }]
             : [{ label: cancel, onClick: onCancel }, { label: confirm, onClick: onConfirm }]
         }

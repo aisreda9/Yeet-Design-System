@@ -113,9 +113,13 @@ export function CollageLayer({ items, defaultSize = 96, base = 353 }: { items: C
   );
 }
 
-export function OutfitCollage({ items, label, footer }: { items: CollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. */ footer?: ReactNode }) {
+/**
+ * Коллаж образа: вещи на точечном фоне, повод-бейдж и панель снизу.
+ * `plain` — без точек, просто карточка light-grey (Figma: outfit-collage · Pattern=None): одна вещь в «Лучшей инвестиции» профиля.
+ */
+export function OutfitCollage({ items, label, footer, plain }: { items: CollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. Паддинг 16/20, 8 от краёв. */ footer?: ReactNode; plain?: boolean }) {
   return (
-    <div className="y-collage">
+    <div className={cx('y-collage', plain && 'y-collage--plain')}>
       {label && <Badge variant="secondary" className="y-collage__label">{label}</Badge>}
       {footer && <div className="y-collage__footer">{footer}</div>}
       <CollageLayer items={items} />
@@ -123,7 +127,7 @@ export function OutfitCollage({ items, label, footer }: { items: CollageItem[]; 
   );
 }
 
-/** Область фото 353×353. Пусто — «Добавить фотографию»; с фото — вещь и кнопка удаления. */
+/** Область фото 353×353. Пусто — «+» Primary (иконка on-accent) и «Добавить фотографию» в две строки; с фото — вещь и «×» 24 серым в 20 от угла. */
 export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: { kind?: Garment; /** Фото вещи после удаления фона. */ image?: string; loading?: boolean; onAdd?: () => void; onRemove?: () => void; children?: ReactNode }) {
   return (
     <div className={cx('y-photo-area', loading && 'is-loading')} aria-busy={loading || undefined}>
@@ -131,7 +135,8 @@ export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: {
         (kind || image ? (
           <>
             <ItemArt kind={kind ?? 'top'} src={image} size={image ? 300 : 160} />
-            {onRemove && <IconButton className="y-photo-area__close" icon="cross" label="Удалить фото" variant="ghost" size="S" onClick={onRemove} />}
+            {/* «×» 24 серым в 20 от угла; зона нажатия 44 */}
+            {onRemove && <button type="button" className="y-photo-area__close" aria-label="Удалить фото" title="Удалить фото" onClick={onRemove}><Icon name="cross" /></button>}
           </>
         ) : (
           <button type="button" className="y-photo-area__add" onClick={onAdd} disabled={loading}>
