@@ -91,6 +91,23 @@ public enum YeetItemColor: String, CaseIterable {
         case .brown: return Color(UIColor(hex: 0xC26547, alpha: 1))
         }
     }
+    /// Цвет буквы / иконки на этом цвете (контраст ≥ 4.5 : 1).
+    public var onColor: Color {
+        switch self {
+        case .black: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .grey: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .white: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .purple: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .pink: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .green: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .blue: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
+        case .yellow: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .orange: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .red: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .beige: return Color(UIColor(hex: 0x000000, alpha: 1))
+        case .brown: return Color(UIColor(hex: 0x000000, alpha: 1))
+        }
+    }
     public var title: String {
         switch self {
         case .black: return "Черный"

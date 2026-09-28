@@ -3,7 +3,7 @@ import { AccountsSheet } from '.';
 import { onOverlay, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 import type { Account } from '../molecules';
 
-const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com' };
+const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com', color: 'blue' };
 const tina: Account = { id: 'tina', name: 'Тинатин', email: 'hello@tin.ru', color: 'orange' };
 
 const meta = {

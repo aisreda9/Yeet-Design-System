@@ -22,17 +22,29 @@
   --yeet-graphite-900: #1a1a1e;
   --yeet-graphite-950: #0f0f11;
   --yeet-item-black: #1a1a2e;
+  --yeet-on-item-black: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-grey: #777777;
+  --yeet-on-item-grey: #000000; /* буква / иконка на этом цвете */
   --yeet-item-white: #ffffff;
+  --yeet-on-item-white: #000000; /* буква / иконка на этом цвете */
   --yeet-item-purple: #6a00ff;
+  --yeet-on-item-purple: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-pink: #d900ff;
+  --yeet-on-item-pink: #000000; /* буква / иконка на этом цвете */
   --yeet-item-green: #00d08b;
+  --yeet-on-item-green: #000000; /* буква / иконка на этом цвете */
   --yeet-item-blue: #0100f4;
+  --yeet-on-item-blue: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-yellow: #ffd000;
+  --yeet-on-item-yellow: #000000; /* буква / иконка на этом цвете */
   --yeet-item-orange: #ff8800;
+  --yeet-on-item-orange: #000000; /* буква / иконка на этом цвете */
   --yeet-item-red: #ff4230;
+  --yeet-on-item-red: #000000; /* буква / иконка на этом цвете */
   --yeet-item-beige: #ffe1c7;
+  --yeet-on-item-beige: #000000; /* буква / иконка на этом цвете */
   --yeet-item-brown: #c26547;
+  --yeet-on-item-brown: #000000; /* буква / иконка на этом цвете */
 
   --space-0: 0px;
   --space-1: 1px;

@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AccountCard, AvatarStack, type Account } from '.';
+import { Avatar } from '../atoms';
 import { unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
+import { avatarPalette, itemColors } from '../tokens/tokens';
 
-const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com' };
+const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com', color: 'blue' };
 const tina: Account = { id: 'tina', name: 'Тинатин', email: 'hello@tin.ru', color: 'orange' };
 
 const meta = {
@@ -40,6 +42,19 @@ export const InFlow: Story = {
       <Usage screen="Profile / Accounts / Sheet" note="текущий"><AccountCard account={sima} kind="current" /></Usage>
       <Usage screen="Profile / Accounts / Sheet" note="другой аккаунт"><AccountCard account={tina} kind="other" /></Usage>
       <Usage screen="Settings / Main" note="с «Выйти»"><AccountCard account={sima} kind="settings" /></Usage>
+    </UsageGrid>
+  ),
+};
+
+export const Colors: Story = {
+  name: 'Цвета аккаунтов',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Фон аватара — цвет из палитры аккаунтов (`tokens.avatar.palette`), буква — `--yeet-on-item-*`: чёрная или белая, у кого контраст выше, все пары ≥ 4.5 : 1 (проверяет `npm run contrast`). Без явного цвета он выбирается по id аккаунта — у одного аккаунта всегда один цвет.' } } },
+  render: () => (
+    <UsageGrid min={120}>
+      {avatarPalette.map((c) => (
+        <Usage key={c} screen={itemColors.find(([id]) => id === c)?.[1] ?? c} note={c}><Avatar size="M" initial="Т" color={c} /></Usage>
+      ))}
     </UsageGrid>
   ),
 };

@@ -51,7 +51,7 @@ function css() {
     L.push(`@font-face { font-family: '${f.family}'; src: url('../../tokens/fonts/${f.file.replace(/\.ttf$/, '.woff2')}') format('woff2'), url('../../tokens/fonts/${f.file}') format('truetype'); font-weight: 100 900; font-style: normal; font-display: swap; }`);
   L.push('', ':root {');
   for (const [k, v] of Object.entries(t.primitive)) L.push(`  --yeet-${k}: ${cssColor(v)};`);
-  for (const [k, v] of Object.entries(t.item)) L.push(`  --yeet-item-${k}: ${cssColor(v.value)};`);
+  for (const [k, v] of Object.entries(t.item)) L.push(`  --yeet-item-${k}: ${cssColor(v.value)};`, `  --yeet-on-item-${k}: ${cssColor(v.on)}; /* буква / иконка на этом цвете */`);
   L.push('');
   for (const s of t.space) L.push(`  --space-${s}: ${s}px;`);
   for (const [k, v] of Object.entries(t.radius)) L.push(`  --radius-${k}: ${v.value}px;`);
@@ -116,6 +116,8 @@ function swift() {
   for (const k of Object.keys(t.item)) L.push(`    case ${k}`);
   L.push('    public var color: Color {', '        switch self {');
   for (const [k, v] of Object.entries(t.item)) L.push(`        case .${k}: return Color(UIColor(hex: ${hexA(v.value)}))`);
+  L.push('        }', '    }', '    /// Цвет буквы / иконки на этом цвете (контраст ≥ 4.5 : 1).', '    public var onColor: Color {', '        switch self {');
+  for (const [k, v] of Object.entries(t.item)) L.push(`        case .${k}: return Color(UIColor(hex: ${hexA(v.on)}))`);
   L.push('        }', '    }', '    public var title: String {', '        switch self {');
   for (const [k, v] of Object.entries(t.item)) L.push(`        case .${k}: return "${v.name}"`);
   L.push('        }', '    }', '}', '');
@@ -168,8 +170,8 @@ function kotlin() {
     Object.entries(colors).forEach(([k, v], i) => L.push(`    ${names[i]} = ${argb(resolve(v[theme], theme))},`));
     L.push(')', '');
   }
-  L.push('/** Цвет вещи — атрибут одежды, не интерфейс. */', 'enum class YeetItemColor(val color: Color, val title: String) {');
-  Object.entries(t.item).forEach(([k, v]) => L.push(`    ${k.toUpperCase()}(${argb(v.value)}, "${v.name}"),`));
+  L.push('/** Цвет вещи — атрибут одежды, не интерфейс. */', 'enum class YeetItemColor(val color: Color, val title: String, /** Буква / иконка на этом цвете (≥ 4.5 : 1) */ val onColor: Color) {');
+  Object.entries(t.item).forEach(([k, v]) => L.push(`    ${k.toUpperCase()}(${argb(v.value)}, "${v.name}", ${argb(v.on)}),`));
   L.push('}', '', 'object YeetSpace {');
   for (const s of t.space) L.push(`    val s${s} = ${s}.dp`);
   L.push(`    val screenGutter = ${t.layout['screen-gutter']}.dp`, '}', '', 'object YeetRadius {');

@@ -114,19 +114,19 @@ val YeetDarkColors = YeetColorScheme(
 )
 
 /** Цвет вещи — атрибут одежды, не интерфейс. */
-enum class YeetItemColor(val color: Color, val title: String) {
-    BLACK(Color(0xFF1A1A2E), "Черный"),
-    GREY(Color(0xFF777777), "Серый"),
-    WHITE(Color(0xFFFFFFFF), "Белый"),
-    PURPLE(Color(0xFF6A00FF), "Фиолетовый"),
-    PINK(Color(0xFFD900FF), "Розовый"),
-    GREEN(Color(0xFF00D08B), "Зеленый"),
-    BLUE(Color(0xFF0100F4), "Синий"),
-    YELLOW(Color(0xFFFFD000), "Желтый"),
-    ORANGE(Color(0xFFFF8800), "Оранжевый"),
-    RED(Color(0xFFFF4230), "Красный"),
-    BEIGE(Color(0xFFFFE1C7), "Бежевый"),
-    BROWN(Color(0xFFC26547), "Коричневый"),
+enum class YeetItemColor(val color: Color, val title: String, /** Буква / иконка на этом цвете (≥ 4.5 : 1) */ val onColor: Color) {
+    BLACK(Color(0xFF1A1A2E), "Черный", Color(0xFFFFFFFF)),
+    GREY(Color(0xFF777777), "Серый", Color(0xFF000000)),
+    WHITE(Color(0xFFFFFFFF), "Белый", Color(0xFF000000)),
+    PURPLE(Color(0xFF6A00FF), "Фиолетовый", Color(0xFFFFFFFF)),
+    PINK(Color(0xFFD900FF), "Розовый", Color(0xFF000000)),
+    GREEN(Color(0xFF00D08B), "Зеленый", Color(0xFF000000)),
+    BLUE(Color(0xFF0100F4), "Синий", Color(0xFFFFFFFF)),
+    YELLOW(Color(0xFFFFD000), "Желтый", Color(0xFF000000)),
+    ORANGE(Color(0xFFFF8800), "Оранжевый", Color(0xFF000000)),
+    RED(Color(0xFFFF4230), "Красный", Color(0xFF000000)),
+    BEIGE(Color(0xFFFFE1C7), "Бежевый", Color(0xFF000000)),
+    BROWN(Color(0xFFC26547), "Коричневый", Color(0xFF000000)),
 }
 
 object YeetSpace {

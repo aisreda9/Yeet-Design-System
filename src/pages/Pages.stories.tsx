@@ -388,7 +388,7 @@ export const Settings: Story = {
   ),
 };
 
-const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com' };
+const sima: Account = { id: 'sima', name: 'Сима', email: 'sima@space.com', color: 'blue' };
 const tina: Account = { id: 'tina', name: 'Тинатин', email: 'hello@tin.ru', color: 'orange' };
 type ProfileOverlay = 'accounts' | 'period' | undefined;
 
