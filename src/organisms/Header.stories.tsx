@@ -51,8 +51,11 @@ export const InFlow: Story = {
       <Usage screen="Search / Discover" note="с подзаголовком"><div style={{ width: 393 }}><Header type="large" title="Поиск в сторах" subtitle="Нашли классную вещь? Покажем, где купить такую же или похожую." /></div></Usage>
       <Usage screen="New Item" note="назад + title-chip"><div style={{ width: 393 }}><Header type="bar" titleChip="Новая вещь" /></div></Usage>
       <Usage screen="Trash" note="2 действия"><div style={{ width: 393 }}><Header type="bar" titleChip="Корзина вещей" actions={[{ icon: 'trash', label: 'Очистить' }, { icon: 'more', label: 'Ещё' }]} /></div></Usage>
-      <Usage screen="Onboarding / First Item"><div style={{ width: 393 }}><Header type="back" title="Добавь первую вещь" textAction={{ label: 'Пропустить' }} /></div></Usage>
-      <Usage screen="Search / Results" note="с фильтрами"><div style={{ width: 393 }}><Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} /></div></Usage>
+      <Usage screen="Outfits / Everyday" note="акцентная строка «повод ⌃» (Show Accent)"><div style={{ width: 393 }}><Header type="large" title="Твои образы" accent={{ label: 'на каждый день' }} /></div></Usage>
+      <Usage screen="Profile / Edit" note="простой заголовок (Show Plain Title)"><div style={{ width: 393 }}><Header type="bar" title="Редактирование профиля" /></div></Usage>
+      <Usage screen="Stylist / Trip Details" note="капсула с датами (Show Trip Chip)"><div style={{ width: 393 }}><Header type="bar" titleChip="Бразилиа" titleChipSub="8-13 сент · 5 ночей" actions={[{ icon: 'more', label: 'Ещё' }]} /></div></Usage>
+      <Usage screen="Onboarding / First Item"><div style={{ width: 393 }}><Header type="back" title="Добавь первую вещь в гардероб" textAction={{ label: 'Пропустить' }} /></div></Usage>
+      <Usage screen="Search / Results" note="с фильтрами"><div style={{ width: 393 }}><Header type="search" query="Белые кроссовки Nike" filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} /></div></Usage>
     </UsageGrid>
   ),
 };
