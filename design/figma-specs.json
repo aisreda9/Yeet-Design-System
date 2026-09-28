@@ -301,8 +301,9 @@
         "paddingTop": 8,
         "paddingLeft": 20,
         "paddingBottom": 20,
-        "gap": 20,
-        "borderTopLeftRadius": 32
+        "gap": 16,
+        "borderTopLeftRadius": 32,
+        "borderBottomLeftRadius": 48
       }
     },
     {

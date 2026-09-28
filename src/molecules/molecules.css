@@ -84,8 +84,7 @@ div.y-list-item { cursor: default; }
   width: 24px; height: 24px; border-radius: var(--radius-full); flex: none;
   display: inline-flex; align-items: center; justify-content: center; background: var(--color-bg-subtle);
 }
-.y-radio--on { background: var(--color-accent); }
-.y-radio--on::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-on-accent); }
+.y-radio--on { background: var(--color-accent); color: var(--color-text-on-accent); } /* флоу: синий круг с галочкой, не точка */
 
 /* ListGroup — строки на карточке. Figma Settings: разделитель с отступом 16, иконки справа 20, одиночная строка — капсула 52 / r32 */
 .y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
@@ -185,3 +184,22 @@ div.y-list-item { cursor: default; }
 .y-range__track input::-moz-range-thumb { pointer-events: auto; width: 24px; height: 24px; border: 0; cursor: grab; }
 .y-range__track:focus-within { outline: 2px solid var(--color-accent); outline-offset: 6px; border-radius: 12px; }
 .y-range__labels { display: flex; justify-content: space-between; color: var(--color-text-primary); }
+
+/* Account — карточка аккаунта (Figma: account-card): 72, паддинг 16/20, радиус 20, иконки действий 24 в кнопках 40 */
+.y-account {
+  display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 72px; padding: var(--space-16) var(--space-20);
+  background: var(--card-bg); border: 0; border-radius: var(--radius-lg); color: var(--color-text-primary); text-align: left;
+}
+button.y-account { cursor: pointer; transition: transform var(--motion-press); -webkit-tap-highlight-color: transparent; }
+button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
+.y-account__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.y-account__text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.y-account__actions { display: flex; gap: var(--space-4); margin-right: calc(var(--space-8) * -1); }
+.y-account__actions .y-icon { width: 24px; height: 24px; }
+
+/* AvatarStack — аватары 40 внахлёст −8 с кольцом цвета фона 2, «+» Tertiary S */
+.y-avatar-stack { display: inline-flex; align-items: center; }
+.y-avatar-stack__people { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; }
+.y-avatar-stack__item { border-radius: var(--radius-full); box-shadow: 0 0 0 2px var(--color-bg-canvas); }
+.y-avatar-stack__item + .y-avatar-stack__item, .y-avatar-stack__people + .y-avatar-stack__item { margin-left: -8px; }
+.y-avatar-stack__item > .y-avatar { display: flex; }

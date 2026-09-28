@@ -82,7 +82,7 @@ val YeetLightColors = YeetColorScheme(
     textAccent = Color(0xFF0100F4),
     textDanger = Color(0xFFCC291B),
     accent = Color(0xFF0100F4),
-    accentSoft = Color(0x1A0100F4),
+    accentSoft = Color(0xFFF1F4FF),
     danger = Color(0xFFCC291B),
     dangerSoft = Color(0x1AFF4230),
     borderSubtle = Color(0x1A000000),
@@ -161,7 +161,7 @@ object YeetRadius {
     val lg = 20.dp
     /** Кнопки-капсулы, верх sheet, подсказка стилиста */
     val xl = 32.dp
-    /** Tab-bar */
+    /** Tab-bar, низ плавающего sheet (концентрично углу экрана) */
     val bar = 48.dp
     /** Аватар, радио */
     val full = 999.dp

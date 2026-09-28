@@ -111,7 +111,7 @@ export function ListItem({ type = 'action', label, description, icon, leading, e
       aria-checked={type === 'radio' ? !!checked : undefined}
       aria-expanded={type === 'expandable' ? !!expanded : undefined}
     >
-      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')} /> : leading ?? (icon && <Icon name={icon} />)}
+      {type === 'radio' ? <span className={cx('y-radio', checked && 'y-radio--on')}>{checked && <Icon name="check" size={16} />}</span> : leading ?? (icon && <Icon name={icon} />)}
       {text}
       {type === 'expandable' ? <Icon name={expanded ? 'chevron-up' : 'chevron-down'} /> : trailing}
     </button>

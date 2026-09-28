@@ -3,6 +3,8 @@ import { Sheet } from '.';
 import { Button } from '../atoms';
 import { onOverlay, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 import { ChipGroup, InputBar, List, ListItem, PhotoTile } from '../molecules';
+import { Grid } from '../templates';
+import { ItemCard } from '.';
 
 type Args = { title: string; type: 'modal' | 'panel'; footer: boolean; content: 'actions' | 'chips' | 'photo' };
 
@@ -18,7 +20,7 @@ const meta: Meta<Args> = {
   args: { title: 'Название вещи', type: 'modal', footer: false, content: 'actions' },
   argTypes: { type: { control: 'inline-radio', options: ['modal', 'panel'] }, content: { control: 'inline-radio', options: ['actions', 'chips', 'photo'] } },
   decorators: [unlessBare(onOverlay)],
-  parameters: { docs: { description: { component: 'Bottom sheet: хэндл 48×4 → H3 → слот Content → пара кнопок L (Tertiary + Primary). Паддинг 8/20/20, gap 20, радиус 32 сверху. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Title, слот Content.' } } },
+  parameters: { docs: { description: { component: 'Bottom sheet. **Modal** — плавающая карточка: 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана), паддинг 8/20/20; хэндл 48×4 → 16 → H3 → 12 → слот Content → 16 → пара кнопок L через 7. **Panel** — панель деталей во всю ширину, 32 сверху, тень. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Title, слот Content.' } } },
   render: ({ title, type, footer, content: c }) => <Sheet title={title || undefined} type={type} footer={footer ? [{ label: 'Сбросить' }, { label: 'Применить' }] : undefined}>{content[c]}</Sheet>,
 };
 export default meta;
@@ -35,6 +37,7 @@ export const InFlow: Story = {
       <Usage screen="Filter" note="сезон">{onOverlay(() => <Sheet title="Сезон">{content.chips}</Sheet>)}</Usage>
       <Usage screen="Picker" note="с парой кнопок">{onOverlay(() => <Sheet title="Категория" footer={[{ label: 'Сбросить' }, { label: 'Применить' }]}><List><ListItem type="expandable" icon="outerwear" label="Верхняя одежда" /><ListItem type="expandable" icon="top" label="Верх" expanded /></List></Sheet>)}</Usage>
       <Usage screen="Search" note="страна">{onOverlay(() => <Sheet title="Страна"><InputBar placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked trailing="🇷🇺" /><ListItem type="radio" label="Грузия" trailing="🇬🇪" /></List></Sheet>)}</Usage>
+      <Usage screen="Outfit Creation / Item Filter" note="с крестиком, без хэндла">{onOverlay(() => <Sheet title="Низ" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}><ChipGroup chips={[{ label: 'Все' }, { label: 'Джинсы', selected: true }, { label: 'Брюки' }, { label: 'Легинсы' }]} /><Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="green" selected /></Grid></Sheet>)}</Usage>
       <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p></Sheet></div></Usage>
     </UsageGrid>
   ),

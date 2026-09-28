@@ -38,13 +38,13 @@ export function Snackbar({ children, onClose, onUndo }: { children: ReactNode; o
 /* ─── EmptyState ────────────────────────────────────────────────────── */
 
 /** Пустое состояние и «ничего не найдено». Ставится по центру свободной области экрана. */
-export function EmptyState({ title, description, action }: { title: string; description: ReactNode; action?: { label: string; onClick?: () => void } }) {
+export function EmptyState({ title, description, action }: { title: string; description: ReactNode; /** Кнопка L через 32: «Добавить вещь» (primary), «Сбросить фильтры» (tertiary, по умолчанию). */ action?: { label: string; variant?: 'primary' | 'tertiary'; onClick?: () => void } }) {
   return (
     <div className="y-empty">
       <h2 className="y-h1 y-text--primary">{title}</h2>
       <p className="y-body y-text--secondary">{description}</p>
       {action && (
-        <Button variant="tertiary" size="M" onClick={action.onClick}>
+        <Button variant={action.variant ?? 'tertiary'} size="L" onClick={action.onClick}>
           {action.label}
         </Button>
       )}

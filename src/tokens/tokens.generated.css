@@ -133,7 +133,7 @@
   --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-600); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
-  --color-accent-soft: rgb(1 0 244 / 0.1); /* ui-colors/blue-10% */
+  --color-accent-soft: #f1f4ff; /* ui-colors/blue-10% */
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 66 48 / 0.1); /* ui-colors/red-10% */
   --color-border-subtle: rgb(0 0 0 / 0.1); /* ui-colors/black-10% */
@@ -368,6 +368,7 @@
   --card-radius: var(--radius-lg);
   --sheet-bg: var(--color-bg-elevated);
   --sheet-radius: var(--radius-xl);
+  --sheet-radius-bottom: var(--radius-bar);
   --tab-bar-bg: var(--color-bg-elevated);
   --input-bg: var(--color-bg-subtle);
 }

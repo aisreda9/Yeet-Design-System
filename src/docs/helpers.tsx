@@ -74,5 +74,5 @@ export const withWidth = (width: number) => (Story: () => ReactNode) => <div sty
 
 /** Декоратор: sheet / dialog на затемнении, как на экране. */
 export const onOverlay = (Story: () => ReactNode) => (
-  <div style={{ width: 393, background: 'var(--color-bg-overlay)', paddingTop: 40, borderRadius: 24, overflow: 'hidden' }}><Story /></div>
+  <div style={{ width: 393, background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
 );

@@ -334,10 +334,11 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 
 #### `sheet` — основа bottom sheet
 
-- Ширина 393, фон `white`, радиус **32 сверху**, паддинг 8 / 20 / 20 / 20, gap 20; подложка под sheet — `ui-colors/overlay`.
-- Состав: хэндл (48 × 4, `light-grey`) → заголовок `H3` (`Title`, `Show Title`) → слот **Content** → футер.
-- `Footer`: **None** | **Buttons** — пара `button` L 50/50 (`secondary-action` + `primary-action`, стиль и текст правятся прямо из инстанса).
-- `Type`: **Modal** — поверх `overlay`; **Panel** — постоянная панель деталей поверх фото (тень `shadow/floating`), раскрывается скроллом (детали вещи/образа, новая вещь, холст образа).
+- **Modal — плавающая карточка** (эталон: New app design → Profile / Accounts / Sheet): ширина 377, **8 от краёв экрана** слева, справа и снизу, радиус **32 сверху и 48 снизу** (концентрично углу экрана 56), паддинг 8 / 20 / 20 / 20; подложка — `ui-colors/overlay`.
+- Состав: хэндл (48 × 4, `light-grey`) → 16 → `body`: заголовок `H3` (`Title`, `Show Title`) → 12 → слот **Content** → 16 → футер.
+- `Footer`: **None** | **Buttons** — пара `button` L 50/50 через **7** (`secondary-action` + `primary-action`, стиль и текст правятся прямо из инстанса).
+- Высокая шторка со своим скроллом (Outfit Creation / Item Filter) — без хэндла, с «×» справа от заголовка (`onClose` в коде).
+- `Type`: **Modal** — поверх `overlay`; **Panel** — во всю ширину 393, 32 сверху, gap 20; — постоянная панель деталей поверх фото (тень `shadow/floating`), раскрывается скроллом (детали вещи/образа, новая вещь, холст образа).
 - Фон — `elevated`.
 
 | Тип (контент слота) | Из чего собран | Примеры |
@@ -348,12 +349,19 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 | **Range** | гистограмма + двухточечный слайдер (`blue`) | Фильтр цены |
 | **Radio** | `list-item` Radio | Год рождения, пол, стиль |
 | **Search** | `input-bar` + `list-item` Radio с флагом в `Trailing` | Страна, валюта |
-| **Photo** | `photo-tile` × 2 (+ `button` Destructive «Удалить фотографию») | Фото вещи, аватар, поиск по фото |
+| **Photo** | `photo-tile` × 2 (Source: Gallery / Camera, 3D-иллюстрации) + `button` Tertiary «Удалить фотографию» | Фото вещи, аватар, поиск по фото |
+| **Accounts** | `account-card` Current + Other × n + `button` Tertiary L «Добавить аккаунт», через 8 | Профиль → аккаунты (один или несколько) |
 
 #### `dialog` — подтверждение
 
-Тот же контейнер, что у `sheet` (фон `elevated`). `Title`, `Description` / `Show Description`, опциональный слот **Content** (`Show Content`) для сложных случаев (удаление аккаунта: плитки статистики, текст с выделением).
-`Tone`: **Default** — Tertiary + Primary; **Destructive** — Destructive + Primary. **Безопасное действие всегда синее, опасное — всегда красное.**
+Та же плавающая форма, что у `sheet` Modal (377, 32 / 48, фон `elevated`). `Title`, `Description` / `Show Description`, опциональный слот **Content** (`Show Content`) для сложных случаев (удаление аккаунта: плитки статистики, текст с выделением).
+`Tone`: **Default** — Tertiary + Primary; **Destructive** — необратимое действие Tertiary слева + «Отмена» Primary (очистить корзину, образ); **Danger** — удаление аккаунта: красная Destructive + «Отменить» Primary. **Безопасное действие всегда синее справа.**
+
+#### Мультиаккаунт: `avatar-stack`, `account-card`
+
+- `avatar-stack` (`Accounts` 1 | 2) — в шапке профиля слева от периода: аватары M 40 с кольцом 2 цвета фона внахлёст −8, в конце «+» Tertiary S. Нажатие — шторка «Аккаунты».
+- `account-card` (`Kind`): **Current** — текущий аккаунт, «Редактировать профиль» (`edit`) и «Настройки» (`settings`); **Other** — переключение, chevron; **Settings** — строка аккаунта в Настройках с «Выйти». 72, паддинг 16 / 20, радиус 20, `light-grey`.
+- Один аккаунт: в шапке аватар + «+», в шторке — Current и «Добавить аккаунт». Несколько: все аватары, в шторке Current, затем Other.
 
 #### `header` — шапка экрана
 

@@ -75,12 +75,12 @@
 @container (max-width: 300px) { .y-tab-bar { gap: 0; } } /* 320 с «+»: каждая вкладка ≥ 40 */
 .y-tab-bar__tab {
   position: relative; z-index: 1; flex: 1; display: grid; place-items: center; border: 0; border-radius: var(--radius-xl); background: transparent;
-  color: var(--color-text-primary); cursor: pointer; transition: background-color var(--motion-fade);
+  color: var(--color-text-secondary); cursor: pointer; transition: background-color var(--motion-fade), color var(--motion-fade);
 }
+.y-tab-bar__tab[aria-current='page'] { color: var(--color-text-primary); } /* флоу: неактивные иконки серые */
 .y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
-.y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 450 14px/20px var(--font-display); color: var(--color-text-secondary); }
-.y-tab-bar__tab[aria-current='page'] > .y-tab-bar__avatar { color: var(--color-text-primary); }
+.y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 450 14px/20px var(--font-display); }
 
 /* Нижняя панель стилиста: хэндл, поле, таб-бар */
 .y-dock {
@@ -99,9 +99,17 @@
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 .y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--color-bg-subtle); }
-.y-sheet__footer { display: flex; gap: var(--space-8); }
+.y-sheet__footer { display: flex; gap: 7px; }
 .y-sheet__footer > .y-button { flex: 1; }
+.y-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 24px; }
+.y-sheet__head > .y-icon-button { margin: -8px -8px -8px 0; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--space-12); }
+/* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
+   радиус 32 сверху и 48 снизу — концентрично углу экрана 56; хэндл → 16 → заголовок → 12 → контент */
+.y-sheet--modal { gap: var(--space-16); border-radius: var(--sheet-radius) var(--sheet-radius) var(--sheet-radius-bottom) var(--sheet-radius-bottom); }
+.y-sheet--modal > .y-sheet__title + *,
+.y-sheet--modal > .y-sheet__head + * { margin-top: calc(var(--space-4) * -1); }
+.y-sheet--modal > .y-sheet__head { margin-top: var(--space-12); } /* без хэндла заголовок на 20 от верха */
 /* Панель деталей (Item / Outfit Details): заголовок H2 → контент 16, → подпись (сезон, цена) 12 */
 .y-sheet--panel { box-shadow: var(--shadow-floating); }
 .y-sheet--panel > .y-sheet__title + * { margin-top: calc(var(--space-4) * -1); }
@@ -109,7 +117,10 @@
 .y-screen__content > .y-sheet--panel:last-child { flex: 1 0 auto; } /* панель внизу экрана тянется до низа */
 
 /* Overlay: затемнение проявляется (fade), шторка выезжает снизу на пружине quick; уход — быстрее (exit) */
-.y-overlay { position: absolute; inset: 0; z-index: 5; background: var(--color-bg-overlay); display: flex; align-items: flex-end; animation: y-overlay-in var(--motion-fade); }
+.y-overlay {
+  position: absolute; inset: 0; z-index: 5; background: var(--color-bg-overlay); animation: y-overlay-in var(--motion-fade);
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--space-8) var(--space-8);
+}
 .y-overlay .y-sheet { animation: y-sheet-in var(--motion-nav); }
 .y-overlay.is-leaving { opacity: 0; transition: opacity var(--motion-exit); }
 .y-overlay.is-leaving .y-sheet { transform: translateY(100%); transition: transform var(--motion-exit); }

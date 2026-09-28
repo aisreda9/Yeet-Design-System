@@ -14,12 +14,12 @@ export function Badge({ variant = 'primary', children, className }: BadgeProps) 
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 
-export type AvatarProps = { size?: 'S' | 'M' | 'L'; initial?: string; src?: string; alt?: string };
+export type AvatarProps = { size?: 'S' | 'M' | 'L'; initial?: string; src?: string; alt?: string; /** Фон буквы: у каждого аккаунта свой цвет (флоу Profile / Accounts: «Т» оранжевым). По умолчанию — акцент. */ color?: ItemColor; className?: string };
 
-/** Аватар: L 96 (профиль), M 40 (настройки, чат), S 24 (таб-бар). Без фото — буква или иконка камеры. */
-export function Avatar({ size = 'M', initial, src, alt = '' }: AvatarProps) {
+/** Аватар: L 96 (профиль), M 40 (аккаунты, настройки, чат), S 24. Без фото — буква Roboto Slab или иконка камеры. */
+export function Avatar({ size = 'M', initial, src, alt = '', color, className }: AvatarProps) {
   return (
-    <span className={cx('y-avatar', `y-avatar--${size}`, !src && initial && 'y-avatar--initial')}>
+    <span className={cx('y-avatar', `y-avatar--${size}`, !src && initial && 'y-avatar--initial', className)} style={color && !src ? { background: `var(--yeet-item-${color})` } : undefined}>
       {src ? <img src={src} alt={alt} /> : initial ? initial : <Icon name="camera" size={size === 'S' ? 14 : 24} />}
     </span>
   );

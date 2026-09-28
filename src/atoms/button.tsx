@@ -94,7 +94,7 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
   tone?: 'primary' | 'secondary';
   /** Иконка малого штампа (`secondary`), по умолчанию `thumb-down`. */
   icon?: IconName;
-  /** Действие выполнено: штамп сжимается, поворачивается на −60° и становится «×» (отменить). */
+  /** Действие выполнено: штамп сжимается до 78, поворачивается на −60°, чернеет и показывает «отменить» (флоу: Wear Action Active). */
   done?: boolean;
 };
 
@@ -118,7 +118,7 @@ export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, clas
         <path d={stampStar} fill="currentColor" />
       </svg>
       <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={20} /> : label}</span>
-      <span className="y-stamp__done" aria-hidden><Icon name="cross" /></span>
+      <span className="y-stamp__done" aria-hidden><Icon name="undo" /></span>
     </button>
   );
 }
