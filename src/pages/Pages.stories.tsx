@@ -198,7 +198,7 @@ function CanvasScreen() {
     setItems((cur) => (cur.some((c) => c.id === w.id) ? cur.filter((c) => c.id !== w.id) : [...cur, { ...w, ...spots[w.id] }]));
   return (
     <Screen
-      header={<Header type="bar" center={<SegmentControl size="M" fit value="canvas" segments={[{ value: 'items', icon: 'wardrobe' }, { value: 'canvas', icon: 'collage' }, { value: 'info', icon: 'info' }]} />} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
+      header={<Header type="bar" center={<SegmentControl size="M" fit value="canvas" segments={[{ value: 'items', icon: 'wardrobe', ariaLabel: 'Гардероб' }, { value: 'canvas', icon: 'collage', ariaLabel: 'Коллаж' }, { value: 'info', icon: 'info', ariaLabel: 'Описание' }]} />} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
       bottom={<BottomBar label="Далее" />}
     >
       <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />

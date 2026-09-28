@@ -10,7 +10,7 @@ const meta = {
   tags: ['autodocs'],
   args: { wrap: true, chips: [{ label: 'Все', selected: true }, { label: 'Весна' }, { label: 'Лето' }, { label: 'Осень' }, { label: 'Зима' }] },
   decorators: [unlessBare(withWidth(353))],
-  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 36. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing).' } } },
+  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 36. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing). С `onToggle` чипс — переключатель (`aria-pressed`), крестик — отдельная кнопка «Удалить: …» (`onRemove`), идентичность — `value` (по умолчанию `label`).' } } },
 } satisfies Meta<typeof ChipGroup>;
 export default meta;
 type Story = StoryObj<typeof meta>;
