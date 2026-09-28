@@ -103,3 +103,27 @@ export const PhotoResults: Story = {
     </Screen>
   ),
 };
+
+const suggestions = ['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'];
+
+export const SearchFocused: Story = {
+  name: 'Search / Text / Query Focused',
+  render: () => (
+    <Screen header={<Header type="search" />}>
+      <ChipGroup wrap center chips={suggestions.map((label) => ({ label }))} />
+    </Screen>
+  ),
+};
+
+export const PhotoFocused: Story = {
+  name: 'Search / Photo / Query Focused',
+  render: () => (
+    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
+      <Grid rowGap={16}>
+        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8"].map((n, i) => (
+          <ProductCard key={i} kind="shoe" name={n} price={i % 2 ? '14 300 ₽' : '10 400 ₽'} discount={i ? undefined : '-10%'} liked={i === 1 || i === 2} />
+        ))}
+      </Grid>
+    </Screen>
+  ),
+};
