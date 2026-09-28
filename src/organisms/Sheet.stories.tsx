@@ -35,7 +35,7 @@ export const InFlow: Story = {
       <Usage screen="Filter" note="сезон">{onOverlay(() => <Sheet title="Сезон">{content.chips}</Sheet>)}</Usage>
       <Usage screen="Picker" note="с парой кнопок">{onOverlay(() => <Sheet title="Категория" footer={[{ label: 'Сбросить' }, { label: 'Применить' }]}><List><ListItem type="expandable" icon="outerwear" label="Верхняя одежда" /><ListItem type="expandable" icon="top" label="Верх" expanded /></List></Sheet>)}</Usage>
       <Usage screen="Search" note="страна">{onOverlay(() => <Sheet title="Страна"><InputBar placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked trailing="🇷🇺" /><ListItem type="radio" label="Грузия" trailing="🇬🇪" /></List></Sheet>)}</Usage>
-      <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Чёрный · Все сезоны</p></Sheet></div></Usage>
+      <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p></Sheet></div></Usage>
     </UsageGrid>
   ),
 };

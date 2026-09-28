@@ -534,6 +534,54 @@
         "width": 24,
         "height": 24
       }
+    },
+    {
+      "figma": "stamp · Tone=Secondary (48, иконка)",
+      "story": "atoms-stamp--in-flow",
+      "selector": ".y-stamp--S",
+      "expect": {
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "figma": "stylist-prompt-card · Wide=true",
+      "story": "organisms-stylistpromptcard--catalog",
+      "selector": ".y-prompt-card--wide",
+      "expect": {
+        "width": 353,
+        "height": 172
+      }
+    },
+    {
+      "figma": "input-bar · Size=L (поле 52, отступ 16)",
+      "story": "pages-экраны-флоу--search-discover",
+      "selector": ".y-input-bar--l .y-input-bar__field",
+      "expect": {
+        "height": 52,
+        "paddingLeft": 16,
+        "gap": 8,
+        "borderRadius": 32
+      }
+    },
+    {
+      "figma": "usage-meter",
+      "story": "molecules-usagemeter--playground",
+      "selector": ".y-usage-meter",
+      "expect": {
+        "paddingTop": 16,
+        "paddingLeft": 20,
+        "paddingBottom": 20,
+        "borderRadius": 20
+      }
+    },
+    {
+      "figma": "divider · Show Label («или»)",
+      "story": "pages-экраны-флоу--sign-in",
+      "selector": ".y-divider-label",
+      "expect": {
+        "gap": 12
+      }
     }
   ]
 }

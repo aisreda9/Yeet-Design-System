@@ -45,7 +45,7 @@ function Sample({ brand, theme, title }: (typeof cases)[number]) {
           <ItemCard kind="bottom" color="beige" discount="-20%" />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Stamp label="Надеть" size="S" done={done} onClick={() => setDone((v) => !v)} />
+          <Stamp label="Надеть" done={done} onClick={() => setDone((v) => !v)} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
             <Badge variant="primary">Новое</Badge>
             <span className="y-body y-text--accent">Акцентный текст</span>

@@ -69,7 +69,7 @@ export const InFlow: Story = {
       <Usage screen="Search / Results" note="активный фильтр"><Button variant="soft" size="S" rightIcon="chevron-up-down">Сначала дешевле</Button></Usage>
       <Usage screen="Wardrobe / Items" note="фильтр со счётчиком"><Button variant="soft" size="S" rightIcon="chevron-up-down">Категория · 2</Button></Usage>
       <Usage screen="Outfit Creation / Criteria" note="тег"><Button variant="tertiary" size="S" rightIcon="cross">Тег #1</Button></Usage>
-      <Usage screen="Stylist / Outfit of the Day" note="плавающая над контентом"><Button variant="inverse" size="L" floating>Показать ещё</Button></Usage>
+      <Usage screen="Stylist / Outfit of the Day" note="плавающая над контентом"><Button variant="inverse" size="L" floating>Показать еще</Button></Usage>
       <Usage screen="Sheet · Category" note="пара действий"><div style={{ display: 'flex', gap: 8, width: '100%' }}><Button variant="tertiary" fullWidth>Сбросить</Button><Button fullWidth>Применить</Button></div></Usage>
       <Usage screen="Dialog · Delete Account" note="деструктивное — всегда красное"><div style={{ display: 'flex', gap: 8, width: '100%' }}><Button variant="destructive" fullWidth>Удалить</Button><Button fullWidth>Отменить</Button></div></Usage>
     </UsageGrid>

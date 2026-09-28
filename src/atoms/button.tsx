@@ -85,12 +85,14 @@ export function IconButton({ icon, label, variant = 'tertiary', size = 'M', floa
 
 
 export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
-  /** Текст действия: «Надеть», «Сохранить». Для `size="S"` не показывается — нужен `icon`. */
+  /** Текст действия: «Надеть», «Сохранить». У `secondary` не показывается (только иконка), но озвучивается. */
   label: string;
-  /** `primary` — главное действие экрана (синий), `secondary` — вспомогательное (чёрный малый, «Не нравится»). */
+  /**
+   * Как в Figma (stamp · Tone): размер задаётся тоном.
+   * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 48 с иконкой («Не нравится»).
+   */
   tone?: 'primary' | 'secondary';
-  /** L 148 — на коллаже образа; S 48 — вспомогательный штамп с иконкой. */
-  size?: 'L' | 'S';
+  /** Иконка малого штампа (`secondary`), по умолчанию `thumb-down`. */
   icon?: IconName;
   /** Действие выполнено: штамп сжимается, поворачивается на −60° и становится «×» (отменить). */
   done?: boolean;
@@ -102,7 +104,8 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
  *
  * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + малый чёрный штамп «Не нравится» (палец вниз).
  */
-export function Stamp({ label, tone = 'primary', size = 'L', icon, done, className, ...rest }: StampProps) {
+export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, ...rest }: StampProps) {
+  const size = tone === 'secondary' ? 'S' : 'L';
   return (
     <button
       type="button"
@@ -114,7 +117,7 @@ export function Stamp({ label, tone = 'primary', size = 'L', icon, done, classNa
       <svg className="y-stamp__shape" viewBox="0 0 144 144" aria-hidden>
         <path d={stampStar} fill="currentColor" />
       </svg>
-      <span className="y-stamp__label">{size === 'S' && icon ? <Icon name={icon} size={20} /> : label}</span>
+      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={20} /> : label}</span>
       <span className="y-stamp__done" aria-hidden><Icon name="cross" /></span>
     </button>
   );

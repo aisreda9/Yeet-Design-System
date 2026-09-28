@@ -106,7 +106,7 @@ export const ItemDetails: Story = {
     <Screen header={<Header type="bar" actions={[{ icon: 'more', label: 'Ещё' }]} centerOnScroll={<ItemArt kind="container" color="black" size={36} />} />} bottom={<BottomBar label="Переместить в гардероб" secondary={{ icon: 'external-link', label: 'Открыть в магазине' }} />} flush>
       <div className="y-gutter"><PhotoArea kind="container" /></div>
       <Sheet type="panel" title="Сумка">
-        <p className="y-body y-text--secondary">10 000 ₽ · Sander · Чёрный<br />Аксессуары · Все сезоны</p>
+        <p className="y-body y-text--secondary">10 000 ₽ · Sander · Черный<br />Аксессуары · Все сезоны</p>
         <p className="y-body y-note">Мягкая сумка округлой формы с логотипом и кожаным ремешком</p>
         <section className="y-section" style={{ gap: 20 }}>
           <h3 className="y-h3">Образы с этой вещью</h3>
@@ -177,7 +177,7 @@ export const NewItem: Story = {
       {/* как во флоу: детали в панели под фото, заголовок H2 */}
       <Sheet type="panel" title="Детали новой вещи">
         <InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup>
-        <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Чёрный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
+        <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
       </Sheet>
     </Screen>
   ),
@@ -418,7 +418,7 @@ export const ProfileAnalytics: Story = {
         footer={<><span><span className="y-h2" style={{ display: 'block' }}>120 640 ₽</span><span className="y-caption y-text--secondary">4 вещи</span></span><Icon name="chevron-right" /></>}
       />
       {/* порядок как во флоу Profile / Overview / Analytics: цвета → давно не надевалось → сезоны → лучшая инвестиция → другие цифры */}
-      <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Чёрный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
+      <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Черный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
       <Carousel title="Давно не надевалось" itemWidth={173}>
         <ItemCard kind="top" color="black" label="20 дней" />
         <ItemCard kind="top" color="white" label="1 день" />

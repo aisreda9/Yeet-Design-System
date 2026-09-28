@@ -10,7 +10,7 @@ export type ScreenProps = {
   bottom?: ReactNode;
   /** Модальный слой (`Overlay` со `Sheet` / `Dialog`). */
   overlay?: ReactNode;
-  /** Плавающий элемент над низом экрана: `Snackbar`, `Hint`, «Показать ещё». */
+  /** Плавающий элемент над низом экрана: `Snackbar`, `Hint`, «Показать еще». */
   floating?: ReactNode;
   floatingOffset?: number;
   /** Центрировать контент по вертикали (пустые состояния, загрузка). */

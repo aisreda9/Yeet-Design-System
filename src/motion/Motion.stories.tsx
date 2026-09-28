@@ -65,7 +65,7 @@ function StampDemo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
       <Stamp label="Надеть" done={done} onClick={() => setDone((v) => !v)} />
-      <Stamp label="Не нравится" tone="secondary" size="S" icon="thumb-down" onClick={() => setSpin((s) => s + 1)} style={{ transform: `translateX(${spin % 2 ? -12 : 0}px)`, transition: 'transform var(--motion-exit)' }} />
+      <Stamp label="Не нравится" tone="secondary" onClick={() => setSpin((s) => s + 1)} style={{ transform: `translateX(${spin % 2 ? -12 : 0}px)`, transition: 'transform var(--motion-exit)' }} />
       <p className="y-caption y-text--secondary" style={{ maxWidth: 200 }}>Нажми на штамп: сжатие, поворот −60° и «×» на пружине bouncy. Повторное нажатие отменяет.</p>
     </div>
   );
@@ -200,7 +200,7 @@ function CollapseDemo() {
       <div className="y-collapse__scroll" onScroll={(e) => setCollapsed(e.currentTarget.scrollTop > 24)}>
         <div className="y-collapse__panel">
           <h2 className="y-h2">Сумка</h2>
-          <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Чёрный · Все сезоны</p>
+          <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p>
           {Array.from({ length: 6 }, (_, k) => <div key={k} style={{ height: 96, borderRadius: 20, background: 'var(--card-bg)' }} />)}
         </div>
       </div>
@@ -227,7 +227,7 @@ function PressDemo() {
         <ListGroup><ListItem label="Корзина вещей" trailing={<Icon name="chevron-right" />} onClick={() => {}} /></ListGroup>
         <figcaption>строка — подсветка фона, без сжатия</figcaption>
       </figure>
-      <figure><Stamp label="Надеть" size="S" /><figcaption>штамп 0.94 · stamp</figcaption></figure>
+      <figure><Stamp label="Не нравится" tone="secondary" /><figcaption>штамп 0.94 · stamp</figcaption></figure>
     </div>
   );
 }

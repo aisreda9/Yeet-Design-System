@@ -115,14 +115,14 @@ val YeetDarkColors = YeetColorScheme(
 
 /** Цвет вещи — атрибут одежды, не интерфейс. */
 enum class YeetItemColor(val color: Color, val title: String) {
-    BLACK(Color(0xFF1A1A2E), "Чёрный"),
+    BLACK(Color(0xFF1A1A2E), "Черный"),
     GREY(Color(0xFF777777), "Серый"),
     WHITE(Color(0xFFFFFFFF), "Белый"),
     PURPLE(Color(0xFF6A00FF), "Фиолетовый"),
     PINK(Color(0xFFD900FF), "Розовый"),
-    GREEN(Color(0xFF00D08B), "Зелёный"),
+    GREEN(Color(0xFF00D08B), "Зеленый"),
     BLUE(Color(0xFF0100F4), "Синий"),
-    YELLOW(Color(0xFFFFD000), "Жёлтый"),
+    YELLOW(Color(0xFFFFD000), "Желтый"),
     ORANGE(Color(0xFFFF8800), "Оранжевый"),
     RED(Color(0xFFFF4230), "Красный"),
     BEIGE(Color(0xFFFFE1C7), "Бежевый"),

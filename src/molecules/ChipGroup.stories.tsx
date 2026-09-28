@@ -29,7 +29,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={353}>
       <Usage screen="Outfit Creation" note="теги, перенос"><ChipGroup wrap onAdd={() => {}} chips={['Тег #1', 'Тег #2', 'Тег #3', 'Тег #4', 'Тег #5'].map((l) => ({ label: l, removable: true }))} /></Usage>
-      <Usage screen="Sheet · Color" note="чипсы с цветом"><ChipGroup wrap chips={[{ label: 'Чёрный', colorDot: 'black', selected: true }, { label: 'Серый', colorDot: 'grey' }, { label: 'Белый', colorDot: 'white' }, { label: 'Зелёный', colorDot: 'green' }]} /></Usage>
+      <Usage screen="Sheet · Color" note="чипсы с цветом"><ChipGroup wrap chips={[{ label: 'Черный', colorDot: 'black', selected: true }, { label: 'Серый', colorDot: 'grey' }, { label: 'Белый', colorDot: 'white' }, { label: 'Зеленый', colorDot: 'green' }]} /></Usage>
       <Usage screen="Wardrobe" note="фильтры-дропдауны, скролл"><ChipGroup chips={[{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Сезон', dropdown: true }, { label: 'Теги', dropdown: true }]} /></Usage>
       <Usage screen="Search / Discover" note="подсказки запросов"><ChipGroup wrap chips={['Nike', 'Crocs', 'Marine Serre', 'Обувь для бега'].map((label) => ({ label }))} /></Usage>
     </UsageGrid>

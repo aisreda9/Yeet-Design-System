@@ -93,14 +93,14 @@ public enum YeetItemColor: String, CaseIterable {
     }
     public var title: String {
         switch self {
-        case .black: return "Чёрный"
+        case .black: return "Черный"
         case .grey: return "Серый"
         case .white: return "Белый"
         case .purple: return "Фиолетовый"
         case .pink: return "Розовый"
-        case .green: return "Зелёный"
+        case .green: return "Зеленый"
         case .blue: return "Синий"
-        case .yellow: return "Жёлтый"
+        case .yellow: return "Желтый"
         case .orange: return "Оранжевый"
         case .red: return "Красный"
         case .beige: return "Бежевый"
