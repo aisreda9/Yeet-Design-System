@@ -1,0 +1,30 @@
+{
+  "base": "claude/figma-access-ara4o8",
+  "staleDays": 5,
+  "zones": {
+    "tokens":    ["tokens/**", "src/tokens/**", "scripts/build-tokens.mjs"],
+    "atoms":     ["src/atoms/**", "src/icons/**", "src/utils/**"],
+    "molecules": ["src/molecules/**"],
+    "organisms": ["src/organisms/**"],
+    "screens":   ["src/pages/**", "src/templates/**", "design/figma-flows.json"],
+    "motion":    ["src/motion/**"],
+    "docs":      ["src/docs/**", "DESIGN.md", "README.md"],
+    "qa":        ["scripts/qa/**", "scripts/check-contrast.mjs", "design/QA.md", "design/figma-specs.json", ".github/workflows/qa.yml"],
+    "infra":     [".gitignore", ".gitattributes", "package.json", "package-lock.json", ".storybook/**", ".github/**", ".claude/**", "scripts/**", "CLAUDE.md", "AGENTS.md", "TEAM.md", "tsconfig.json"]
+  },
+  "hot": [
+    "tokens/tokens.json",
+    "src/docs/registry.ts",
+    "src/pages/Pages.stories.tsx",
+    "src/*/index.tsx",
+    "src/*/*.css",
+    "DESIGN.md",
+    "package.json",
+    "package-lock.json"
+  ],
+  "generated": [
+    "src/tokens/tokens.generated.css",
+    "tokens/ios/YeetTokens.swift",
+    "tokens/android/YeetTokens.kt"
+  ]
+}

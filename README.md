@@ -7,6 +7,7 @@
 | **Storybook** · GitHub Pages | Живые компоненты, правила, «В флоу» — для продукта, разработки и дизайна |
 | **Figma** · YeetStyle 2.0 → «Design System 2.0 (Claude)» | Компоненты и варианты, переменные Yeet DS 2.0 (Light / Dark) |
 | [`DESIGN.md`](./DESIGN.md) | Полная текстовая спецификация |
+| [`TEAM.md`](./TEAM.md) | Как параллельные сессии Claude и боты работают вместе: роли, зоны, issues, замок Figma |
 
 ## Структура
 
@@ -48,6 +49,16 @@ npm run build-storybook  # статическая сборка в storybook-stat
 
 Workflow `.github/workflows/storybook.yml` собирает Storybook и публикует на GitHub Pages при пуше в `main`
 или `claude/figma-access-ara4o8`. Один раз нужно включить Pages: **Settings → Pages → Source: GitHub Actions**.
+
+## Командная работа
+
+Несколько сессий Claude и ботов работают параллельно, каждая в своей ветке. Правила — [`TEAM.md`](./TEAM.md), зоны — `.github/team.json`.
+
+```bash
+npm run team   # активные ветки, их зоны и пересечения с твоей веткой
+```
+
+На каждом PR workflow `team-overlap.yml` ставит метки `zone:*` и пишет, с какими открытыми PR есть общие файлы.
 
 ## Токены для iOS и Android
 

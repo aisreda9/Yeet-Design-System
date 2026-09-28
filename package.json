@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "qa": "node scripts/qa/run.mjs",
     "contrast": "node scripts/check-contrast.mjs",
-    "flow-diff": "node scripts/qa/flow-diff.mjs"
+    "flow-diff": "node scripts/qa/flow-diff.mjs",
+    "team": "node scripts/team/status.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
