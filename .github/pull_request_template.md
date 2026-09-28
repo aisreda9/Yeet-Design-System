@@ -11,7 +11,7 @@ Closes #
 <!-- Какие из tokens.json, registry.ts, Pages.stories.tsx, index.tsx, *.css, DESIGN.md, package*.json затронуты и как (добавление / правка). Сгенерированные файлы — только через npm run tokens. -->
 
 ## Проверки
-- [ ] База влита в ветку (`git merge origin/claude/figma-access-ara4o8`)
+- [ ] База влита в ветку (`git merge origin/main`)
 - [ ] `npm run typecheck`
 - [ ] `npm run build-storybook` (+ `npm run qa` / `npm run flow-diff`, если менялись компоненты или экраны)
 - [ ] Figma: не писал / писал под замком в issue «Координация» и снял его

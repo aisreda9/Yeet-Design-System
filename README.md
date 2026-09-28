@@ -47,8 +47,8 @@ npm run build-storybook  # статическая сборка в storybook-stat
 
 ## Публикация
 
-Workflow `.github/workflows/storybook.yml` собирает Storybook и публикует на GitHub Pages при пуше в `main`
-или `claude/figma-access-ara4o8`. Один раз нужно включить Pages: **Settings → Pages → Source: GitHub Actions**.
+Workflow `.github/workflows/storybook.yml` собирает Storybook и публикует на GitHub Pages при пуше в `main`.
+`main` защищена: изменения только через PR с зелёной проверкой `qa`.
 
 ## Командная работа
 

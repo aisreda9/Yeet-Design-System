@@ -1,5 +1,5 @@
 {
-  "base": "claude/figma-access-ara4o8",
+  "base": "main",
   "staleDays": 5,
   "zones": {
     "tokens":    ["tokens/**", "src/tokens/**", "scripts/build-tokens.mjs"],
