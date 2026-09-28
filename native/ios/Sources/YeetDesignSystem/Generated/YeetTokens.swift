@@ -1,6 +1,6 @@
 // Сгенерировано scripts/build-tokens.mjs из tokens/tokens.json — не редактировать вручную.
 // SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически (UIColor с dynamicProvider, без asset-каталога).
-// Шрифты: добавьте в приложение tokens/fonts/RobotoSlab-Variable.ttf, Inter-Variable.ttf — они регистрируются из Bundle.main при первом использовании (или перечислите их в Info.plist → UIAppFonts).
+// Шрифты лежат в ресурсах пакета YeetDesignSystem и регистрируются при первом использовании (YeetFonts.register()).
 
 import CoreText
 import SwiftUI
@@ -62,8 +62,6 @@ public enum YeetColor {
     public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1))
     /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent
     public static let textOnDanger = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
-    /// Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white
-    public static let textOnPhoto = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
     public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1))
     /// Ошибки, деструктивные действия · Figma ui-colors/red-text
@@ -114,23 +112,6 @@ public enum YeetItemColor: String, CaseIterable, Identifiable {
         case .red: return Color(UIColor(hex: 0xFF4230, alpha: 1))
         case .beige: return Color(UIColor(hex: 0xFFE1C7, alpha: 1))
         case .brown: return Color(UIColor(hex: 0xC26547, alpha: 1))
-        }
-    }
-    /// Цвет буквы / иконки на этом цвете (контраст ≥ 4.5 : 1).
-    public var onColor: Color {
-        switch self {
-        case .black: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
-        case .grey: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .white: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .purple: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
-        case .pink: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .green: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .blue: return Color(UIColor(hex: 0xFFFFFF, alpha: 1))
-        case .yellow: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .orange: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .red: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .beige: return Color(UIColor(hex: 0x000000, alpha: 1))
-        case .brown: return Color(UIColor(hex: 0x000000, alpha: 1))
         }
     }
     public var title: String {
@@ -229,7 +210,7 @@ public enum YeetFonts {
     /// Google Fonts · ofl/inter
     public static let text = "Inter"
     private static let files = ["RobotoSlab-Variable", "Inter-Variable"]
-    private static var bundle: Bundle { .main }
+    private static var bundle: Bundle { .module }
     private static let registration: Void = {
         for name in files {
             guard let url = bundle.url(forResource: name, withExtension: "ttf") ?? bundle.url(forResource: name, withExtension: "ttf", subdirectory: "Fonts") else { continue }
