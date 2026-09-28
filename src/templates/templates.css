@@ -94,7 +94,10 @@
 }
 .y-details__spacer > span { aspect-ratio: 1; min-height: 0; }
 .y-details[data-collapsed] .y-details__spacer { grid-template-rows: 0fr; margin-bottom: calc(25px - var(--space-20)); }
-/* Панель не короче экрана: свёрнутое состояние держится, даже если в панели мало полей */
-.y-details .y-sheet--panel { min-height: 100%; }
+/* Панель не короче экрана и уходит под нижнюю панель до низа экрана (Figma: панель y138 → 852):
+   свёрнутое состояние держится, даже если в панели мало полей */
+.y-details .y-sheet--panel { min-height: calc(100% + 120px); }
+/* В миниатюре кнопок нет: «×» фото не нажимается и не показывается */
+.y-details[data-collapsed] .y-details__media button { visibility: hidden; }
 /* Штамп «Надеть»: поверх контента, x225 y676 (справа 20, снизу 28), со скроллом не едет */
 .y-details__stamp { position: absolute; z-index: 4; right: var(--screen-gutter); bottom: 28px; }
