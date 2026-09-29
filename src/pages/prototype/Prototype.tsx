@@ -30,7 +30,7 @@ type ToastState = { key: number; text: string; undo?: boolean; offset: number };
 
 const INTERACTIVE = 'button, a[href], input, textarea, select, [role=slider], [role=switch], [role=checkbox]';
 /** Контролы внутри карточек и экранов, у которых своё действие: тап по ним не ведёт по флоу. */
-const NATIVE = 'input, textarea, select, [role=slider], [role=switch], [role=checkbox], .y-product-card__like, .y-item-card__remove, .y-photo-area__close, .y-photo-area__add, .y-chip__remove, .y-snackbar button, .y-stamp, .y-input-bar__clear';
+const NATIVE = 'input:not([readonly]), textarea:not([readonly]), select, [role=slider], [role=switch], [role=checkbox], .y-product-card__like, .y-item-card__remove, .y-photo-area__close, .y-photo-area__add, .y-chip__remove, .y-snackbar button, .y-stamp, .y-input-bar__clear';
 const cssVar = (name: string, fallback: string) => (typeof document === 'undefined' ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
 const anims = (el?: Element | null) => el?.getAnimations?.() ?? [];
 

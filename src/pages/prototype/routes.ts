@@ -76,6 +76,9 @@ const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): 
     .filter(([l]) => l !== self)
     .map(([l, id]) => ({ sel: '.y-segment [role=radio]', text: l, go: (n: Nav) => n.swap(id) }));
 
+/** Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ. */
+const today: Route[] = [{ sel: '.y-outfit-thumb', go: ok('OutfitDetails') }, openOutfit];
+
 /** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. */
 const noResults = /^Белое платье/;
 const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
@@ -114,17 +117,17 @@ export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'Shuffle
 export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Запуск и онбординг */
   OnboardingWelcome: [btn('Начать бесплатно', 'SignIn')],
-  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'FirstItemPrompt'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'FirstItemPrompt')],
-  FirstItemPrompt: [btn('Пропустить', (n) => n.root('Today')), { sel: '.y-photo-tile', go: ok('NewItem') }],
+  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
+  OnboardingName: [btn('Далее', 'FirstItemPrompt')],
+  FirstOutfit: [btn('Пропустить', (n) => n.root('Today')), btn('Сохранить образ и завершить', async (n) => { await n.root('Today'); n.toast('Образ сохранён'); })],
+  FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), { sel: '.y-photo-tile', go: ok('NewItem') }],
   PasswordRecovery: [btn('Отправить код', (n) => n.overlay('PasswordRecoverySent'))],
   PasswordRecoverySent: [btn('Ок!', closeThen((n) => n.back()))],
 
   /* Главная */
-  Today: [
-    { sel: '.y-outfit-thumb', go: ok('OutfitDetails') },
-    openOutfit,
-    { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: true }) },
-  ],
+  Today: today,
+  TodayRain: today,
+  TodayWorn: today,
   RecommendationsEmpty: [btn('Добавить вещь', 'NewItemNoPhotoV2')],
 
   /* Гардероб */
@@ -176,7 +179,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ItemSearchEmpty: [btn('Сбросить поиск', (n) => n.swap('ItemSearchFocused')), { sel: '.y-input-bar__field', go: (n) => n.swap('ItemSearchFocused') }],
 
   /* Поиск в сторах */
-  SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchResults') }],
+  SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchFocused') }],
+  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty')],
   SearchResults: [
     { sel: '.y-chip-group button', text: 'Цена', go: (n) => n.overlay('PriceFilter') },
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
@@ -189,6 +193,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   StylistHome: [
     { sel: '.y-prompt-card', text: /^Конструктор/, go: ok('OutfitItems') },
     { sel: '.y-prompt-card', text: /^Для поездок/, go: ok('Trips') },
+    { sel: '.y-prompt-card', text: /^Удиви меня/, go: ok('OutfitOfTheDay') },
+    { sel: '.y-prompt-card', text: /^С чем носить/, go: ok('WhatToWear') },
     { sel: '.y-prompt-card', go: comingSoon },
     { sel: '.y-dock .y-input-bar__field', go: ok('Stylist') },
     { sel: '.y-dock .y-input-bar__send', go: ok('Stylist') },
@@ -198,7 +204,9 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-trip-card', go: ok('TripDetails') },
     btn('Как это работает', comingSoon),
   ],
-  TripDetails: [openOutfit],
+  TripDetails: [{ sel: '.y-segment [role=radio]', text: /^Вещи/, go: (n) => n.swap('TripItems') }, openOutfit],
+  TripItems: [{ sel: '.y-segment [role=radio]', text: /^Образы/, go: (n) => n.swap('TripDetails') }, openItem],
+  OutfitOfTheDayEmpty: [btn('Показать еще', (n) => n.swap('OutfitOfTheDay'))],
 
   /* Создание образа */
   OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), shuffleAsk, exitAsk],
