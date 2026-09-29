@@ -182,6 +182,7 @@ fun Gallery(
                     }
                 }
             }
+            item { Section("Шторки · единое правило") { SheetRulesSection() } }
             item {
                 Section("AccountCard") {
                     AccountCard(accounts[0], kind = AccountCardKind.Current)
