@@ -114,3 +114,6 @@
 /* Длинные слова заголовка на узком экране (320: «конфиденциальности») переносятся по слогам */
 .y-prose h1, .y-prose h2 { hyphens: auto; overflow-wrap: break-word; }
 .y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }
+/* Панель выбора вещей (ItemSlots) последним блоком на flush-экране — до низа экрана и под BottomBar, как шторка в Figma (414:1459) */
+.y-screen__content--flush:has(> .y-item-slots:last-child) { padding-bottom: 0; }
+.y-screen__content--flush > .y-item-slots:last-child { flex: 1 0 auto; min-height: calc(100% + 120px); }

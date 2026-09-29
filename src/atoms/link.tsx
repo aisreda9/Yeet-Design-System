@@ -20,7 +20,7 @@ const isExternal = (href: string) => /^https?:\/\//i.test(href);
  *
  * **Контексты:** юридическая подпись на входе («условиями» · «политикой конфиденциальности»), диалог удаления аккаунта, e-mail в Legal.
  */
-export function Link({ href, external = isExternal(href), className, target, rel, ...rest }: LinkProps) {
+export function Link({ href, external = isExternal(href), className, target, rel, children, ...rest }: LinkProps) {
   return (
     <a
       href={href}
@@ -28,6 +28,8 @@ export function Link({ href, external = isExternal(href), className, target, rel
       target={target ?? (external ? '_blank' : undefined)}
       rel={rel ?? (external ? 'noopener noreferrer' : undefined)}
       {...rest}
-    />
+    >
+      {children}
+    </a>
   );
 }

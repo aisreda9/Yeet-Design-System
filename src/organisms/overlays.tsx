@@ -53,10 +53,10 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
 
 export type SheetProps = {
   title?: string;
-  /** Абзац-пояснение под заголовком: Body серым, 12 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
+  /** Абзац-пояснение под заголовком: Body серым, 16 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
   description?: ReactNode;
   /**
-   * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана).
+   * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 48 на все углы (`--radius-overlay`, концентрично углу экрана).
    * `panel` — постоянная панель деталей во всю ширину, 32 сверху, с тенью.
    */
   type?: 'modal' | 'panel';
@@ -79,7 +79,7 @@ export type SheetProps = {
 
 /**
  * Bottom sheet — основа всех выборов, действий и фильтров. Всё временное открывается sheet'ом, а не новым экраном.
- * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
+ * Хэндл → 16 → заголовок H3 → 16 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
 export function Sheet({ title, description, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
