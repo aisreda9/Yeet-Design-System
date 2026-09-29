@@ -466,3 +466,74 @@ object YeetShadow {
     /** Размытие как в CSS / Figma (blur radius). */
     val floatingBlur = 40.dp
 }
+
+/** Прозрачность состояний элемента целиком (не цвета: прозрачные цвета — в color.*). */
+object YeetOpacity {
+    /** Недоступная кнопка, иконка, стрелка пейджера */
+    const val disabled = 0.4f
+    /** Нажатая строка списка */
+    const val pressed = 0.64f
+}
+
+/** Слои (z-index) внутри экрана: чем выше, тем ближе к пользователю. Web — z-index, iOS — .zIndex, Android — Modifier.zIndex. */
+object YeetLayer {
+    /** Подложка: медиа под сворачивающейся шапкой */
+    const val base = 0f
+    /** Над соседями: вкладка таб-бара, подпись коллажа, текущий образ */
+    const val raised = 1f
+    /** Поверх контента: погода и штамп на «Сегодня», подсказка кропа, перетаскиваемая вещь */
+    const val float = 2f
+    /** Шапка, таб-бар, нижняя панель, стрелки пейджера */
+    const val bar = 3f
+    /** Плавающие и прилипающие элементы экрана, штамп в деталях */
+    const val sticky = 4f
+    /** Затемнение и модальные sheet / dialog */
+    const val overlay = 5f
+}
+
+object YeetSize {
+    /** S: чипсы, компактные кнопки, свёрнутая шапка */
+    val controlS = 40.dp
+    /** M: поле ввода в панели, заголовок-чипс, сегмент M */
+    val controlM = 48.dp
+    /** L: snackbar, чат, строка списка без группы */
+    val controlL = 52.dp
+    /** XL: главная кнопка, поле, таб-бар, строка в группе */
+    val controlXl = 56.dp
+}
+
+/** Цвет кольца */
+val YeetColorScheme.focusRingColor: Color get() = textAccent
+/** Кольцо фокуса клавиатуры (:focus-visible). Цвет — text-accent: держит ≥ 3 : 1 во всех брендах, accent в светлых брендах падает до 1.4 : 1. */
+object YeetFocusRing {
+    /** Толщина outline */
+    val width = 2.dp
+    /** Отступ снаружи: кнопки, чипсы, ссылки */
+    val offset = 2.dp
+    /** Кольцо внутри: элемент у края экрана или внутри карточки */
+    val offsetInset = -2.dp
+}
+
+/** Толщина линий: обводки, разделители, кольца. */
+object YeetBorderWidth {
+    /** Разделители, обводка свотча, волосяная рамка кропа */
+    val thin = 1.dp
+    /** Линия иконок ui-icons (24 × 24) и кольцо аватара в таб-баре */
+    val icon = 1.3.dp
+    /** Кольцо фокуса поля ввода, выделение вещи на холсте */
+    val medium = 1.5.dp
+    /** Уголки кропа, кольцо стопки аватаров, цель перетаскивания */
+    val thick = 2.dp
+}
+
+/** Ширины, под которые проверяется вёрстка. CSS-переменные нельзя подставить в @media / @container — значения для сверки и JS (matchMedia). */
+object YeetBreakpoint {
+    /** Контейнер таб-бара (CSS @container): уже — на экране 320 с кнопкой «+» вкладки идут без зазора */
+    val containerCompact = 300.dp
+    /** Самый узкий экран (iPhone SE) */
+    val compact = 320.dp
+    /** Базовый экран макетов (iPhone 15/16) */
+    val regular = 393.dp
+    /** Широкий экран (Pro Max) */
+    val large = 430.dp
+}

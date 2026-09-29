@@ -10,6 +10,23 @@ import { HapticTable, MechanicsTable, MotionTable } from './blocks';
 **семантический токен** (что анимируется) поверх **примитива кривой** (как именно). В компонентах используются
 только семантические токены `--motion-*`, конкретные миллисекунды и кривые в них не пишутся.
 
+## Где это работает
+
+Страница Animations [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) — пять переходов. Не всё, что показано в демо ниже, уже есть на экранах `Pages`:
+**на экране** — применено в `src/pages`; **в компоненте** — компонент умеет, но экраны статичны и переход не запускают;
+**демо** — только в истории Storybook, на экран ещё не перенесено.
+
+| Переход | Figma | Сейчас | Что осталось |
+|---|---|---|---|
+| Таб-бар → FAB | [`458:1256`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1256) → [`458:1342`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1342) | на экране: `BottomNav fab` на Гардеробе и Вишлисте | вкладки на экранах не переключаются |
+| Сворачивание фото | [`354:17405`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17405) → [`354:17449`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17449) | на экране: `DetailsScreen` — детали вещи и образа, новая вещь; переход по порогу 24 pt | в демо фото ведётся скроллом (`usePhotoCollapse`), на экране — переход по порогу |
+| Смена образа | [`354:17678`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17678) → [`354:17767`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17767) | в компоненте: `OutfitPager` (`useSwipePager`) | Главная пока статична — `OutfitPager` на неё не поставлен |
+| Штамп «Надеть» | [`354:17504`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17504) → [`354:17591`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17591) | в компоненте: `Stamp done`, слот `stamp` у `OutfitPager` и `DetailsScreen` | на экранах штамп без `onClick` / `done` |
+| Листание образов и поводов | [`798:2215`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2215) → [`798:2274`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2274) → [`799:2433`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=799-2433) | в компоненте: `OutfitPager axis="x"` | экрана «С чем носить» нет |
+
+Механики, которых нет в Animations (шторка, шапка при скролле, snackbar, холст, профиль, нажатие и выбор), уже на экранах
+или в компонентах; перестановка сетки и push / pop — только демо (правило для натива).
+
 ## Принципы
 
 1. **Движение объясняет, откуда пришло и куда ушло.** Фото сворачивается в шапку, а не исчезает; следующий образ
@@ -50,23 +67,38 @@ import { HapticTable, MechanicsTable, MotionTable } from './blocks';
 ### Штамп «Надеть»
 Фирменная кнопка-звезда поверх коллажа. После нажатия отмечает образ надетым и превращается в «×», чтобы действие
 можно было отменить. Черный малый штамп «Не нравится» (палец вниз, «С чем носить») убирает образ: коллаж уходит влево, следующий приходит справа.
+
+_Figma [`354:17504`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17504) → [`354:17591`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17591). **В компоненте**: `Stamp done`; на экранах штамп пока не нажимается._
+
 <Canvas of={Motion.StampPress} />
 
 ### Главная: смена образа и повод
 Свайп по коллажу вверх — следующий образ вырастает из превью снизу, вниз — предыдущий. Порог 30 % высоты коллажа или бросок быстрее 500 pt/с (хаптика `threshold` при пересечении, `skip` при смене); на первом и последнем образе — сопротивление 0,55. Штамп «Надеть» у каждого образа свой, листать после «Надеть» можно. Касание «на каждый день ⌃» открывает шторку «Повод»: выбор отмечается (`select`), через 150 мс шторка уходит, строка повода меняется, образы — gentle.
+
+_Figma «scale» [`354:17678`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17678) → [`354:17767`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17767). **В компоненте** `OutfitPager` (`useSwipePager`); Главная пока статична._
+
 <Canvas of={Motion.OutfitSwap} />
 
 ### Сворачивание фото
-Скролл деталей вещи: фото уезжает в превью 52 в центре шапки, панель деталей поднимается на его место.
+Скролл деталей вещи: фото уезжает в миниатюру по центру шапки, панель деталей поднимается на его место и наезжает на фото. На экранах миниатюра 48 ([`349:10424`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=349-10424)), в кадре Animations — 52 ([`354:17497`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17497)); целевой размер — 48, как на экранах.
+
+_Figma «new things» [`354:17405`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17405) → [`354:17449`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17449). **На экране**: `DetailsScreen` (детали вещи и образа, новая вещь) — переход по порогу 24 pt; в демо фото ведётся скроллом._
+
 <Canvas of={Motion.PhotoCollapse} />
 
 ### Листание поводов
 Свайп по образу листает поводы; ряд чипсов сдвигается, чтобы активный повод оставался на виду.
+
+_Figma «Stylist / Trips / List» [`798:2215`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2215) → [`798:2274`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2274) → [`799:2433`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=799-2433). **В компоненте** `OutfitPager axis="x"`; экрана «С чем носить» пока нет._
+
 <Canvas of={Motion.OccasionPager} />
 
 ### Таб-бар и FAB
 Пилюля активной вкладки переезжает на пружине quick (хаптика `select`); на вкладке с FAB таб-бар сжимается 353 → 290
 и «+» вырастает справа. Уход «+» быстрее появления: прозрачность и масштаб за `exit`, ширина — на той же пружине.
+
+_Figma «default → things» [`458:1256`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1256) → [`458:1342`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1342). **На экране**: `BottomNav fab` на Гардеробе и Вишлисте._
+
 <Canvas of={Motion.NavFab} />
 
 ## Механики экранов

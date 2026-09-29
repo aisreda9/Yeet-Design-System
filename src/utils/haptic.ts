@@ -1,4 +1,4 @@
-import tokens from '../../tokens/tokens.json';
+import { tokens } from '../tokens/model';
 
 /** События хаптики из tokens.json → motion.haptic (iOS / Android — см. таблицу «Хаптика»). */
 export type HapticEvent = keyof typeof tokens.motion.haptic;

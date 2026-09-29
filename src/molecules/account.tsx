@@ -6,7 +6,8 @@ import { avatarColor, type ItemColor } from '../tokens/tokens';
 /** `color` — из палитры аккаунтов (tokens.avatar.palette); без него цвет выбирается по `id`. */
 export type Account = { id: string; name: string; email: string; initial?: string; photo?: string; color?: ItemColor };
 
-const avatarOf = (a: Account) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color ?? avatarColor(a.id)} alt={a.name} />;
+// Имя написано рядом с аватаром (или в aria-label кнопки), поэтому сам аватар декоративный — без повтора имени
+const avatarOf = (a: Account) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color ?? avatarColor(a.id)} />;
 
 export type AccountCardProps = {
   account: Account;
