@@ -6,7 +6,9 @@
 |---|---|
 | **Storybook** · GitHub Pages | Живые компоненты, правила, «В флоу» — для продукта, разработки и дизайна |
 | **Figma** · YeetStyle 2.0 → «Design System 2.0 (Claude)» | Компоненты и варианты, переменные Yeet DS 2.0 (Light / Dark) |
-| [`DESIGN.md`](./DESIGN.md) | Полная текстовая спецификация |
+| [`DESIGN.md`](./DESIGN.md) | Указатель: что где лежит, ID страниц Figma, таблицы токенов (генерируются) |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Как добавить или изменить компонент, статусы `alpha` / `beta` / `stable`, чек-лист PR |
+| [`design/adr/`](./design/adr/) | Принятые решения (ADR) |
 | [`TEAM.md`](./TEAM.md) | Как параллельные сессии Claude и боты работают вместе: роли, зоны, issues, замок Figma |
 
 ## Структура
@@ -30,7 +32,7 @@ src/
   templates/   Screen — каркас экрана со скроллом под навигацией; Grid, Row — раскладка
   pages/       экраны флоу, собранные только из компонентов (stories)
   motion/      метаданные анимаций и интерактивные демо
-  docs/        страницы документации (MDX), registry.ts — реестр Figma ↔ код
+  docs/        страницы документации (MDX), registry.ts — реестр Figma ↔ код со статусом, status.ts — бейджи
   utils/       cx, plural
 ```
 
