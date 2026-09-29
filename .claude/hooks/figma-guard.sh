@@ -14,8 +14,8 @@ if printf '%s' "$code" | grep -Eq '\.remove\(\)|removeMode\(|deleteVariable|\.de
   reasons+=("удаление или необратимая операция")
 fi
 
-# Original pages of YeetStyle 2.0 (Design System, New app design, Prod, Animations, Archive)
-if printf '%s' "$code" | grep -Eq "551:2286|70:12|'0:1'|\"0:1\"|354:17404|352:12171"; then
+# Original pages of YeetStyle 2.0 (Design System 0.1, Screens Design 0.1, Prod, Animations, Archive)
+if printf '%s' "$code" | grep -Eq "551:2286|1306:22698|'0:1'|\"0:1\"|354:17404|352:12171"; then
   if printf '%s' "$code" | grep -Eq '\.(set|swapComponent|appendChild|insertChild|resize|setProperties|setBoundVariable|setRangeFills|editComponentProperty|renameMode|setValueForMode)\(|\.(characters|fills|strokes|name|visible|description|cornerRadius|opacity)[[:space:]]*=[^=]'; then
     reasons+=("скрипт обращается к оригинальным страницам и что-то меняет")
   fi

@@ -9,7 +9,7 @@ disallowedTools: Edit, Write, NotebookEdit, mcp__Figma__use_figma
 
 ## Источники
 
-- Figma `1LAkot5WySMWhwiiFJqJ0e`: DS 2.0 `942:5666` и коллекция «Yeet DS 2.0» — источник правды; Flow 2.0 `1168:12824` / `1173:7887` — компоненты в экранах; New app design `70:12` — эталон вида; Animations `354:17404`.
+- Figma `1LAkot5WySMWhwiiFJqJ0e`: Design System 0.2 `942:5666` и коллекция «Yeet DS 2.0» — источник правды; Screen Design 2.0 `70:12` (секция `1168:12824`, только светлая тема) — компоненты в экранах; Screens Design 0.1 `1306:22698` (бывшая New app design, ID кадров прежние) — эталон вида; Animations `354:17404`.
 - Код: `src/docs/registry.ts` (`figmaId`), `tokens/tokens.json` (DTCG, `$extensions["com.yeet"].figma`), компоненты `src/{atoms,molecules,organisms,templates}`.
 - Эталоны: `design/figma-specs.json` (размеры, допуск 1 px), `design/figma-flows.json` (якоря и `known`).
 - Уже известное: `design/SHEETS-AUDIT.md`, `design/AUDIT.md`, решения — `design/adr/`, открытые issues. Не дублируй — ссылайся.
