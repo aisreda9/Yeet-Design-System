@@ -36,6 +36,8 @@ const member = (t) => camel(t.path.slice(1).join('-'));
 
 const colorGroups = (v) => v.keys(v.source.color).map((g) => ({ title: v.groupNode(`color.${g}`).$description, tokens: v.list(`color.${g}`) }));
 const brands = (v) => v.keys(v.source.brand).map((id) => ({ id, ...v.x(v.groupNode(`brand.${id}`)).brand, tokens: v.list(`brand.${id}`) }));
+/** Подпись пружины: пресет Figma (`figma`) или пояснение (`note`), если пружина своя. */
+const springNote = (v, t, prefix = 'Figma') => (v.x(t).figma ? `${prefix} ${v.x(t).figma}` : v.x(t).note);
 const fontMeta = (v) => v.list('font').map((t) => ({ key: v.key(t), family: v.orig(t)[0], ...v.x(t), source: t.$description }));
 
 /* ─── CSS ─────────────────────────────────────────────────────────────── */
@@ -212,11 +214,11 @@ export function swift({ dictionary, options }, source) {
   L.push('/// Пружина Figma Smart Animate: та же физика (масса, жёсткость, демпфирование), что в прототипе и в CSS linear().', 'public struct YeetSpring {', '    public let mass: Double', '    public let stiffness: Double', '    public let damping: Double', '    /// Время успокоения, с (для web linear()).', '    public let duration: TimeInterval', '',
     '    public var dampingRatio: Double { damping / (2 * (stiffness * mass).squareRoot()) }', '    public var animation: Animation { .interpolatingSpring(mass: mass, stiffness: stiffness, damping: damping, initialVelocity: 0) }',
     '    /// SwiftUI.Spring с той же физикой (iOS 17+).', '    @available(iOS 17.0, *)', '    public var spring: Spring { Spring(mass: mass, stiffness: stiffness, damping: damping) }', '');
-  for (const t of v.list('motion.spring')) { const s = t.$value; L.push(`    /// Figma ${v.x(t).figma}`, `    public static let ${t.name} = YeetSpring(mass: ${s.mass}, stiffness: ${s.stiffness}, damping: ${s.damping}, duration: ${s.duration})`); }
+  for (const t of v.list('motion.spring')) { const s = t.$value; L.push(`    /// ${springNote(v, t)}`, `    public static let ${t.name} = YeetSpring(mass: ${s.mass}, stiffness: ${s.stiffness}, damping: ${s.damping}, duration: ${s.duration})`); }
   L.push('}', '', 'public enum YeetMotion {');
   for (const t of v.list('motion.transition')) {
     const o = v.orig(t);
-    if (t.$type === 'spring') { const s = v.get(refPath(o)); L.push(`    /// ${t.$description} · Figma Smart Animate ${v.x(s).figma}`, `    public static let ${t.name} = YeetSpring.${s.name}.animation`); }
+    if (t.$type === 'spring') { const s = v.get(refPath(o)); L.push(`    /// ${t.$description} · ${springNote(v, s, 'Figma Smart Animate')}`, `    public static let ${t.name} = YeetSpring.${s.name}.animation`); }
     else { const e = v.get(refPath(o.timingFunction)), d = v.get(refPath(o.duration)); L.push(`    /// ${t.$description}`, `    public static let ${t.name} = Animation.timingCurve(${e.$value}, duration: ${d.$value})`); }
   }
   L.push('}', '', '/// Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации).', 'public enum YeetGesture {');
@@ -317,7 +319,7 @@ export function kotlin({ dictionary }, source) {
   L.push('}', '', '/** Пружины Figma Smart Animate (mass 1): stiffness и доля затухания для spring(). */', 'object YeetSpring {');
   for (const t of v.list('motion.spring')) {
     const o = v.orig(t);
-    L.push(`    /** Figma ${v.x(t).figma}: k ${o.stiffness}, c ${o.damping}, ~${o.duration.value} мс */`, `    const val ${v.key(t)}DampingRatio = ${t.$value.dampingRatio}`, `    const val ${v.key(t)}Stiffness = ${t.$value.stiffness}`);
+    L.push(`    /** ${springNote(v, t)}: k ${o.stiffness}, c ${o.damping}, ~${o.duration.value} мс */`, `    const val ${v.key(t)}DampingRatio = ${t.$value.dampingRatio}`, `    const val ${v.key(t)}Stiffness = ${t.$value.stiffness}`);
   }
   L.push('}', '', 'object YeetMotion {');
   const transitions = v.list('motion.transition');
@@ -327,7 +329,7 @@ export function kotlin({ dictionary }, source) {
     return `tween(durationMillis = ${v.get(refPath(o.duration)).$value}, easing = YeetEasing.${v.get(refPath(o.timingFunction)).name})`;
   };
   for (const t of transitions) {
-    const note = t.$type === 'spring' ? ` · Figma Smart Animate ${v.x(v.get(refPath(v.orig(t)))).figma}` : '';
+    const note = t.$type === 'spring' ? ` · ${springNote(v, v.get(refPath(v.orig(t))), 'Figma Smart Animate')}` : '';
     L.push(`    /** ${t.$description}${note} */`, `    fun <T> ${t.name}(): FiniteAnimationSpec<T> = ${specOf(t)}`);
   }
   L.push('}', '');
