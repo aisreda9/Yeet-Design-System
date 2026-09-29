@@ -139,6 +139,27 @@
       }
     },
     {
+      "figma": "segment-control · Size=M, Fit, Icon (414:1519)",
+      "story": "molecules-segmentcontrol--icons-fit",
+      "selector": ".y-segment--M",
+      "expect": {
+        "width": 136,
+        "height": 48,
+        "paddingLeft": 4,
+        "gap": 4,
+        "borderRadius": 32
+      }
+    },
+    {
+      "figma": "segment-control · M Fit Icon · кнопка 40×40",
+      "story": "molecules-segmentcontrol--icons-fit",
+      "selector": ".y-segment--M > .y-icon-button",
+      "expect": {
+        "width": 40,
+        "height": 40
+      }
+    },
+    {
       "figma": "chip-group",
       "story": "molecules-chipgroup--playground",
       "selector": ".y-chip-group",
