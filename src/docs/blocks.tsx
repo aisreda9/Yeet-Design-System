@@ -246,9 +246,10 @@ export function MotionTable() {
 export function MechanicsTable() {
   return (
     <DocTable
-      head={['Механика', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
+      head={['Механика', 'Где сейчас', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
       rows={mechanics.map((m) => [
         <span style={{ fontWeight: 500 }}>{m.name}<div style={cap}>{m.group} · {m.where}</div></span>,
+        <span>{m.on}{m.hook && <div style={cap}><Code>{m.hook}</Code></div>}</span>,
         m.what,
         <Code>{m.token}</Code>,
         <Muted>{m.duration}</Muted>,
