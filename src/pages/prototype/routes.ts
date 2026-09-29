@@ -22,7 +22,7 @@ export type Nav = {
   scrollTop(): void;
 };
 
-export type Go = ScreenId | ((nav: Nav, el: HTMLElement) => void | Promise<void>);
+export type Go = ScreenId | ((nav: Nav, el: HTMLElement, e?: MouseEvent) => void | Promise<void>);
 
 export type Route = {
   /** CSS-селектор элемента. */
@@ -85,7 +85,7 @@ const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет 
 export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Запуск и онбординг */
   OnboardingWelcome: [btn('Начать бесплатно', 'SignIn')],
-  SignIn: [btn('Войти', 'FirstItemPrompt'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'FirstItemPrompt')],
+  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'FirstItemPrompt'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'FirstItemPrompt')],
   FirstItemPrompt: [btn('Пропустить', (n) => n.root('Today')), { sel: '.y-photo-tile', go: ok('NewItem') }],
   PasswordRecovery: [btn('Отправить код', (n) => n.overlay('PasswordRecoverySent'))],
   PasswordRecoverySent: [btn('Ок!', closeThen((n) => n.back()))],
@@ -187,6 +187,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-field', text: /^Страна/, go: (n) => n.overlay('CountrySheet') },
     { sel: '.y-field', text: /^Валюта/, go: (n) => n.overlay('CurrencySheet') },
     btn('Удалить аккаунт', (n) => n.overlay('DeleteAccount')),
+    // одна строка-абзац с двумя ссылками: верхняя половина — политика, нижняя — условия
+    { sel: '.y-settings-footer p:not(:last-of-type)', go: (n, el, e) => { const r = el.getBoundingClientRect(); return n.push(e && e.clientY > r.top + r.height / 2 ? 'LegalTerms' : 'LegalPrivacy'); } },
     { sel: '.y-list-item', go: (n, el) => n.toast(`${label(el)}: откроется во внешнем приложении`) },
   ],
   CountrySheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Страна изменена')) }],

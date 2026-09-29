@@ -146,12 +146,12 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   }, [commit]);
 
   /** Переход выполняется до конца; нажатия во время анимации не копятся. */
-  const run = useCallback(async (go: Go, target: HTMLElement) => {
+  const run = useCallback(async (go: Go, target: HTMLElement, ev?: MouseEvent) => {
     if (busy.current) return;
     busy.current = true;
     try {
       if (typeof go === 'string') await (screens[go].overlay ? nav.overlay(go) : nav.push(go));
-      else await go(nav, target);
+      else await go(nav, target, ev);
     } finally {
       busy.current = false;
     }
@@ -181,7 +181,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     const hit = resolve(t, 'tap');
     if (!hit) return;
     if (!hit.route.native) { e.preventDefault(); e.stopPropagation(); }
-    void run(hit.route.go, hit.target);
+    void run(hit.route.go, hit.target, e.nativeEvent);
   };
 
   const onKeyDownCapture = (e: React.KeyboardEvent) => {
