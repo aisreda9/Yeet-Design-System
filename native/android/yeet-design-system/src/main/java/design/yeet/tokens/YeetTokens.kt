@@ -302,6 +302,9 @@ object YeetSpring {
     /** Figma Bouncy: k 600, c 15, ~958 мс */
     const val bouncyDampingRatio = 0.3062f
     const val bouncyStiffness = 600f
+    /** Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58): k 300, c 34.641, ~540 мс */
+    const val criticalDampingRatio = 1f
+    const val criticalStiffness = 300f
 }
 
 object YeetMotion {
@@ -331,6 +334,8 @@ object YeetMotion {
     fun <T> appear(): FiniteAnimationSpec<T> = tween(durationMillis = 240, easing = YeetEasing.standard)
     /** Исчезновение: быстрее появления, чтобы не мешать */
     fun <T> exit(): FiniteAnimationSpec<T> = tween(durationMillis = 150, easing = YeetEasing.standard)
+    /** Шторка: появление и возврат после смахивания, без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58) */
+    fun <T> sheet(): FiniteAnimationSpec<T> = spring(dampingRatio = YeetSpring.criticalDampingRatio, stiffness = YeetSpring.criticalStiffness)
 }
 
 /**
@@ -365,6 +370,8 @@ class YeetMotionScheme(val reduced: Boolean = false) {
     fun <T> appear(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.appear()
     /** Исчезновение: быстрее появления, чтобы не мешать */
     fun <T> exit(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.exit()
+    /** Шторка: появление и возврат после смахивания, без перелёта */
+    fun <T> sheet(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.sheet()
     val liftScale: Float get() = if (reduced) 1f else YeetGesture.liftScale
     val targetScale: Float get() = if (reduced) 1f else YeetGesture.targetScale
 }

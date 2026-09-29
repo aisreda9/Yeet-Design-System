@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Токены слоя
 
 /// Геометрия и движение шторки по «Единому правилу шторки» (`design/SHEETS-AUDIT.md`) и решениям владельца в #58.
-/// Значения — из сгенерированных токенов; локальна только пружина, пока в токенах нет `motion.spring.critical`.
+/// Значения — из сгенерированных токенов; пружина шторки — `YeetMotion.sheet` (`motion.spring.critical`).
 enum YeetOverlayToken {
     /// Все четыре угла шторки и диалога — 48: концентрично углу экрана 56 при отступе 8 (#58, решение 1).
     static let radius: CGFloat = YeetRadius.overlay
@@ -13,8 +13,6 @@ enum YeetOverlayToken {
     static let topGap: CGFloat = YeetComponent.sheetTopGap
     /// Хэндл 48 × 4 (D8).
     static let handle: Color = YeetComponent.sheetHandle
-    /// Пружина шторки без перелёта (D5): жёсткость quick (300), ζ = 1. TODO(tokens, #92): `motion.spring.critical`.
-    static let spring = Animation.interpolatingSpring(mass: 1, stiffness: 300, damping: 2 * (300.0).squareRoot(), initialVelocity: 0)
     /// Отступ между кнопками футера.
     static let footerGap: CGFloat = 7
 }
@@ -678,7 +676,7 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
     private var animation: Animation {
         if reduceMotion { return YeetMotion.fade }
         if !isPresented { return YeetMotion.exit }
-        return presentation == .dialog ? YeetMotion.appear : YeetOverlayToken.spring
+        return presentation == .dialog ? YeetMotion.appear : YeetMotion.sheet
     }
 
     /// Затемнение гаснет вместе с жестом.
@@ -757,7 +755,7 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
         if dy > threshold || (dy > 0 && velocity > YeetGesture.swipeVelocity) {
             dismiss()
         } else {
-            yeetWithAnimation(YeetOverlayToken.spring, reduceMotion: reduceMotion) { dragOffset = 0 }
+            yeetWithAnimation(YeetMotion.sheet, reduceMotion: reduceMotion) { dragOffset = 0 }
         }
     }
 }
