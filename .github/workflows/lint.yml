@@ -1,0 +1,42 @@
+name: Lint
+
+# ESLint + stylelint: ошибки валят PR, предупреждения — нет (их список по зонам — #59).
+# Prettier — только для новых файлов PR и пока без падения (::warning), см. scripts/format-check.mjs.
+# Отдельный workflow, а не job в qa.yml: qa.yml — зона QA, так меньше пересечений.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # для format-check: новые файлы относительно базы PR
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        env:
+          LEFTHOOK: '0' # хуки в CI не нужны
+      - name: ESLint
+        run: npx eslint .
+      - name: stylelint
+        if: always()
+        run: npx stylelint "**/*.css"
+      - name: Prettier (только новые файлы)
+        if: always() && github.event_name == 'pull_request'
+        run: node scripts/format-check.mjs --base origin/${{ github.base_ref }}
