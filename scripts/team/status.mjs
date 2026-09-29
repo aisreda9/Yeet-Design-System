@@ -70,5 +70,22 @@ for (let i = 0; i < branches.length; i++)
   }
 if (pairs.length) out.push('', 'Ветки, которые конфликтуют между собой (мержить по очереди):', ...pairs);
 
+// Лимиты из team.json: перегруженные зоны и слишком широкие ветки
+const limits = config.limits;
+if (limits) {
+  const all = [...branches, ...(mine.size ? [{ name: `${current} (ты)`, zones: zonesOf([...mine]) }] : [])];
+  const warns = [];
+  for (const z of limits.limitedZones ?? []) {
+    const inZone = all.filter((b) => b.zones.includes(z));
+    if (inZone.length > limits.maxBranchesPerZone)
+      warns.push(`- зона \`${z}\`: ${inZone.length} веток при лимите ${limits.maxBranchesPerZone} (${inZone.map((b) => b.name).join(', ')}) — новую не начинай, встань в очередь в issue`);
+  }
+  for (const b of all) {
+    const zs = b.zones.filter((z) => z !== 'other');
+    if (zs.length > limits.maxZonesPerBranch) warns.push(`- ветка \`${b.name}\` затрагивает ${zs.length} зон (${zs.join(', ')}) при лимите ${limits.maxZonesPerBranch} — разрежь на PR`);
+  }
+  if (warns.length) out.push('', 'Лимиты (TEAM.md §7):', ...warns);
+}
+
 out.push('', 'Правила: TEAM.md. Прежде чем начать — возьми задачу (issue) и не заходи в чужие зоны без договорённости в issue/PR.');
 console.log(out.join('\n'));
