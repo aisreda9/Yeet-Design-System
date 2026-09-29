@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import design.yeet.ds.atoms.AvatarSize
 import design.yeet.ds.atoms.ButtonStyle
 import design.yeet.ds.atoms.ControlSize
 import design.yeet.ds.atoms.ControlSurface
+import design.yeet.ds.atoms.MinTouchTarget
 import design.yeet.ds.atoms.Icon
 import design.yeet.ds.atoms.IconButtonImpl
 import design.yeet.ds.atoms.Text
@@ -87,7 +89,8 @@ fun AccountCard(
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = 72.dp)
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                // кнопки S 40 справа занимают 48 (зона нажатия): поля меньше на 4 — карточка 72 и иконки на местах из макета
+                .padding(start = 20.dp, end = if (kind == AccountCardKind.Other) 20.dp else 16.dp, top = 12.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -98,7 +101,7 @@ fun AccountCard(
             }
             when (kind) {
                 AccountCardKind.Other -> Icon(IconName.ChevronRight)
-                AccountCardKind.Current -> Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                AccountCardKind.Current -> Row(horizontalArrangement = Arrangement.spacedBy((-4).dp)) {
                     IconButtonImpl(IconName.Edit, "Редактировать профиль", { onEdit?.invoke() }, variant = ButtonStyle.Ghost, size = ControlSize.S, iconSize = 24.dp)
                     IconButtonImpl(IconName.Settings, "Настройки", { onSettings?.invoke() }, variant = ButtonStyle.Ghost, size = ControlSize.S, iconSize = 24.dp)
                 }
@@ -135,9 +138,12 @@ fun AvatarStack(
 ) {
     val canvas = YeetTheme.colors.bgCanvas
     val overlap = 8.dp
-    Overlapping(modifier, overlap) {
+    // «+» S 40 стоит в зоне нажатия 48 (по 4 с каждой стороны): нахлёст больше на 4 — видимый нахлёст круга те же 8
+    Overlapping(modifier, overlap + (MinTouchTarget - ControlSize.S.height) / 2) {
         Overlapping(
             Modifier
+                // аватары 40 — зона нажатия 48 по высоте (web: невидимый ::after 44)
+                .minimumInteractiveComponentSize()
                 .clickable(role = Role.Button, enabled = onOpen != null) { onOpen?.invoke() }
                 .semantics { contentDescription = "Аккаунты: ${accounts.joinToString { it.name }}" },
             overlap,

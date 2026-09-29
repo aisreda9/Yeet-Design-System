@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -29,6 +32,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,6 +44,7 @@ import design.yeet.ds.atoms.ControlSize
 import design.yeet.ds.atoms.Icon
 import design.yeet.ds.atoms.IconButton
 import design.yeet.ds.atoms.IconButtonImpl
+import design.yeet.ds.atoms.MinTouchTarget
 import design.yeet.ds.atoms.Text
 import design.yeet.ds.icons.IconName
 import design.yeet.ds.theme.YeetPreviewSurface
@@ -51,7 +56,12 @@ import design.yeet.tokens.inputBg
 
 /* ─── Field ─────────────────────────────────────────────────────────── */
 
-/** Поле ввода внутри [Field] (web: `input` — InputHTMLAttributes). */
+/**
+ * Поле ввода внутри [Field] (web: `input` — InputHTMLAttributes).
+ * @param password пароль (web: `type="password"`): символы скрыты, справа встроенная кнопка-«глаз» «Показать пароль» /
+ * «Скрыть пароль» (переключатель, состояние переживает поворот экрана). Клавиатура — `KeyboardType.Password`, если не задана своя.
+ * Со своим `trailingIcon` / `onTrailingClick` у [Field] глаз не встраивается, скрытие — через [visualTransformation].
+ */
 data class FieldInput(
     val value: String,
     val onValueChange: (String) -> Unit,
@@ -59,6 +69,7 @@ data class FieldInput(
     val keyboardActions: KeyboardActions = KeyboardActions.Default,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
     val enabled: Boolean = true,
+    val password: Boolean = false,
 )
 
 /** Высота строки в группе (Figma input-group · Size): M 48 / L 52 / XL 56. */
@@ -84,6 +95,9 @@ private fun defaultTrailingLabel(icon: IconName): String = when (icon) {
  * @param colorDot свотч цвета вещи перед значением.
  * @param trailingIcon `ChevronUpDown` — выбор, `Eye` — пароль, `ExternalLink` — ссылка.
  * @param trailingLabel описание кнопки справа для TalkBack (по умолчанию — по иконке: «Показать пароль»…).
+ *
+ * Кнопка справа занимает 48 dp ([minimumInteractiveComponentSize]) без сдвига иконки и без роста строки.
+ * Внутри [FormField] имя поля для TalkBack и текст ошибки (`error()` в семантике) берутся у обёртки.
  */
 @Composable
 fun Field(
@@ -101,28 +115,59 @@ fun Field(
     val c = YeetTheme.colors
     val body = YeetTheme.typography.body
     val rowHeight = LocalInputGroupSize.current.rowHeight
-    val valueColor = if (error) c.textDanger else c.textPrimary
+    // внутри FormField: имя поля и текст ошибки приходят от обёртки (web: aria-labelledby / aria-invalid)
+    val form = LocalFormField.current
+    val invalid = error || form?.error != null
+    val errorMessage = form?.error ?: "Ошибка"
+    val a11yLabel = form?.a11yLabel ?: label
+    val valueColor = if (invalid) c.textDanger else c.textPrimary
+    // пароль: «глаз» встроен, если не задана своя кнопка справа (web: type="password" без onTrailingClick)
+    val passwordToggle = input?.password == true && trailingIcon == null && onTrailingClick == null
+    var passwordShown by rememberSaveable { mutableStateOf(false) }
+    val trailingSize = if (trailingIcon == IconName.ChevronUpDown) 20.dp else 24.dp
+    val trailingButton = passwordToggle || (trailingIcon != null && onTrailingClick != null)
+    // кнопка справа занимает 48 (minimumInteractiveComponentSize) — поле справа и промежуток меньше на выступ зоны,
+    // иконка остаётся там же, где в макете (20 от края, 12 от текста)
+    val inset = if (trailingButton) (MinTouchTarget - trailingSize) / 2 else 0.dp
     Row(
         modifier
             .fillMaxWidth()
             .heightIn(min = rowHeight)
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .semantics { if (error) error("Ошибка") }
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .semantics { if (invalid) error(errorMessage) }
+            .padding(start = 20.dp, end = (20.dp - inset).coerceAtLeast(0.dp)),
+        horizontalArrangement = Arrangement.spacedBy((12.dp - inset).coerceAtLeast(0.dp)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        // вертикальные поля — у содержимого, а не у строки: зона 48 кнопки справа не раздвигает строку
+        Row(
+            Modifier.weight(1f).padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             if (input != null) {
+                val transformation = when {
+                    passwordToggle && passwordShown -> VisualTransformation.None
+                    passwordToggle -> PasswordVisualTransformation()
+                    else -> input.visualTransformation
+                }
+                val keyboard = if (input.password && input.keyboardOptions == KeyboardOptions.Default) {
+                    KeyboardOptions(keyboardType = KeyboardType.Password)
+                } else {
+                    input.keyboardOptions
+                }
                 BasicTextField(
                     value = input.value,
                     onValueChange = input.onValueChange,
-                    modifier = Modifier.weight(1f).semantics { contentDescription = label },
+                    modifier = Modifier.weight(1f).semantics {
+                        contentDescription = a11yLabel
+                        if (invalid) error(errorMessage)
+                    },
                     enabled = input.enabled,
                     textStyle = body.merge(TextStyle(color = valueColor)),
-                    keyboardOptions = input.keyboardOptions,
+                    keyboardOptions = keyboard,
                     keyboardActions = input.keyboardActions,
-                    visualTransformation = input.visualTransformation,
+                    visualTransformation = transformation,
                     singleLine = true,
                     cursorBrush = SolidColor(c.accent),
                     decorationBox = { inner ->
@@ -147,19 +192,23 @@ fun Field(
                 }
             }
         }
-        if (trailingIcon != null) {
-            val size = if (trailingIcon == IconName.ChevronUpDown) 20.dp else 24.dp
-            if (onTrailingClick != null) {
-                Box(
-                    Modifier
-                        .size(size)
-                        .clickable(role = Role.Button, onClick = onTrailingClick)
-                        .semantics { contentDescription = trailingLabel ?: defaultTrailingLabel(trailingIcon) },
-                    contentAlignment = Alignment.Center,
-                ) { Icon(trailingIcon, size = size) }
-            } else {
-                Icon(trailingIcon, size = size)
-            }
+        when {
+            passwordToggle -> Box(
+                Modifier
+                    .minimumInteractiveComponentSize()
+                    .toggleable(value = passwordShown, role = Role.Button, onValueChange = { passwordShown = it })
+                    // имя меняется вместе с состоянием, как в вебе (aria-label + aria-pressed)
+                    .semantics { contentDescription = if (passwordShown) "Скрыть пароль" else "Показать пароль" },
+                contentAlignment = Alignment.Center,
+            ) { Icon(if (passwordShown) IconName.EyeOff else IconName.Eye, size = 24.dp) }
+            trailingIcon != null && onTrailingClick != null -> Box(
+                Modifier
+                    .minimumInteractiveComponentSize()
+                    .clickable(role = Role.Button, onClick = onTrailingClick)
+                    .semantics { contentDescription = trailingLabel ?: defaultTrailingLabel(trailingIcon) },
+                contentAlignment = Alignment.Center,
+            ) { Icon(trailingIcon, size = trailingSize) }
+            trailingIcon != null -> Icon(trailingIcon, size = trailingSize)
         }
     }
 }
@@ -238,7 +287,13 @@ fun InputBar(
                 .background(if (chat) c.bgElevated else c.inputBg, shape)
                 .padding(
                     start = if (size == InputBarSize.L && !chat) 16.dp else 20.dp,
-                    end = if (chat) 4.dp else 20.dp,
+                    // зоны нажатия 48 у «Отправить» 44 и «×» 20 выступают за кнопку на 2 и 14 — поле меньше на столько же,
+                    // кнопки остаются на местах из макета (4 и 20 от края)
+                    end = when {
+                        chat -> 2.dp
+                        value.isNotEmpty() -> 6.dp
+                        else -> 20.dp
+                    },
                 ),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -263,6 +318,7 @@ fun InputBar(
             if (value.isNotEmpty() && !chat) {
                 Box(
                     Modifier
+                        .minimumInteractiveComponentSize()
                         .size(20.dp)
                         .clickable(role = Role.Button) { onChange?.invoke("") }
                         .semantics { contentDescription = "Очистить" },
@@ -304,6 +360,8 @@ private fun InputsPreview() = YeetPreviewSurface {
             trailingIcon = if (visible) IconName.EyeOff else IconName.Eye,
             onTrailingClick = { visible = !visible },
         )
+        // встроенный «глаз»: FieldInput(password = true)
+        Field(label = "Новый пароль", input = FieldInput(password, { password = it }, password = true))
     }
     InputGroup(size = InputGroupSize.L) {
         Field(label = "Категория", value = "Верх", trailingIcon = IconName.ChevronUpDown, onClick = {})
