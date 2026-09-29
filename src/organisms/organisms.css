@@ -139,8 +139,8 @@
   overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
 }
 .y-sheet__body::-webkit-scrollbar { display: none; }
-.y-sheet--modal > .y-sheet__title + .y-sheet__body,
-.y-sheet--modal > .y-sheet__head + .y-sheet__body { margin-top: calc(var(--space-8) * -1); }
+/* заголовок → 12 → контент: как прежде, −4 у первого блока контента (тело само стоит на 16) */
+.y-sheet--modal > :is(.y-sheet__title, .y-sheet__head) + .y-sheet__body > :first-child { margin-top: calc(var(--space-4) * -1); }
 .y-overlay > .y-sheet--modal { max-height: 100%; }
 /* Панель деталей (Item / Outfit Details): заголовок H2 → контент 16, → подпись (сезон, цена) 12 */
 .y-sheet--panel { box-shadow: var(--shadow-floating); }
