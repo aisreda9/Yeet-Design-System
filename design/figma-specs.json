@@ -701,6 +701,124 @@
         "width": 337,
         "height": 52
       }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · коллаж 353 в 20 под превью 96",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__look.is-current",
+      "expect": {
+        "width": 353,
+        "height": 353,
+        "top": 116
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · превью предыдущего образа 96",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager--y .y-outfit-pager__look.is-prev",
+      "expect": {
+        "width": 96,
+        "height": 96,
+        "top": 0
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · штамп 148 у правого нижнего угла коллажа",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__stamp",
+      "expect": {
+        "width": 148,
+        "height": 148,
+        "left": 185,
+        "top": 280
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · погода над левым верхним углом коллажа",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__weather",
+      "expect": {
+        "left": 20,
+        "top": -43
+      }
+    },
+    {
+      "figma": "Stylist / Outfit of the Day 798:1741 · превью 150, коллаж в 20 под ним",
+      "story": "organisms-outfitpager--in-flow-surprise",
+      "selector": ".y-outfit-pager--preview-150 .y-outfit-pager__look.is-current",
+      "expect": {
+        "width": 353,
+        "top": 170
+      }
+    },
+    {
+      "figma": "Stylist / Trips / List 463:1534 · «Не нравится» 64 у левого нижнего угла",
+      "story": "organisms-outfitpager--in-flow-trips",
+      "selector": ".y-outfit-pager--x .y-outfit-pager__skip",
+      "expect": {
+        "width": 64,
+        "height": 64,
+        "left": 20,
+        "top": 321
+      }
+    },
+    {
+      "figma": "Settings / Currency 513:6256 · описание 12 под заголовком",
+      "story": "organisms-sheet--description",
+      "selector": ".y-sheet__description",
+      "expect": {
+        "fontSize": 14,
+        "lineHeight": 20,
+        "marginTop": -4
+      }
+    },
+    {
+      "figma": "Settings / Currency 513:6256 · список 20 под описанием",
+      "story": "organisms-sheet--description",
+      "selector": ".y-sheet__description + *",
+      "expect": {
+        "marginTop": 4
+      }
+    },
+    {
+      "figma": "Outfit Creation / Item Selection 414:1459 · карточка 173 × 172 по центру ряда 393",
+      "story": "organisms-itemslots--playground",
+      "selector": ".y-item-slot__item.is-current",
+      "expect": {
+        "width": 173,
+        "height": 172,
+        "left": 110
+      }
+    },
+    {
+      "figma": "Outfit Creation / Item Selection 414:1459 · «+» кнопка L 52",
+      "story": "organisms-itemslots--playground",
+      "selector": ".y-item-slot__add .y-icon-button",
+      "expect": {
+        "width": 52,
+        "height": 52
+      }
+    },
+    {
+      "figma": "Search / Photo / Crop 261:1590 · рамка 353 × 226, 20 от края, верх 315",
+      "story": "organisms-cropframe--in-flow",
+      "selector": ".y-crop__frame",
+      "expect": {
+        "width": 353,
+        "height": 226,
+        "left": 20,
+        "top": 315,
+        "borderRadius": 20
+      }
+    },
+    {
+      "figma": "Stylist / Assistant 413:846 · аватар стилиста 64",
+      "story": "organisms-chatbubble--with-avatar",
+      "selector": ".y-stylist-face",
+      "expect": {
+        "width": 64,
+        "height": 64
+      }
     }
   ]
 }

@@ -268,3 +268,12 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 .y-avatar-stack__item::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--color-bg-canvas); pointer-events: none; z-index: 1; } /* Figma: кольцо 2 внутри аватара 40 */
 .y-avatar-stack__item + .y-avatar-stack__item, .y-avatar-stack__people + .y-avatar-stack__item { margin-left: -8px; }
 .y-avatar-stack__item > .y-avatar { display: flex; }
+
+/* Зона нажатия чипсов ≥ 44 (hit-slop — atoms.css): лента с прокруткой режет ::after по вертикали — запас 2 сверху и снизу без сдвига раскладки
+   (margin-top ленты задают соседи, поэтому вверх — через top, а не отрицательный margin).
+   Стопка аккаунтов: аватары и «+» внахлёст −8, поэтому зоны растут наружу — аватары влево, «+» вправо.
+   Сегмент: иконки стоят через 4 — вбок зона растёт не дальше половины зазора, соседние не перекрываются. */
+.y-chip-group--scroll { position: relative; top: -2px; padding-block: 2px; margin-bottom: -4px; } /* +4 по высоте гасит margin-bottom, сдвиг содержимого — top */
+.y-avatar-stack__people::after { left: min(0px, calc(100% - 44px)); right: 0; }
+.y-avatar-stack__people + .y-icon-button::after { left: 0; right: min(0px, calc(100% - 44px)); }
+.y-segment > :is(.y-button, .y-icon-button)::after { left: max(-2px, min(0px, calc((100% - 44px) / 2))); right: max(-2px, min(0px, calc((100% - 44px) / 2))); }

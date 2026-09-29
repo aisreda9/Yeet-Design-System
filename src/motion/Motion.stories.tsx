@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
 import { Carousel, ChipGroup, List, ListGroup, ListItem } from '../molecules';
 import { BottomNav, ItemCard, OutfitCollage, Overlay, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
-import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
+import { motionMs } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
 import { LeavingContext, usePresence } from '../utils/usePresence';
 import { DragGrid } from './DragGrid';
 import { CanvasDemo, FeedbackDemo, HapticChip, HeaderScrollDemo, PageStackDemo, ProfileDemo, SelectDemo, SheetDemo } from './Mechanics';
-import { curves, sample } from './motion';
+import { curves, sample, usePhotoCollapse, useSwipePager } from '.';
 import './motion.css';
 
 const meta = {
@@ -106,40 +106,12 @@ function TodayDemo() {
   const [i, setI] = useState(0);
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [sheet, setSheet] = useState(false);
-  const [drag, setDrag] = useState<number | null>(null);
-  const g = useRef<{ y: number; crossed: boolean } | null>(null);
-  const speed = useRef(velocityTracker());
   // у каждого повода свой порядок образов
   const order = looks.map((_, k) => (k + occ) % looks.length);
   const n = order.length;
   const id = `${occ}-${i}`;
-
-  const down = (e: PointerEvent) => {
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    g.current = { y: e.clientY, crossed: false };
-    speed.current.reset();
-    speed.current.add(e.clientX, e.clientY, e.timeStamp);
-  };
-  const move = (e: PointerEvent) => {
-    if (!g.current) return;
-    speed.current.add(e.clientX, e.clientY, e.timeStamp);
-    const dy = e.clientY - g.current.y;
-    if (drag === null && Math.abs(dy) < gesture.slop) return;
-    const edge = (dy < 0 && i === n - 1) || (dy > 0 && i === 0);
-    const crossed = !edge && Math.abs(dy) > LOOK * gesture.swipeDistance;
-    if (crossed && !g.current.crossed) haptic('threshold'); // один раз при пересечении порога
-    g.current.crossed = crossed;
-    setDrag(edge ? rubberBand(dy, LOOK) : dy); // на первом и последнем образе — сопротивление
-  };
-  const up = (e: PointerEvent) => {
-    if (!g.current) return;
-    const dy = e.clientY - g.current.y, v = speed.current.get().y;
-    g.current = null;
-    setDrag(null); // стопка отпускается из текущего положения на пружине gentle
-    const target = i + (dy < 0 ? 1 : -1);
-    const flick = Math.abs(v) > gesture.swipeVelocity && Math.abs(dy) > gesture.slop && Math.sign(v) === Math.sign(dy);
-    if ((Math.abs(dy) > LOOK * gesture.swipeDistance || flick) && target >= 0 && target < n) { setI(target); haptic('skip'); }
-  };
+  // вертикальный свайп по стопке: порог и резинка от высоты коллажа, при смене — хаптика skip
+  const { drag, dragging, bind } = useSwipePager({ axis: 'y', count: n, index: i, onChange: setI, size: LOOK });
   const pick = (k: number) => {
     setOcc(k); setI(0);
     window.setTimeout(() => setSheet(false), motionMs('--motion-select')); // выбор успевает отрисоваться, потом шторка уходит
@@ -166,9 +138,9 @@ function TodayDemo() {
       </div>
       <div
         className="y-swap y-swap--drag"
-        data-dragging={drag !== null || undefined}
+        data-dragging={dragging || undefined}
         style={{ ['--drag' as string]: `${drag ?? 0}px`, ['--turn' as string]: `${i * 180}deg` }}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+        {...bind}
         role="group" aria-label="Образы: свайп вверх — следующий, вниз — предыдущий"
       >
         {order.map((look, k) => (
@@ -194,7 +166,8 @@ export const OutfitSwap: Story = { name: 'Главная: смена образ�
 /* ─── Сворачивание фото ─────────────────────────────────────────────── */
 
 function CollapseDemo() {
-  const [collapsed, setCollapsed] = useState(false);
+  const scroll = useRef<HTMLDivElement>(null);
+  const { collapsed } = usePhotoCollapse(scroll, { threshold: 24 });
   return (
     <div className={`y-motion-phone y-collapse ${collapsed ? 'is-collapsed' : ''}`}>
       <StatusBar />
@@ -205,7 +178,7 @@ function CollapseDemo() {
       <div className="y-collapse__photo" aria-hidden>
         <OutfitCollage items={[{ kind: 'container', x: 50, y: 50, size: 180, color: 'black' }]} />
       </div>
-      <div className="y-collapse__scroll" onScroll={(e) => setCollapsed(e.currentTarget.scrollTop > 24)}>
+      <div ref={scroll} className="y-collapse__scroll">
         <div className="y-collapse__panel">
           <h2 className="y-h2">Сумка</h2>
           <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p>
@@ -252,47 +225,16 @@ const occasions = ['Офис', 'На каждый день', 'Свидание',
 
 function PagerDemo() {
   const [i, setI] = useState(1);
-  const [drag, setDrag] = useState<number | null>(null);
-  const g = useRef<{ x: number; y: number; crossed: boolean; axis?: 'x' | 'y' } | null>(null);
-  const speed = useRef(velocityTracker());
   const PAGE = 353 + 20;
   const last = occasions.length - 1;
   const go = (k: number) => { if (k !== i) haptic('select'); setI(Math.min(last, Math.max(0, k))); };
-  const down = (e: PointerEvent) => {
-    g.current = { x: e.clientX, y: e.clientY, crossed: false };
-    speed.current.reset();
-    speed.current.add(e.clientX, e.clientY, e.timeStamp);
-  };
-  const move = (e: PointerEvent) => {
-    const s = g.current;
-    if (!s) return;
-    speed.current.add(e.clientX, e.clientY, e.timeStamp);
-    const dx = e.clientX - s.x, dy = e.clientY - s.y;
-    if (!s.axis) {
-      if (Math.hypot(dx, dy) < gesture.slop) return;
-      s.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; // вертикальный жест — скролл страницы, не листание
-      if (s.axis === 'x') (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    }
-    if (s.axis !== 'x') return;
-    const edge = (dx > 0 && i === 0) || (dx < 0 && i === last);
-    const crossed = !edge && Math.abs(dx) > 353 * gesture.swipeDistance;
-    if (crossed && !s.crossed) haptic('threshold');
-    s.crossed = crossed;
-    setDrag(edge ? rubberBand(dx, 353) : dx);
-  };
-  const up = (e: PointerEvent) => {
-    const s = g.current;
-    g.current = null;
-    setDrag(null);
-    if (!s || s.axis !== 'x') return;
-    const dx = e.clientX - s.x, v = speed.current.get().x;
-    if (Math.abs(dx) > 353 * gesture.swipeDistance || (Math.abs(v) > gesture.swipeVelocity && Math.sign(v) === Math.sign(dx))) go(i + (dx < 0 ? 1 : -1));
-  };
+  // горизонтальная лента: вертикальный жест остаётся скроллу; хаптику смены даёт go (select), как у чипсов
+  const { drag, bind } = useSwipePager({ axis: 'x', count: occasions.length, index: i, onChange: go, size: 353, changeHaptic: false });
   const track: CSSProperties = { transform: `translateX(${-i * PAGE + (drag ?? 0)}px)`, transition: drag === null ? undefined : 'none' };
   return (
     <div className="y-motion-phone">
       <StatusBar />
-      <div className="y-pager" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+      <div className="y-pager" {...bind}>
         <div className="y-pager__track" style={track}>
           {occasions.map((o, k) => (
             <div key={o} className="y-pager__page"><OutfitCollage items={looks[k % looks.length]} /></div>
