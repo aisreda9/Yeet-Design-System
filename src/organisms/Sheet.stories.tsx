@@ -7,7 +7,7 @@ import { onOverlay, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 import { ChipGroup, InputBar, List, ListItem, PhotoTile } from '../molecules';
 import { Grid, Screen } from '../templates';
 import { ItemCard } from '.';
-import { Flag } from '../atoms';
+import { Flag, type FlagCode } from '../atoms';
 
 type Args = { title: string; description: string; type: 'modal' | 'panel'; footer: boolean; handle: boolean; content: 'actions' | 'chips' | 'photo' };
 
@@ -129,6 +129,84 @@ export const Keyboard: Story = {
       await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
       await expect(opener).toHaveFocus();
       await expect(canvasElement.querySelector('.y-screen__content')).toHaveProperty('inert', false);
+    });
+  },
+};
+
+const countries: [string, string, FlagCode?][] = [['ru', 'Россия', 'ru'], ['by', 'Беларусь', 'by'], ['kz', 'Казахстан', 'kz'], ['ge', 'Грузия', 'ge'], ['am', 'Армения', 'am'], ['az', 'Азербайджан'], ['uz', 'Узбекистан'], ['kg', 'Киргизия'], ['rs', 'Сербия'], ['me', 'Черногория'], ['tr', 'Турция', 'tr'], ['cy', 'Кипр'], ['ae', 'ОАЭ'], ['th', 'Таиланд'], ['de', 'Германия', 'de'], ['fr', 'Франция', 'fr'], ['it', 'Италия', 'it'], ['gb', 'Великобритания', 'gb'], ['us', 'США', 'us'], ['jp', 'Япония', 'jp'], ['cn', 'Китай', 'cn']];
+
+function LongDemo() {
+  const [open, setOpen] = useState(true);
+  const [country, setCountry] = useState('ru');
+  return (
+    <Screen
+      header={<Header type="large" title="Настройки" />}
+      overlay={
+        <Overlay open={open} onOpenChange={setOpen}>
+          <Sheet title="Страна" description="Влияет на валюту и размерную сетку." footer={[{ label: 'Сбросить', onClick: () => setCountry('ru') }, { label: 'Сохранить и выйти', onClick: () => setOpen(false) }]}>
+            <ChipGroup chips={[{ label: 'Все', selected: true }, { label: 'СНГ' }, { label: 'Европа' }, { label: 'Азия' }, { label: 'Ближний Восток' }, { label: 'Кавказ' }]} />
+            <List>{countries.map(([code, label, flag]) => <ListItem key={code} type="radio" label={label} checked={country === code} onClick={() => setCountry(code)} trailing={flag && <Flag code={flag} />} />)}</List>
+          </Sheet>
+        </Overlay>
+      }
+    >
+      <Button variant="tertiary" size="S" rightIcon="chevron-up-down" onClick={() => setOpen(true)} aria-haspopup="dialog">Страна</Button>
+    </Screen>
+  );
+}
+
+/** Синтетическое касание: pointerdown → шаги pointermove → pointerup (настоящую прокрутку пальцем проверяет CDP, см. PR #69). */
+async function drag(target: Element, dy: number) {
+  const r = target.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + Math.min(r.height / 2, 40);
+  const at = (type: string, yy: number) => target.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, pointerType: 'touch', isPrimary: true, clientX: x, clientY: yy }));
+  at('pointerdown', y);
+  for (let i = 1; i <= 10; i++) { at('pointermove', y + (dy * i) / 10); await new Promise((f) => setTimeout(f, 16)); }
+  at('pointerup', y + dy);
+}
+
+/** Длинная шторка: шапка и футер закреплены, прокручивается только тело; верх — под статус-баром + 8. */
+export const Long: Story = {
+  name: 'Длинная шторка',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Высокая шторка не выше «экран − статус-бар − 8» (`--sheet-top-gap`). Хэндл, заголовок и футер закреплены и не сжимаются; прокручивается только тело `.y-sheet__body` — пальцем (`touch-action: pan-y`), колесом и клавиатурой, без прокрутки фона (`overscroll-behavior: contain`). Смахнуть шторку можно с шапки и футера, а из тела — только когда оно прокручено к началу и палец идёт вниз. Кнопки футера — равные половины; не влезает подпись — одна под другой (при 320).' } } },
+  render: () => <LongDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const sheet = await canvas.findByRole('dialog', { name: 'Страна' });
+    const body = sheet.querySelector<HTMLElement>('.y-sheet__body')!;
+    await step('Геометрия: верх под статус-баром, ничего не сжато, футер виден', async () => {
+      const screen = canvasElement.querySelector('.y-screen')!.getBoundingClientRect();
+      const r = sheet.getBoundingClientRect();
+      const gap = parseFloat(getComputedStyle(sheet.parentElement!).paddingTop);
+      await expect(Math.round(r.top - screen.top)).toBeGreaterThanOrEqual(Math.round(gap));
+      await expect(sheet.querySelector('.y-sheet__handle')!.getBoundingClientRect().height).toBe(4);
+      await expect(sheet.querySelector('.y-chip-group--scroll')!.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+      const f = sheet.querySelector('.y-sheet__footer')!.getBoundingClientRect();
+      await expect(f.bottom).toBeLessThanOrEqual(r.bottom);
+      await expect(body.scrollHeight).toBeGreaterThan(body.clientHeight);
+    });
+    await step('Тело прокручено: палец вниз не тянет шторку, футер на месте', async () => {
+      const footer = sheet.querySelector('.y-sheet__footer')!.getBoundingClientRect().top;
+      body.scrollTop = 300;
+      await expect(body.scrollTop).toBeGreaterThan(0);
+      await expect(sheet.querySelector('.y-sheet__footer')!.getBoundingClientRect().top).toBe(footer);
+      await drag(body.querySelector('.y-list-item')!, 200);
+      await expect(sheet.style.transform).toBe('');
+      await expect(canvas.getByRole('dialog', { name: 'Страна' })).toBeInTheDocument();
+      body.scrollTop = 0;
+    });
+    await step('Из верха тела палец вверх — прокрутка, не шторка', async () => {
+      await drag(body.querySelector('.y-list-item')!, -150);
+      await expect(sheet.style.transform).toBe('');
+    });
+    await step('Из верха тела палец вниз — смахивание закрывает', async () => {
+      await drag(body.querySelector('.y-list-item')!, sheet.offsetHeight * 0.6);
+      await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+    });
+    await step('Открыть снова', async () => {
+      await userEvent.click(canvas.getByRole('button', { name: 'Страна' }));
+      await canvas.findByRole('dialog', { name: 'Страна' });
     });
   },
 };
