@@ -72,11 +72,28 @@ const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): 
     .filter(([l]) => l !== self)
     .map(([l, id]) => ({ sel: '.y-segment [role=radio]', text: l, go: (n: Nav) => n.swap(id) }));
 
+/** Холст образа: выход и перемешивание с несохранёнными вещами спрашивают подтверждение, чипсы гардероба открывают фильтр. */
+const canvas: Route[] = [
+  btn('Назад', (n) => n.overlay('ExitDialog')),
+  btn('Далее', 'OutfitCriteria'),
+  ...steps('Коллаж'),
+  btn('Перемешать', (n) => n.overlay('ShuffleDialog')),
+  { sel: '.y-sheet--panel .y-chip-group button', go: (n) => n.overlay('ItemFilterSheet') },
+];
+
 /** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. */
 const noResults = /^Белое платье/;
 const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
   { sel: '.y-chip-group button', text: noResults, go: empty },
   { sel: '.y-chip-group button', go: results },
+];
+
+/** Вещь добавлена: в гардероб с подтверждением. */
+const addedItem: Go = async (n) => { await n.root('Wardrobe'); n.toast('Вещь добавлена в гардероб'); };
+/** Редактирование профиля: аватар и год рождения открывают шторки. */
+const profileEdit = (avatarSheet: ScreenId): Route[] => [
+  { sel: '.y-avatar', name: 'Фото профиля', go: (n) => n.overlay(avatarSheet) },
+  { sel: '.y-field', text: /^Год рождения/, go: (n) => n.overlay('BirthYearSheet') },
 ];
 
 const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет в макетах');
@@ -96,17 +113,17 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     openOutfit,
     { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: true }) },
   ],
-  RecommendationsEmpty: [btn('Добавить вещь', 'NewItem')],
+  RecommendationsEmpty: [btn('Добавить вещь', 'NewItemNoPhotoV2')],
 
   /* Гардероб */
   Wardrobe: [...topSeg('items'), ...gridSearch, filters, { sel: '.y-item-card', on: 'long', go: (n) => n.overlay('ItemActions') }, openItem,
-    { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
-  WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
-  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, filters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
+    { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
+  WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
+  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, filters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   OutfitsPopulated: [...topSeg('outfits'), filters, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsEmpty: [...topSeg('outfits'), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsNoFilterResults: [...topSeg('outfits'), filters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
-  Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
+  Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   FilterSheet: [
     btn('Применить', closeThen((n) => { const b = n.below(); if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); })),
     btn('Сбросить', closeThen((n) => { const b = n.below(); if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); })),
@@ -173,8 +190,33 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
 
   /* Создание образа */
   OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), btn('Перемешать', (n) => n.toast('Вещи перемешаны'))],
-  Canvas: [btn('Далее', 'OutfitCriteria'), ...steps('Коллаж'), btn('Перемешать', (n) => n.toast('Вещи перемешаны'))],
+  Canvas: canvas,
+  CanvasDefault: canvas,
+  CanvasHint: canvas,
   OutfitCriteria: [btn('Создать образ', async (n) => { await n.root('OutfitsPopulated'); n.toast('Образ создан'); }), ...steps('Описание')],
+
+
+  /* Новая вещь: без фото → загрузка (сама) → фото добавлено → «Добавить» */
+  NewItemNoPhotoV1: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItemLoadingV1') }],
+  NewItemNoPhotoV2: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItem') }],
+  NewItemPhotoV1: [btn('Добавить', addedItem)],
+  NewItemPhotoV2: [btn('Добавить', addedItem)],
+  NewItemCompletedV1: [btn('Добавить', addedItem)],
+  NewItemCompletedV2: [btn('Добавить', addedItem)],
+
+  /* Создание образа: шторка фильтра и диалоги */
+  ItemFilterSheet: [btn('Закрыть', sheet), btn('Очистить', sheet), btn('Использовать', closeThen((n) => n.toast('Вещи выбраны')))],
+  ShuffleDialog: [btn('Перемешать', closeThen((n) => n.toast('Вещи перемешаны'))), btn('Сохранить и начать', closeThen((n) => n.toast('Образ сохранён')))],
+  ExitDialog: [btn('Выйти', closeThen((n) => n.back())), btn('Сохранить и выйти', closeThen(async (n) => { await n.back(); n.toast('Образ сохранён'); }))],
+  ClearDialog: [btn('Отмена', sheet), btn('Очистить', closeThen((n) => n.toast('Образ очищен')))],
+
+  /* Профиль: редактирование */
+  ProfileEdit: [...profileEdit('AvatarAddSheet')],
+  ProfileEditAvatar: [...profileEdit('AvatarReplaceSheet')],
+  BirthYearSheet: [{ sel: '.y-list-item', go: sheet }],
+  AvatarAddSheet: [{ sel: '.y-photo-tile', go: closeThen((n) => n.swap('ProfileEditAvatar')) }],
+  AvatarReplaceSheet: [{ sel: '.y-photo-tile', go: sheet }, btn('Удалить фотографию', closeThen((n) => n.swap('ProfileEdit')))],
+  SignOutDialog: [btn('Отменить', sheet), btn('Выйти', closeThen(async (n) => { await n.root('OnboardingWelcome'); n.toast('Вы вышли из аккаунта'); }))],
 
   /* Профиль и настройки */
   ProfileAnalytics: [openItem, openOutfit, btn('Настройки', 'Settings', { native: true }), btn('Редактировать профиль', 'ProfileEdit', { native: true }), { sel: '.y-overlay button', text: 'Добавить аккаунт', go: 'SignIn', native: true }],
@@ -187,6 +229,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-field', text: /^Страна/, go: (n) => n.overlay('CountrySheet') },
     { sel: '.y-field', text: /^Валюта/, go: (n) => n.overlay('CurrencySheet') },
     btn('Удалить аккаунт', (n) => n.overlay('DeleteAccount')),
+    btn('Выйти', (n) => n.overlay('SignOutDialog')),
     // одна строка-абзац с двумя ссылками: верхняя половина — политика, нижняя — условия
     { sel: '.y-settings-footer p:not(:last-of-type)', go: (n, el, e) => { const r = el.getBoundingClientRect(); return n.push(e && e.clientY > r.top + r.height / 2 ? 'LegalTerms' : 'LegalPrivacy'); } },
     { sel: '.y-list-item', go: (n, el) => n.toast(`${label(el)}: откроется во внешнем приложении`) },
@@ -212,7 +255,8 @@ export const globalRoutes: Route[] = [
 /** Экран, который сам уходит дальше: сплэш и загрузка фото. */
 export const auto: Partial<Record<ScreenId, { after: number; go: Go }>> = {
   Splash: { after: 1600, go: (n) => n.swap('OnboardingWelcome') },
-  NewItem: { after: 2600, go: async (n) => { await n.swap('WardrobeItemDetails'); n.toast('Вещь добавлена в гардероб'); } },
+  NewItem: { after: 2600, go: (n) => n.swap('NewItemPhotoV2') },
+  NewItemLoadingV1: { after: 2600, go: (n) => n.swap('NewItemPhotoV1') },
 };
 
 /** Первый экран по умолчанию и экран, куда «Назад» ведёт с единственного экрана в стеке. */
