@@ -56,7 +56,7 @@
 | RangeSlider `step`, `format` | — | **оставить** (API для рублей/шага) |
 | Chip `editing`, `colorDot` | Editing есть (`1137:10333`); цвет — во флоу `586:2057` | **оставить** |
 | Hint `default` | Tone=Default есть (`1183:20594`) | **оставить** |
-| Snackbar `autoHide` | — | **оставить**; включить на экране Toast (сейчас только в демо) |
+| Snackbar `autoHide` | — | **оставить**; включить на экране Toast (сейчас — в демо и в прототипе, `Prototype.tsx`) |
 | Dialog default с двумя кнопками | Tone=Default (`962:3136`), во флоу `349:10496`, `517:6986` | **оставить**; экраны «Выйти», «Несохранённые изменения» — §3.2 |
 | Sheet `onClose`, `handle` | Show Handle, Show Close (`962:3095`) | **оставить** |
 | BottomBar `disabled` | — | **оставить** (форма «Новая вещь» до заполнения) |
@@ -218,14 +218,14 @@
 
 | Механика | Figma | Демо (`Motion.stories.tsx`) | На экране `src/pages` |
 |---|---|---|---|
-| Сворачивание фото в миниатюру | «new things» `354:17405 → 354:17449` | `PhotoCollapse` (`.y-collapse`, motion.css:45) | **нет** — ItemDetails/OutfitDetails без морфа |
+| Сворачивание фото в миниатюру | «new things» `354:17405 → 354:17449` | `PhotoCollapse` (`.y-collapse`, motion.css:45) | ✓ `DetailsScreen` (`.y-details[data-collapsed]`, ADR 0004): порог 24 / возврат 8, фото → миниатюра 48; в демо фото ведётся скроллом |
 | Смена образа (стопка, scale) | «scale» `354:17678 → 354:17767` | `OutfitSwap` (TodayDemo) | **нет** — Today статичен; `--motion-swap` только в демо |
 | Штамп «Надеть» → done | «dropdown → active button» `354:17504 → 354:17591` | `StampPress` | **нет** — на Today и OutfitDetails `Stamp` без `onClick`/`done`; компонент умеет |
 | Таб-бар → FAB | «default → things» `458:1256 → 458:1342` | `NavFab` | в компоненте `BottomNav fab` ✓; экраны статичны (вкладки не переключаются) |
 | Листание образов и поводов | «Stylist / Trips / List» `798:2215 → 798:2274 → 799:2433` | `OccasionPager` | **нет** — экрана «С чем носить» нет; `--motion-page` только в демо |
 | Шапка при скролле, липкие фильтры | не нарисовано (решение кода) | `HeaderScroll` | ✓ Header large + Sticky на Гардеробе, Вишлисте |
 | Шторка: появление / уход / смахивание | — | `SheetDismiss` | ✓ в `Overlay`; интерактивно только на Профиле (`onClose` передан 1 из 9 `Overlay` в Pages) |
-| Snackbar, подсказка, загрузка | — | `Feedback` | Snackbar ✓ (Toast, без `autoHide`); LoadingState ✓ (NewItem) |
+| Snackbar, подсказка, загрузка | — | `Feedback` | Snackbar ✓ (`autoHide` в прототипе, `Prototype.tsx`); LoadingState ✓ (NewItem) |
 | Холст: подъём, бросок, щипок | «Gesture Hint» `414:1605` (подсказка) | `CanvasGesture` | ✓ Canvas (`OutfitCanvas`) |
 | Профиль: аккаунты и период | — | `ProfileAccounts` | ✓ Profile* |
 | Сегмент и радио | — | `Selection` | ✓ в компонентах |

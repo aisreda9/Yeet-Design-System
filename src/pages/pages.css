@@ -38,3 +38,13 @@
 .y-sheet--panel.y-profile-panel { gap: var(--space-32); }
 .y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
 .y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */
+
+/* «С чем носить» (463:1534): поводы на 101 ниже ленты — под штампами «Сохранить» и «Не нравится», которые выходят за коллаж */
+.y-occasions { margin-top: 81px; }
+
+/* Search / Photo / Crop: рамка обрезки на всё фото под контентом; жесты доходят до рамки, кнопки остаются нажимаемыми */
+.y-crop-screen .y-crop-layer { position: absolute; inset: 0; }
+.y-crop-screen .y-status-bar,
+.y-crop-screen .y-screen__content { position: relative; z-index: 1; }
+.y-crop-screen .y-screen__content { pointer-events: none; }
+.y-crop-screen .y-screen__content > * { pointer-events: auto; }

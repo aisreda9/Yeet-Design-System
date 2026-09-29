@@ -307,7 +307,7 @@ object YeetSpring {
 object YeetMotion {
     /** Нажатие кнопки, scale 0.97 */
     fun <T> press(): FiniteAnimationSpec<T> = tween(durationMillis = 150, easing = YeetEasing.standard)
-    /** Затухание краёв, тосты */
+    /** Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
     fun <T> fade(): FiniteAnimationSpec<T> = tween(durationMillis = 240, easing = YeetEasing.standard)
     /** Фото сворачивается в шапку при скролле */
     fun <T> collapse(): FiniteAnimationSpec<T> = tween(durationMillis = 300, easing = YeetEasing.out)
@@ -341,7 +341,7 @@ object YeetMotion {
 class YeetMotionScheme(val reduced: Boolean = false) {
     /** Нажатие кнопки, scale 0.97 */
     fun <T> press(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.press()
-    /** Затухание краёв, тосты */
+    /** Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
     fun <T> fade(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.fade()
     /** Фото сворачивается в шапку при скролле */
     fun <T> collapse(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.collapse()
@@ -395,6 +395,8 @@ object YeetGesture {
     const val rubberBand = 0.55f
     /** Время показа snackbar без действия (с действием — 6000) */
     const val snackbarMillis = 4000L
+    /** Время показа snackbar с действием */
+    const val snackbarActionMillis = 6000L
 }
 
 /** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */
