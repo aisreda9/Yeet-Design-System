@@ -82,3 +82,23 @@ export const withWidth = (width: number) => (Story: () => ReactNode) => <div sty
 export const onOverlay = (Story: () => ReactNode) => (
   <div style={{ width: 393, background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
 );
+
+/**
+ * Слот-заглушка для историй Templates: пунктирная рамка с подписью зоны шаблона вместо реального контента.
+ * `height` — высота блока, `square` — квадрат во всю ширину (фото деталей).
+ */
+export function Slot({ label, height = 56, square, style }: { label: string; height?: number; square?: boolean; style?: CSSProperties }) {
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '100%',
+        ...(square ? { aspectRatio: '1 / 1' } : { minHeight: height }),
+        border: '1.5px dashed var(--color-border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-subtle)',
+        color: 'var(--color-text-secondary)', font: '500 13px/18px var(--font-text)', textAlign: 'center', padding: 8,
+        ...style,
+      }}
+    >
+      {label}
+    </div>
+  );
+}
