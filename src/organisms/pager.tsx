@@ -81,6 +81,8 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
   const current = looks[index];
 
   return (
+    // Карусель: стрелки листают образы с фокуса на группе (паттерн ARIA carousel), свайп — pointer
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className={cx('y-outfit-pager', `y-outfit-pager--${axis}`, axis === 'y' && preview === 150 && 'y-outfit-pager--preview-150', className)}
       {...rest}
@@ -97,6 +99,8 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
           {looks.map((look, k) => {
             const hidden = k !== index;
             return (
+              // тап по превью дублирует кнопки «Назад / Дальше» (.y-outfit-pager__nav) и стрелки — клавиатурный путь есть
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
               <div
                 key={look.id}
                 className={cx('y-outfit-pager__look', place(k, index))}

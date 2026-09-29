@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button, Divider, Logo } from '../atoms';
+import { Button, Divider, Link, Logo } from '../atoms';
 import { Field, InputGroup, PhotoTile } from '../molecules';
 import { BottomBar, type CanvasItem, Dialog, Header, OutfitCanvas, Overlay } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
@@ -65,7 +65,7 @@ export const SignIn: Story = {
       </Stack>
       <Divider label="или" />
       <Button variant="secondary" size="L" leftIcon="apple" fullWidth>Войти с Apple</Button>
-      <p className="y-caption y-text--secondary y-legal">Продолжая, вы соглашаетесь <br />с <a href="#">политикой конфиденциальности</a> <br />и <a href="#">условиями использования</a></p>
+      <p className="y-caption y-text--secondary y-legal">Продолжая, вы соглашаетесь <br />с <Link href="#">политикой конфиденциальности</Link> <br />и <Link href="#">условиями использования</Link></p>
     </Screen>
   ),
 };

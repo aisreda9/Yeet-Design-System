@@ -75,13 +75,15 @@ span.y-field__trailing { cursor: inherit; }
   position: relative; flex-shrink: 0; display: flex; gap: var(--space-4); padding: var(--space-4); width: 100%;
   background: var(--color-bg-subtle); border-radius: var(--radius-xl);
 }
-.y-segment--S { height: 40px; } .y-segment--M { height: 48px; } .y-segment--L { height: 52px; } .y-segment--XL { height: 56px; }
+.y-segment--S { --seg-h: 40px; } .y-segment--M { --seg-h: 48px; } .y-segment--L { --seg-h: 52px; } .y-segment--XL { --seg-h: 56px; }
+.y-segment { height: var(--seg-h); }
 .y-segment > .y-button,
 .y-segment > .y-icon-button { position: relative; z-index: 1; flex: 1; width: auto; height: 100%; }
 .y-segment > .y-icon-button:not([aria-checked='true']) { color: var(--color-text-secondary); }
-.y-segment--fit { width: auto; align-self: flex-start; }
+.y-segment--fit { width: fit-content; align-self: flex-start; }
 .y-segment--fit > .y-button { flex: none; }
-.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--button-inverse-bg); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
+.y-segment--fit > .y-icon-button { flex: none; width: calc(var(--seg-h) - 8px); } /* иконка: квадрат height − 8 (M 40), а не 36 */
+.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-canvas); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 
 /* ChipGroup: чипс — Button S, боковой отступ 16; с иконкой справа 16 / 12 и иконка 20 */
 .y-chip-group { display: flex; gap: var(--space-4); align-items: center; }
@@ -97,6 +99,9 @@ span.y-field__trailing { cursor: inherit; }
 /* removable: капсула из двух кнопок — чипс (слева 16, до крестика 8) и «удалить» (иконка 20, справа 12); размеры как у Button S с rightIcon */
 .y-chip__toggle,
 .y-chip__remove { display: inline-flex; align-items: center; align-self: stretch; padding: 0; border: 0; border-radius: var(--radius-xl); background: none; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.y-chip--static,
+.y-chip__toggle:is(span) { cursor: default; }
+.y-chip--static:active { transform: none; }
 .y-chip__toggle { gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-16); }
 .y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
 .y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */

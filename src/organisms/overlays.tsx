@@ -98,6 +98,8 @@ export function Sheet({ title, description, variant, type: legacyType, footer, o
   const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
   const desc = description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>;
   return (
+    // Escape закрывает модальную шторку: слушатель у самого dialog, как в паттерне ARIA
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
       className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)}
       role={modal ? 'dialog' : undefined}
@@ -181,6 +183,8 @@ export function Dialog({ variant, tone: legacyTone, title, description, cancel, 
   const showHandle = handle ?? (DIALOG_HANDLE && !!layer?.dismiss && loose);
   const described = [description && `${id}-text`, children && `${id}-more`].filter(Boolean).join(' ');
   return (
+    // Escape закрывает диалог: слушатель у самого alertdialog, как в паттерне ARIA
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
       className={cx('y-sheet', 'y-sheet--modal', !showHandle && 'y-sheet--no-handle', className)}
       role="alertdialog"
@@ -372,6 +376,8 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
   };
 
   return (
+    // Слой затемнения: жест смахивания (pointer) и Escape для всего слоя; с клавиатуры закрывают Escape и кнопки шторки
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       {...rest}
       ref={(n) => { ref.current = n; setRef(refProp, n); }}
