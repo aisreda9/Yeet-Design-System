@@ -8,6 +8,7 @@
 // Пары не перечисляются руками, а собираются из токенов:
 //   · текст 4.5:1 — каждая пара component `*-fg` × `*-bg` и каждый `text-*` × каждая поверхность;
 //   · не-текст 3:1 (WCAG 1.4.11) — фокус-кольцо, индикаторы выбранного (accent), ошибки (danger) × поверхности.
+//   · декоративный не-текст — в коридоре (хэндл шторки ≈ 1,5:1, D8): заметно, но не громко.
 // Полупрозрачный фон кладётся на каждую поверхность, где компонент может стоять; берётся худший случай.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -44,6 +45,12 @@ const NON_TEXT = [
   { what: 'индикатор выбранного', keys: ['accent'] },
 ];
 // danger не в списке: бейдж и Destructive-кнопка опознаются по тексту (4.5:1 проверен выше), иконки ошибки — text-danger.
+
+/**
+ * Декоративный не-текст: видно, но не громко — контраст в коридоре [min, max], а не «не ниже 3:1».
+ * Хэндл шторки (D8, #58): ≈ 1,5:1 к фону шторки; жест дублируется затемнением, «×» и Escape.
+ */
+const DECOR = [{ what: 'хэндл шторки', fg: 'component.sheet-handle', bg: 'component.sheet-bg', min: 1.4, max: 1.8 }];
 
 /**
  * Известные нарушения базовой темы: [набор, пара] → ссылка. Не валят CI, но печатаются.
@@ -131,6 +138,11 @@ for (const { what, keys } of NON_TEXT) {
   if (key !== keys[0]) nonTextSkipped.push(`${what}: токена \`${keys[0]}\` нет, проверяется \`${key}\``);
   for (const bg of SURFACES) push(key, bg, UI, what);
 }
+for (const d of DECOR) {
+  if (!comp[d.fg.slice(10)] || !comp[d.bg.slice(10)]) throw new Error(`${d.what}: нет ${d.fg} или ${d.bg}`);
+  push(d.fg, d.bg, d.min, d.what);
+  pairs.at(-1).max = d.max;
+}
 
 /* ─── Наборы: база и бренды ─────────────────────────────────────────── */
 const sets = [];
@@ -161,10 +173,10 @@ for (const s of sets) {
       if (!worst || r < worst.r) worst = { r, on: bg.on };
     }
     const name = `${p.fg.replace('component.', '')} / ${p.bg.replace('component.', '')}${worst.on ? ` над ${worst.on}` : ''}`;
-    const ok = worst.r >= p.min;
+    const ok = worst.r >= p.min && (p.max === undefined || worst.r <= p.max);
     const known = KNOWN[`${s.label}|${name}`];
     const level = ok ? 'ok' : known ? 'known' : s.brand && !brandsAreErrors ? 'warn' : 'error';
-    rows.push({ set: s.label, kind: p.kind, pair: name, min: p.min, ratio: worst.r, level, known });
+    rows.push({ set: s.label, kind: p.kind, pair: name, min: p.min, max: p.max, ratio: worst.r, level, known });
   }
 }
 
@@ -185,7 +197,7 @@ if (shown.length) {
   console.log(`${'-'.repeat(w.set)}  ${'-'.repeat(w.kind)}  ${'-'.repeat(w.pair)}  --------  -----  ----`);
   let prev = '';
   for (const r of shown) {
-    console.log(`${(r.set === prev ? '' : r.set).padEnd(w.set)}  ${r.kind.padEnd(w.kind)}  ${r.pair.padEnd(w.pair)}  ${r.ratio.toFixed(2).padStart(8)}  ${`${r.min}:1`.padStart(5)}  ${LABEL[r.level]}${r.known ? ` ${r.known}` : ''}`);
+    console.log(`${(r.set === prev ? '' : r.set).padEnd(w.set)}  ${r.kind.padEnd(w.kind)}  ${r.pair.padEnd(w.pair)}  ${r.ratio.toFixed(2).padStart(8)}  ${(r.max ? `${r.min}–${r.max}` : `${r.min}:1`).padStart(5)}  ${LABEL[r.level]}${r.known ? ` ${r.known}` : ''}`);
     prev = r.set;
   }
   console.log('');

@@ -20,16 +20,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
@@ -75,6 +79,12 @@ data class Segment(val value: String, val label: String? = null, val icon: IconN
 /**
  * Переключатель вкладок: под активным сегментом — пилюля `Inverse`, которая переезжает между пунктами (`nav`, пружина quick).
  * **Контексты:** «Вещи / Образы / Вишлист» в Гардеробе, «Образы · 1 / Вещи» в поездке, режимы создания образа (иконки).
+ *
+ * Для TalkBack — группа (`selectableGroup`) пунктов `Role.Tab` с состоянием «выбрано» (`selectable`).
+ * Зона нажатия — вся высота пункта; отдельный [minimumInteractiveComponentSize] сегментам не нужен: он раздвинул бы
+ * контейнер и пилюлю (у S 40 пункты по 32 — касание рядом Compose доводит до 48 сам, как `::after` в вебе).
+ *
+ * Controlled: выбор снаружи (`value` + `onChange`). Uncontrolled — перегрузка с `defaultValue`.
  *
  * @param fit по ширине содержимого (вложенный переключатель «Вещи / Образы» в Вишлисте).
  */
@@ -145,25 +155,70 @@ fun SegmentControl(
     }
 }
 
+/**
+ * Uncontrolled [SegmentControl] (web: `defaultValue` без `value`, useControllableState): выбор хранится внутри
+ * (`rememberSaveable` — переживает поворот экрана и смерть процесса), о смене сообщает [onChange].
+ *
+ * @param defaultValue начальный сегмент; по умолчанию — первый.
+ */
+@Composable
+fun SegmentControl(
+    segments: List<Segment>,
+    modifier: Modifier = Modifier,
+    defaultValue: String? = null,
+    onChange: ((String) -> Unit)? = null,
+    size: ControlSize = ControlSize.L,
+    fit: Boolean = false,
+) {
+    var current by rememberSaveable { mutableStateOf(defaultValue ?: segments.firstOrNull()?.value.orEmpty()) }
+    SegmentControl(
+        segments = segments,
+        value = current,
+        modifier = modifier,
+        onChange = { v ->
+            current = v
+            onChange?.invoke(v)
+        },
+        size = size,
+        fit = fit,
+    )
+}
+
 /* ─── ChipGroup ─────────────────────────────────────────────────────── */
 
-/** Чипс: не выбран — `Tertiary`, выбран — `Soft`. `removable` — «×» справа, `dropdown` — ⇕ справа. */
+/**
+ * Чипс: не выбран — `Tertiary`, выбран — `Soft`. `removable` — «×» справа, `dropdown` — ⇕ справа.
+ * @param value идентичность чипса для `onToggle` / `onRemove` / выбора; по умолчанию — `label`.
+ */
 data class Chip(
     val label: String,
     val selected: Boolean = false,
     val removable: Boolean = false,
     val colorDot: YeetItemColor? = null,
     val dropdown: Boolean = false,
+    val value: String? = null,
 )
+
+/** Идентичность чипса (web: `chipId`): `value`, иначе `label`. */
+val Chip.id: String get() = value ?: label
 
 /**
  * Группа чипсов на базе `Button S`: не выбран — `Tertiary`, выбран — `Soft`.
  * `wrap` — перенос строк (теги, цвета), иначе горизонтальный скролл (фильтры, поводы) с выходом за поля экрана.
  *
+ * **Выбор** — как в вебе, три способа:
+ * - `chips[].selected` + [onToggle] — состояние снаружи (эта перегрузка);
+ * - `value` + `onValueChange` — controlled-перегрузка, `selected` у чипсов не читается;
+ * - `defaultValue` — uncontrolled-перегрузка: группа хранит выбор сама (`rememberSaveable`).
+ *
+ * Для TalkBack чипс с [onToggle] — переключатель (`toggleable`, `Role.Checkbox`: «отмечено / не отмечено»),
+ * фильтр-дропдаун — кнопка. Чипс 40 занимает в раскладке 48 ([minimumInteractiveComponentSize]), рисуется прежним.
+ *
  * @param center подсказки по центру (Поиск в сторах).
  * @param bleed на сколько лента со скроллом выходит за поля слева и справа (web: −gutter). 0 — без выхода.
+ * @param onRemove «×» у `removable` — отдельная кнопка «Удалить: …» внутри капсулы, приходит `Chip.id`.
+ * Без него, как раньше, нажатие на весь чипс вызывает [onToggle] с подсказкой TalkBack «Удалить».
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChipGroup(
     chips: List<Chip>,
@@ -173,16 +228,134 @@ fun ChipGroup(
     wrap: Boolean = false,
     center: Boolean = false,
     bleed: Dp = YeetSpace.screenGutter,
+    onRemove: ((String) -> Unit)? = null,
+) {
+    ChipGroupLayout(
+        chips = chips,
+        modifier = modifier,
+        isSelected = { it.selected },
+        toggleable = onToggle != null,
+        onChipClick = { chip -> onToggle?.invoke(chip.id) },
+        onRemove = onRemove,
+        onAdd = onAdd,
+        wrap = wrap,
+        center = center,
+        bleed = bleed,
+    )
+}
+
+/**
+ * Controlled-выбор чипсов (web: `value` + `onValueChange`): выбранные — по `Chip.id`, `selected` у чипсов не читается.
+ * @param multiple `false` — одиночный выбор (повод, категория): новый чипс снимает прежний, повторное нажатие — снимает выбор.
+ * @param onToggle дополнительно: нажатый чипс (например, дропдаун, который открывает sheet и не выбирается).
+ */
+@Composable
+fun ChipGroup(
+    chips: List<Chip>,
+    value: List<String>,
+    onValueChange: (List<String>) -> Unit,
+    modifier: Modifier = Modifier,
+    multiple: Boolean = true,
+    onToggle: ((String) -> Unit)? = null,
+    onRemove: ((String) -> Unit)? = null,
+    onAdd: (() -> Unit)? = null,
+    wrap: Boolean = false,
+    center: Boolean = false,
+    bleed: Dp = YeetSpace.screenGutter,
+) {
+    ChipGroupLayout(
+        chips = chips,
+        modifier = modifier,
+        isSelected = { it.id in value },
+        toggleable = true,
+        onChipClick = { chip ->
+            if (!chip.dropdown) onValueChange(toggleChip(value, chip.id, multiple))
+            onToggle?.invoke(chip.id)
+        },
+        onRemove = onRemove,
+        onAdd = onAdd,
+        wrap = wrap,
+        center = center,
+        bleed = bleed,
+    )
+}
+
+/**
+ * Uncontrolled-выбор чипсов (web: `defaultValue`): группа хранит выбор сама (`rememberSaveable`) и сообщает новый
+ * выбор целиком в [onValueChange]. Остальное — как у controlled-перегрузки.
+ */
+@Composable
+fun ChipGroup(
+    chips: List<Chip>,
+    defaultValue: List<String>,
+    modifier: Modifier = Modifier,
+    onValueChange: ((List<String>) -> Unit)? = null,
+    multiple: Boolean = true,
+    onToggle: ((String) -> Unit)? = null,
+    onRemove: ((String) -> Unit)? = null,
+    onAdd: (() -> Unit)? = null,
+    wrap: Boolean = false,
+    center: Boolean = false,
+    bleed: Dp = YeetSpace.screenGutter,
+) {
+    var current by rememberSaveable { mutableStateOf(defaultValue.toList()) }
+    ChipGroup(
+        chips = chips,
+        value = current,
+        onValueChange = { v ->
+            current = v
+            onValueChange?.invoke(v)
+        },
+        modifier = modifier,
+        multiple = multiple,
+        onToggle = onToggle,
+        onRemove = onRemove,
+        onAdd = onAdd,
+        wrap = wrap,
+        center = center,
+        bleed = bleed,
+    )
+}
+
+/** Новый выбор после нажатия на чипс `id` (web: `setValue(cur => …)` в ChipGroup). */
+private fun toggleChip(current: List<String>, id: String, multiple: Boolean): List<String> = when {
+    id in current -> current.filter { it != id }
+    multiple -> current + id
+    else -> listOf(id)
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ChipGroupLayout(
+    chips: List<Chip>,
+    modifier: Modifier,
+    isSelected: (Chip) -> Boolean,
+    toggleable: Boolean,
+    onChipClick: (Chip) -> Unit,
+    onRemove: ((String) -> Unit)?,
+    onAdd: (() -> Unit)?,
+    wrap: Boolean,
+    center: Boolean,
+    bleed: Dp,
 ) {
     val items: @Composable () -> Unit = {
         if (onAdd != null) {
             IconButtonImpl(IconName.Plus, "Добавить", onAdd, variant = ButtonStyle.Primary, size = ControlSize.S, diameter = 36.dp, iconSize = 20.dp)
         }
-        chips.forEach { ChipButton(it, onToggle) }
+        chips.forEach { chip ->
+            ChipButton(
+                chip = chip,
+                selected = isSelected(chip),
+                toggleable = toggleable,
+                onClick = { onChipClick(chip) },
+                onRemove = if (chip.removable && onRemove != null) ({ onRemove(chip.id) }) else null,
+            )
+        }
     }
     val arrangement = if (center) Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally) else Arrangement.spacedBy(4.dp)
     if (wrap) {
-        FlowRow(modifier.fillMaxWidth(), horizontalArrangement = arrangement, verticalArrangement = Arrangement.spacedBy(4.dp)) { items() }
+        // чипсы 40 в зонах нажатия 48: строки без промежутка — между капсулами визуально 8
+        FlowRow(modifier.fillMaxWidth(), horizontalArrangement = arrangement, verticalArrangement = Arrangement.spacedBy(0.dp)) { items() }
     } else {
         Row(
             modifier
@@ -197,26 +370,37 @@ fun ChipGroup(
 }
 
 @Composable
-private fun ChipButton(chip: Chip, onToggle: ((String) -> Unit)?) {
+private fun ChipButton(
+    chip: Chip,
+    selected: Boolean,
+    toggleable: Boolean,
+    onClick: () -> Unit,
+    onRemove: (() -> Unit)?,
+) {
     val c = YeetTheme.colors
     val haptics = YeetTheme.haptics
-    val style = if (chip.selected) ButtonStyle.Soft else ButtonStyle.Tertiary
+    val style = if (selected) ButtonStyle.Soft else ButtonStyle.Tertiary
+    // «×» отдельной кнопкой (onRemove) рисуется в содержимом, а не как rightIcon
     val trailing = when {
-        chip.removable -> IconName.Cross
+        chip.removable && onRemove == null -> IconName.Cross
         chip.dropdown -> IconName.ChevronUpDown
         else -> null
     }
+    // фильтр-дропдаун открывает sheet — это кнопка, а не переключатель
+    val isToggle = toggleable && !chip.dropdown
     ControlSurface(
         onClick = {
             haptics.perform(YeetHapticEvent.Select)
-            onToggle?.invoke(chip.label)
+            onClick()
         },
-        modifier = Modifier,
+        modifier = Modifier.minimumInteractiveComponentSize(),
         shape = RoundedCornerShape(YeetTheme.radius.xl),
         background = style.background(c),
         contentColor = style.content(c),
-        selected = chip.selected,
-        onClickLabel = if (chip.removable) "Удалить" else null,
+        role = if (isToggle) Role.Checkbox else Role.Button,
+        selected = if (isToggle || chip.dropdown) null else selected,
+        toggled = if (isToggle) selected else null,
+        onClickLabel = if (chip.removable && onRemove == null) "Удалить" else null,
     ) {
         ButtonRow(
             size = ControlSize.S,
@@ -224,13 +408,37 @@ private fun ChipButton(chip: Chip, onToggle: ((String) -> Unit)?) {
             leftIcon = null,
             rightIcon = trailing,
             startPadding = 16.dp,
-            endPadding = if (trailing != null) 12.dp else 16.dp,
+            endPadding = when {
+                onRemove != null -> 0.dp
+                trailing != null -> 12.dp
+                else -> 16.dp
+            },
             rightIconSize = 20.dp,
             rightIconTint = if (chip.removable) c.textSecondary else Color.Unspecified,
         ) {
             if (chip.colorDot != null) ColorDot(chip.colorDot)
             Text(chip.label, maxLines = 1)
+            if (onRemove != null) ChipRemoveButton(chip.label, onRemove)
         }
+    }
+}
+
+/**
+ * «×» внутри капсулы чипса — отдельная кнопка «Удалить: …» (web: `y-chip__remove`, зона 40).
+ * Вложенный `clickable` — своя граница слияния семантики: TalkBack фокусирует чипс и «×» по отдельности.
+ */
+@Composable
+private fun ChipRemoveButton(label: String, onRemove: () -> Unit) {
+    Box(
+        Modifier
+            .heightIn(min = ControlSize.S.height)
+            .widthIn(min = ControlSize.S.height)
+            .clickable(role = Role.Button, onClick = onRemove)
+            .semantics { contentDescription = "Удалить: $label" }
+            .padding(end = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(IconName.Cross, size = 20.dp, tint = YeetTheme.colors.textSecondary)
     }
 }
 
@@ -373,6 +581,23 @@ private fun SelectionPreview() = YeetPreviewSurface {
     }
     ChipGroup(chips = chips, onToggle = { l -> chips = chips.map { if (it.label == l) it.copy(selected = !it.selected) else it } })
     ChipGroup(chips = listOf(Chip("базовое", removable = true), Chip("офис", removable = true)), onAdd = {}, wrap = true)
+    // uncontrolled: выбор внутри группы и сегмента, «×» — отдельная кнопка
+    SegmentControl(
+        segments = listOf(Segment("day", "День"), Segment("week", "Неделя"), Segment("month", "Месяц")),
+        defaultValue = "week",
+        size = ControlSize.M,
+    )
+    ChipGroup(
+        chips = listOf(Chip("Работа"), Chip("Прогулка"), Chip("Свидание"), Chip("Спорт")),
+        defaultValue = listOf("Прогулка"),
+        multiple = false,
+    )
+    ChipGroup(
+        chips = listOf(Chip("базовое", removable = true), Chip("офис", removable = true)),
+        defaultValue = listOf("офис"),
+        onRemove = {},
+        wrap = true,
+    )
     var radio by remember { mutableStateOf("1990") }
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ListItem("Создать образ", icon = IconName.Collage, onClick = {})

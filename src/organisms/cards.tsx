@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ComponentPropsWithRef, type ReactNode } from 'react';
 import { Badge, ColorDot, Icon, IconButton, WeatherIcon, type Weather } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
@@ -7,6 +7,7 @@ import { useFitScale } from '../utils/useFitScale';
 import { haptic } from '../utils/haptic';
 import { balanceArt, collageBalance, layoutCollage, measureArt, type ArtContext, type ArtMeta } from '../utils/artBalance';
 import stylistAvatar from './art/stylist-avatar.png';
+import { setRef } from './refs';
 
 /* ─── Cards ─────────────────────────────────────────────────────────── */
 
@@ -46,7 +47,7 @@ export function useArtMetas(list: { src?: string; meta?: ArtMeta }[]): (ArtMeta 
   return list.map((it) => it.meta ?? (it.src ? metaCache.get(it.src) ?? undefined : undefined));
 }
 
-export type ItemArtProps = {
+export type ItemArtProps = Omit<ComponentPropsWithRef<'span'>, 'children' | 'color'> & {
   kind: Garment;
   color?: ItemColor;
   /** Сторона ячейки, px. Фото балансируется внутри неё, иллюстрация рисуется во всю ячейку. */
@@ -61,18 +62,18 @@ export type ItemArtProps = {
 };
 
 /** Вещь: фото без фона (`src`), выровненное по визуальному весу и оптическому центру, или, в Storybook, иллюстрация по категории. */
-export function ItemArt({ kind, color, size = 88, src, meta, context = 'card', alt = '' }: ItemArtProps) {
+export function ItemArt({ kind, color, size = 88, src, meta, context = 'card', alt = '', className, style, ...rest }: ItemArtProps) {
   const [m] = useArtMetas([{ src, meta }]);
   if (src) {
     const p = balanceArt(m, size, kind, context, context === 'collage' ? collageBalance : undefined);
     return (
-      <span className="y-item-art y-item-art--photo" style={{ width: size, height: size }}>
+      <span className={cx('y-item-art', 'y-item-art--photo', className)} style={{ width: size, height: size, ...style }} {...rest}>
         <img className="y-item-art__img" src={src} alt={alt} draggable={false} style={{ width: p.width, height: p.height, left: p.left, top: p.top }} />
       </span>
     );
   }
   return (
-    <span className="y-item-art" style={{ width: size, height: size }}>
+    <span className={cx('y-item-art', className)} style={{ width: size, height: size, ...style }} {...rest}>
       <Icon name={kind} size={size} strokeWidth={Math.max(0.35, (1.3 * 24) / size)} />
       {color && (
         <span className="y-item-art__dot">
@@ -87,7 +88,7 @@ export function ItemArt({ kind, color, size = 88, src, meta, context = 'card', a
  * Карточка вещи 173×172 в сетке 2 колонки. Фото без фона на `--card-bg`.
  * **Контексты:** Гардероб (сетка), результаты поиска (`discount`), создание образа (`selected`).
  */
-export type ItemCardProps = {
+export type ItemCardProps = Omit<ComponentPropsWithRef<'button'>, 'children' | 'onClick' | 'color'> & {
   kind: Garment;
   color?: ItemColor;
   /** Фото вещи без фона. Без него — иллюстрация по `kind`. */
@@ -107,15 +108,19 @@ export type ItemCardProps = {
   onRemove?: () => void;
 };
 
-const kindNames: Record<Garment, string> = { top: 'Верх', bottom: 'Низ', outerwear: 'Верхняя одежда', shoe: 'Обувь', accessories: 'Аксессуары', container: 'Сумка' };
+/** Категория вещи словами — имя для скринридера по умолчанию. */
+export const garmentNames: Record<Garment, string> = { top: 'Верх', bottom: 'Низ', outerwear: 'Верхняя одежда', shoe: 'Обувь', accessories: 'Аксессуары', container: 'Сумка' };
 
-export function ItemCard({ kind, color, image, imageMeta, name, discount, label, selected, onClick, onRemove }: ItemCardProps) {
-  const a11y = [name ?? kindNames[kind], discount && `скидка ${discount}`, label].filter(Boolean).join(', ');
+/**
+ * `ref` и атрибуты — на кнопку карточки; `className` — на корень (обёртку, если есть «×» `onRemove`).
+ */
+export function ItemCard({ kind, color, image, imageMeta, name, discount, label, selected, onClick, onRemove, ref, className, ...rest }: ItemCardProps) {
+  const a11y = [name ?? garmentNames[kind], discount && `скидка ${discount}`, label].filter(Boolean).join(', ');
   // карточка резиновая (ширина колонки), вещь в ней — пропорционально: 88 (фото 138) при ширине 173
-  const ref = useRef<HTMLButtonElement>(null);
-  const k = useFitScale(ref, 173);
+  const box = useRef<HTMLButtonElement | null>(null);
+  const k = useFitScale(box, 173);
   const card = (
-    <button ref={ref} type="button" className={cx('y-item-card', selected && 'y-item-card--selected')} onClick={() => { if (selected !== undefined) haptic('toggle'); onClick?.(); }} aria-pressed={selected} aria-label={a11y}>
+    <button ref={(n) => { box.current = n; setRef(ref, n); }} type="button" className={cx('y-item-card', selected && 'y-item-card--selected', !onRemove && className)} onClick={() => { if (selected !== undefined) haptic('toggle'); onClick?.(); }} aria-pressed={selected} aria-label={a11y} {...rest}>
       <ItemArt kind={kind} color={color} src={image} meta={imageMeta} size={(image ? 173 : 88) * k} />
       {discount && <Badge variant="danger" className="y-item-card__badge">{discount}</Badge>}
       {label && !discount && <Badge variant="secondary" className="y-item-card__badge">{label}</Badge>}
@@ -125,20 +130,22 @@ export function ItemCard({ kind, color, image, imageMeta, name, discount, label,
   if (!onRemove) return card;
   // «×» — отдельная кнопка рядом с карточкой, не внутри неё (вложенные кнопки ломают доступность)
   return (
-    <div className="y-item-card-wrap">
+    <div className={cx('y-item-card-wrap', className)}>
       {card}
       <button type="button" className="y-item-card__remove" aria-label={`Убрать: ${a11y}`} onClick={onRemove}><Icon name="cross" size={20} /></button>
     </div>
   );
 }
 
+export type ProductCardProps = Omit<ComponentPropsWithRef<'article'>, 'children'> & { kind: Garment; image?: string; name: string; price: string; discount?: string; liked?: boolean; showLike?: boolean; onLike?: () => void };
+
 /** Карточка товара в поиске: фото + название, цена, магазин. */
-export function ProductCard({ kind, image, name, price, discount, liked, showLike = true, onLike }: { kind: Garment; image?: string; name: string; price: string; discount?: string; liked?: boolean; showLike?: boolean; onLike?: () => void }) {
+export function ProductCard({ kind, image, name, price, discount, liked, showLike = true, onLike, className, ...rest }: ProductCardProps) {
   // сердце подпрыгивает только от нажатия «лайк», а не при загрузке уже лайкнутого товара
   const [pop, setPop] = useState(false);
   const like = () => { haptic('toggle'); setPop(!liked); onLike?.(); };
   return (
-    <article className="y-product-card">
+    <article className={cx('y-product-card', className)} {...rest}>
       <div style={{ position: 'relative' }}>
         <ItemCard kind={kind} image={image} name={name} discount={discount} />
         {showLike && (
@@ -167,9 +174,11 @@ const isPlaced = (items: CollageItem[] | AutoCollageItem[]): items is CollageIte
  * слой растягивается по контейнеру и масштабирует вещи.
  * Вещи с x, y — ручная раскладка (центр в %); без них — автораскладка с равными зазорами между силуэтами (`pad` — поля под бейдж и панель).
  */
-export function CollageLayer({ items, defaultSize = 96, base = 353, pad }: { items: CollageItem[] | AutoCollageItem[]; defaultSize?: number; base?: number; pad?: number | [number, number, number, number] }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const k = useFitScale(ref, base);
+export type CollageLayerProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & { items: CollageItem[] | AutoCollageItem[]; defaultSize?: number; base?: number; pad?: number | [number, number, number, number] };
+
+export function CollageLayer({ items, defaultSize = 96, base = 353, pad, ref, className, ...rest }: CollageLayerProps) {
+  const box = useRef<HTMLSpanElement | null>(null);
+  const k = useFitScale(box, base);
   const metas = useArtMetas(items);
   const placed: CollageItem[] = isPlaced(items)
     ? items
@@ -178,7 +187,7 @@ export function CollageLayer({ items, defaultSize = 96, base = 353, pad }: { ite
         return items.map((it, i) => ({ ...it, ...slots[i] }));
       })();
   return (
-    <span ref={ref} className="y-collage__layer">
+    <span ref={(n) => { box.current = n; setRef(ref, n); }} className={cx('y-collage__layer', className)} {...rest}>
       {placed.map((it, i) => (
         <span key={i} className="y-collage__item" style={{ left: `${it.x}%`, top: `${it.y}%` }}>
           <ItemArt kind={it.kind} color={it.color} src={it.src} meta={metas[i]} context="collage" size={(it.size ?? defaultSize) * k} />
@@ -192,11 +201,13 @@ export function CollageLayer({ items, defaultSize = 96, base = 353, pad }: { ite
  * Коллаж образа: вещи на точечном фоне, повод-бейдж и панель снизу.
  * `plain` — без точек, просто карточка light-grey (Figma: outfit-collage · Pattern=None): одна вещь в «Лучшей инвестиции» профиля.
  */
-export function OutfitCollage({ items, label, footer, plain }: { items: CollageItem[] | AutoCollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. Паддинг 16/20, 8 от краёв. */ footer?: ReactNode; plain?: boolean }) {
+export type OutfitCollageProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { items: CollageItem[] | AutoCollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. Паддинг 16/20, 8 от краёв. */ footer?: ReactNode; plain?: boolean };
+
+export function OutfitCollage({ items, label, footer, plain, className, ...rest }: OutfitCollageProps) {
   // автораскладка обходит бейдж повода (20 + 28 + 12) и панель цены (8 + 72 + 12)
   const pad: [number, number, number, number] = [label ? 60 : 24, 24, footer ? 92 : 24, 24];
   return (
-    <div className={cx('y-collage', plain && 'y-collage--plain')}>
+    <div className={cx('y-collage', plain && 'y-collage--plain', className)} {...rest}>
       {label && <Badge variant="secondary" className="y-collage__label">{label}</Badge>}
       {footer && <div className="y-collage__footer">{footer}</div>}
       <CollageLayer items={items} pad={pad} />
@@ -205,9 +216,11 @@ export function OutfitCollage({ items, label, footer, plain }: { items: CollageI
 }
 
 /** Область фото 353×353. Пусто — «+» Primary (иконка on-accent) и «Добавить фотографию» в две строки; с фото — вещь и «×» 24 серым в 20 от угла. */
-export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: { kind?: Garment; /** Фото вещи после удаления фона. */ image?: string; loading?: boolean; onAdd?: () => void; onRemove?: () => void; children?: ReactNode }) {
+export type PhotoAreaProps = ComponentPropsWithRef<'div'> & { kind?: Garment; /** Фото вещи после удаления фона. */ image?: string; loading?: boolean; onAdd?: () => void; onRemove?: () => void };
+
+export function PhotoArea({ kind, image, loading, onAdd, onRemove, children, className, ...rest }: PhotoAreaProps) {
   return (
-    <div className={cx('y-photo-area', loading && 'is-loading')} aria-busy={loading || undefined}>
+    <div className={cx('y-photo-area', loading && 'is-loading', className)} aria-busy={loading || undefined} {...rest}>
       {children ??
         (kind || image ? (
           <>
@@ -226,9 +239,11 @@ export function PhotoArea({ kind, image, loading, onAdd, onRemove, children }: {
 }
 
 /** Карточка погоды на экране «Сегодня»: температура + описание. Плавающая, инвертированная. */
-export function WeatherCard({ temperature, description, weather = 'sunny', icon, alert, tilt }: { temperature: string; description: string; /** Цветная иконка погоды (как во флоу). */ weather?: Weather; /** Линейная иконка вместо цветной. */ icon?: IconName; /** Предупреждение второй строкой: «Через 1 час дождь, захвати зонт». */ alert?: string; /** Наклон 10° поверх коллажа (экран «Образы дня»). */ tilt?: boolean }) {
+export type WeatherCardProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { temperature: string; description: string; /** Цветная иконка погоды (как во флоу). */ weather?: Weather; /** Линейная иконка вместо цветной. */ icon?: IconName; /** Предупреждение второй строкой: «Через 1 час дождь, захвати зонт». */ alert?: string; /** Наклон 10° поверх коллажа (экран «Образы дня»). */ tilt?: boolean };
+
+export function WeatherCard({ temperature, description, weather = 'sunny', icon, alert, tilt, className, ...rest }: WeatherCardProps) {
   return (
-    <div className={cx('y-weather', tilt && 'y-weather--tilt')}>
+    <div className={cx('y-weather', tilt && 'y-weather--tilt', className)} {...rest}>
       <span className="y-weather__temp">{icon ? <Icon name={icon} /> : <WeatherIcon kind={weather} />}{temperature}</span>
       <span className="y-caption y-weather__desc">{description}{alert && <span className="y-weather__alert">{alert}</span>}</span>
     </div>
@@ -237,15 +252,20 @@ export function WeatherCard({ temperature, description, weather = 'sunny', icon,
 
 /** Сообщение в чате со стилистом. `from="user"` — сообщение пользователя (blue, справа). Figma: chat-bubble · From. */
 /** Аватар ИИ-стилиста 64: иллюстрация из флоу Stylist (`413:846`, `699:2858`). Декоративный — имя стилиста уже в тексте. */
-export function StylistAvatar({ size = 64 }: { size?: number }) {
-  return <img className="y-stylist-face" src={stylistAvatar} width={size} height={size} alt="" draggable={false} />;
+export type StylistAvatarProps = Omit<ComponentPropsWithRef<'img'>, 'src' | 'width' | 'height'> & { /** Сторона в px. */ size?: number };
+
+export function StylistAvatar({ size = 64, className, ...rest }: StylistAvatarProps) {
+  return <img className={cx('y-stylist-face', className)} src={stylistAvatar} width={size} height={size} alt="" draggable={false} {...rest} />;
 }
 
-export function ChatBubble({ from = 'stylist', avatar, children }: { from?: 'stylist' | 'user'; /** Аватар 64 слева, выровнен по низу (флоу Stylist / Home). `true` — аватар стилиста по умолчанию (`StylistAvatar`). */ avatar?: ReactNode | true; children: ReactNode }) {
-  const bubble = <div className={cx('y-bubble', 'y-body', from === 'user' && 'y-bubble--own')}>{children}</div>;
+export type ChatBubbleProps = ComponentPropsWithRef<'div'> & { from?: 'stylist' | 'user'; /** Аватар 64 слева, выровнен по низу (флоу Stylist / Home). `true` — аватар стилиста по умолчанию (`StylistAvatar`). */ avatar?: ReactNode | true; children: ReactNode };
+
+/** `ref`, `className` и атрибуты — на корень: пузырь или ряд с аватаром. */
+export function ChatBubble({ from = 'stylist', avatar, children, className, ...rest }: ChatBubbleProps) {
+  const bubble = <div className={cx('y-bubble', 'y-body', from === 'user' && 'y-bubble--own', !avatar && className)} {...(avatar ? {} : rest)}>{children}</div>;
   if (!avatar) return bubble;
   return (
-    <div className="y-bubble-row">
+    <div className={cx('y-bubble-row', className)} {...rest}>
       <span className="y-bubble-row__avatar" aria-hidden>{avatar === true ? <StylistAvatar /> : avatar}</span>
       {bubble}
     </div>

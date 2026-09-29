@@ -6,7 +6,7 @@ import { tokens as tokenSource } from '../tokens/model';
 import { registry, type Level, type Status } from './registry';
 import { statusMeta } from './status';
 import { mechanics, motions } from '../motion/motion';
-import '../tokens/tokens.css';
+import '../styles.css';
 
 const mono: CSSProperties = { font: '400 12px/16px ui-monospace, SFMono-Regular, Menlo, monospace' };
 const cap: CSSProperties = { font: '400 12px/16px var(--font-text)', color: '#6E6E6E' };

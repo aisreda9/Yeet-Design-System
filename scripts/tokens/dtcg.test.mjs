@@ -67,3 +67,9 @@ test('неизвестная тема в modes — ошибка', () => {
   t.color.surface['bg-canvas'].$extensions['com.yeet'].modes.sepia = '{primitive.neutral-0}';
   expectError(t, /modes\.sepia: нет такой темы/);
 });
+
+test('after — ссылка на dimension-токен', () => {
+  const t = fresh();
+  t.component['sheet-top-gap'].$extensions['com.yeet'].after = '{color.surface.bg-canvas}';
+  expectError(t, /sheet-top-gap \(after\): ссылка \{color\.surface\.bg-canvas\}: тип color, ожидается dimension/);
+});
