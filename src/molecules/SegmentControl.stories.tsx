@@ -39,6 +39,17 @@ export const Sizes: Story = {
   ),
 };
 
+export const IconsFit: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Иконки, fit',
+  tags: ['bare'],
+  render: () => (
+    <Matrix rows={['S', 'M', 'L', 'XL']} cols={['Fit']} render={(s) => (
+      <SegmentControl size={s as never} fit value="a" segments={[{ value: 'a', icon: 'wardrobe', ariaLabel: 'Гардероб' }, { value: 'b', icon: 'collage', ariaLabel: 'Коллаж' }, { value: 'c', icon: 'info', ariaLabel: 'Описание' }]} />
+    )} />
+  ),
+};
+
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
   name: 'В флоу',

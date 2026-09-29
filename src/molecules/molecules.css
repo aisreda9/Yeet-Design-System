@@ -3,11 +3,11 @@
 /* Field (Figma: input + input-value) */
 .y-field {
   display: flex; align-items: center; gap: var(--space-12);
-  min-height: 56px; padding: var(--space-12) var(--space-20);
-  position: relative; font: var(--font-weight-body) 14px/20px var(--font-text); color: var(--color-text-primary);
+  min-height: var(--size-control-xl); padding: var(--space-12) var(--space-20);
+  position: relative; font: var(--typography-body); color: var(--color-text-primary);
 }
-.y-input-group--M .y-field { min-height: 48px; }
-.y-input-group--L .y-field { min-height: 52px; }
+.y-input-group--M .y-field { min-height: var(--size-control-m); }
+.y-input-group--L .y-field { min-height: var(--size-control-l); }
 .y-field__label { color: var(--color-text-secondary); flex: none; }
 .y-field__main { flex: 1; display: flex; align-items: center; gap: var(--space-12); min-width: 0; }
 .y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); min-width: 0; } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 20 */
@@ -20,22 +20,23 @@
 .y-field--error .y-field__input,
 .y-field--error .y-field__value { color: var(--color-text-danger); }
 .y-field__trailing { display: inline-flex; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
-button.y-field__trailing { flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -12px; } /* зона нажатия 44, отрицательные поля сохраняют вид 20 */
+button.y-field__trailing { flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -12px; } /* зона нажатия 44, отрицательные поля сохраняют вид 20 */ /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG), токена нет */
 span.y-field__trailing { cursor: inherit; }
+.y-field + .y-field::before {
+  content: ''; position: absolute; top: 0; left: var(--space-16); right: var(--space-16); height: var(--border-width-thin); background: var(--color-divider);
+}
 /* Фокус (WCAG 2.4.7): кольцо 1.5 акцентом по строке, как у InputBar · State=Focus; без фокуса вид прежний */
 .y-field[role='button'] { cursor: pointer; }
 .y-field[role='button']:focus-visible,
-.y-field:has(.y-field__input:focus-visible) { outline: 0; border-radius: var(--radius-lg); box-shadow: inset 0 0 0 1.5px var(--color-text-accent); } /* text-accent: ≥ 4.5 : 1 к input-bg во всех брендах (accent у lime/butter — 1.4 : 1) */
+.y-field:has(.y-field__input:focus-visible) { outline: 0; border-radius: var(--radius-lg); box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-text-accent); } /* text-accent: ≥ 4.5 : 1 к input-bg во всех брендах (accent у lime/butter — 1.4 : 1) */
 .y-field:is([role='button']:focus-visible, :has(.y-field__input:focus-visible))::before,
 .y-field:is([role='button']:focus-visible, :has(.y-field__input:focus-visible)) + .y-field::before { opacity: 0; } /* линия-разделитель не режет кольцо */
 .y-field__trailing:focus-visible { outline: 2px solid var(--color-text-accent); outline-offset: -8px; border-radius: var(--radius-full); }
 /* Multiline (Figma: input · Multiline): 104, текст сверху, паддинг 16/20 — «Комментарий» */
+/* stylelint-disable-next-line unit-disallowed-list -- высота Multiline 104 из Figma, токена нет */
 .y-field--multiline { align-items: stretch; height: 104px; padding: var(--space-16) var(--space-20); }
 .y-field--multiline .y-field__input { resize: none; height: 100%; }
-.y-input-group--M .y-field--multiline, .y-input-group--L .y-field--multiline { min-height: 104px; }
-.y-field + .y-field::before {
-  content: ''; position: absolute; top: 0; left: var(--space-16); right: var(--space-16); height: 1px; background: var(--color-divider);
-}
+.y-input-group--M .y-field--multiline, .y-input-group--L .y-field--multiline { min-height: 104px; } /* stylelint-disable-line unit-disallowed-list -- 104 — см. выше */
 
 /* InputGroup */
 .y-input-group { background: var(--input-bg); border-radius: var(--radius-lg); overflow: hidden; width: 100%; }
@@ -43,64 +44,76 @@ span.y-field__trailing { cursor: inherit; }
 /* InputBar: [кнопка] поле [кнопка]. Поле 48 (в шапке), L — 52 (на экране), чат — 52 на подложке с тенью */
 .y-input-bar { display: flex; align-items: center; gap: var(--space-8); width: 100%; }
 .y-input-bar__field {
-  flex: 1; display: flex; align-items: center; gap: var(--space-8); height: 48px; padding: 0 var(--space-20); /* флоу: иконка 24 + 8 до текста */
+  flex: 1; display: flex; align-items: center; gap: var(--space-8); height: var(--size-control-m); padding: 0 var(--space-20); /* флоу: иконка 24 + 8 до текста */
   background: var(--input-bg); border-radius: var(--radius-xl); min-width: 0; color: var(--color-text-primary);
 }
-.y-input-bar__field > .y-icon:first-child { color: var(--color-text-secondary); }
-.y-input-bar__field .y-field__input { font: var(--font-weight-body) 14px/20px var(--font-text); min-width: 0; text-overflow: ellipsis; } /* длинный запрос — «…», как в макете */
+.y-input-bar__field .y-field__input { font: var(--typography-body); min-width: 0; text-overflow: ellipsis; } /* длинный запрос — «…», как в макете */
 /* Очистка «×» 20 серым; зона нажатия 44, отрицательные поля сохраняют вид */
 .y-input-bar__clear {
-  flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -12px;
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -12px; /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG), токена нет */
   padding: 0; border: 0; background: none; color: var(--color-text-secondary); cursor: pointer;
 }
 /* Focus (Figma: input-bar · State=Focus): обводка 1.5 акцентом внутри поля (text-accent — виден во всех брендах) */
-.y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-text-accent); }
-.y-input-bar--chat .y-input-bar__field:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-text-accent), var(--shadow-floating); }
+.y-input-bar__field:focus-within { box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-text-accent); }
 .y-input-bar__clear:focus-visible { outline: 2px solid var(--color-text-accent); outline-offset: -8px; border-radius: var(--radius-full); }
 /* Превью фото справа (поиск по фото): круг 48 (L — 52) с картинкой на light-grey */
 .y-input-bar__photo {
-  flex: none; width: 48px; height: 48px; padding: 0; border: 0; border-radius: var(--radius-full); overflow: hidden;
+  flex: none; width: var(--size-control-m); height: var(--size-control-m); padding: 0; border: 0; border-radius: var(--radius-full); overflow: hidden;
   background: var(--color-bg-subtle); cursor: pointer; transition: transform var(--motion-press); -webkit-tap-highlight-color: transparent;
 }
-.y-input-bar__photo--l { width: 52px; height: 52px; }
+.y-input-bar__photo--l { width: var(--size-control-l); height: var(--size-control-l); }
 .y-input-bar__photo:active { transform: scale(var(--gesture-press-scale)); }
 .y-input-bar__photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.y-input-bar--l .y-input-bar__field { height: 52px; padding-left: var(--space-16); }
-.y-input-bar--chat .y-input-bar__field { height: 52px; padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
-.y-input-bar--chat .y-input-bar__send { width: 44px; height: 44px; margin-left: auto; }
+.y-input-bar--l .y-input-bar__field { height: var(--size-control-l); padding-left: var(--space-16); }
+.y-input-bar--chat .y-input-bar__field { height: var(--size-control-l); padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
+.y-input-bar--chat .y-input-bar__send { width: 44px; height: 44px; margin-left: auto; } /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG) */
+.y-input-bar--chat .y-input-bar__field:focus-within { box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-text-accent), var(--shadow-floating); }
+
 .y-input-bar--chat .y-input-bar__send:disabled { opacity: 1; color: var(--color-text-secondary); }
 
 /* SegmentControl: пилюля активного сегмента (inverse) переезжает между пунктами */
 .y-segment {
   position: relative; flex-shrink: 0; display: flex; gap: var(--space-4); padding: var(--space-4); width: 100%;
-  background: var(--color-bg-subtle); border-radius: var(--radius-xl);
+  background: var(--color-bg-subtle); border-radius: var(--radius-xl); height: var(--seg-h);
 }
-.y-segment--S { height: 40px; } .y-segment--M { height: 48px; } .y-segment--L { height: 52px; } .y-segment--XL { height: 56px; }
+.y-segment--S { --seg-h: var(--size-control-s); } .y-segment--M { --seg-h: var(--size-control-m); } .y-segment--L { --seg-h: var(--size-control-l); } .y-segment--XL { --seg-h: var(--size-control-xl); }
 .y-segment > .y-button,
 .y-segment > .y-icon-button { position: relative; z-index: 1; flex: 1; width: auto; height: 100%; }
-.y-segment > .y-icon-button:not([aria-checked='true']) { color: var(--color-text-secondary); }
-.y-segment--fit { width: auto; align-self: flex-start; }
+.y-segment--fit { width: fit-content; align-self: flex-start; }
 .y-segment--fit > .y-button { flex: none; }
-.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--button-inverse-bg); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
+.y-segment--fit > .y-icon-button { flex: none; width: calc(var(--seg-h) - var(--space-8)); } /* иконка: квадрат height − 8 (M 40), а не 36 */
+.y-segment > .y-icon-button:not([aria-checked='true']) { color: var(--color-text-secondary); }
+.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-canvas); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
+
+/* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
+.y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; } /* stylelint-disable-line unit-disallowed-list -- ширина текста 353 из Figma */
+.y-empty > .y-button { margin-top: var(--space-16); }
 
 /* ChipGroup: чипс — Button S, боковой отступ 16; с иконкой справа 16 / 12 и иконка 20 */
 .y-chip-group { display: flex; gap: var(--space-4); align-items: center; }
 .y-chip-group--wrap { flex-wrap: wrap; }
 .y-chip-group--center { justify-content: center; }
-.y-chip-group--scroll { overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--screen-gutter)); padding: 0 var(--screen-gutter); }
+.y-chip-group--scroll {
+  overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--screen-gutter)); padding: 0 var(--screen-gutter);
+  /* Зона нажатия чипсов ≥ 44 (hit-slop — atoms.css): лента с прокруткой режет ::after по вертикали — запас 2 сверху и снизу без сдвига раскладки
+     (margin-top ленты задают соседи, поэтому вверх — через top, а не отрицательный margin). +4 по высоте гасит margin-bottom, сдвиг содержимого — top */
+  position: relative; top: calc(-1 * var(--space-2)); padding-block: var(--space-2); margin-bottom: calc(-1 * var(--space-4));
+}
 .y-chip-group--scroll::-webkit-scrollbar { display: none; } /* выход за край = --screen-gutter: это и поля экрана, и поля Sheet, поэтому в шторке лента упирается в её край */
 .y-row > .y-chip-group--scroll { flex: 1; min-width: 0; margin-left: 0; padding-left: 0; } /* в ряду с кнопками выход за край только справа */
 .y-chip-group > .y-button:not(.y-chip--trailing) { padding: 0 var(--space-16); }
 .y-chip-group > .y-chip--trailing { padding: 0 var(--space-12) 0 var(--space-16); }
-.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; }
 .y-chip-group > .y-chip--removable { padding: 0; gap: 0; }
 /* removable: капсула из двух кнопок — чипс (слева 16, до крестика 8) и «удалить» (иконка 20, справа 12); размеры как у Button S с rightIcon */
 .y-chip__toggle,
 .y-chip__remove { display: inline-flex; align-items: center; align-self: stretch; padding: 0; border: 0; border-radius: var(--radius-xl); background: none; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .y-chip__toggle { gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-16); }
+.y-chip--static,
+.y-chip__toggle:is(span) { cursor: default; }
+.y-chip--static:active { transform: none; }
 .y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
 .y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */
-.y-chip__remove > .y-icon { width: 20px; height: 20px; }
+.y-chip__remove > .y-icon { width: 20px; height: 20px; } /* stylelint-disable-line unit-disallowed-list -- иконка 20 */
 /* Chip · State=Editing: поле по ширине текста внутри капсулы S, плейсхолдер серым, каретка акцентом */
 .y-chip--editing { padding: 0 var(--space-16); cursor: text; }
 .y-chip--editing:active { transform: none; }
@@ -110,42 +123,41 @@ span.y-field__trailing { cursor: inherit; }
 }
 .y-chip__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .y-chip--editing:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; } /* «+» перед тегами */
+.y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; } /* «+» перед тегами */ /* stylelint-disable-line unit-disallowed-list -- 36 из Figma, токена нет */
 
 /* ListItem & List */
 .y-list { display: flex; flex-direction: column; gap: var(--space-20); }
 .y-list-item {
-  display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 24px;
+  display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 24px; /* stylelint-disable-line unit-disallowed-list -- строка не ниже иконки 24 */
   background: none; border: 0; padding: 0; text-align: left; cursor: pointer;
-  font: var(--font-weight-body) 14px/20px var(--font-text); color: var(--color-text-primary);
+  font: var(--typography-body); color: var(--color-text-primary);
 }
 div.y-list-item { cursor: default; }
 .y-list-item__label { flex: 1; }
 .y-list-item__trailing { flex: none; color: var(--color-text-secondary); white-space: nowrap; } /* текстовый trailing: «₽ · RUB» */
 .y-radio {
-  width: 24px; height: 24px; border-radius: var(--radius-full); flex: none;
+  width: 24px; height: 24px; border-radius: var(--radius-full); flex: none; /* stylelint-disable-line unit-disallowed-list -- радио 24 из Figma */
   display: inline-flex; align-items: center; justify-content: center; background: var(--color-bg-subtle);
+  transition: background-color var(--motion-select), color var(--motion-select);
 }
 .y-radio--on { background: var(--color-accent); color: var(--color-text-on-accent); } /* флоу: синий круг с галочкой, не точка */
-.y-radio { transition: background-color var(--motion-select), color var(--motion-select); }
-/* Строка в шторке (без карточки): нажатие — лёгкое затухание, без сжатия и без смены фона (фона у строки нет) */
-.y-list > button.y-list-item { transition: opacity var(--motion-press); -webkit-tap-highlight-color: transparent; }
-.y-list > button.y-list-item:active { opacity: 0.64; }
 
 /* ListGroup — строки на карточке. Figma Settings: разделитель с отступом 16, иконки справа 20, одиночная строка — капсула 52 / r32 */
 .y-list-group { flex: none; width: 100%; display: flex; flex-direction: column; background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden; }
 .y-list-group:has(> .y-list-item:only-child) { border-radius: var(--radius-xl); }
-.y-list-group > .y-list-item { position: relative; min-height: 56px; padding: var(--space-16) var(--space-20); }
-.y-list-group > .y-list-item:only-child { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
-.y-list-group > .y-list-item + .y-list-item::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px; background: var(--color-divider); }
-.y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; }
+.y-list-group > .y-list-item { position: relative; min-height: var(--size-control-xl); padding: var(--space-16) var(--space-20); }
+.y-list-group > .y-list-item:only-child { min-height: var(--size-control-l); padding-top: 14px; padding-bottom: 14px; } /* stylelint-disable-line unit-disallowed-list -- 14 = (52 − 24) / 2, токена нет */
+.y-list-group > .y-list-item + .y-list-item::before { content: ''; position: absolute; top: 0; left: var(--space-16); right: var(--space-16); height: var(--border-width-thin); background: var(--color-divider); }
 /* Строка не сжимается при нажатии — подсвечивается фоном */
 .y-list-group > button.y-list-item { transition: background-color var(--motion-select); }
+/* Строка в шторке (без карточки): нажатие — лёгкое затухание, без сжатия и без смены фона (фона у строки нет) */
+.y-list > button.y-list-item { transition: opacity var(--motion-press); -webkit-tap-highlight-color: transparent; }
 .y-list-group > button.y-list-item:active { background-color: var(--color-border-subtle); }
+.y-list > button.y-list-item:active { opacity: 0.64; }
 
 /* StatTile */
 .y-stat { flex: 1; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-16) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); }
-.y-stat--L { min-height: 88px; } /* Figma stat-tile · Size=L: 16 + Caption 16 + 4 + H1 36 + 16 */
+.y-stat--L { min-height: 88px; } /* stylelint-disable-line unit-disallowed-list -- 88 из Figma */ /* Figma stat-tile · Size=L: 16 + Caption 16 + 4 + H1 36 + 16 */
 .y-stat__row { display: flex; gap: var(--space-8); width: 100%; }
 
 /* Note (Figma: note): текст Body на light-grey — 20 со всех сторон, радиус 20, по ширине контейнера */
@@ -153,50 +165,44 @@ div.y-list-item { cursor: default; }
 
 /* Hint: Body 14 + иконка 16; On Photo — без подложки, белым поверх фото */
 .y-hint {
-  display: inline-flex; align-items: center; gap: 6px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
+  display: inline-flex; align-items: center; gap: 6px; /* stylelint-disable-line unit-disallowed-list -- зазор 6 из Figma, токена нет */ padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   background: var(--color-bg-elevated); color: var(--color-text-primary); border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-floating); font: var(--font-weight-body) 14px/20px var(--font-text);
+  box-shadow: var(--shadow-floating); font: var(--typography-body);
   transition: translate var(--motion-appear), opacity var(--motion-appear);
 }
-@starting-style { .y-hint { translate: 0 8px; opacity: 0; } } /* появление: прозрачность + сдвиг 8 pt */
+@starting-style { .y-hint { translate: 0 var(--space-8); opacity: 0; } } /* появление: прозрачность + сдвиг 8 pt */
 .y-hint--on-photo { padding: 0; background: none; box-shadow: none; border-radius: 0; color: var(--color-text-on-photo); }
 
 /* Snackbar: флоу — 52, радиус 12; появление снизу */
 .y-snackbar {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
-  width: 100%; height: 52px; padding: 0 var(--space-20); border-radius: var(--radius-sm);
-  background: var(--color-bg-inverse); color: var(--color-text-inverse); font: var(--font-weight-body) 14px/20px var(--font-text);
+  width: 100%; height: var(--size-control-l); padding: 0 var(--space-20); border-radius: var(--radius-sm);
+  background: var(--color-bg-inverse); color: var(--color-text-inverse); font: var(--typography-body);
   transition: translate var(--motion-appear), opacity var(--motion-appear);
 }
-@starting-style { .y-snackbar { translate: 0 16px; opacity: 0; } }
+@starting-style { .y-snackbar { translate: 0 var(--space-16); opacity: 0; } }
 /* уход быстрее появления и короче по пути: 8 pt вниз за 150 мс */
-.y-snackbar.is-leaving { translate: 0 8px; opacity: 0; pointer-events: none; transition: translate var(--motion-exit), opacity var(--motion-exit); }
-.y-snackbar--S { height: 48px; padding: 0 var(--space-16); } /* подсказка на холсте: 313 × 48, паддинг 16, радиус 12 */
+.y-snackbar.is-leaving { translate: 0 var(--space-8); opacity: 0; pointer-events: none; transition: translate var(--motion-exit), opacity var(--motion-exit); }
+.y-snackbar--S { height: var(--size-control-m); padding: 0 var(--space-16); } /* подсказка на холсте: 313 × 48, паддинг 16, радиус 12 */
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
 
-/* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
-.y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; }
-.y-empty > .y-button { margin-top: var(--space-16); }
-
 /* LoadingState */
-.y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--font-weight-body) 14px/20px var(--font-text); }
-.y-loading .y-icon { width: 24px; height: 24px; color: var(--color-text-primary); animation: y-spin 1.2s linear infinite; }
+.y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--typography-body); animation: y-loading-in var(--motion-appear) 120ms backwards; } /* подпись — через 120 мс, без мигания на быстрых операциях */
+.y-loading .y-icon { width: 24px; height: 24px; /* stylelint-disable-line unit-disallowed-list -- иконка 24 */ color: var(--color-text-primary); animation: y-spin 1.2s linear infinite; }
 @keyframes y-spin { to { transform: rotate(360deg); } }
 /* Меньше движения: вместо вращения — медленная пульсация прозрачности (загрузка всё равно видна) */
 @media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
 @keyframes y-pulse { to { opacity: 0.4; } }
-/* Появление подписи загрузки — без мигания на быстрых операциях: показываем через 120 мс */
-.y-loading { animation: y-loading-in var(--motion-appear) 120ms backwards; }
 @keyframes y-loading-in { from { opacity: 0; } }
 
 /* PhotoTile: строго квадрат 173, как в Figma, даже с подписью в две строки */
 .y-photo-tile {
-  flex: 1; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 22px; /* Figma: art 63 → 22 → подпись */
-  padding: 28px var(--space-20) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); border: 0; cursor: pointer;
+  flex: 1; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 22px; /* Figma: art 63 → 22 → подпись */ /* stylelint-disable-line unit-disallowed-list -- 22 из Figma, токена нет */
+  padding: var(--space-28) var(--space-20) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); border: 0; cursor: pointer;
   min-height: 0; overflow: hidden;
-  color: var(--color-text-primary); font: var(--font-weight-body) 14px/20px var(--font-text); text-align: center;
+  color: var(--color-text-primary); font: var(--typography-body); text-align: center;
 }
-.y-photo-tile__art { position: relative; flex: none; width: 63px; height: 63px; }
+.y-photo-tile__art { position: relative; flex: none; width: 63px; height: 63px; } /* stylelint-disable-line unit-disallowed-list -- арт 63 из Figma */
 .y-photo-tile__art > img { position: absolute; max-width: none; pointer-events: none; }
 
 /* Carousel: лента выходит за поля экрана (bleed) */
@@ -212,21 +218,24 @@ div.y-list-item { cursor: default; }
 .y-carousel__track > * { scroll-snap-align: start; }
 
 /* BarChart */
-.y-bar-chart { flex: none; display: flex; align-items: center; gap: 7px; width: 100%; }
+.y-bar-chart { flex: none; display: flex; align-items: center; gap: 7px; width: 100%; } /* stylelint-disable-line unit-disallowed-list -- зазор 7 из Figma */
 .y-bar-chart__bar {
   flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; gap: var(--space-4);
-  padding: var(--space-4); background: var(--card-bg); border-radius: 24px;
+  padding: var(--space-4); background: var(--card-bg); border-radius: 24px; /* stylelint-disable-line unit-disallowed-list -- радиус 24 из Figma, токена нет */
 }
+/* stylelint-disable unit-disallowed-list -- высота 44 из Figma */
 .y-bar-chart__cap { height: 44px; display: grid; place-items: center; background: var(--color-bg-elevated); border-radius: var(--radius-full); color: var(--color-text-primary); }
-.y-bar-chart__value { height: 44px; display: grid; place-items: center; font: var(--font-weight-h2) 24px/28px var(--font-display); letter-spacing: -0.4px; color: var(--color-text-primary); }
+.y-bar-chart__value { height: 44px; display: grid; place-items: center; font: var(--typography-h2); letter-spacing: var(--typography-h2-letter-spacing); color: var(--color-text-primary); }
+/* stylelint-enable unit-disallowed-list */
 
 /* UsageMeter */
 .y-usage-meter { flex: none; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-16) var(--space-20) var(--space-20); background: var(--card-bg); border-radius: var(--radius-lg); }
-.y-usage-meter__dots { display: grid; grid-template-columns: repeat(30, 1fr); gap: 4px; align-content: center; height: 48px; margin-top: var(--space-12); } /* флоу: поле точек 48, карточка 156 */
+.y-usage-meter__dots { display: grid; grid-template-columns: repeat(30, 1fr); gap: var(--space-4); align-content: center; height: 48px; margin-top: var(--space-12); } /* stylelint-disable-line unit-disallowed-list -- поле точек 48 */ /* флоу: поле точек 48, карточка 156 */
 .y-usage-meter__dots span { aspect-ratio: 1; border-radius: 50%; background: var(--color-border-subtle); }
 .y-usage-meter__dots span.is-on { background: var(--color-accent); }
 
 /* RangeSlider */
+/* stylelint-disable unit-disallowed-list -- геометрия из Figma: ползунок 24, гистограмма 64, линия 1; токенов нет */
 .y-range { position: relative; width: 100%; display: flex; flex-direction: column; gap: var(--space-8); }
 .y-range__hist { width: 100%; height: 64px; display: block; margin-bottom: -12px; }
 .y-range__hist-all { fill: var(--color-bg-subtle); }
@@ -243,37 +252,38 @@ div.y-list-item { cursor: default; }
 }
 .y-range__track input::-webkit-slider-thumb { pointer-events: auto; width: 24px; height: 24px; -webkit-appearance: none; cursor: grab; }
 .y-range__track input::-moz-range-thumb { pointer-events: auto; width: 24px; height: 24px; border: 0; cursor: grab; }
-.y-range__track:focus-within { outline: 2px solid var(--color-accent); outline-offset: 6px; border-radius: 12px; }
+.y-range__track:focus-within { outline: 2px solid var(--color-accent); outline-offset: 6px; border-radius: var(--radius-sm); }
+/* stylelint-enable unit-disallowed-list */
 .y-range__labels { display: flex; justify-content: space-between; color: var(--color-text-primary); }
 
 /* Account — карточка аккаунта (Figma: account-card): 72, паддинг 16/20, радиус 20, иконки действий 24 в кнопках 40 */
 .y-account {
-  display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 72px; padding: var(--space-16) var(--space-20);
+  display: flex; align-items: center; gap: var(--space-12); width: 100%; min-height: 72px; padding: var(--space-16) var(--space-20); /* stylelint-disable-line unit-disallowed-list -- 72 из Figma */
   background: var(--card-bg); border: 0; border-radius: var(--radius-lg); color: var(--color-text-primary); text-align: left;
 }
 button.y-account { cursor: pointer; transition: transform var(--motion-press); -webkit-tap-highlight-color: transparent; }
 button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
-.y-account__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.y-account__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .y-account__text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .y-account__actions { display: flex; gap: var(--space-4); } /* флоу: кнопки 40 заканчиваются на паддинге 20 */
-.y-account__actions .y-icon { width: 24px; height: 24px; }
+.y-account__actions .y-icon { width: 24px; height: 24px; } /* stylelint-disable-line unit-disallowed-list -- иконка 24 */
 
 /* AvatarStack — аватары 40 внахлёст −8 с кольцом цвета фона 2, «+» Tertiary S */
 .y-avatar-stack { display: inline-flex; align-items: center; }
 .y-avatar-stack__people { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; }
 .y-avatar-stack__item { border-radius: var(--radius-full); position: relative; }
-.y-avatar-stack__item::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--color-bg-canvas); pointer-events: none; z-index: 1; } /* Figma: кольцо 2 внутри аватара 40 */
-.y-avatar-stack__item + .y-avatar-stack__item, .y-avatar-stack__people + .y-avatar-stack__item { margin-left: -8px; }
+.y-avatar-stack__item::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--border-width-thick) var(--color-bg-canvas); pointer-events: none; z-index: 1; } /* Figma: кольцо 2 внутри аватара 40 */
+.y-avatar-stack__item + .y-avatar-stack__item, .y-avatar-stack__people + .y-avatar-stack__item { margin-left: calc(-1 * var(--space-8)); }
 .y-avatar-stack__item > .y-avatar { display: flex; }
 
-/* Зона нажатия чипсов ≥ 44 (hit-slop — atoms.css): лента с прокруткой режет ::after по вертикали — запас 2 сверху и снизу без сдвига раскладки
-   (margin-top ленты задают соседи, поэтому вверх — через top, а не отрицательный margin).
+/* Зона нажатия ≥ 44 (hit-slop — atoms.css). Лента чипсов — в .y-chip-group--scroll.
    Стопка аккаунтов: аватары и «+» внахлёст −8, поэтому зоны растут наружу — аватары влево, «+» вправо.
    Сегмент: иконки стоят через 4 — вбок зона растёт не дальше половины зазора, соседние не перекрываются. */
-.y-chip-group--scroll { position: relative; top: -2px; padding-block: 2px; margin-bottom: -4px; } /* +4 по высоте гасит margin-bottom, сдвиг содержимого — top */
+/* stylelint-disable unit-disallowed-list -- 44 — минимум зоны нажатия (HIG), 0px нужен в min() с длиной; токенов нет */
 .y-avatar-stack__people::after { left: min(0px, calc(100% - 44px)); right: 0; }
 .y-avatar-stack__people + .y-icon-button::after { left: 0; right: min(0px, calc(100% - 44px)); }
 .y-segment > :is(.y-button, .y-icon-button)::after { left: max(-2px, min(0px, calc((100% - 44px) / 2))); right: max(-2px, min(0px, calc((100% - 44px) / 2))); }
+/* stylelint-enable unit-disallowed-list */
 
 /* ─── FormField: лейбл, описание и ошибка вокруг поля; текст на отступе 20, как значение в Field ─── */
 .y-form-field { display: flex; flex-direction: column; gap: var(--space-8); }
@@ -284,3 +294,8 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 .y-form-field__description { color: var(--color-text-secondary); }
 .y-form-field__error { color: var(--color-text-danger); }
 .y-form-field__error:empty { margin-top: calc(-1 * var(--space-8)); } /* пустой live-регион остаётся в дереве доступности, но не добавляет отступ */
+
+/* Иконки внутри компонентов — в конце файла: эти селекторы специфичнее прочих `… .y-icon` (no-descending-specificity) */
+.y-input-bar__field > .y-icon:first-child { color: var(--color-text-secondary); } /* InputBar: иконка слева серым */
+.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; } /* ChipGroup · trailing */ /* stylelint-disable-line unit-disallowed-list -- иконка 20, токена размера иконки нет */
+.y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; } /* ListGroup: иконки справа 20 */ /* stylelint-disable-line unit-disallowed-list -- иконка 20 */

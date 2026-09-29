@@ -38,14 +38,14 @@ export type Entry = {
 
 export const registry: Entry[] = [
   { code: 'Icon', figma: 'ui-icons/*', figmaId: '942:5714', level: 'Atoms', section: '01 Foundations', story: 'Atoms/Icon', status: 'beta', statusWhy: 'нет истории «В флоу»' },
-  { code: 'Logo', figma: 'yeet', figmaId: '1180:20027', level: 'Atoms', section: '01 Foundations', story: 'Atoms/Logo', note: 'цвет наследуется: on-accent, on-photo, secondary', status: 'stable' },
+  { code: 'Logo', figma: 'yeet', figmaId: '1180:20027', level: 'Atoms', section: '01 Foundations', story: 'Atoms/Logo', note: 'Size: L 136×88 / S 61×40; Tone: Default / On Dark / Muted — цвет наследуется (currentColor), пропа tone нет', status: 'stable' },
   { code: 'Button', figma: 'button', figmaId: '942:6953', level: 'Atoms', section: '02 Actions', story: 'Atoms/Button', status: 'stable' },
   { code: 'IconButton', figma: 'icon-button', figmaId: '942:7068', level: 'Atoms', section: '02 Actions', story: 'Atoms/IconButton', status: 'stable' },
   { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', section: '02 Actions', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp', status: 'stable' },
   { code: 'Badge', figma: 'badge', figmaId: '942:7125', level: 'Atoms', section: '02 Actions', story: 'Atoms/Badge', status: 'stable' },
   { code: 'Avatar', figma: 'avatar', figmaId: '968:3666', level: 'Atoms', section: '07 Content', story: 'Atoms/Avatar', note: 'Content: Empty / Initial / Photo', status: 'stable' },
   { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Divider', status: 'stable' },
-  { code: 'ColorDot', figma: 'color', figmaId: '1182:15916', level: 'Atoms', section: '01 Foundations', story: 'Atoms/ColorDot', status: 'beta', statusWhy: 'нет истории «В флоу»' },
+  { code: 'ColorDot', figma: 'color-dot', figmaId: '1182:15916', level: 'Atoms', section: '01 Foundations', story: 'Atoms/ColorDot', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'ScrollEdge', figma: 'scroll-edge', figmaId: '965:3491', level: 'Atoms', section: '05 Navigation & scroll', story: 'Templates/Screen', status: 'beta', statusWhy: 'своей истории нет, показан в Templates/Screen' },
   { code: 'Link', figma: 'link', figmaId: '1209:21285', level: 'Atoms', section: '02 Actions', story: 'Atoms/Link', note: 'State: Default / Focus; в макетах — 203:1372, 517:7004, 513:6603', status: 'alpha', statusWhy: 'ещё не на экранах (Delete Account, Legal — #50–#54)' },
 
