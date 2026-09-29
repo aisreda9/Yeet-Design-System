@@ -1,21 +1,18 @@
 import SwiftUI
 
-// MARK: - Токены слоя (временно локальные)
+// MARK: - Токены слоя
 
 /// Геометрия и движение шторки по «Единому правилу шторки» (`design/SHEETS-AUDIT.md`) и решениям владельца в #58.
-/// Значения, которых ещё нет в `YeetTokens.swift`, живут здесь до мержа токенов (tokens-сессия, #58 → #92).
+/// Значения — из сгенерированных токенов; пружина шторки — `YeetMotion.sheet` (`motion.spring.critical`).
 enum YeetOverlayToken {
     /// Все четыре угла шторки и диалога — 48: концентрично углу экрана 56 при отступе 8 (#58, решение 1).
-    /// TODO(tokens, #92): `YeetRadius.overlay` после мержа токена `radius.overlay`. Пока — то же число, что `radius.bar`.
-    static let radius: CGFloat = YeetRadius.bar
+    static let radius: CGFloat = YeetRadius.overlay
     /// Отступ плавающей шторки от краёв экрана L / R / низ и от клавиатуры (D4).
     static let inset: CGFloat = YeetSpace.s8
-    /// Верх высокой шторки — под статус-баром + 8 (D2). TODO(tokens, #92): `sheet-top-gap`.
-    static let topGap: CGFloat = YeetSpace.s8
-    /// Хэндл 48 × 4. TODO(tokens, #92): `YeetComponent.sheetHandle` (D8) — пока цвет веба `bg-subtle`.
-    static let handle: Color = YeetColor.bgSubtle
-    /// Пружина шторки без перелёта (D5): жёсткость quick (300), ζ = 1. TODO(tokens, #92): `motion.spring.critical`.
-    static let spring = Animation.interpolatingSpring(mass: 1, stiffness: 300, damping: 2 * (300.0).squareRoot(), initialVelocity: 0)
+    /// Верх высокой шторки — под статус-баром + 8 (D2).
+    static let topGap: CGFloat = YeetComponent.sheetTopGap
+    /// Хэндл 48 × 4 (D8).
+    static let handle: Color = YeetComponent.sheetHandle
     /// Отступ между кнопками футера.
     static let footerGap: CGFloat = 7
 }
@@ -679,7 +676,7 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
     private var animation: Animation {
         if reduceMotion { return YeetMotion.fade }
         if !isPresented { return YeetMotion.exit }
-        return presentation == .dialog ? YeetMotion.appear : YeetOverlayToken.spring
+        return presentation == .dialog ? YeetMotion.appear : YeetMotion.sheet
     }
 
     /// Затемнение гаснет вместе с жестом.
@@ -758,7 +755,7 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
         if dy > threshold || (dy > 0 && velocity > YeetGesture.swipeVelocity) {
             dismiss()
         } else {
-            yeetWithAnimation(YeetOverlayToken.spring, reduceMotion: reduceMotion) { dragOffset = 0 }
+            yeetWithAnimation(YeetMotion.sheet, reduceMotion: reduceMotion) { dragOffset = 0 }
         }
     }
 }

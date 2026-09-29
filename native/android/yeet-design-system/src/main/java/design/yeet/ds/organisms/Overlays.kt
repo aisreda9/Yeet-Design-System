@@ -1,11 +1,7 @@
 package design.yeet.ds.organisms
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -92,11 +88,11 @@ import design.yeet.ds.theme.yeetFloatingShadow
 import design.yeet.tokens.YeetComponent
 import design.yeet.tokens.YeetGesture
 import design.yeet.tokens.YeetHapticEvent
-import design.yeet.tokens.YeetMotionScheme
+import design.yeet.tokens.YeetMotion
 import design.yeet.tokens.YeetRadius
 import design.yeet.tokens.YeetSpace
-import design.yeet.tokens.YeetSpring
 import design.yeet.tokens.sheetBg
+import design.yeet.tokens.sheetHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -105,12 +101,14 @@ import androidx.compose.ui.window.Dialog as WindowDialog
 
 /* ─── Значения, которых ещё нет в токенах ───────────────────────────── */
 
-// TODO(tokens, #93): radius-overlay = 48 — одно скругление на все 4 угла шторки и диалога (решение владельца в #58).
-//  Заменить на токен, когда его добавит tokens-сессия; пока то же значение — радиус таб-бара (концентрично экрану 56 при отступе 8).
-private val OverlayRadius: Dp get() = YeetRadius.bar
+/** Все 4 угла шторки и диалога (`radius-overlay`, концентрично экрану 56 при отступе 8, #58). */
+private val OverlayRadius: Dp get() = YeetRadius.overlay
 
-// TODO(tokens, #93): sheet-top-gap — верх высокой шторки на «статус-бар + 8» (D2). На Android статус-бар — WindowInsets.statusBars.
-private val SheetTopGap: Dp get() = YeetSpace.s8
+/** Верх высокой шторки — 8 под статус-баром (D2, `sheet-top-gap`). На Android статус-бар — WindowInsets.statusBars. */
+private val SheetTopGap: Dp get() = YeetComponent.sheetTopGap
+
+/** Хэндл → заголовок, заголовок → контент и заголовок → описание (`sheet-title-gap`, решение владельца #58). */
+private val SheetTitleGap: Dp get() = YeetComponent.sheetTitleGap
 
 /** Отступ плавающей шторки от краёв экрана и от клавиатуры (D3, D4). */
 private val OverlayInset: Dp get() = YeetSpace.s8
@@ -177,11 +175,11 @@ private fun SheetFooter(actions: List<FooterAction>, modifier: Modifier = Modifi
 
 @Composable
 private fun SheetHandle() {
-    // TODO(tokens, #93): sheet-handle — отдельный цвет хэндла ≈ 1,5 : 1 (D8); пока bg-subtle, хэндл декоративный
+    // хэндл декоративный, ≈ 1,5 : 1 к фону шторки (D8, `sheet-handle`)
     Box(
         Modifier
             .size(width = 48.dp, height = 4.dp)
-            .background(YeetTheme.colors.bgSubtle, RoundedCornerShape(YeetTheme.radius.xs)),
+            .background(YeetTheme.colors.sheetHandle, RoundedCornerShape(YeetTheme.radius.xs)),
     )
 }
 
@@ -251,7 +249,7 @@ fun Sheet(
         head = {
             if (handle) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { SheetHandle() }
-                if (hasHead) Spacer(Modifier.height(16.dp))
+                if (hasHead) Spacer(Modifier.height(SheetTitleGap))
             }
             SheetHead(title, TextVariant.H3, onClose)
         },
@@ -292,7 +290,7 @@ private fun ModalSurface(
     ) {
         if (showHead) {
             Column(Modifier.fillMaxWidth().padding(horizontal = YeetSpace.screenGutter), content = head)
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(SheetTitleGap))
         }
         Column(
             Modifier
@@ -407,7 +405,7 @@ fun Dialog(
     ModalSurface(modifier = modifier, paneTitle = title, top = 20.dp, showHead = false, head = {}, footer = footer) {
         Text(title, variant = TextVariant.H3)
         if (description != null) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(SheetTitleGap))
             Text(description, tone = TextTone.Secondary)
         }
         if (content != null) {
@@ -434,18 +432,15 @@ internal class OverlayController {
 
 internal val LocalOverlay = staticCompositionLocalOf<OverlayController?> { null }
 
-/** Появление и возврат шторки — пружина quick без перелёта (D5); «уменьшить движение» — мгновенно. */
-private fun YeetMotionScheme.sheet(): AnimationSpec<Float> =
-    if (reduced) snap() else spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = YeetSpring.quickStiffness)
-
 /**
  * Модальный слой (web: Overlay): затемнение `bgOverlay` и прижатая к низу плавающая шторка.
  *
  * **Геометрия.** 8 от краёв слева и справа; снизу `max(8, навигационная панель)`, над клавиатурой — 8 от клавиатуры (D3, D4);
  * сверху не выше «статус-бар + 8» (D2) — высокая шторка прокручивает тело, шапка и футер на месте.
  *
- * **Движение.** Шторка выезжает на пружине quick без перелёта (D5), [Dialog] — `appear`; уход — `exit`, целиком за край
- * из текущего положения. «Уменьшить движение» (`ANIMATOR_DURATION_SCALE = 0`) — всё мгновенно.
+ * **Движение.** Шторка выезжает на пружине без перелёта `sheet` (`motion.spring.critical`, D5), [Dialog] — `appear`;
+ * уход — `exit`, целиком за край из текущего положения. «Уменьшить движение» (`ANIMATOR_DURATION_SCALE = 0`) — слой
+ * появляется и уходит растворением `fade` (240 мс) без сдвига, как на iOS; возврат после смахивания — мгновенно.
  *
  * **Смахивание.** С хэндла, шапки и футера — сразу; из тела — только когда тело прокручено в начало (nested scroll:
  * тело сначала докручивается к началу, остаток жеста тянет шторку). Вниз 1 : 1, вверх — с сопротивлением.
@@ -497,9 +492,10 @@ fun Overlay(
             offset = 0f
             // ждём первый замер: до него шторка не видна и не прыгает в конечное положение на кадр
             snapshotFlow { sheetHeight }.first { it > 0f }
-            enter.animateTo(1f, if (controller.dialog) motion.appear() else motion.sheet())
+            // «уменьшить движение» — растворение fade вместо сдвига (как iOS: YeetMotion.fade + .opacity)
+            enter.animateTo(1f, if (motion.reduced) YeetMotion.fade() else if (controller.dialog) motion.appear() else motion.sheet())
         } else if (inWindow) {
-            enter.animateTo(0f, motion.exit())
+            enter.animateTo(0f, if (motion.reduced) YeetMotion.fade() else motion.exit())
             inWindow = false
             offset = 0f
         }
@@ -611,8 +607,9 @@ fun Overlay(
                     .fillMaxWidth()
                     .onSizeChanged { sheetHeight = it.height.toFloat() }
                     .graphicsLayer {
-                        alpha = if (sheetHeight > 0f) 1f else 0f
-                        translationY = offset + (1f - enter.value) * (sheetHeight + bottomGap)
+                        // «уменьшить движение»: enter — прозрачность, а не сдвиг за край
+                        alpha = if (sheetHeight <= 0f) 0f else if (motion.reduced) enter.value.coerceIn(0f, 1f) else 1f
+                        translationY = offset + (if (motion.reduced) 0f else (1f - enter.value) * (sheetHeight + bottomGap))
                     }
                     // тап по шторке не закрывает слой (и не делает шторку «кнопкой» для TalkBack)
                     .pointerInput(Unit) { detectTapGestures { } }

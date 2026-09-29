@@ -111,7 +111,7 @@
   background: var(--sheet-bg); color: var(--color-text-primary);
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
-.y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--color-bg-subtle); }
+.y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--sheet-handle); } /* ≈ 1,5:1 к фону шторки (D8) */
 /* Кнопки футера — равные половины через 7; не влезает подпись — обе на всю ширину, одна под другой, безопасная снизу (C11, D7).
    Ширина по подписи, но не шире футера: длиннее строки — многоточие. Поля 16 вместо 20 — только запас до переноса:
    короткая подпись по центру выглядит так же, а «Сохранить и выйти» при 393 остаётся в половине 165, как в Figma. */
@@ -120,13 +120,13 @@
 .y-sheet__footer-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; }
 .y-sheet__head > .y-icon-button { margin: -8px -8px -8px auto; }
-.y-dialog__text { display: flex; flex-direction: column; gap: var(--space-12); }
+.y-dialog__text { display: flex; flex-direction: column; gap: var(--sheet-title-gap); } /* заголовок → 16 → описание (#58) */
 .y-dialog__more { display: contents; } /* обёртка только для aria-describedby: раскладка как у прямых детей тела */
 /* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
-   радиус 32 сверху и 48 снизу — концентрично углу экрана 56; хэндл → 16 → заголовок → 12 → контент */
-.y-sheet--modal { gap: var(--space-16); border-radius: var(--sheet-radius) var(--sheet-radius) var(--sheet-radius-bottom) var(--sheet-radius-bottom); }
+   все 4 угла --radius-overlay (48, концентрично углу экрана 56); хэндл → 16 → заголовок → --sheet-title-gap (16) → контент / описание (#58) */
+.y-sheet--modal { gap: var(--space-16); border-radius: var(--radius-overlay); }
 .y-sheet--modal > .y-sheet__title + *,
-.y-sheet--modal > .y-sheet__head + * { margin-top: calc(var(--space-4) * -1); }
+.y-sheet--modal > .y-sheet__head + * { margin-top: calc(var(--sheet-title-gap) - var(--space-16)); }
 .y-sheet--modal > .y-sheet__head { margin-top: var(--space-12); } /* без хэндла заголовок на 20 от верха */
 .y-sheet--no-handle { padding-top: var(--space-20); } /* Show Handle=false: контент на 20 от верха */
 .y-sheet--no-handle > .y-sheet__head { margin-top: 0; }
@@ -141,8 +141,8 @@
   overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
 }
 .y-sheet__body::-webkit-scrollbar { display: none; }
-/* заголовок → 12 → контент: как прежде, −4 у первого блока контента (тело само стоит на 16) */
-.y-sheet--modal > :is(.y-sheet__title, .y-sheet__head) + .y-sheet__body > :first-child { margin-top: calc(var(--space-4) * -1); }
+/* заголовок → --sheet-title-gap → контент: у первого блока тела — разница с gap 16 (тело само стоит на 16) */
+.y-sheet--modal > :is(.y-sheet__title, .y-sheet__head) + .y-sheet__body > :first-child { margin-top: calc(var(--sheet-title-gap) - var(--space-16)); }
 .y-overlay > .y-sheet--modal { max-height: 100%; }
 /* Панель деталей (Item / Outfit Details): заголовок H2 → контент 16, → подпись (сезон, цена) 12 */
 .y-sheet--panel { box-shadow: var(--shadow-floating); }
@@ -158,8 +158,7 @@
   /* D5: шторка приезжает на пружине без перелёта — stiffness 300 как у quick, но ζ = 1 (x = 1 − (1 + ωt)·e^−ωt, 540 мс до 0,1 %).
      TODO(tokens): токен motion.spring.critical → --motion-sheet. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
   --sheet-spring: 540ms linear(0, 0.059, 0.184, 0.326, 0.462, 0.58, 0.678, 0.756, 0.818, 0.865, 0.901, 0.927, 0.947, 0.962, 0.972, 0.98, 0.986, 0.99, 0.993, 0.995, 0.996, 0.997, 0.998, 0.999, 1);
-  /* верх высокой шторки — под статус-баром + 8 (D2). TODO(tokens): перенести в токен --sheet-top-gap */
-  --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8));
+  /* верх высокой шторки — под статус-баром + 8 (D2): токен --sheet-top-gap */
   display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
 }
 .y-overlay::before {
@@ -392,7 +391,7 @@
 .y-outfit-pager__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; } /* только для скринридера */
 
 /* ─── Sheet · описание (#27) ─── */
-/* Settings / Currency 513:6256: Body серым 12 под заголовком (через правило title + *), 20 до контента */
+/* Settings / Currency 513:6256: Body серым 16 под заголовком (через правило title + *), 20 до контента */
 .y-sheet__description + * { margin-top: var(--space-4); }
 .y-sheet--panel > .y-sheet__description + * { margin-top: 0; } /* в панели gap 20 — описание → контент 20, а не 24 (C14) */
 

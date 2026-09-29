@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import { StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
 import { LeavingContext, usePresence } from '../utils/usePresence';
-import './templates.css';
+import '../styles.css';
 
 export type ScreenProps = {
   /** Закреплённая шапка (`Header`). Если нет — рисуется статус-бар. */
@@ -61,6 +61,8 @@ export function Screen({ header, bottom, overlay, floating, floatingOffset = 132
       // тот же объект — React не перерисовывает экран на каждое событие скролла
       return next.top === prev.top && next.bottom === prev.bottom && next.collapsed === prev.collapsed ? prev : next;
     });
+  // ref.current читается в момент вызова; с [ref] React Compiler не сохраняет мемоизацию (preserve-manual-memoization)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // скролл читается раз в кадр: чтение scrollTop / scrollHeight — после отрисовки, без дёрганья layout
   const onScroll = useCallback(() => {
@@ -86,7 +88,9 @@ export function Screen({ header, bottom, overlay, floating, floatingOffset = 132
       data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={edges.collapsed || undefined}>
       {header ?? <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />}
       {backdrop}
-      <main ref={ref} onScroll={onScroll} tabIndex={0} /* прокрутка с клавиатуры */ className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush')}>
+      {/* tabIndex у прокручиваемой области — прокрутка с клавиатуры (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <main ref={ref} onScroll={onScroll} tabIndex={0} className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush')}>
         {children}
       </main>
       {bottom}

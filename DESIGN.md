@@ -1,7 +1,7 @@
 # Yeet Design System
 
 Указатель по дизайн-системе приложения **YeetStyle (yeet)** — умного гардероба: что где лежит, ID страниц Figma и сводные таблицы токенов.
-Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->86<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
+Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->100<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
 здесь она не дублируется. Storybook публикуется на GitHub Pages (`.github/workflows/storybook.yml`); локально — `npm ci && npm run storybook`.
 
 > Таблицы токенов ниже **генерируются** из `tokens/tokens.json` (`npm run docs-tokens`, проверка — `npm run docs-tokens -- --check`): блоки между `<!-- gen:… -->` руками не правятся.
@@ -10,7 +10,7 @@
 
 ## 1. Figma
 
-Файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e) (`fileKey: 1LAkot5WySMWhwiiFJqJ0e`). Ссылки с пояснениями — Storybook «Процессы / Ресурсы».
+Файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e) (`fileKey: 1LAkot5WySMWhwiiFJqJ0e`). Ссылки с пояснениями — Storybook «Старт / Процессы / Ресурсы».
 
 | Что | Узел | Назначение |
 |---|---|---|
@@ -39,11 +39,11 @@
 | Движение, жесты, хаптика | Foundations / Анимации | `16-Motion.mdx`, `src/motion/motion.ts` |
 | Тексты и тон (гендерно-нейтрально) | Foundations / Тексты и тон | `15-Tone.mdx` |
 | Компоненты: варианты, «В флоу», спецификация | Atoms / Molecules / Organisms / Templates | `src/<уровень>/*.stories.tsx` |
-| Реестр Figma ↔ код, статус зрелости | Процессы / Figma ↔ код | `src/docs/registry.ts`, `src/docs/status.ts` |
+| Реестр Figma ↔ код, статус зрелости | Старт / Процессы / Figma ↔ код | `src/docs/registry.ts`, `src/docs/status.ts` |
 | Экраны флоу | Pages / Экраны флоу | `src/pages/` (документация экранов — PR #50–#54) |
-| Нативные платформы | Процессы / iOS и Android | `native/ios`, `native/android`, `21-Mobile.mdx` |
+| Нативные платформы | Старт / Процессы / iOS и Android | `native/ios`, `native/android`, `21-Mobile.mdx` |
 | Быстрый старт: запуск, подключение, ассеты, проверки | Старт / Быстрый старт | `00-QuickStart.mdx` |
-| Ресурсы: ссылки, выгрузки | Процессы / Ресурсы | `22-Resources.mdx` |
+| Ресурсы: ссылки, выгрузки | Старт / Процессы / Ресурсы | `22-Resources.mdx` |
 | Как вносить изменения, чек-лист PR | — | `CONTRIBUTING.md` |
 | Параллельная работа, зоны, замок Figma | — | `TEAM.md`, `.github/team.json`, `.github/CODEOWNERS` |
 | Принятые решения | — | `design/adr/` |
@@ -163,12 +163,12 @@
 ### 3.7 Движение — `--motion-*`
 
 <!-- gen:motion -->
-Переходов — 13.
+Переходов — 14.
 
 | Токен | Кривая | Что происходит |
 |---|---|---|
 | `--motion-press` | 150 мс · standard | Нажатие кнопки, scale 0.97 |
-| `--motion-fade` | 240 мс · standard | Затухание краёв, тосты |
+| `--motion-fade` | 240 мс · standard | Затухание краёв при скролле, затемнение под шторкой, подписи и тени |
 | `--motion-collapse` | 300 мс · ease-out | Фото сворачивается в шапку при скролле |
 | `--motion-page` | 300 мс · ease-out | Листание образов и поводов по свайпу |
 | `--motion-nav` | 744 мс · spring quick (k300 c20) | Таб-бар уступает место FAB |
@@ -180,4 +180,5 @@
 | `--motion-return` | 1022 мс · spring gentle (k100 c15) | Отмена перетаскивания: вещь возвращается туда, откуда взяли |
 | `--motion-appear` | 240 мс · standard | Появление: snackbar, подсказка, диалог |
 | `--motion-exit` | 150 мс · standard | Исчезновение: быстрее появления, чтобы не мешать |
+| `--motion-sheet` | 540 мс · spring critical (k300 c34.641) | Шторка: появление и возврат после смахивания, без перелёта |
 <!-- /gen:motion -->

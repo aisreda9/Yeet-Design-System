@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Icon } from '../atoms';
-import { EmptyState, InputBar, SegmentControl } from '../molecules';
-import { ChatBubble, type Garment, Header, ItemArt, ItemCard, OutfitCollage, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
+import { useState } from 'react';
+import { Icon, Stamp } from '../atoms';
+import { Carousel, ChipGroup, EmptyState, InputBar, SegmentControl } from '../molecules';
+import { ChatBubble, type Garment, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
 import { Grid, Screen } from '../templates';
 import './pages.css';
 
@@ -117,3 +118,57 @@ export const OutfitOfTheDayEmpty: Story = {
     </Screen>
   ),
 };
+
+/* ─── «Удиви меня» и «С чем носить»: пейджер образов (#30, после #25) ── */
+
+const stylistLooks: PagerLook[] = [
+  { id: 'green', name: 'зелёный деним', items: [{ kind: 'accessories', x: 34, y: 18, size: 56 }, { kind: 'top', x: 66, y: 34, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 130, color: 'green' }, { kind: 'shoe', x: 72, y: 76, size: 72, color: 'brown' }] },
+  { id: 'black', name: 'чёрная юбка', items: [{ kind: 'bottom', x: 28, y: 58, size: 140, color: 'black' }, { kind: 'top', x: 64, y: 36, color: 'brown' }, { kind: 'container', x: 76, y: 76, size: 64, color: 'black' }] },
+  { id: 'beige', name: 'бежевый жакет', items: [{ kind: 'outerwear', x: 36, y: 36, size: 120, color: 'beige' }, { kind: 'bottom', x: 68, y: 58, size: 110, color: 'blue' }, { kind: 'shoe', x: 34, y: 80, size: 64, color: 'white' }] },
+];
+
+/** «Удиви меня» (Figma `798:1741`): стопка образов с превью 150, «Сохранить» и «Не нравится» — следующий образ. */
+function SurpriseScreen() {
+  const [index, setIndex] = useState(1);
+  const [saved, setSaved] = useState(false);
+  return (
+    <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+      <OutfitPager
+        looks={stylistLooks}
+        preview={150}
+        index={index}
+        onIndexChange={(k) => { setIndex(k); setSaved(false); }}
+        stamp={<Stamp label="Сохранить" done={saved} onClick={() => setSaved((v) => !v)} />}
+        skip={<Stamp label="Не нравится" tone="secondary" onClick={() => setIndex((k) => Math.min(k + 1, stylistLooks.length - 1))} />}
+      />
+    </Screen>
+  );
+}
+
+export const OutfitOfTheDay: Story = { name: 'Stylist / Outfit of the Day / Default', render: () => <SurpriseScreen /> };
+
+const occasions = ['Прогулка', 'Вечеринка', 'Офис', 'На каждый день', 'Свидание', 'Вечеринка ', 'Офис '];
+
+/**
+ * «С чем носить» (Figma `463:1534`, в макете кадр назван «Stylist / Trips / List»): лента образов с одной вещью,
+ * под ней поводы — чипсы и свайп ведут один индекс, ниже вещи из образа.
+ */
+function WhatToWearScreen() {
+  const [index, setIndex] = useState(3);
+  const looks = occasions.map((o, k) => ({ ...stylistLooks[k % stylistLooks.length], id: o, name: o.trim() }));
+  return (
+    <Screen header={<Header type="bar" titleChip="С чем носить" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+      <OutfitPager axis="x" looks={looks} index={index} onIndexChange={setIndex} aria-label="Образы по поводам" stamp={<Stamp label="Сохранить" />} skip={<Stamp label="Не нравится" tone="secondary" onClick={() => setIndex((k) => Math.min(k + 1, looks.length - 1))} />} />
+      <div className="y-occasions">
+        <ChipGroup chips={occasions.map((label, k) => ({ label: label.trim(), selected: k === index }))} onToggle={(label) => setIndex(occasions.findIndex((o) => o.trim() === label))} />
+      </div>
+      <Carousel itemWidth={173}>
+        <ItemCard kind="top" color="green" />
+        <ItemCard kind="bottom" color="green" />
+        <ItemCard kind="shoe" color="brown" />
+      </Carousel>
+    </Screen>
+  );
+}
+
+export const WhatToWear: Story = { name: 'Stylist / What to Wear / Outfits', render: () => <WhatToWearScreen /> };

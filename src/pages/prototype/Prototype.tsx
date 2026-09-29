@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 import { Snackbar } from '../../molecules';
 import { cx } from '../../utils/cx';
 import { gesture, motionMs, velocityTracker } from '../../utils/gesture';
-import { auto, globalRoutes, HOME, label, routes, START, type Go, type Nav, type Route } from './routes';
+import { auto, globalRoutes, HOME, label, LOOSE_DIALOGS, routes, START, type Go, type Nav, type Route } from './routes';
 import { screens, type ScreenId } from './screens';
 import './prototype.css';
 
@@ -118,6 +118,16 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         commit([layer]);
         focusTop();
       },
+      async leave(ids) {
+        const l = layersRef.current;
+        let i = l.length - 1;
+        while (i >= 0 && ids.includes(l[i].id) && !l[i].overlay) i--;
+        if (i === l.length - 1) return;
+        if (i < 0) return api.root(HOME); // в цепочку попали из списка экранов — выходить некуда, кроме главной
+        // промежуточные шаги уходят без анимации, верхний — обычным «назад» к экрану входа
+        commit([...l.slice(0, i + 1), l[l.length - 1]]);
+        return api.back();
+      },
       async overlay(id) {
         commit([...layersRef.current, make(id)]);
       },
@@ -149,13 +159,18 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const run = useCallback(async (go: Go, target: HTMLElement, ev?: MouseEvent) => {
     if (busy.current) return;
     busy.current = true;
+    frame.current?.setAttribute('data-busy', ''); // play-тесты ждут конца перехода
     try {
       if (typeof go === 'string') await (screens[go].overlay ? nav.overlay(go) : nav.push(go));
       else await go(nav, target, ev);
     } finally {
       busy.current = false;
+      frame.current?.removeAttribute('data-busy');
     }
   }, [nav]);
+
+  /** Верхний слой закрывается тапом по затемнению и смахиванием: шторка или диалог без риска (#89). */
+  const loose = (l: Layer) => l.overlay && (LOOSE_DIALOGS.has(l.id) || !el(l)?.querySelector('[role=alertdialog]'));
 
   /** Маршрут для элемента под пальцем: поля и контролы с собственным действием остаются нативными. */
   const resolve = (target: Element, kind: 'tap' | 'long') => {
@@ -164,7 +179,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     if (!layerEl || !layer) return null;
     const list = [...(routes[layer.id] ?? []), ...globalRoutes].filter((r) => (r.on ?? 'tap') === kind);
     for (let e: Element | null = target; e && e !== layerEl; e = e.parentElement) {
-      const route = list.find((r) => e!.matches(r.sel) && textOk(r, e!));
+      const route = list.find((r) => e!.matches(r.sel) && textOk(r, e!) && !(r.not && target.closest(r.not)));
       if (route) return { route, target: e as HTMLElement };
       if (kind === 'tap' && e.matches(NATIVE)) return null;
     }
@@ -176,8 +191,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     if (suppress.current) { e.preventDefault(); e.stopPropagation(); suppress.current = false; return; }
     if (t.closest('a[href^="#"]')) e.preventDefault();
     const cur = top();
-    // тап по затемнению закрывает шторку; диалог-подтверждение так не закрывается
-    if (cur.overlay && t.classList.contains('y-overlay') && !el(cur)?.querySelector('[role=alertdialog]')) { e.stopPropagation(); void run(() => nav.close(), t); return; }
+    // тап по затемнению закрывает шторку и безопасный диалог; рискованный — только кнопками и Escape (#89)
+    if (t.classList.contains('y-overlay') && loose(cur)) { e.stopPropagation(); void run(() => nav.close(), t); return; }
     const hit = resolve(t, 'tap');
     if (!hit) return;
     if (!hit.route.native) { e.preventDefault(); e.stopPropagation(); }
@@ -218,9 +233,9 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
       edge.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, active: false, w: box.width, cur, prev: layersRef.current[layersRef.current.length - 2], speed: velocityTracker() };
       edge.current.speed.add(e.clientX, e.clientY, e.timeStamp);
     }
-    // смахивание шторки вниз (диалог-подтверждение не смахивается)
-    const ov = t.closest<HTMLElement>('.y-overlay'), s = t.closest<HTMLElement>('.y-sheet[role=dialog]');
-    if (cur.overlay && ov && s && !t.closest('input, textarea, select, [role=slider], .y-chip-group--scroll') && !busy.current) {
+    // смахивание шторки вниз (рискованный диалог не смахивается)
+    const ov = t.closest<HTMLElement>('.y-overlay'), s = t.closest<HTMLElement>('.y-sheet:is([role=dialog], [role=alertdialog])');
+    if (loose(cur) && ov && s && !t.closest('input, textarea, select, [role=slider], .y-chip-group--scroll') && !busy.current) {
       let scrolled = false;
       for (let a: Element | null = t; a && a !== s.parentElement; a = a.parentElement) if (a.scrollTop > 0) scrolled = true;
       if (!scrolled) {
@@ -348,6 +363,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               if (!n.matches(INTERACTIVE) && !n.hasAttribute('tabindex')) {
                 n.tabIndex = 0;
                 n.setAttribute('role', 'button');
+                n.removeAttribute('aria-hidden'); // декоративный аватар становится кнопкой «Изменить фото»
                 if (!n.hasAttribute('aria-label')) n.setAttribute('aria-label', r.name ?? (label(n) || 'Открыть'));
               }
             });
@@ -433,7 +449,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
           <ul className="y-proto__hints y-caption y-text--secondary">
             <li>Таб-бар, «Назад», карточки, кнопки и чипсы ведут по флоу</li>
             <li>Свайп от левого края — назад, шторку смахни вниз или нажми на затемнение</li>
-            <li>Долгое нажатие на вещь в гардеробе — действия</li>
+            <li>Долгое нажатие на вещь в гардеробе — действия, на пустой холст образа — очистить</li>
           </ul>
         </aside>
       )}

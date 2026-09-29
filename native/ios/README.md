@@ -18,7 +18,7 @@ native/ios/
     ├── Molecules/                    ChipGroup, SegmentControl, ListItem, ListGroup, RadioList, Field, InputGroup, FormField,
     │                                 InputBar, Snackbar, EmptyState, StatTile, AccountCard, AvatarStack
     └── Organisms/                    Sheet, Dialog, Overlay, AccountsSheet, Header, TabBar, BottomNav,
-                                      ItemCard, OutfitCollage, WeatherCard
+                                      ItemCard, OutfitCollage, WeatherCard, OutfitPager, ItemSlots, CropFrame, DetailsScreen
 ```
 
 У каждого компонента есть `#Preview` (Xcode 15+): откройте `native/ios/Package.swift` в Xcode и выберите файл компонента.
@@ -150,6 +150,10 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `ItemCard` | `YeetItemCard` | `kind`, `color`, `image`, `discount`, `label`, `name`, `selected: Bool?`, `onClick`, `onRemove` |
 | `OutfitCollage` / `CollageLayer` | `YeetOutfitCollage` / `YeetCollageLayer` | `items: [YeetCollageItem]`, `label`, `footer` |
 | `WeatherCard` / `WeatherIcon` | `YeetWeatherCard` / `YeetWeatherIcon` | `temperature`, `description`, `weather: YeetWeather`, `icon`, `alert`, `tilt` |
+| `OutfitPager` / `PagerLook` | `YeetOutfitPager` / `YeetPagerLook` | `looks`, `axis: Axis` (`.vertical` стопка, `.horizontal` лента), `preview` (96 / 150), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `weather`, `stamp`, `skip`, `disabled`, `label` |
+| `ItemSlots` / `ItemSlot` | `YeetItemSlots` / `YeetItemSlot` | `title`, `items` + `card: (Item) -> View` (вместо `children`), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `onAdd`, `addLabel` |
+| `CropFrame` / `CropRect` | `YeetCropFrame` / `YeetCropRect` | `rect: Binding<YeetCropRect>` или `defaultRect`, `onChange`, `hint`, `minSide` (= `min`), `photo` |
+| `DetailsScreen` (template) | `YeetDetailsScreen` | `title`, `titleChip`, `actions`, `onBack`, `thumb`, `bottom`, `stamp`, `media`, `content` |
 
 Токены: `--color-*` → `YeetColor.*`, `--button-*` / `--card-*` / `--sheet-*` → `YeetComponent.*`, `--space-N` → `YeetSpace.sN`,
 `--radius-*` → `YeetRadius.*`, `.y-h1…caption` → `YeetType.*` + `.yeetText(_:)`, `--motion-*` → `YeetMotion.*`,
@@ -157,7 +161,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 
 Пока не перенесены (есть в React): `RangeSlider`, `Carousel`, `BarChart`, `UsageMeter`, `Hint`, `LoadingState`, `PhotoTile`,
 `PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`, бренд-темы (`data-brand`),
-сворачивание шапки при скролле.
+сворачивание большого заголовка шапки при скролле (сворачивание фото в `YeetDetailsScreen` есть).
 
 ## Шторки и диалоги
 
@@ -171,7 +175,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
   рискованный диалог (`destructive`, `danger`) закрывается только кнопками и «escape»;
 - шторка — пружина без перелёта, диалог — `YeetMotion.appear`, уход — `YeetMotion.exit`, при Reduce Motion — растворение.
 
-Пока токенов `radius-overlay`, `sheet-top-gap`, `sheet-handle` нет в `tokens.json`, их значения — в `YeetOverlayToken` (`Organisms/Sheet.swift`, TODO #92).
+Радиус, отступ сверху и хэндл — токены `YeetRadius.overlay`, `YeetComponent.sheetTopGap`, `YeetComponent.sheetHandle`; пружина без перелёта — `YeetMotion.sheet` (`motion.spring.critical`, ζ = 1).
 
 ## Доступность
 

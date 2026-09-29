@@ -82,7 +82,7 @@ export const InFlow: Story = {
   parameters: { controls: { disable: true }, docs: { description: { story: 'Outfit Creation / Item Selection / Ready to Continue `414:1459`. Экран `src/pages` переводит на компонент задача screens (#30).' } } },
   render: () => (
     <Usage screen="Outfit Creation / Item Selection / Ready to Continue" note="414:1459">
-      <Screen header={<Header type="bar" titleChip="Выбор вещей" onBack={() => {}} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={<div style={{ padding: '20px var(--screen-gutter)', background: 'var(--color-bg-elevated)' }}><Button size="L" fullWidth>Далее</Button></div>} flush>
+      <Screen header={<Header variant="bar" titleChip="Выбор вещей" onBack={() => {}} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={<div style={{ padding: '20px var(--screen-gutter)', background: 'var(--color-bg-elevated)' }}><Button size="L" fullWidth>Далее</Button></div>} flush>
         <Slots top={1} bottom={0} shoe={2} />
       </Screen>
     </Usage>

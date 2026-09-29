@@ -1,6 +1,11 @@
 {
   "base": "main",
   "staleDays": 5,
+  "limits": {
+    "maxBranchesPerZone": 2,
+    "limitedZones": ["atoms", "molecules", "organisms", "screens"],
+    "maxZonesPerBranch": 3
+  },
   "zones": {
     "tokens":    ["tokens/**", "src/tokens/**", "scripts/build-tokens.mjs"],
     "atoms":     ["src/atoms/**", "src/icons/**", "src/utils/**"],

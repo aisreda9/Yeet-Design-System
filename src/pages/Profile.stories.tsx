@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
-import { Avatar, Icon } from '../atoms';
-import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, StatRow, StatTile, UsageMeter } from '../molecules';
+import { useState, type ReactNode } from 'react';
+import { Avatar, Button, Icon } from '../atoms';
+import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, List, ListItem, PhotoTile, StatRow, StatTile, UsageMeter } from '../molecules';
 import { AccountsSheet, BottomNav, Header, ItemCard, OutfitCollage, Overlay, Sheet } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
 import { demoAvatar } from '../docs/helpers';
@@ -96,9 +96,9 @@ export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Singl
 export const PeriodSheet: Story = { name: 'Profile / Analytics / Sheet / Period', render: () => <ProfileScreen accounts={[sima, tina]} open="period" /> };
 
 /** Редактирование профиля (Figma `Profile / Edit`): без фото — камера в круге, с фото — снимок. */
-function ProfileEditScreen({ photo }: { photo?: string }) {
+function ProfileEditScreen({ photo, overlay }: { photo?: string; overlay?: ReactNode }) {
   return (
-    <Screen header={<Header type="bar" title="Редактирование профиля" />}>
+    <Screen header={<Header type="bar" title="Редактирование профиля" />} overlay={overlay && <Overlay>{overlay}</Overlay>}>
       <Row justify="center"><Avatar size="L" src={photo} /></Row>
       {/* флоу: поля ввода без подписей — имя введено, почта подсказкой */}
       <InputGroup>
@@ -116,3 +116,25 @@ function ProfileEditScreen({ photo }: { photo?: string }) {
 
 export const ProfileEdit: Story = { name: 'Profile / Edit / No Avatar', render: () => <ProfileEditScreen /> };
 export const ProfileEditAvatar: Story = { name: 'Profile / Edit / Avatar Added', render: () => <ProfileEditScreen photo={demoAvatar} /> };
+
+/* ─── Профиль: шторки редактирования (#30) ─────────────────────────── */
+
+const years = Array.from({ length: 10 }, (_, i) => String(1991 + i));
+
+export const BirthYearSheet: Story = {
+  name: 'Profile / Edit / Sheet / Birth Year',
+  render: () => (
+    <ProfileEditScreen photo={demoAvatar} overlay={<Sheet title="Год рождения"><List>{years.map((y) => <ListItem key={y} type="radio" label={y} checked={y === '1991'} />)}</List></Sheet>} />
+  ),
+};
+
+/** Фото профиля: галерея или камера, у готового фото — ещё «Удалить фотографию». */
+const avatarSheet = (replace?: boolean) => (
+  <Sheet label="Фото профиля">
+    <Row gap={7}><PhotoTile source="gallery" /><PhotoTile source="camera" /></Row>
+    {replace && <Button variant="tertiary" size="L" fullWidth>Удалить фотографию</Button>}
+  </Sheet>
+);
+
+export const AvatarAddSheet: Story = { name: 'Profile / Avatar / Sheet / Add', render: () => <ProfileEditScreen overlay={avatarSheet()} /> };
+export const AvatarReplaceSheet: Story = { name: 'Profile / Avatar / Sheet / Replace', render: () => <ProfileEditScreen photo={demoAvatar} overlay={avatarSheet(true)} /> };

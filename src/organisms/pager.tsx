@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import { useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import { IconButton } from '../atoms';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
@@ -15,7 +15,7 @@ export type PagerLook = {
   name?: string;
 };
 
-export type OutfitPagerProps = {
+export type OutfitPagerProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
   looks: PagerLook[];
   /** `y` — стопка образов (главная, «Удиви меня»): превью 96 сверху и снизу. `x` — лента («С чем носить»): соседние за краем. */
   axis?: 'x' | 'y';
@@ -37,7 +37,6 @@ export type OutfitPagerProps = {
   disabled?: boolean;
   /** Подпись группы для скринридера. */
   'aria-label'?: string;
-  className?: string;
 };
 
 /** Геометрия из Figma: коллаж 353, превью 96 (стопка) или шаг 353 + 20 (лента). */
@@ -56,7 +55,7 @@ const place = (k: number, i: number) => (k === i ? 'is-current' : k === i - 1 ? 
  *   стрелки по оси, Home и End.
  *   Скрытые образы — `aria-hidden` и `inert`, текущий объявляется через `aria-live`.
  */
-export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled, defaultIndex = 0, onIndexChange, weather, stamp, skip, disabled, className, 'aria-label': ariaLabel = 'Образы' }: OutfitPagerProps) {
+export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled, defaultIndex = 0, onIndexChange, weather, stamp, skip, disabled, className, style: styleProp, 'aria-label': ariaLabel = 'Образы', ...rest }: OutfitPagerProps) {
   const [own, setOwn] = useState(defaultIndex);
   const count = looks.length;
   const index = Math.min(Math.max(controlled ?? own, 0), Math.max(count - 1, 0));
@@ -84,8 +83,9 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
   return (
     <div
       className={cx('y-outfit-pager', `y-outfit-pager--${axis}`, axis === 'y' && preview === 150 && 'y-outfit-pager--preview-150', className)}
+      {...rest}
       data-dragging={dragging || undefined}
-      style={style}
+      style={{ ...styleProp, ...style }}
       role="group"
       aria-roledescription="карусель"
       aria-label={ariaLabel}

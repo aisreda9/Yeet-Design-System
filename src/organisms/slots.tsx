@@ -1,4 +1,4 @@
-import { Children, useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
+import { Children, useEffect, useRef, type ComponentPropsWithRef, type KeyboardEvent, type ReactNode } from 'react';
 import { IconButton } from '../atoms';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
@@ -8,11 +8,13 @@ import { useReducedMotion } from '../motion';
  * Выбор вещей в образ (Outfit Creation / Item Selection `414:1459`, пустой `414:1541`): панель с секциями «Верх / Низ / Обувь»,
  * между секциями — разделитель с полями 20. Фон `elevated`, радиус сверху, тень — как у панели шторки.
  */
-export function ItemSlots({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('y-item-slots', className)}>{children}</div>;
+export type ItemSlotsProps = ComponentPropsWithRef<'div'>;
+
+export function ItemSlots({ className, ...rest }: ItemSlotsProps) {
+  return <div className={cx('y-item-slots', className)} {...rest} />;
 }
 
-export type ItemSlotProps = {
+export type ItemSlotProps = Omit<ComponentPropsWithRef<'section'>, 'children' | 'title'> & {
   /** Заголовок секции H2: «Верх», «Низ», «Обувь». */
   title: string;
   /** Карточки вещей (`ItemCard` 173 × 172, обычно с `onRemove`). Пусто — только карточка «+» по центру (`414:1491`). */
@@ -35,7 +37,7 @@ export type ItemSlotProps = {
  * - Клавиатура: ряд в порядке Tab, ← / → — соседняя вещь.
  * - Смена `index` снаружи прокручивает ряд плавно, при «Уменьшении движения» — сразу.
  */
-export function ItemSlot({ title, children, index = 0, onIndexChange, onAdd, addLabel }: ItemSlotProps) {
+export function ItemSlot({ title, children, index = 0, onIndexChange, onAdd, addLabel, className, ...rest }: ItemSlotProps) {
   const row = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const items = Children.toArray(children);
@@ -87,7 +89,7 @@ export function ItemSlot({ title, children, index = 0, onIndexChange, onAdd, add
   };
 
   return (
-    <section className="y-item-slot">
+    <section className={cx('y-item-slot', className)} {...rest}>
       <h2 className="y-h2">{title}</h2>
       <div
         ref={row}
