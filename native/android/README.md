@@ -120,9 +120,9 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
 | `<StatTile label value>`, `<StatRow>` | `StatTile(label, value)`, `StatRow { … }` | ширина делится поровну |
 | `<Hint icon>`, `<Snackbar onClose onUndo>`, `<EmptyState title description action>`, `<LoadingState label>` | `Hint(text)`, `Snackbar(text, onClose, onUndo)`, `EmptyState(…, action = EmptyStateAction(…))`, `LoadingState(label)` | |
 | `<AccountCard account kind onClick onEdit onSettings onSignOut>` | `AccountCard(account, kind = AccountCardKind.*, …)` | `Account.photo: Painter?` |
-| `<Sheet title type footer onClose>` | `Sheet(title, type = SheetType.*, footer = a to b, onClose) { … }` | |
-| `<Dialog tone title description cancel confirm onCancel onConfirm>` | `Dialog(title, cancel, confirm, tone = DialogTone.*, …)` | |
-| `<Overlay onClose>` | `Overlay(visible, onClose) { Sheet / Dialog }` | окно Dialog: затемнение `bgOverlay`, выезд `nav`, свайп вниз, «Назад» |
+| `<Sheet title description type footer onClose label handle>` | `Sheet(title, type = SheetType.*, footer = a to b, onClose, description, label, handle) { … }` | шапка и футер закреплены, тело — `verticalScroll` (не кладите внутрь `LazyColumn`); кнопки футера — половины или столбец |
+| `<Dialog tone title description cancel confirm onCancel onConfirm>` | `Dialog(title, cancel, confirm, tone = DialogTone.*, …)` | без хэндла; `cancel = null` — одна кнопка; `Destructive` / `Danger` в `Overlay` закрываются только кнопками, «Назад» → `onCancel` |
+| `<Overlay onClose>` | `Overlay(visible, onClose) { Sheet / Dialog }` | окно Dialog: затемнение `bgOverlay`, пружина без перелёта, свайп вниз (из тела — через nested scroll), «Назад», TalkBack «Закрыть»; `WindowInsets` статус-бара, навигации и IME |
 | `<AccountsSheet accounts onEdit onSettings onSwitch onAdd>` | `AccountsSheet(accounts, …)` | |
 | `<Header type="large" …>` | `Header(HeaderType.Large(title, subtitle, accent, action))` | тип — sealed-класс: `Large`, `Bar`, `Back`, `Search` |
 | `<TabBar active initial onChange>`, `<BottomNav active fab onFab onTabChange>`, `<BottomBar>` | `TabBar`, `BottomNav`, `BottomBar` | `Tab.Today…Profile` |
