@@ -16,7 +16,8 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: 'Одиночный выбор строками `ListItem variant="radio"` в колонке `List` (вид тот же). Для скринридера — `radiogroup` с именем `label`: Tab попадает в выбранную строку, стрелки и Home / End выбирают соседнюю. Controlled (`value` + `onChange`) или uncontrolled (`defaultValue`). Figma: `list-item` · Type=Radio.',
+        component:
+          'Одиночный выбор строками `ListItem variant="radio"` в колонке `List` (вид тот же). Для скринридера — `radiogroup` с именем `label`: Tab попадает в выбранную строку, стрелки и Home / End выбирают соседнюю. Controlled (`value` + `onChange`) или uncontrolled (`defaultValue`). Figma: `list-item` · Type=Radio.',
       },
     },
   },
@@ -41,9 +42,31 @@ export const InFlow: Story = {
   tags: ['bare'],
   render: () => (
     <UsageGrid min={300}>
-      <Usage screen="Sheet · Birth Year" note="uncontrolled"><RadioList label="Год рождения" defaultValue="1991" options={years.slice(0, 3)} /></Usage>
-      <Usage screen="Settings / Country / Sheet" note="с флагом"><RadioList label="Страна" defaultValue="ru" options={[{ value: 'ru', label: 'Россия', trailing: <Flag code="ru" /> }, { value: 'by', label: 'Беларусь', trailing: <Flag code="by" /> }, { value: 'ge', label: 'Грузия', trailing: <Flag code="ge" /> }]} /></Usage>
-      <Usage screen="Settings / Currency / Sheet" note="текст справа"><RadioList label="Валюта" defaultValue="rub" options={[{ value: 'rub', label: 'Российский рубль', trailing: '₽ · RUB' }, { value: 'byn', label: 'Белорусский рубль', trailing: 'Br · BYN' }, { value: 'usd', label: 'Доллар США', trailing: '$ · USD' }]} /></Usage>
+      <Usage screen="Sheet · Birth Year" note="uncontrolled">
+        <RadioList label="Год рождения" defaultValue="1991" options={years.slice(0, 3)} />
+      </Usage>
+      <Usage screen="Settings / Country / Sheet" note="с флагом">
+        <RadioList
+          label="Страна"
+          defaultValue="ru"
+          options={[
+            { value: 'ru', label: 'Россия', trailing: <Flag code="ru" /> },
+            { value: 'by', label: 'Беларусь', trailing: <Flag code="by" /> },
+            { value: 'ge', label: 'Грузия', trailing: <Flag code="ge" /> },
+          ]}
+        />
+      </Usage>
+      <Usage screen="Settings / Currency / Sheet" note="текст справа">
+        <RadioList
+          label="Валюта"
+          defaultValue="rub"
+          options={[
+            { value: 'rub', label: 'Российский рубль', trailing: '₽ · RUB' },
+            { value: 'byn', label: 'Белорусский рубль', trailing: 'Br · BYN' },
+            { value: 'usd', label: 'Доллар США', trailing: '$ · USD' },
+          ]}
+        />
+      </Usage>
     </UsageGrid>
   ),
 };
