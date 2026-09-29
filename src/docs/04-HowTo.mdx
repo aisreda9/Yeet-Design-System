@@ -12,22 +12,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 5. Проектируйте экран во всех состояниях: Default / Populated, Empty, No Results, Focused, Filled, Loading.
 
 ## Разработчикам
-
-```tsx
-import { Button, IconButton } from 'src/atoms';
-import { InputGroup, Field } from 'src/molecules';
-import { Header, BottomNav } from 'src/organisms';
-import { Screen } from 'src/templates';
-import 'src/tokens/tokens.css';
-
-<Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />}>
-  …
-</Screen>
-```
-
-- Тема: `document.documentElement.dataset.theme = 'dark'`.
-- В компонентах — **только семантические и компонентные токены** (`--color-*`, `--button-*`), никогда примитивы и hex.
-- Для iOS (SwiftUI) имена токенов и компонентов те же; таблица соответствий — «Процессы / Figma ↔ код» и «Процессы / iOS и Android».
+Запуск, подключение (web, iOS, Android), ассеты, JSON и проверки — **Старт / Быстрый старт**. Правила токенов и слоёв там же.
 
 ## Чек-лист нового компонента
 Полный порядок (Figma → реестр → код → «В флоу» → QA → эталоны) и чек-лист PR — `CONTRIBUTING.md` в репозитории.
