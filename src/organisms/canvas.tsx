@@ -119,7 +119,7 @@ export function OutfitCanvas({ items, onChange, selectedId, onSelect, hint, ref,
     const hit = (e.target as Element).closest<HTMLElement>('.y-canvas__item');
     // подсказка и её кнопки — не жест холста
     if (!hit && (e.target as Element).closest('.y-canvas__hint')) return;
-    e.currentTarget.setPointerCapture?.(e.pointerId);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* указатель уже неактивен (синтетическое событие) — жест идёт и без захвата */ }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current;
     const count = pointers.current.size;
