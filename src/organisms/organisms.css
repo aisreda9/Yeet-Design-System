@@ -150,14 +150,14 @@
 .y-sheet--panel > .y-sheet__title + .y-text--secondary { margin-top: calc(var(--space-8) * -1); }
 .y-screen__content > .y-sheet--panel:last-child { flex: 1 0 auto; } /* панель внизу экрана тянется до низа */
 
-/* Overlay: затемнение проявляется (fade), шторка выезжает снизу на пружине quick; уход — быстрее (exit).
+/* Overlay: затемнение проявляется (fade), шторка выезжает снизу на пружине без перелёта (--motion-sheet); уход — быстрее (exit).
    Всё на transition + @starting-style, а не на keyframes: появление, уход и смахивание прерываются
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
   position: absolute; inset: 0; z-index: 5; --y-dim: 1;
-  /* D5: шторка приезжает на пружине без перелёта — stiffness 300 как у quick, но ζ = 1 (x = 1 − (1 + ωt)·e^−ωt, 540 мс до 0,1 %).
-     TODO(tokens): токен motion.spring.critical → --motion-sheet. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
-  --sheet-spring: 540ms linear(0, 0.059, 0.184, 0.326, 0.462, 0.58, 0.678, 0.756, 0.818, 0.865, 0.901, 0.927, 0.947, 0.962, 0.972, 0.98, 0.986, 0.99, 0.993, 0.995, 0.996, 0.997, 0.998, 0.999, 1);
+  /* D5: шторка приезжает на пружине без перелёта — токен --motion-sheet (motion.spring.critical: stiffness 300 как у quick, ζ = 1, 540 мс).
+     При «Уменьшении движения» токен сам даёт 1ms. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
+  --sheet-spring: var(--motion-sheet);
   /* верх высокой шторки — под статус-баром + 8 (D2): токен --sheet-top-gap */
   display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
 }
@@ -169,7 +169,6 @@
    палец вниз забирает жест шторки (touchmove в OverlayLayer). Лента чипсов — горизонталь своя, вертикаль — телу / шторке (C1, C4). */
 .y-overlay .y-sheet { transition: transform var(--sheet-spring); touch-action: none; }
 .y-overlay .y-sheet[role='alertdialog'] { transition: transform var(--motion-appear); } /* диалог — 240 мс standard, без пружины (C7) */
-@media (prefers-reduced-motion: reduce) { .y-overlay { --sheet-spring: 1ms linear; } }
 .y-overlay .y-sheet__body { touch-action: pan-y; }
 .y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
@@ -323,10 +322,11 @@
 /* штамп у правого нижнего угла коллажа на любой ширине: коллаж квадратный (100cqw), над ним превью 96 + отступы 3 + 20; штамп заходит на 73 выше низа коллажа */
 .y-today__stamp { position: absolute; right: 20px; top: calc(119px + 100cqw - 73px); z-index: 2; }
 
-/* Создание образа · выбор вещей: разделы с H2, карусель по центру, соседние карточки выглядывают, разделители во всю ширину */
+/* Создание образа · выбор вещей: разделы с H2, карусель по центру, соседние карточки выглядывают, разделители с полями 20 */
 .y-slots { display: flex; flex-direction: column; gap: var(--space-20); padding-top: var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating); flex: 1 0 auto; overflow: hidden; }
 .y-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter); }
-.y-slot + .y-slot { border-top: 1px solid var(--color-divider); padding-top: var(--space-20); }
+.y-slot + .y-slot { position: relative; padding-top: var(--space-20); }
+.y-slot + .y-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* как atom divider: линия с полями 20, не во всю ширину */
 .y-slot__row { display: flex; justify-content: center; align-items: center; gap: var(--space-8); }
 .y-slot__row > * { flex: none; width: calc((100% - 7px) / 2); } /* ширина колонки сетки: 173 при 393 */
 .y-slot__add { aspect-ratio: 173 / 172; display: grid; place-items: center; }
@@ -398,13 +398,14 @@
 .y-stylist-face { display: block; object-fit: contain; user-select: none; }
 
 /* ─── ItemSlots (#27) ─── */
-/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель во всю ширину; заголовок H2 → 16 → ряд карточек 173 × 172 */
+/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель с полями 20; заголовок H2 → 16 → ряд карточек 173 × 172 */
 .y-item-slots {
   display: flex; flex-direction: column; padding-top: var(--space-20);
   background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
 }
 .y-item-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter) var(--space-20); }
-.y-item-slot + .y-item-slot { border-top: 1px solid var(--color-divider); padding-top: var(--space-20); }
+.y-item-slot + .y-item-slot { position: relative; padding-top: var(--space-20); }
+.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* Flow 2.0: instance divider 353 при 393 — поля 20, цвет как у atom */
 /* ряд выходит на поля экрана; поля ряда (50 % секции + 20 − 86.5 = 110 при 393) дают первой и последней вещи встать по центру */
 .y-item-slot__row {
   --slot-card: 173px;

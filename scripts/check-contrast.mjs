@@ -10,11 +10,6 @@
 //   · не-текст 3:1 (WCAG 1.4.11) — фокус-кольцо, индикаторы выбранного (accent), ошибки (danger) × поверхности.
 //   · декоративный не-текст — в коридоре (хэндл шторки ≈ 1,5:1, D8): заметно, но не громко.
 // Полупрозрачный фон кладётся на каждую поверхность, где компонент может стоять; берётся худший случай.
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { tokens: t } = await import('../src/tokens/model.js'); // tokens/tokens.json (DTCG) → удобная форма
 const args = new Set(process.argv.slice(2));
 const brandsAreErrors = args.has('--brands=error');

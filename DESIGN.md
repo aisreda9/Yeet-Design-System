@@ -149,7 +149,7 @@
 | `--radius-full` | 999 | Аватар, радио |
 | `--radius-overlay` | 48 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) |
 
-Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`, `--sheet-radius-bottom` → `bar`.
+Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`.
 <!-- /gen:radius -->
 
 ### 3.6 Тени

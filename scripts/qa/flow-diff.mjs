@@ -19,7 +19,7 @@ if (unknown.length) { console.error(`Нет в design/figma-flows.json: ${unknow
 // Осознанные замены цветов (контраст AA): цвет флоу → цвет кода.
 const colorAlias = { '777777': '6e6e6e', ff4230: 'cc291b' };
 
-const norm = (s) => s.toLowerCase().replace(/ё/g, 'е').replace(/[«»"“”„]/g, '"').replace(/[ \s]+/g, ' ').trim();
+const norm = (s) => s.toLowerCase().replace(/ё/g, 'е').replace(/[«»"“”„]/g, '"').replace(/[\u00a0\s]+/g, ' ').trim();
 const lev = (a, b) => {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
   for (let j = 1; j <= b.length; j++) d[0][j] = j;
@@ -102,7 +102,7 @@ for (const [slug, frame] of Object.entries(frames)) {
   const used = new Set();
   const rows = [], okRows = [];
   let screenBad = 0;
-  for (const [text, x, y, w, h, size, fam, color] of frame.t) {
+  for (const [text, x, y, w, , size, fam, color] of frame.t) {
     total++;
     const t = norm(text);
     let best = null, score = 0;

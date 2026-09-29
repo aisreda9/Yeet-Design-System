@@ -183,7 +183,6 @@ val YeetColorScheme.sheetHandle: Color get() = handle
 object YeetComponent {
     val cardRadius = YeetRadius.lg
     val sheetRadius = YeetRadius.xl
-    val sheetRadiusBottom = YeetRadius.bar
     /** Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top */
     val sheetTopGap = YeetSpace.s8
     /** Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
