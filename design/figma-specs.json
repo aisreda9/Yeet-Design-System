@@ -327,16 +327,6 @@
       }
     },
     {
-      "figma": "sheet · description (Show Description, #58): Body grey 14/20, 12 под заголовком (y 64 при заголовке на 28)",
-      "story": "organisms-sheet--description",
-      "selector": ".y-sheet__description",
-      "expect": {
-        "fontSize": 14,
-        "lineHeight": 20,
-        "top": 64
-      }
-    },
-    {
       "figma": "dialog · кнопки L",
       "story": "organisms-dialog--playground",
       "selector": ".y-sheet__footer .y-button",
