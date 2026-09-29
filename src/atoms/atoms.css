@@ -124,8 +124,9 @@
 .y-stamp__label { rotate: 15deg; }
 .y-stamp:active .y-stamp__shape { scale: var(--gesture-press-scale-stamp); }
 .y-stamp:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 50%; }
-/* done: 148 → 78 (×0.53), поворот −60°, чёрный, текст → «отменить» */
-.y-stamp--done .y-stamp__shape { transform: scale(0.53) rotate(-60deg); color: var(--button-secondary-bg); }
+/* done: 148 → 78 (×0.53), поворот −60°, чёрный, текст → «отменить». doneSize S: 148 → 56 (×0.378, детали образа 440:3008) */
+.y-stamp--done .y-stamp__shape { transform: scale(var(--stamp-done-scale, 0.53)) rotate(-60deg); color: var(--button-secondary-bg); }
+.y-stamp--done-S { --stamp-done-scale: 0.378; }
 .y-stamp--done .y-stamp__done { color: var(--button-secondary-fg); }
 .y-stamp--done .y-stamp__label { opacity: 0; transform: scale(0.6); }
 .y-stamp--done .y-stamp__done { opacity: 1; transform: none; }
@@ -136,11 +137,17 @@
 
 /* Зона нажатия ≥ 44 без изменения вида (HIG 44 pt, Material 48 dp): невидимый ::after выходит за края мелкого элемента.
    :where — нулевая специфичность, собственное position компонента (absolute у лайка) не перебивается. */
-:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-avatar-stack__people, .y-tab-bar__tab) { position: relative; }
-:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-avatar-stack__people, .y-tab-bar__tab)::after {
+:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-link, .y-avatar-stack__people, .y-tab-bar__tab) { position: relative; }
+:where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-link, .y-avatar-stack__people, .y-tab-bar__tab)::after {
   content: ''; position: absolute;
   top: min(0px, calc((100% - 44px) / 2)); bottom: min(0px, calc((100% - 44px) / 2));
   left: min(0px, calc((100% - 44px) / 2)); right: min(0px, calc((100% - 44px) / 2));
 }
 /* Соседи без зазора не делят зону: вкладки таб-бара на 320 (gap 0) растут только по вертикали — ширина ячейки и есть её зона */
 @container (max-width: 300px) { .y-tab-bar__tab::after { left: 0; right: 0; } }
+
+/* Link — инлайн-ссылка в тексте (юридическая подпись входа, диалог удаления, e-mail в Legal): цвет текста вокруг, подчёркивание, видимый фокус */
+.y-link { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; border-radius: 2px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.y-link:visited { color: inherit; } /* посещённая ссылка не перекрашивается: цвет задаёт текст, а не история браузера */
+.y-link:hover { text-decoration-thickness: 2px; }
+.y-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
