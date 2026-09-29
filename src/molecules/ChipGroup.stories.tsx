@@ -12,7 +12,7 @@ const meta = {
   tags: ['autodocs'],
   args: { wrap: true, chips: [{ label: 'Все', selected: true }, { label: 'Весна' }, { label: 'Лето' }, { label: 'Осень' }, { label: 'Зима' }] },
   decorators: [unlessBare(withWidth(353))],
-  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 36. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing). С `onToggle` чипс — переключатель (`aria-pressed`), крестик — отдельная кнопка «Удалить: …» (`onRemove`), идентичность — `value` (по умолчанию `label`).' } } },
+  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 36. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing). С `onToggle` чипс — переключатель (`aria-pressed`), крестик — отдельная кнопка «Удалить: …» (`onRemove`), идентичность — `value` (по умолчанию `label`). Выбор можно отдать группе: `defaultValue` (uncontrolled) или `value` + `onValueChange` (controlled), `multiple={false}` — одиночный.' } } },
 } satisfies Meta<typeof ChipGroup>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -70,4 +70,20 @@ export const InSheet: Story = {
         <Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="grey" /></Grid>
       </Sheet>
     )),
+};
+
+/**
+ * Uncontrolled: `defaultValue` — группа сама переключает чипсы и сообщает новый выбор в `onValueChange`.
+ * Сценарий проверки: в «Сезонах» нажать «Лето» — выбраны «Весна» и «Лето»; в «Поводе» нажать «Ужин» — «Прогулка» снимается.
+ */
+export const Uncontrolled: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Без состояния снаружи',
+  tags: ['bare'],
+  render: () => (
+    <UsageGrid min={353}>
+      <Usage screen="Sheet · Season" note="множественный выбор"><ChipGroup wrap defaultValue={['spring']} chips={[{ label: 'Весна', value: 'spring' }, { label: 'Лето', value: 'summer' }, { label: 'Осень', value: 'autumn' }, { label: 'Зима', value: 'winter' }]} /></Usage>
+      <Usage screen="Outfit Creation / Occasion" note="multiple={false}"><ChipGroup wrap multiple={false} defaultValue={['walk']} chips={[{ label: 'Прогулка', value: 'walk' }, { label: 'Ужин', value: 'dinner' }, { label: 'Работа', value: 'work' }]} /></Usage>
+    </UsageGrid>
+  ),
 };

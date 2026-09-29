@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState, type ComponentPropsWithRef, type FocusEvent, type PointerEvent, type ReactNode } from 'react';
 import { Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { cx } from '../utils/cx';
@@ -13,9 +13,11 @@ import photoGallery from '../icons/art/photo-gallery.png';
  * Подсказка поверх холста или фото, Body 14 с иконкой 16.
  * `default` — пилюля `elevated` с тенью; `onPhoto` — без подложки, белый текст и иконка поверх фото (Figma: hint · On Photo, флоу Search / Photo / Crop).
  */
-export function Hint({ icon = 'fingers-pinch', tone = 'default', children }: { icon?: IconName; tone?: 'default' | 'onPhoto'; children: ReactNode }) {
+export type HintProps = ComponentPropsWithRef<'span'> & { icon?: IconName; /** Окраска относительно фона. */ tone?: 'default' | 'onPhoto' };
+
+export function Hint({ icon = 'fingers-pinch', tone = 'default', children, className, ...rest }: HintProps) {
   return (
-    <span className={cx('y-hint', tone === 'onPhoto' && 'y-hint--on-photo')} role="note">
+    <span className={cx('y-hint', tone === 'onPhoto' && 'y-hint--on-photo', className)} role="note" {...rest}>
       <Icon name={icon} size={16} />
       {children}
     </span>
@@ -33,7 +35,17 @@ export function Hint({ icon = 'fingers-pinch', tone = 'default', children }: { i
  * «Отменить» и «×» сначала доигрывают уход, потом вызывают `onClose`.
  * `size`: **M** — 52, паддинг 20 (тост над таб-баром); **S** — 48, паддинг 16 (подсказка на холсте образа, 313 при отступах 20).
  */
-export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M' }: { children: ReactNode; onClose?: () => void; /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */ onUndo?: () => void; /** Закрыться самому через 4 с (с «Отменить» — 6 с). Нужен `onClose`. */ autoHide?: boolean; /** S — подсказка на холсте образа. */ size?: 'M' | 'S' }) {
+export type SnackbarProps = ComponentPropsWithRef<'div'> & {
+  onClose?: () => void;
+  /** «Отменить» — изогнутая стрелка справа (флоу: «Вещь перемещена в архив»). */
+  onUndo?: () => void;
+  /** Закрыться самому через 4 с (с «Отменить» — 6 с). Нужен `onClose`. */
+  autoHide?: boolean;
+  /** S — подсказка на холсте образа. */
+  size?: 'M' | 'S';
+};
+
+export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M', className, ...rest }: SnackbarProps) {
   const [closing, setClosing] = useState(false);
   const leaving = useContext(LeavingContext) || closing;
   const [paused, setPaused] = useState(false);
@@ -48,9 +60,15 @@ export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M' }: { 
     const t = window.setTimeout(() => leave(), onUndo ? gesture.snackbarAction : gesture.snackbar);
     return () => window.clearTimeout(t);
   }, [autoHide, onClose, onUndo, paused, leaving, leave]);
-  const hold = { onPointerEnter: () => setPaused(true), onPointerLeave: () => setPaused(false), onFocus: () => setPaused(true), onBlur: () => setPaused(false) };
+  // пауза таймера не отнимает у потребителя его обработчики
+  const hold = {
+    onPointerEnter: (e: PointerEvent<HTMLDivElement>) => { setPaused(true); rest.onPointerEnter?.(e); },
+    onPointerLeave: (e: PointerEvent<HTMLDivElement>) => { setPaused(false); rest.onPointerLeave?.(e); },
+    onFocus: (e: FocusEvent<HTMLDivElement>) => { setPaused(true); rest.onFocus?.(e); },
+    onBlur: (e: FocusEvent<HTMLDivElement>) => { setPaused(false); rest.onBlur?.(e); },
+  };
   return (
-    <div className={cx('y-snackbar', size === 'S' && 'y-snackbar--S', leaving && 'is-leaving')} role="status" {...(autoHide ? hold : {})}>
+    <div className={cx('y-snackbar', size === 'S' && 'y-snackbar--S', leaving && 'is-leaving', className)} role="status" {...rest} {...(autoHide ? hold : {})}>
       <span>{children}</span>
       {onUndo && (
         <button type="button" aria-label="Отменить" onClick={() => leave(onUndo)}>
@@ -69,9 +87,16 @@ export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M' }: { 
 /* ─── EmptyState ────────────────────────────────────────────────────── */
 
 /** Пустое состояние и «ничего не найдено». Ставится по центру свободной области экрана. */
-export function EmptyState({ title, description, action }: { title: string; description: ReactNode; /** Кнопка L через 32: «Добавить вещь» (primary), «Сбросить фильтры» (tertiary, по умолчанию). */ action?: { label: string; variant?: 'primary' | 'tertiary'; onClick?: () => void } }) {
+export type EmptyStateProps = Omit<ComponentPropsWithRef<'div'>, 'title' | 'children'> & {
+  title: string;
+  description: ReactNode;
+  /** Кнопка L через 32: «Добавить вещь» (primary), «Сбросить фильтры» (tertiary, по умолчанию). */
+  action?: { label: string; variant?: 'primary' | 'tertiary'; onClick?: () => void };
+};
+
+export function EmptyState({ title, description, action, className, ...rest }: EmptyStateProps) {
   return (
-    <div className="y-empty">
+    <div className={cx('y-empty', className)} {...rest}>
       <h2 className="y-h1 y-text--primary">{title}</h2>
       <p className="y-body y-text--secondary">{description}</p>
       {action && (
@@ -86,9 +111,11 @@ export function EmptyState({ title, description, action }: { title: string; desc
 /* ─── LoadingState ──────────────────────────────────────────────────── */
 
 /** Загрузка внутри области: крутящаяся `spin` + подпись. */
-export function LoadingState({ label }: { label: string }) {
+export type LoadingStateProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & { label: string };
+
+export function LoadingState({ label, className, ...rest }: LoadingStateProps) {
   return (
-    <span className="y-loading" role="status" aria-live="polite">
+    <span className={cx('y-loading', className)} role="status" aria-live="polite" {...rest}>
       <Icon name="spin" />
       {label}
     </span>
@@ -104,10 +131,12 @@ const photoArt = {
 };
 
 /** Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): 173×173, 3D-иллюстрация и подпись в две строки. */
-export function PhotoTile({ source, label, onClick }: { source: 'gallery' | 'camera'; label?: string; onClick?: () => void }) {
+export type PhotoTileProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & { source: 'gallery' | 'camera'; label?: string };
+
+export function PhotoTile({ source, label, className, ...rest }: PhotoTileProps) {
   const art = photoArt[source];
   return (
-    <button type="button" className="y-photo-tile" onClick={onClick}>
+    <button type="button" className={cx('y-photo-tile', className)} {...rest}>
       <span className="y-photo-tile__art" aria-hidden>
         <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top, left: (63 - art.size) / 2 }} />
       </span>

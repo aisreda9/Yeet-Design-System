@@ -50,3 +50,13 @@ export const InFlow: Story = {
     </UsageGrid>
   ),
 };
+
+/**
+ * Uncontrolled: только `defaultValue`, без `value` и обработчика — переключатель хранит выбор сам.
+ * Сценарий проверки: нажать «Образы» — пилюля переезжает; Tab в группу, стрелки ←→ и Home / End переключают сегменты.
+ */
+export const Uncontrolled: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Без состояния снаружи',
+  render: () => <SegmentControl label="Раздел гардероба" defaultValue="outfits" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wishlist', label: 'Вишлист' }]} />,
+};
