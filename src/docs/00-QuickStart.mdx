@@ -1,0 +1,113 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Старт/Быстрый старт" />
+
+# Быстрый старт для разработчиков
+
+От клона репозитория до первого экрана — за пять минут. Здесь только самое нужное и ссылки; подробности живут на своих страницах и в файлах репозитория, а не копируются сюда.
+
+## 1. Запустить
+
+Нужен Node.js 22+.
+
+```bash
+npm ci
+npm run storybook          # http://localhost:6006 — живые компоненты и экраны
+npm run build-storybook    # статическая сборка в storybook-static/
+```
+
+Что посмотреть первым: **Прототип / Приложение** — всё приложение кликабельно (переходы, шторки, жесты), **Pages / Экраны флоу** — те же экраны по одному.
+Тема, размер экрана (320–430) и бренд-палитра переключаются в верхней панели.
+
+## 2. Подключить
+
+**Web (React)** — импорт всегда из папки слоя, не из файла:
+
+```tsx
+import { Button } from 'src/atoms';
+import { Field, InputGroup } from 'src/molecules';
+import { BottomNav, Header } from 'src/organisms';
+import { Screen } from 'src/templates';
+import 'src/tokens/tokens.css';
+
+<Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />}>
+  <InputGroup><Field label="Название" input={{}} /></InputGroup>
+  <Button size="L" fullWidth>Добавить</Button>
+</Screen>
+```
+
+- Тема: `document.documentElement.dataset.theme = 'dark'`, бренд-палитра — `dataset.brand`.
+- В стилях — только семантические и компонентные токены (`--color-*`, `--button-*`), без hex и примитивов.
+- Слой импортирует только слои ниже себя: атом → молекула → организм → шаблон → экран.
+
+**iOS (SwiftUI, iOS 16+)** — Swift Package Manager по URL репозитория, продукт `YeetDesignSystem`:
+
+```swift
+.package(url: "https://github.com/indiekola/Yeet-Design-System.git", branch: "main")
+```
+
+**Android (Jetpack Compose)** — модуль или Maven Local:
+
+```bash
+cd native/android && ./gradlew :yeet-design-system:publishToMavenLocal   # design.yeet:yeet-design-system
+```
+
+Только токены, без компонентов: скопируйте `YeetTokens.swift` / `YeetTokens.kt` и шрифты. Полная инструкция и правила нативных компонентов — **Процессы / iOS и Android**, `native/ios/README.md`, `native/android/README.md`.
+
+## 3. Взять ассеты и JSON
+
+Файлы собираются из репозитория при каждой сборке Storybook (`npm run assets`) и всегда актуальны. Полный каталог, включая все иконки по одной, — **Процессы / Ресурсы**.
+
+| Файл | Что внутри | Зачем |
+|---|---|---|
+| <a href="./downloads/tokens/tokens.json" download>tokens.json</a> | Единый источник: цвета Light / Dark, отступы, радиусы, шрифты, тени, анимации, жесты, хаптика | Любой генератор, свои платформы |
+| <a href="./downloads/tokens/tokens.css" download>tokens.css</a> | CSS-переменные обеих тем и брендов | Web |
+| <a href="./downloads/tokens/ios/YeetTokens.swift" download>YeetTokens.swift</a> | Токены SwiftUI | iOS |
+| <a href="./downloads/tokens/android/YeetTokens.kt" download>YeetTokens.kt</a> | Токены Compose | Android |
+| <a href="./downloads/icons/ui-sprite.svg" download>ui-sprite.svg</a> | Линейные иконки 24 × 24, `currentColor` | Web, макеты |
+| <a href="./downloads/manifest.json" download>manifest.json</a> | Список всех файлов и имён иконок | Автоматизация, проверки |
+| <a href="./downloads/yeet-design-system.zip" download>yeet-design-system.zip</a> | Всё вышеперечисленное + иконки погоды, флаги, иллюстрации, шрифты Inter и Roboto Slab | Один раз забрать всё |
+
+**Правило одного источника:** значения токенов правятся только в `tokens/tokens.json`, затем `npm run tokens` генерирует CSS, Swift и Kotlin. Сгенерированные файлы руками не правятся.
+Реестр «компонент Figma ↔ код» и статус зрелости — `src/docs/registry.ts` (таблица — **Процессы / Figma ↔ код**).
+
+## 4. Проверить перед PR
+
+```bash
+npm run typecheck
+npm run build-storybook && npm run qa && npm run flow-diff
+npm run contrast
+npm run team              # кто над чем работает
+```
+
+Что означают проверки и когда обновлять эталоны скриншотов — `design/QA.md`.
+
+## 5. Где что лежит
+
+```
+src/atoms · molecules · organisms   компоненты и их истории (*.stories.tsx)
+src/templates                        Screen, Grid, Row — каркас и раскладка
+src/pages                            экраны флоу; src/pages/prototype — карта переходов прототипа
+src/motion                           анимации, жесты, хуки
+src/docs                             страницы Storybook (MDX) и реестр Figma ↔ код
+tokens/                              tokens.json — единый источник; ios/, android/, fonts/
+native/ios · native/android          нативные библиотеки
+design/                              QA, аудит, решения (ADR)
+```
+
+## 6. Карта Storybook
+
+| Раздел | Зачем |
+|---|---|
+| **Старт** | Продукт, принципы, устройство системы, этот быстрый старт, инструкция дизайнерам |
+| **Foundations** | Токены, типографика, отступы, иконки, скролл, анимации, тексты — правила без компонентов |
+| **Atoms → Templates** | Компоненты по уровням: песочница, варианты, «В флоу» |
+| **Pages** | Экраны флоу по одному, с названиями как в Figma |
+| **Прототип** | Те же экраны, связанные в кликабельное приложение |
+| **Процессы** | Figma ↔ код, iOS и Android, Ресурсы (выгрузки и ссылки) |
+
+## Дальше
+
+- Добавить или изменить компонент — `CONTRIBUTING.md`.
+- Работать параллельно с другими сессиями и ботами — `TEAM.md`.
+- Спецификация одним файлом — `DESIGN.md`.
