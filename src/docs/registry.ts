@@ -31,10 +31,10 @@ export const registry: Entry[] = [
   { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', section: '02 Actions', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp' },
   { code: 'Badge', figma: 'badge', figmaId: '942:7125', level: 'Atoms', section: '02 Actions', story: 'Atoms/Badge' },
   { code: 'Avatar', figma: 'avatar', figmaId: '968:3666', level: 'Atoms', section: '07 Content', story: 'Atoms/Avatar', note: 'Content: Empty / Initial / Photo' },
-  { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Text' },
+  { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Divider' },
   { code: 'ColorDot', figma: 'color', figmaId: '1182:15916', level: 'Atoms', section: '01 Foundations', story: 'Atoms/ColorDot' },
-  { code: 'Text', figma: 'text styles', figmaId: null, figmaWhy: 'текстовые стили Figma, не компонент', level: 'Atoms', section: '01 Foundations', story: 'Atoms/Text' },
   { code: 'ScrollEdge', figma: 'scroll-edge', figmaId: '965:3491', level: 'Atoms', section: '05 Navigation & scroll', story: 'Templates/Screen' },
+  { code: 'Link', figma: null, figmaId: null, figmaWhy: 'компонента ещё нет, в макетах — подчёркнутый текст (203:1372, 517:7004, 513:6603); соберёт #33', level: 'Atoms', section: '02 Actions', story: 'Atoms/Link' },
 
   { code: 'Field', figma: 'input (+ input-value)', figmaId: '1182:20099', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup', note: 'Multiline 104 («Комментарий»)' },
   { code: 'InputGroup', figma: 'input-group', figmaId: '942:7264', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup' },
