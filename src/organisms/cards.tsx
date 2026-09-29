@@ -107,10 +107,11 @@ export type ItemCardProps = {
   onRemove?: () => void;
 };
 
-const kindNames: Record<Garment, string> = { top: 'Верх', bottom: 'Низ', outerwear: 'Верхняя одежда', shoe: 'Обувь', accessories: 'Аксессуары', container: 'Сумка' };
+/** Категория вещи словами — имя для скринридера по умолчанию. */
+export const garmentNames: Record<Garment, string> = { top: 'Верх', bottom: 'Низ', outerwear: 'Верхняя одежда', shoe: 'Обувь', accessories: 'Аксессуары', container: 'Сумка' };
 
 export function ItemCard({ kind, color, image, imageMeta, name, discount, label, selected, onClick, onRemove }: ItemCardProps) {
-  const a11y = [name ?? kindNames[kind], discount && `скидка ${discount}`, label].filter(Boolean).join(', ');
+  const a11y = [name ?? garmentNames[kind], discount && `скидка ${discount}`, label].filter(Boolean).join(', ');
   // карточка резиновая (ширина колонки), вещь в ней — пропорционально: 88 (фото 138) при ширине 173
   const ref = useRef<HTMLButtonElement>(null);
   const k = useFitScale(ref, 173);

@@ -87,7 +87,12 @@ export function css({ dictionary }, source) {
     }
   // Компонентные токены пересчитываются там, где меняется тема или бренд, а не только на :root
   L.push(':root,\n[data-theme],\n[data-brand] {');
-  for (const t of v.list('component')) { const o = v.orig(t); L.push(`  --${t.name}: ${isRef(o) ? `var(--${v.get(refPath(o)).name})` : t.$value};`); }
+  for (const t of v.list('component')) {
+    const o = v.orig(t), after = v.x(v.groupNode(t.path.join('.'))).after; // из исходника: SD раскрывает ссылки в $extensions
+    const val = isRef(o) ? `var(--${v.get(refPath(o)).name})` : t.$value;
+    // after — отступ отсчитывается от другого размера (верх шторки — от статус-бара)
+    L.push(`  --${t.name}: ${after ? `calc(var(--${v.get(refPath(after)).name}) + ${val})` : val};${t.$description ? ` /* ${t.$description} */` : ''}`);
+  }
   L.push('}', '');
   for (const t of v.list('typography')) {
     const o = v.orig(t);
@@ -153,9 +158,11 @@ export function swift({ dictionary, options }, source) {
   L.push('/// Компонентные токены: ссылки на семантические цвета и радиусы (tokens.json → component).', 'public enum YeetComponent {');
   for (const t of v.list('component')) {
     const o = v.orig(t);
+    if (t.$description) L.push(`    /// ${t.$description}`);
     if (!isRef(o) && o.alpha === 0) L.push(`    public static let ${t.name}: Color = .clear`);
     else if (isRef(o) && o.startsWith('{color.')) L.push(`    public static let ${t.name}: Color = YeetColor.${v.get(refPath(o)).name}`);
     else if (isRef(o) && o.startsWith('{radius.')) L.push(`    public static let ${t.name}: CGFloat = YeetRadius.${v.get(refPath(o)).name}`);
+    else if (isRef(o) && o.startsWith('{space.')) L.push(`    public static let ${t.name}: CGFloat = YeetSpace.s${v.refKey(o)}`);
     else throw new Error(`Unsupported component token ${t.path.join('.')}`);
   }
   L.push('}', '');
@@ -272,10 +279,18 @@ export function kotlin({ dictionary }, source) {
   for (const t of components) {
     if (t.$type !== 'color') continue;
     const o = v.orig(t);
+    if (t.$description) L.push(`/** ${t.$description} */`);
     L.push(`val YeetColorScheme.${t.name}: Color get() = ${isRef(o) ? v.get(refPath(o)).name : t.$value}`);
   }
   L.push('', 'object YeetComponent {');
-  for (const t of components) if (t.$type === 'dimension') L.push(`    val ${t.name} = YeetRadius.${v.get(refPath(v.orig(t))).name}`);
+  for (const t of components) {
+    if (t.$type !== 'dimension') continue;
+    const o = v.orig(t);
+    if (t.$description) L.push(`    /** ${t.$description} */`);
+    if (o.startsWith('{radius.')) L.push(`    val ${t.name} = YeetRadius.${v.get(refPath(o)).name}`);
+    else if (o.startsWith('{space.')) L.push(`    val ${t.name} = YeetSpace.s${v.refKey(o)}`);
+    else throw new Error(`Unsupported component token ${t.path.join('.')}`);
+  }
   L.push('}', '');
   L.push('/** Цвет вещи — атрибут одежды, не интерфейс. */', 'enum class YeetItemColor(val color: Color, val title: String, /** Буква / иконка на этом цвете (≥ 4.5 : 1) */ val onColor: Color) {');
   for (const t of v.list('item')) L.push(`    ${v.key(t).toUpperCase()}(${t.$value}, "${v.x(t).name}", ${v.get(`on-item.${v.key(t)}`).$value}),`);

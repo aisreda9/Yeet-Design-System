@@ -70,6 +70,8 @@ data class YeetColorScheme(
     val divider: Color,
     /** Точки фона коллажа и холста (2 px, шаг 10) · Figma ui-colors/pattern-dot */
     val patternDot: Color,
+    /** Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) · Figma ui-colors/handle */
+    val handle: Color,
 )
 
 val YeetLightColors = YeetColorScheme(
@@ -94,6 +96,7 @@ val YeetLightColors = YeetColorScheme(
     borderSubtle = Color(0x1A000000),
     divider = Color(0x0D000000),
     patternDot = Color(0x3B000000),
+    handle = Color(0x2B000000),
 )
 
 val YeetDarkColors = YeetColorScheme(
@@ -118,6 +121,7 @@ val YeetDarkColors = YeetColorScheme(
     borderSubtle = Color(0x1FF5F5F7),
     divider = Color(0x14F5F5F7),
     patternDot = Color(0x3BF5F5F7),
+    handle = Color(0x24F5F5F7),
 )
 
 /** Бренд-варианты: переопределяют семантические цвета поверх светлой / тёмной темы (web: data-brand). */
@@ -173,11 +177,17 @@ val YeetColorScheme.cardBg: Color get() = bgSubtle
 val YeetColorScheme.sheetBg: Color get() = bgElevated
 val YeetColorScheme.tabBarBg: Color get() = bgElevated
 val YeetColorScheme.inputBg: Color get() = bgSubtle
+/** Хэндл шторки, 48 × 4 (D8) */
+val YeetColorScheme.sheetHandle: Color get() = handle
 
 object YeetComponent {
     val cardRadius = YeetRadius.lg
     val sheetRadius = YeetRadius.xl
     val sheetRadiusBottom = YeetRadius.bar
+    /** Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top */
+    val sheetTopGap = YeetSpace.s8
+    /** Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
+    val sheetTitleGap = YeetSpace.s16
 }
 
 /** Цвет вещи — атрибут одежды, не интерфейс. */
@@ -229,6 +239,8 @@ object YeetRadius {
     val bar = 48.dp
     /** Аватар, радио */
     val full = 999.dp
+    /** Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) */
+    val overlay = 48.dp
 }
 
 /** Базовый экран макетов (iPhone 15/16), боковые поля. */
