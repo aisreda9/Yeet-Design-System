@@ -88,7 +88,9 @@ export function useSwipePager({ axis, count, index, onChange, size, changeHaptic
     g.current = null;
     setDrag(null); // отпускаем из текущего положения — доводку делает переход CSS
     if (!s?.axis || cancelled) return;
-    const d = along(e.clientX - s.x, e.clientY - s.y), v = along(speed.current.get().x, speed.current.get().y);
+    speed.current.add(e.clientX, e.clientY, e.timeStamp); // точка отпускания: палец мог стоять перед подъёмом
+    const vel = speed.current.get(e.timeStamp);
+    const d = along(e.clientX - s.x, e.clientY - s.y), v = along(vel.x, vel.y);
     const flick = Math.abs(v) > gesture.swipeVelocity && Math.sign(v) === Math.sign(d);
     if (!(Math.abs(d) > size * gesture.swipeDistance || flick)) return;
     const target = index + (d < 0 ? 1 : -1);
