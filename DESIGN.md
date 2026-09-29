@@ -42,6 +42,7 @@
 | Реестр Figma ↔ код, статус зрелости | Процессы / Figma ↔ код | `src/docs/registry.ts`, `src/docs/status.ts` |
 | Экраны флоу | Pages / Экраны флоу | `src/pages/` (документация экранов — PR #50–#54) |
 | Нативные платформы | Процессы / iOS и Android | `native/ios`, `native/android`, `21-Mobile.mdx` |
+| Быстрый старт: запуск, подключение, ассеты, проверки | Старт / Быстрый старт | `00-QuickStart.mdx` |
 | Ресурсы: ссылки, выгрузки | Процессы / Ресурсы | `22-Resources.mdx` |
 | Как вносить изменения, чек-лист PR | — | `CONTRIBUTING.md` |
 | Параллельная работа, зоны, замок Figma | — | `TEAM.md`, `.github/team.json`, `.github/CODEOWNERS` |
