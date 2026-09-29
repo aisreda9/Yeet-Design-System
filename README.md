@@ -83,3 +83,48 @@ npm run docs-tokens -- --check   # только сверить: код выхо�
 `native/ios` — Swift Package `YeetDesignSystem` (iOS 16+, без зависимостей): те же компоненты и props, что в React.
 Подключение через SPM по URL репозитория, таблица соответствий React ↔ Swift — [native/ios/README.md](native/ios/README.md).
 Сборку проверяет `.github/workflows/ios.yml` (macOS, iOS Simulator).
+
+## Релизы
+
+Одна версия на всю систему (`package.json` → Android AAR и тег для SPM), семвер: **major** — удалён или переименован токен,
+компонент, prop или роль токена поменяла значение так, что экраны поедут; **minor** — новое и обратно совместимое; **patch** —
+исправления без изменения API. Подробно — [`.changeset/README.md`](.changeset/README.md).
+
+1. **В каждом PR**, который меняет то, что получают приложения, — `npx changeset` (уровень и одна строка для CHANGELOG).
+2. **Подготовка релиза** (человек): ветка от `main`, затем
+
+   ```bash
+   npm run release:version   # changeset version: версия в package.json, CHANGELOG.md
+                             # + раздел «Токены» — дифф значений tokens.json с прошлым тегом
+   ```
+
+   PR «Release vX.Y.Z», мерж после зелёного CI.
+3. **Тег** на коммите мержа: `git tag vX.Y.Z && git push origin vX.Y.Z`. Workflow `.github/workflows/release.yml`:
+   проверяет, что тег совпадает с `package.json`, создаёт GitHub Release (CHANGELOG + дифф токенов между тегами)
+   и публикует AAR в GitHub Packages. Сухой прогон без публикации — Actions → Release → Run workflow.
+
+Посмотреть заранее: `npm run tokens:changelog` (последний тег → рабочее дерево), `npm run release:notes -- vX.Y.Z`.
+
+**iOS (SPM)** — отдельной публикации нет: Xcode → Add Package Dependencies → `https://github.com/indiekola/Yeet-Design-System`,
+правило «Up to Next Major» от нужной версии. SPM читает корневой `Package.swift` по тегу `vX.Y.Z`.
+
+**Android (GitHub Packages)** — `settings.gradle.kts` приложения:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/indiekola/Yeet-Design-System")
+            credentials { // GitHub Packages требует токен даже для чтения: PAT с read:packages
+                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
+                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+```
+
+и `implementation("design.yeet:yeet-design-system:X.Y.Z")`. Локально без публикации:
+`cd native/android && ./gradlew :yeet-design-system:publishToMavenLocal` + `mavenLocal()`.
