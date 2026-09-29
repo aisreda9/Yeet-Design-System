@@ -135,9 +135,9 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `EmptyState` | `YeetEmptyState` | `title`, `description`, `action: YeetEmptyStateAction` |
 | `StatTile` / `StatRow` | `YeetStatTile` / `YeetStatRow` | `label`, `value` |
 | `AccountCard` | `YeetAccountCard` | `account`, `kind: YeetAccountCardKind` (current, other, settings), `onClick`, `onEdit`, `onSettings`, `onSignOut` |
-| `Sheet` | `YeetSheet` | `title`, `type: YeetSheetType` (modal, panel), `footer: (YeetFooterAction, YeetFooterAction)?`, `onClose`, `content` |
-| `Dialog` | `YeetDialog` | `tone: YeetDialogTone` (default, destructive, danger), `title`, `description`, `cancel`, `confirm`, `onCancel`, `onConfirm`, `content` |
-| `Overlay` | `.yeetOverlay(isPresented:)` | + `dismissOnTap`, `dragToDismiss` (свайп вниз, порог 30 % / 500 pt/с) |
+| `Sheet` | `YeetSheet` | `title`, `description`, `type: YeetSheetType` (modal, panel), `footer: (YeetFooterAction, YeetFooterAction)?`, `onClose`, `label`, `handle`, `content` |
+| `Dialog` | `YeetDialog` | `tone: YeetDialogTone` (default, destructive, danger), `title`, `description`, `cancel` (без него — одна кнопка), `confirm`, `onCancel`, `onConfirm`, `handle` (нет), `dismissible`, `content` |
+| `Overlay` | `.yeetOverlay(isPresented:)`, `.yeetDialog(isPresented:)` | + `dismissOnTap`, `dragToDismiss` (свайп вниз, порог 30 % / 500 pt/с, пауза > 80 мс — не бросок) |
 | `AccountsSheet` | `YeetAccountsSheet` | `accounts`, `onEdit`, `onSettings`, `onSwitch(id)`, `onAdd` |
 | `Header` | `YeetHeader(type:)` | `.large(title:subtitle:accent:action:)`, `.bar(title:titleChip:titleChipSub:center:onBack:actions:)`, `.back(title:onBack:textAction:)`, `.search(query:placeholder:onBack:filters:)` |
 | `TabBar` / `Tab` | `YeetTabBar` / `YeetTab` | `active: Binding<YeetTab>`, `initial` |
@@ -155,10 +155,25 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 `PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`, бренд-темы (`data-brand`),
 сворачивание шапки при скролле.
 
+## Шторки и диалоги
+
+По «Единому правилу шторки» (`design/SHEETS-AUDIT.md`, решения владельца в #58):
+
+- плавающая карточка 8 от краёв, **все углы 48** (концентрично экрану), снизу `max(8, safe area)`, над клавиатурой 8, сверху не выше статус-бара + 8;
+- хэндл → 16 → заголовок → 16 → [описание → 20] → контент → 16 → футер; без хэндла заголовок на 20 от верха;
+- хэндл, заголовок и футер закреплены, прокручивается только тело; пока тело влезает, оно тянет шторку вместе с шапкой;
+- кнопки футера — равные половины через 7, если подписи влезают, иначе столбец во всю ширину;
+- закрытие одним путём (свайп, затемнение, «escape», крестик, «Отмена») — колбэк шторки вызывается один раз;
+  рискованный диалог (`destructive`, `danger`) закрывается только кнопками и «escape»;
+- шторка — пружина без перелёта, диалог — `YeetMotion.appear`, уход — `YeetMotion.exit`, при Reduce Motion — растворение.
+
+Пока токенов `radius-overlay`, `sheet-top-gap`, `sheet-handle` нет в `tokens.json`, их значения — в `YeetOverlayToken` (`Organisms/Sheet.swift`, TODO #92).
+
 ## Доступность
 
 - **VoiceOver:** у кнопок-иконок обязательный `label`; выбранные чипсы, сегменты, вкладки, радио — трейт `isSelected`;
-  заголовки — `isHeader`; sheet и dialog — `isModal`, закрываются жестом «escape» (Z двумя пальцами); Snackbar с текстом озвучивается при появлении.
+  заголовки — `isHeader`; sheet и dialog — `isModal`, при появлении VoiceOver переходит в шторку (у диалога — на безопасное действие),
+  закрываются жестом «escape» (Z двумя пальцами); Snackbar с текстом озвучивается при появлении.
 - **Dynamic Type:** `yeetText(_:)` масштабирует размер, межстрочный интервал и трекинг по кривой `textStyle` стиля
   (H1 — `.largeTitle`, H2 — `.title`, H3 — `.title3`, Body — `.body`, Caption — `.caption`); кнопки растут по высоте (`minHeight`).
 - **Зона касания ≥ 44 pt:** `yeetHitArea` расширяет форму нажатия мелких элементов (кнопки S 40, «×», иконки в snackbar) без изменения вида.
