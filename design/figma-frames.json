@@ -1,6 +1,6 @@
 {
-  "$description": "Снимок кадров страницы New app design (Figma 70:12, get_metadata): [node-id, имя, ширина, высота]. Экран — ширина 393 и высота от 852, остальное — оверлей (шторка, диалог, тост). Обновлять вручную при изменении страницы, как figma-flows.json. `node scripts/qa/coverage.mjs` сверяет кадры с историями Pages/* и якорями flow-diff.",
-  "page": "70:12",
+  "$description": "Снимок кадров страницы Screens Design 0.1 (Figma 1306:22698, до 29.09 — New app design 70:12; ID кадров прежние; get_metadata): [node-id, имя, ширина, высота]. Экран — ширина 393 и высота от 852, остальное — оверлей (шторка, диалог, тост). Обновлять вручную при изменении страницы, как figma-flows.json. `node scripts/qa/coverage.mjs` сверяет кадры с историями Pages/* и якорями flow-diff.",
+  "page": "1306:22698",
   "frames": [
     ["203:1599", "App / Splash / Default", 393, 852],
     ["337:2567", "Archive / Item / Sheet / Actions", 377, 152],
