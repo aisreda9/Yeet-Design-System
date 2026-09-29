@@ -1,3 +1,4 @@
+import type { ComponentPropsWithRef } from 'react';
 import { cx } from '../utils/cx';
 
 
@@ -5,11 +6,21 @@ import { cx } from '../utils/cx';
 
 /**
  * Статус-бар iOS — только для макетов и Storybook (Figma: system / status-bar · Tone).
- * `onAccent` — светлый текст на акцентном фоне (сплэш); `onPhoto` — белый поверх фото и камеры (Search / Photo / Crop).
+ * `tone`: `onAccent` — светлый текст на акцентном фоне (сплэш); `onPhoto` — белый поверх фото и камеры (Search / Photo / Crop).
  */
-export function StatusBar({ onAccent, onPhoto }: { onAccent?: boolean; onPhoto?: boolean }) {
+export type StatusBarProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
+  /** Окраска относительно фона (Figma: status-bar · Tone). */
+  tone?: 'default' | 'onAccent' | 'onPhoto';
+  /** @deprecated Используйте `tone="onAccent"`. */
+  onAccent?: boolean;
+  /** @deprecated Используйте `tone="onPhoto"`. */
+  onPhoto?: boolean;
+};
+
+export function StatusBar({ tone, onAccent, onPhoto, className, ...rest }: StatusBarProps) {
+  const t = tone ?? (onAccent ? 'onAccent' : onPhoto ? 'onPhoto' : 'default');
   return (
-    <div className={cx('y-status-bar', onAccent && 'y-status-bar--on-accent', onPhoto && 'y-status-bar--on-photo')} aria-hidden>
+    <div className={cx('y-status-bar', t === 'onAccent' && 'y-status-bar--on-accent', t === 'onPhoto' && 'y-status-bar--on-photo', className)} aria-hidden {...rest}>
       <span>9:41</span>
       <span className="y-status-bar__icons">
         <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5.5" width="3" height="6.5" rx="1" /><rect x="10" y="3" width="3" height="9" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
