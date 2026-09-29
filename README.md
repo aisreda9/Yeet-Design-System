@@ -60,6 +60,8 @@ Workflow `.github/workflows/storybook.yml` собирает Storybook и пуб�
 npm run team   # активные ветки, их зоны и пересечения с твоей веткой
 ```
 
+Задачу крупнее одной правки внутри сессии можно раздать агентам дизайн-системы: `/ds-team <задача>` (`.claude/skills/ds-team/SKILL.md`, агенты `.claude/agents/ds-*.md`, правила Figma → код — `design/FIGMA-RULES.md`).
+
 На каждом PR workflow `team-overlap.yml` ставит метки `zone:*` и пишет, с какими открытыми PR есть общие файлы.
 
 ## Токены для iOS и Android

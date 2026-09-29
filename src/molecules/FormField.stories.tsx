@@ -8,8 +8,20 @@ const meta = {
   title: 'Molecules/FormField',
   component: FormField,
   tags: ['autodocs'],
-  args: { label: 'Почта', description: 'Пришлём код для входа', error: '', hideLabel: false, required: false, children: () => null },
-  argTypes: { error: { control: 'text' }, description: { control: 'text' }, label: { control: 'text' }, children: { control: false } },
+  args: {
+    label: 'Почта',
+    description: 'Пришлём код для входа',
+    error: '',
+    hideLabel: false,
+    required: false,
+    children: () => null,
+  },
+  argTypes: {
+    error: { control: 'text' },
+    description: { control: 'text' },
+    label: { control: 'text' },
+    children: { control: false },
+  },
   decorators: [unlessBare(withWidth(353))],
   parameters: {
     docs: {
@@ -26,9 +38,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  render: ({ children: _, ...args }) => (
+  render: (args) => (
     <FormField {...args}>
-      {(control) => <InputGroup><Field label="name@mail.ru" error={!!args.error} input={{ ...control, type: 'email' }} /></InputGroup>}
+      {(control) => (
+        <InputGroup>
+          <Field label="name@mail.ru" error={!!args.error} input={{ ...control, type: 'email' }} />
+        </InputGroup>
+      )}
     </FormField>
   ),
 };
@@ -39,10 +55,42 @@ export const States: Story = {
   tags: ['bare'],
   render: () => (
     <UsageGrid min={353}>
-      <Usage screen="обычное"><FormField label="Имя">{(c) => <InputGroup><Field label="Как к тебе обращаться" input={{ ...c, defaultValue: 'Сима' }} /></InputGroup>}</FormField></Usage>
-      <Usage screen="с описанием"><FormField label="Почта" description="Пришлём код для входа">{(c) => <InputGroup><Field label="name@mail.ru" input={{ ...c, type: 'email' }} /></InputGroup>}</FormField></Usage>
-      <Usage screen="с ошибкой"><FormField label="Пароль" description="Не короче 8 символов" error="Слишком короткий пароль">{(c) => <InputGroup><Field label="Пароль" error input={{ ...c, type: 'password', defaultValue: 'yeet' }} /></InputGroup>}</FormField></Usage>
-      <Usage screen="лейбл скрыт" note="hideLabel"><FormField label="Поиск по гардеробу" hideLabel>{(c) => <InputGroup><Field label="Поиск по гардеробу" input={c} /></InputGroup>}</FormField></Usage>
+      <Usage screen="обычное">
+        <FormField label="Имя">
+          {(c) => (
+            <InputGroup>
+              <Field label="Как к тебе обращаться" input={{ ...c, defaultValue: 'Сима' }} />
+            </InputGroup>
+          )}
+        </FormField>
+      </Usage>
+      <Usage screen="с описанием">
+        <FormField label="Почта" description="Пришлём код для входа">
+          {(c) => (
+            <InputGroup>
+              <Field label="name@mail.ru" input={{ ...c, type: 'email' }} />
+            </InputGroup>
+          )}
+        </FormField>
+      </Usage>
+      <Usage screen="с ошибкой">
+        <FormField label="Пароль" description="Не короче 8 символов" error="Слишком короткий пароль">
+          {(c) => (
+            <InputGroup>
+              <Field label="Пароль" error input={{ ...c, type: 'password', defaultValue: 'yeet' }} />
+            </InputGroup>
+          )}
+        </FormField>
+      </Usage>
+      <Usage screen="лейбл скрыт" note="hideLabel">
+        <FormField label="Поиск по гардеробу" hideLabel>
+          {(c) => (
+            <InputGroup>
+              <Field label="Поиск по гардеробу" input={c} />
+            </InputGroup>
+          )}
+        </FormField>
+      </Usage>
     </UsageGrid>
   ),
 };
@@ -53,12 +101,25 @@ function SignInDemo() {
   return (
     <form
       style={{ display: 'grid', gap: 16 }}
-      onSubmit={(e) => { e.preventDefault(); setError(/^\S+@\S+\.\S+$/.test(email) ? '' : 'Проверьте адрес: нужен вид name@mail.ru'); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        setError(/^\S+@\S+\.\S+$/.test(email) ? '' : 'Проверьте адрес: нужен вид name@mail.ru');
+      }}
     >
       <FormField label="Почта" description="Пришлём код для входа" error={error} required>
-        {(c) => <InputGroup><Field label="name@mail.ru" error={!!error} input={{ ...c, type: 'email', value: email, onChange: (e) => setEmail(e.target.value) }} /></InputGroup>}
+        {(c) => (
+          <InputGroup>
+            <Field
+              label="name@mail.ru"
+              error={!!error}
+              input={{ ...c, type: 'email', value: email, onChange: (e) => setEmail(e.target.value) }}
+            />
+          </InputGroup>
+        )}
       </FormField>
-      <Button type="submit" size="XL" fullWidth>Получить код</Button>
+      <Button type="submit" size="XL" fullWidth>
+        Получить код
+      </Button>
     </form>
   );
 }
