@@ -12,8 +12,6 @@
  *   3. Component   (--button-*, …) решения конкретного компонента из семантики.
  */
 
-@import './tokens.generated.css' layer(yeet.tokens); /* слой — src/styles.css; стили потребителя вне слоёв перебивают токены */
+@import './tokens.generated.css';
 
-@layer yeet.tokens {
-  *, *::before, *::after { box-sizing: border-box; }
-}
+*, *::before, *::after { box-sizing: border-box; }

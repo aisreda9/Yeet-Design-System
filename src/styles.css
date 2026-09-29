@@ -4,12 +4,12 @@
  * Каскадные слои: порядок слоёв, а не специфичность, решает, кто кого перебивает между уровнями системы —
  * токены < атомы < молекулы < организмы < шаблоны. Стили потребителя вне слоёв (обычный CSS приложения,
  * `className` на компоненте) перебивают любой стиль системы без `!important` и цепочек селекторов.
- * Файлы уровней не оборачиваются в `@layer` сами — слой им назначает этот файл (`@import … layer(…)`).
- * Токены (`tokens.css`) сами кладут себя в `yeet.tokens`: их импортирует и документация отдельно.
+ * Файлы уровней, включая сгенерированные токены, не оборачиваются в `@layer` сами — слой им назначает этот файл
+ * (`@import … layer(…)`). Поэтому стили подключаются только через него: отдельный импорт `tokens.css` лёг бы вне слоёв.
  */
 @layer yeet.tokens, yeet.atoms, yeet.molecules, yeet.organisms, yeet.templates;
 
-@import './tokens/tokens.css';
+@import './tokens/tokens.css' layer(yeet.tokens);
 @import './utils/a11y.css' layer(yeet.atoms);
 @import './atoms/atoms.css' layer(yeet.atoms);
 @import './molecules/molecules.css' layer(yeet.molecules);
