@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { useState } from 'react';
 import { useArgs } from 'storybook/preview-api';
 import { ChipGroup, type Chip } from '.';
@@ -86,4 +87,58 @@ export const Uncontrolled: Story = {
       <Usage screen="Outfit Creation / Occasion" note="multiple={false}"><ChipGroup wrap multiple={false} defaultValue={['walk']} chips={[{ label: 'Прогулка', value: 'walk' }, { label: 'Ужин', value: 'dinner' }, { label: 'Работа', value: 'work' }]} /></Usage>
     </UsageGrid>
   ),
+};
+
+function KeyboardDemo() {
+  const [tags, setTags] = useState(['Офис', 'Вечер', 'Отпуск']);
+  return (
+    <div style={{ display: 'grid', gap: 16, width: 353 }}>
+      <ChipGroup wrap aria-label="Сезон" defaultValue={['spring']} chips={[{ label: 'Весна', value: 'spring' }, { label: 'Лето', value: 'summer' }, { label: 'Осень', value: 'autumn' }]} />
+      <ChipGroup wrap aria-label="Повод" multiple={false} defaultValue={['walk']} chips={[{ label: 'Прогулка', value: 'walk' }, { label: 'Ужин', value: 'dinner' }]} />
+      <ChipGroup wrap aria-label="Теги" chips={tags.map((label) => ({ label, removable: true }))} onToggle={() => {}} onRemove={(v) => setTags((cur) => cur.filter((t) => t !== v))} />
+    </div>
+  );
+}
+
+/** Клавиатура: чипсы — кнопки в порядке Tab; Enter и пробел переключают `aria-pressed`; одиночный выбор снимает прежний; крестик — своя кнопка. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true } },
+  render: () => <KeyboardDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const chip = (name: string) => canvas.getByRole('button', { name });
+    await step('Множественный выбор: пробел и Enter переключают', async () => {
+      await userEvent.tab();
+      await expect(chip('Весна')).toHaveFocus();
+      await expect(chip('Весна')).toHaveAttribute('aria-pressed', 'true');
+      await userEvent.tab();
+      await expect(chip('Лето')).toHaveFocus();
+      await userEvent.keyboard(' ');
+      await expect(chip('Лето')).toHaveAttribute('aria-pressed', 'true');
+      await expect(chip('Весна')).toHaveAttribute('aria-pressed', 'true');
+      await userEvent.tab({ shift: true });
+      await userEvent.keyboard('{Enter}');
+      await expect(chip('Весна')).toHaveAttribute('aria-pressed', 'false');
+      await expect(chip('Весна')).toHaveFocus();
+    });
+    await step('Одиночный выбор: новый чипс снимает прежний', async () => {
+      chip('Прогулка').focus();
+      await userEvent.tab();
+      await expect(chip('Ужин')).toHaveFocus();
+      await userEvent.keyboard('{Enter}');
+      await expect(chip('Ужин')).toHaveAttribute('aria-pressed', 'true');
+      await expect(chip('Прогулка')).toHaveAttribute('aria-pressed', 'false');
+    });
+    await step('Крестик — отдельная кнопка «Удалить: …» после чипса', async () => {
+      await userEvent.tab();
+      await expect(chip('Офис')).toHaveFocus();
+      await userEvent.tab();
+      await expect(chip('Удалить: Офис')).toHaveFocus();
+      await userEvent.keyboard('{Enter}');
+      await expect(canvas.queryByRole('button', { name: 'Офис' })).toBeNull();
+      await expect(chip('Вечер')).toBeInTheDocument();
+    });
+  },
 };
