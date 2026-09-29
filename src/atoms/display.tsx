@@ -14,16 +14,19 @@ export function Badge({ variant = 'primary', className, ...rest }: BadgeProps) {
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 
+/** Цвета аккаунтов — 9 цветов из Figma `avatar` (tokens.avatar.palette): без grey, white, beige — теряются на белом фоне. */
+export type AvatarColor = Exclude<ItemColor, 'grey' | 'white' | 'beige'>;
+
 export type AvatarProps = Omit<ComponentPropsWithRef<'span'>, 'color' | 'children'> & {
   size?: 'S' | 'M' | 'L';
   initial?: string;
   src?: string;
   /** Чей аватар — для скринридера: «Сима». Без имени аватар декоративный и не озвучивается (буква одна ничего не говорит). */
   name?: string;
-  /** @deprecated Используйте `name`: он озвучивается и у фото, и у буквы. */
+  /** @deprecated Бери `name`: он озвучивается и у фото, и у буквы. */
   alt?: string;
-  /** Фон буквы: у каждого аккаунта свой цвет (флоу Profile / Accounts: «Т» оранжевым). По умолчанию — акцент. */
-  color?: ItemColor;
+  /** Фон буквы: у каждого аккаунта свой цвет (флоу Profile / Accounts: «Т» оранжевым), 9 цветов из Figma. По умолчанию — акцент. */
+  color?: AvatarColor;
 };
 
 /** Аватар: L 96 (профиль), M 40 (аккаунты, настройки, чат), S 24. Без фото — буква Roboto Slab или иконка камеры. */
@@ -65,13 +68,16 @@ export function Divider({ label, className, ref, ...rest }: DividerProps) {
 
 export type ColorDotProps = Omit<ComponentPropsWithRef<'span'>, 'color' | 'children'> & {
   color: ItemColor;
-  /** Диаметр в px (графический примитив: число, а не шкала S–XL). */
+  /** Диаметр в px, по умолчанию 16 (графический примитив: число, а не шкала S–XL). */
   size?: number;
 };
 
-/** Свотч цвета вещи. Только для атрибута «цвет вещи», не для интерфейса. */
-export function ColorDot({ color, size = 12, className, style, ...rest }: ColorDotProps) {
-  return <span className={cx('y-color-dot', className)} style={{ width: size, height: size, background: `var(--yeet-item-${color})`, ...style }} {...rest} />;
+/** Светлые цвета, которые без обводки теряются на белом фоне — обводка только у них (Figma `color-dot`). */
+const outlinedDots: ReadonlySet<ItemColor> = new Set<ItemColor>(['white', 'beige']);
+
+/** Свотч цвета вещи, по умолчанию 16 (Figma `color-dot`). Только для атрибута «цвет вещи», не для интерфейса. */
+export function ColorDot({ color, size = 16, className, style, ...rest }: ColorDotProps) {
+  return <span className={cx('y-color-dot', outlinedDots.has(color) && 'y-color-dot--outlined', className)} style={{ width: size, height: size, background: `var(--yeet-item-${color})`, ...style }} {...rest} />;
 }
 
 /* ─── ScrollEdge ────────────────────────────────────────────────────── */
@@ -80,9 +86,9 @@ export function ColorDot({ color, size = 12, className, style, ...rest }: ColorD
  * Полоса затухания: контент уходит под закреплённую шапку / нижнюю навигацию и плавно гаснет.
  * Уже встроена в `Header`, `BottomNav`, `BottomBar` — отдельно нужна редко.
  */
-export type ScrollEdgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & { position: 'top' | 'bottom'; /** Высота полосы в px. */ size?: number; offset?: number };
+export type ScrollEdgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & { position: 'top' | 'bottom'; /** Высота полосы в px, по умолчанию 32 (Figma `scroll-edge`). */ size?: number; offset?: number };
 
-export function ScrollEdge({ position, size = 24, offset = 0, className, style, ...rest }: ScrollEdgeProps) {
+export function ScrollEdge({ position, size = 32, offset = 0, className, style, ...rest }: ScrollEdgeProps) {
   const edge: CSSProperties = { height: size, [position === 'top' ? 'bottom' : 'top']: -size + offset, ...style };
   return <span aria-hidden className={cx('y-scroll-edge', `y-scroll-edge--${position}`, className)} style={edge} {...rest} />;
 }

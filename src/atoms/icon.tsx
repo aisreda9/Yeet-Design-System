@@ -36,15 +36,28 @@ export function Icon({ name, size = 24, className, title, strokeWidth = 1.3, ...
 
 /* ─── Logo ──────────────────────────────────────────────────────────── */
 
-/**
- * Словесный знак yeet. Цвет наследуется: на акцентном фоне (Splash) — `--color-text-on-accent`,
- * поверх фото — `--color-text-on-photo`, в подвале настроек — `--color-text-secondary`.
- */
-export type LogoProps = Omit<ComponentPropsWithRef<'svg'>, 'children'> & { height?: number };
+/** Рамка и viewBox логотипа по Figma `yeet` 1180:20027: L — 136×88 (знак 130×60), S — 61×40 (знак 58×26.8). */
+const logoFrame = { L: { width: 136, height: 88 }, S: { width: 61, height: 40 } } as const;
 
-export function Logo({ height = 32, className, ...rest }: LogoProps) {
+/**
+ * Словесный знак yeet. Цвет наследуется (`currentColor`), отдельного `tone` нет — тоны Figma задаёт родитель:
+ * Default — `--color-text-primary`, On Dark — `--color-text-on-accent` / `--color-text-on-photo`, Muted — `--color-text-secondary`.
+ */
+export type LogoProps = Omit<ComponentPropsWithRef<'svg'>, 'children'> & {
+  /** Размер по Figma: L — рамка 136×88, S — рамка 61×40 (знак вписан с полями, как в макете). */
+  size?: 'L' | 'S';
+  /**
+   * Высота знака без полей, px (по умолчанию 32).
+   * @deprecated Для новых мест бери `size`. Проп оставлен для экранов, где высота не совпадает с L / S; при `size` игнорируется.
+   */
+  height?: number;
+};
+
+export function Logo({ size, height = 32, className, style, ...rest }: LogoProps) {
+  // `.y-logo` ставит `width: auto` — рамку L / S задаём инлайном, чтобы ширина была ровно по Figma.
+  const box = size ? { viewBox: '0 0 136 88', style: { ...logoFrame[size], ...style } } : { viewBox: '0 14 136 64', height, style };
   return (
-    <svg className={cx('y-logo', className)} height={height} viewBox="0 14 136 64" fill="currentColor" role="img" aria-label="yeet" {...rest}>
+    <svg className={cx('y-logo', className)} {...box} fill="currentColor" role="img" aria-label="yeet" {...rest}>
       {logoPaths.map((d) => <path key={d.slice(0, 12)} d={d} />)}
     </svg>
   );

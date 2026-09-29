@@ -1,15 +1,15 @@
 import type { ComponentPropsWithRef, Ref } from 'react';
-import { Avatar, Icon, IconButton } from '../atoms';
+import { Avatar, Icon, IconButton, type AvatarColor } from '../atoms';
 import { cx } from '../utils/cx';
-import { avatarColor, type ItemColor } from '../tokens/tokens';
+import { avatarColor } from '../tokens/tokens';
 
 /* ─── Account ───────────────────────────────────────────────────────── */
 
 /** `color` — из палитры аккаунтов (tokens.avatar.palette); без него цвет выбирается по `id`. */
-export type Account = { id: string; name: string; email: string; initial?: string; photo?: string; color?: ItemColor };
+export type Account = { id: string; name: string; email: string; initial?: string; photo?: string; color?: AvatarColor };
 
 // Имя написано рядом с аватаром (или в aria-label кнопки), поэтому сам аватар декоративный — без повтора имени
-const avatarOf = (a: Account) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color ?? avatarColor(a.id)} />;
+const avatarOf = (a: Account) => <Avatar size="M" src={a.photo} initial={a.initial ?? a.name[0]} color={a.color ?? (avatarColor(a.id) as AvatarColor)} />;
 
 export type AccountCardProps = Omit<ComponentPropsWithRef<'div'>, 'ref' | 'children' | 'onClick'> & {
   account: Account;
