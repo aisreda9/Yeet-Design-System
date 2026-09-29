@@ -61,14 +61,40 @@ for (const b of branches) {
   }
 }
 
-// Пересечения между чужими ветками — сигнал координатору о порядке мержа
-const pairs = [];
+// Реальный конфликт, а не просто общий файл: пробный мерж без рабочего дерева (git merge-tree)
+const conflictFiles = (a, b) => {
+  try { execFileSync('git', ['merge-tree', '--write-tree', '--name-only', a, b], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 }); return []; }
+  catch (e) {
+    if (e.status !== 1) return null;
+    // формат --name-only: id дерева, имена файлов с конфликтом, пустая строка, сообщения
+    const [, ...rest] = String(e.stdout ?? '').split('\n');
+    const names = rest.slice(0, rest.indexOf('') < 0 ? rest.length : rest.indexOf(''));
+    return [...new Set(names)].slice(0, 4);
+  }
+};
+
+// Ветки, которые не сливаются с main: их владелец подтягивает main до всего остального
+const stuck = branches.map((b) => ({ b, files: conflictFiles(base, b.ref) })).filter((x) => x.files && x.files.length);
+if (stuck.length) {
+  out.push('', `Не сливаются с ${config.base} — владелец подтягивает ${config.base} и решает конфликт у себя:`);
+  for (const { b, files } of stuck) out.push(`- \`${b.name}\` (отстаёт на ${lines(git('rev-list', '--count', `${b.ref}..${base}`)).join('')} коммитов): ${files.join('; ')}`);
+}
+
+// Пересечения между чужими ветками: общий файл ≠ конфликт. Показываем только реальные конфликты;
+// остальные — коротко, счётчиком (порядок мержа важен, но переделывать нечего).
+const stuckNames = new Set(stuck.map((x) => x.b.name));
+const real = [], soft = [];
 for (let i = 0; i < branches.length; i++)
   for (let j = i + 1; j < branches.length; j++) {
     const shared = branches[i].files.filter((f) => branches[j].files.includes(f));
-    if (shared.length) pairs.push(`- \`${branches[i].name}\` × \`${branches[j].name}\`: ${shared.length} общих (${shared.slice(0, 4).join(', ')}${shared.length > 4 ? ', …' : ''})`);
+    if (!shared.length) continue;
+    if (stuckNames.has(branches[i].name) || stuckNames.has(branches[j].name)) { soft.push(shared.length); continue; }
+    const c = conflictFiles(branches[i].ref, branches[j].ref);
+    if (c && c.length) real.push(`- \`${branches[i].name}\` × \`${branches[j].name}\`: ${c.join('; ')}`);
+    else soft.push(shared.length);
   }
-if (pairs.length) out.push('', 'Ветки, которые конфликтуют между собой (мержить по очереди):', ...pairs);
+if (real.length) out.push('', 'Конфликтуют между собой (мержить по очереди, второй вливает main):', ...real);
+if (soft.length) out.push('', `Ещё ${soft.length} пар веток трогают общие файлы, но сливаются без конфликта.`);
 
 // Лимиты из team.json: перегруженные зоны и слишком широкие ветки
 const limits = config.limits;
