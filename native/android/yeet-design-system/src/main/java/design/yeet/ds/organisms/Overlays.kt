@@ -97,6 +97,7 @@ import design.yeet.tokens.YeetRadius
 import design.yeet.tokens.YeetSpace
 import design.yeet.tokens.YeetSpring
 import design.yeet.tokens.sheetBg
+import design.yeet.tokens.sheetHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -105,12 +106,14 @@ import androidx.compose.ui.window.Dialog as WindowDialog
 
 /* ─── Значения, которых ещё нет в токенах ───────────────────────────── */
 
-// TODO(tokens, #93): radius-overlay = 48 — одно скругление на все 4 угла шторки и диалога (решение владельца в #58).
-//  Заменить на токен, когда его добавит tokens-сессия; пока то же значение — радиус таб-бара (концентрично экрану 56 при отступе 8).
-private val OverlayRadius: Dp get() = YeetRadius.bar
+/** Все 4 угла шторки и диалога (`radius-overlay`, концентрично экрану 56 при отступе 8, #58). */
+private val OverlayRadius: Dp get() = YeetRadius.overlay
 
-// TODO(tokens, #93): sheet-top-gap — верх высокой шторки на «статус-бар + 8» (D2). На Android статус-бар — WindowInsets.statusBars.
-private val SheetTopGap: Dp get() = YeetSpace.s8
+/** Верх высокой шторки — 8 под статус-баром (D2, `sheet-top-gap`). На Android статус-бар — WindowInsets.statusBars. */
+private val SheetTopGap: Dp get() = YeetComponent.sheetTopGap
+
+/** Хэндл → заголовок, заголовок → контент и заголовок → описание (`sheet-title-gap`, решение владельца #58). */
+private val SheetTitleGap: Dp get() = YeetComponent.sheetTitleGap
 
 /** Отступ плавающей шторки от краёв экрана и от клавиатуры (D3, D4). */
 private val OverlayInset: Dp get() = YeetSpace.s8
@@ -177,11 +180,11 @@ private fun SheetFooter(actions: List<FooterAction>, modifier: Modifier = Modifi
 
 @Composable
 private fun SheetHandle() {
-    // TODO(tokens, #93): sheet-handle — отдельный цвет хэндла ≈ 1,5 : 1 (D8); пока bg-subtle, хэндл декоративный
+    // хэндл декоративный, ≈ 1,5 : 1 к фону шторки (D8, `sheet-handle`)
     Box(
         Modifier
             .size(width = 48.dp, height = 4.dp)
-            .background(YeetTheme.colors.bgSubtle, RoundedCornerShape(YeetTheme.radius.xs)),
+            .background(YeetTheme.colors.sheetHandle, RoundedCornerShape(YeetTheme.radius.xs)),
     )
 }
 
@@ -251,7 +254,7 @@ fun Sheet(
         head = {
             if (handle) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { SheetHandle() }
-                if (hasHead) Spacer(Modifier.height(16.dp))
+                if (hasHead) Spacer(Modifier.height(SheetTitleGap))
             }
             SheetHead(title, TextVariant.H3, onClose)
         },
@@ -292,7 +295,7 @@ private fun ModalSurface(
     ) {
         if (showHead) {
             Column(Modifier.fillMaxWidth().padding(horizontal = YeetSpace.screenGutter), content = head)
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(SheetTitleGap))
         }
         Column(
             Modifier
@@ -407,7 +410,7 @@ fun Dialog(
     ModalSurface(modifier = modifier, paneTitle = title, top = 20.dp, showHead = false, head = {}, footer = footer) {
         Text(title, variant = TextVariant.H3)
         if (description != null) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(SheetTitleGap))
             Text(description, tone = TextTone.Secondary)
         }
         if (content != null) {

@@ -1,39 +1,50 @@
 import { useSlidingPill } from '../utils/useSlidingPill';
-import type { ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 import { Button, Icon, IconButton, ScrollEdge } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { ChipGroup, InputBar, type Chip } from '../molecules';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
+import { setRef } from './refs';
 import { StatusBar } from './system';
 
 /* ─── Header ────────────────────────────────────────────────────────── */
 
 type Action = { icon: IconName; label: string; onClick?: () => void };
 
-export type HeaderProps =
-  | { type: 'large'; title: string; subtitle?: ReactNode; /** Вторая строка H1 акцентом с раскрывашкой: «на каждый день ⌃» (выбор повода на главной). */ accent?: { label: string; onClick?: () => void }; action?: Action }
-  | { type: 'bar'; /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8-13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] }
-  | { type: 'back'; title: string; /** Подзаголовок Body серым через 12 под заголовком (Password Recovery, First Item Prompt). */ subtitle?: ReactNode; onBack?: () => void; /** Текстовое действие справа — Tertiary M с отступами 20: «Пропустить». */ textAction?: { label: string; onClick?: () => void } }
-  | { type: 'search'; query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string };
+type HeaderFields = {
+  large: { title: string; subtitle?: ReactNode; /** Вторая строка H1 акцентом с раскрывашкой: «на каждый день ⌃» (выбор повода на главной). */ accent?: { label: string; onClick?: () => void }; action?: Action };
+  bar: { /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8-13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] };
+  back: { title: string; /** Подзаголовок Body серым через 12 под заголовком (Password Recovery, First Item Prompt). */ subtitle?: ReactNode; onBack?: () => void; /** Текстовое действие справа — Tertiary M с отступами 20: «Пропустить». */ textAction?: { label: string; onClick?: () => void } };
+  search: { query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string };
+};
 
-/**
- * Закреплённая шапка экрана со статус-баром. Сплошная подложка + полоса затухания снизу:
- * контент скроллится под шапку и плавно гаснет.
- *
- * | type | Где |
- * |---|---|
- * | `large` | Корневые вкладки: Гардероб, Стилист, Профиль, Поиск |
- * | `bar` | Новая вещь, Архив, Корзина, детали вещи и образа, создание образа |
- * | `back` | Вход, восстановление пароля (с подзаголовком), онбординг («Пропустить» — Tertiary M) |
- * | `search` | Поиск, результаты, поиск по гардеробу |
- */
-export function Header(props: HeaderProps) {
+/** Вид шапки: `large` — корневые вкладки, `bar` — экраны с «назад» и пилюлей, `back` — вход и онбординг, `search` — поиск. */
+export type HeaderVariant = keyof HeaderFields;
+
+type HeaderOf<V extends HeaderVariant> = HeaderFields[V] &
+  ({ variant: V; type?: never } | { /** @deprecated Используйте `variant`: `type` в системе — атрибут HTML. */ type: V; variant?: never });
+
+/** Все поля всех видов — чтобы не утекали в `<header>` вместе с `...rest`. */
+type HeaderAllFields = Partial<HeaderFields['large'] & HeaderFields['bar'] & HeaderFields['back'] & HeaderFields['search']>;
+
+export type HeaderProps = Omit<ComponentPropsWithRef<'header'>, 'title' | 'children' | 'placeholder'> & { [V in HeaderVariant]: HeaderOf<V> }[HeaderVariant];
+
+/** Пропсы шапки одного вида после разбора `variant` / `type`. */
+type HeaderView = { [V in HeaderVariant]: HeaderFields[V] & { variant: V } }[HeaderVariant];
+
+export function Header(allProps: HeaderProps) {
+  const {
+    variant, type, className,
+    title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo,
+    ...rest
+  } = allProps as Omit<ComponentPropsWithRef<'header'>, 'title' | 'children' | 'placeholder'> & HeaderAllFields & { variant?: HeaderVariant; type?: HeaderVariant };
+  const props = { title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo, variant: variant ?? type } as HeaderView;
   return (
-    <header className="y-header">
+    <header className={cx('y-header', className)} {...rest}>
       <StatusBar />
       <div className="y-header__body">
-        {props.type === 'large' && (
+        {props.variant === 'large' && (
           <>
             <div className="y-header__title-row">
               <h1 className="y-h1 y-header__large-title">{props.title}</h1>
@@ -50,7 +61,7 @@ export function Header(props: HeaderProps) {
             {props.subtitle && <p className="y-body y-text--secondary y-header__subtitle">{props.subtitle}</p>}
           </>
         )}
-        {props.type === 'bar' && (
+        {props.variant === 'bar' && (
           <div className="y-header__row y-header__row--bar">
             <div className="y-header__side">
               <IconButton icon="chevron-left" label="Назад" onClick={props.onBack} />
@@ -64,7 +75,7 @@ export function Header(props: HeaderProps) {
             </div>
           </div>
         )}
-        {props.type === 'back' && (
+        {props.variant === 'back' && (
           <>
             <div className="y-header__row">
               <IconButton icon="chevron-left" label="Назад" onClick={props.onBack} />
@@ -83,7 +94,7 @@ export function Header(props: HeaderProps) {
             </div>
           </>
         )}
-        {props.type === 'search' && (
+        {props.variant === 'search' && (
           <>
             <InputBar
               placeholder={props.placeholder ?? 'Уточните текстом'}
@@ -118,10 +129,12 @@ const tabs: { id: Tab; label: string; icon?: IconName }[] = [
  * Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`; она переезжает к новой вкладке на пружине quick (`--motion-nav`).
  * Вкладка «Профиль» — буква в кружке 20 или фото профиля (`avatarSrc`, Figma: avatar · Content=Photo).
  */
-export function TabBar({ active, initial = 'С', avatarSrc, onChange }: { active: Tab; initial?: string; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string; onChange?: (t: Tab) => void }) {
-  const [ref, pill] = useSlidingPill<HTMLElement>(tabs.findIndex((t) => t.id === active));
+export type TabBarProps = Omit<ComponentPropsWithRef<'nav'>, 'children' | 'onChange'> & { active: Tab; initial?: string; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string; onChange?: (t: Tab) => void };
+
+export function TabBar({ active, initial = 'С', avatarSrc, onChange, ref, className, ...rest }: TabBarProps) {
+  const [pillRef, pill] = useSlidingPill<HTMLElement>(tabs.findIndex((t) => t.id === active));
   return (
-    <nav ref={ref} className="y-tab-bar" aria-label="Основная навигация">
+    <nav ref={(n) => { pillRef.current = n; setRef(ref, n); }} className={cx('y-tab-bar', className)} aria-label="Основная навигация" {...rest}>
       <span className="y-tab-bar__pill" style={pill} aria-hidden />
       {tabs.map((t) => (
         <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => { if (t.id !== active) haptic('select'); onChange?.(t.id); }}>
@@ -137,9 +150,11 @@ export function TabBar({ active, initial = 'С', avatarSrc, onChange }: { active
  * **Контексты:** все корневые вкладки; FAB — Гардероб и Вишлист.
  * При переходе на вкладку с FAB таб-бар сжимается и уступает место кнопке — `--motion-nav` (quick, 744 мс).
  */
-export function BottomNav({ active, fab, onFab, onTabChange, avatarSrc }: { active: Tab; fab?: boolean; onFab?: () => void; onTabChange?: (t: Tab) => void; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string }) {
+export type BottomNavProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { active: Tab; fab?: boolean; onFab?: () => void; onTabChange?: (t: Tab) => void; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string };
+
+export function BottomNav({ active, fab, onFab, onTabChange, avatarSrc, className, ...rest }: BottomNavProps) {
   return (
-    <div className="y-bottom-nav">
+    <div className={cx('y-bottom-nav', className)} {...rest}>
       <ScrollEdge position="bottom" size={40} />
       <TabBar active={active} avatarSrc={avatarSrc} onChange={onTabChange} />
       <span className={cx('y-bottom-nav__fab', fab && 'is-open')} aria-hidden={!fab}>
@@ -153,9 +168,17 @@ export function BottomNav({ active, fab, onFab, onTabChange, avatarSrc }: { acti
  * Закреплённая нижняя кнопка (CTA) поверх контента: «Добавить», «Создать образ», «Переместить в гардероб».
  * Справа опционально — вторичное действие `IconButton Secondary XL`.
  */
-export function BottomBar({ label, onClick, secondary, disabled }: { label: string; onClick?: () => void; secondary?: Action; disabled?: boolean }) {
+export type BottomBarProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onClick'> & {
+  label: string;
+  /** Нажатие главной кнопки (не всей панели). */
+  onClick?: () => void;
+  secondary?: Action;
+  disabled?: boolean;
+};
+
+export function BottomBar({ label, onClick, secondary, disabled, className, ...rest }: BottomBarProps) {
   return (
-    <div className="y-bottom-bar">
+    <div className={cx('y-bottom-bar', className)} {...rest}>
       <ScrollEdge position="bottom" size={24} />
       <Button variant="primary" size="L" fullWidth onClick={onClick} disabled={disabled}>
         {label}
@@ -169,9 +192,11 @@ export function BottomBar({ label, onClick, secondary, disabled }: { label: stri
  * Нижняя панель стилиста (флоу Stylist / Catalog, Home): белая подложка со скруглением 32 сверху и тенью,
  * хэндл, поле «Спроси у стилиста» и таб-бар.
  */
-export function StylistDock({ value, onChange, active = 'stylist', onTabChange }: { value?: string; onChange?: (v: string) => void; active?: Tab; onTabChange?: (t: Tab) => void }) {
+export type StylistDockProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onChange'> & { value?: string; onChange?: (v: string) => void; active?: Tab; onTabChange?: (t: Tab) => void };
+
+export function StylistDock({ value, onChange, active = 'stylist', onTabChange, className, ...rest }: StylistDockProps) {
   return (
-    <div className="y-dock">
+    <div className={cx('y-dock', className)} {...rest}>
       <span className="y-sheet__handle" aria-hidden />
       <InputBar placeholder="Спроси у стилиста" value={value} onChange={onChange} send={{ label: 'Отправить' }} />
       <TabBar active={active} onChange={onTabChange} />
