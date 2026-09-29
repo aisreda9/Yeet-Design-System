@@ -7,7 +7,7 @@
 .y-welcome { margin-top: calc(var(--space-12) * -1); }
 
 /* Auth / Sign In: юридическая подпись внизу экрана — 3 строки по центру, 20 от низа; ссылки — Link */
-.y-legal { margin: auto 0 -4px; text-align: center; }
+.y-legal { margin: auto 0 calc(-1 * var(--space-4)); text-align: center; }
 
 /* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
 .y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; } /* stylelint-disable-line unit-disallowed-list -- подъём над таб-баром из Figma */

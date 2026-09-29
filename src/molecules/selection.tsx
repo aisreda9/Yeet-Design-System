@@ -129,7 +129,7 @@ const chipId = (c: Chip) => c.value ?? c.label;
 /**
  * Группа чипсов на базе `Button S`: не выбран — `tertiary`, выбран — `soft`.
  * `wrap` — перенос строк (теги, цвета), иначе горизонтальный скролл (фильтры, поводы).
- * С `onToggle` чипс — переключатель (`aria-pressed`); крестик у `removable` — отдельная кнопка «Удалить: …».
+ * С `onToggle` (или `value` / `defaultValue`) чипс — переключатель (`aria-pressed`); без них — статичный текст, действуют только «×» у `removable` (отдельная кнопка «Удалить: …») и «+» (`onAdd`).
  *
  * **Выбор:** по-старому — `chips[].selected` + `onToggle` (состояние снаружи); либо `value` + `onValueChange` (controlled)
  * или `defaultValue` (uncontrolled: группа хранит выбор сама), `multiple={false}` — один выбранный.
@@ -140,8 +140,10 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
   const [value, setValue] = useControllableState<string[]>({ value: valueProp, defaultValue: defaultValue ?? [], onChange: onValueChange });
   const isSelected = (c: Chip) => (managed ? value.includes(chipId(c)) : !!c.selected);
   const toggleable = managed || !!onToggle;
+  // Лента без единого интерактивного элемента всё равно скроллится: фокус на самой ленте (axe scrollable-region-focusable)
+  const hasFocusable = toggleable || !!onAdd || chips.some((c) => c.dropdown || c.removable || c.editing);
   return (
-    <div className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center', className)} {...rest}>
+    <div tabIndex={!wrap && !hasFocusable ? 0 : undefined} className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center', className)} {...rest}>
       {onAdd && <IconButton icon="plus" label="Добавить" variant="primary" size="S" onClick={onAdd} />}
       {chips.map((c) => {
         if (c.editing)
@@ -170,14 +172,26 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
         // Фильтр-дропдаун открывает sheet, это не переключатель
         const pressed = toggleable && !c.dropdown ? selected : undefined;
         const content = <>{c.colorDot && <ColorDot color={c.colorDot} size={16} />}{c.label}</>;
+        // Без onToggle / выбора тело чипса — статичный текст: действуют только «×» и «+»
+        const isStatic = !toggleable && !c.dropdown;
         // Две кнопки в одной капсуле: вложить «удалить» в кнопку чипса нельзя
         if (c.removable)
           return (
             <span key={id} className={cx('y-button y-button--S', `y-style--${selected ? 'soft' : 'tertiary'}`, 'y-chip--trailing y-chip--removable')}>
-              <button type="button" className="y-chip__toggle" aria-pressed={pressed} onClick={toggle}>{content}</button>
+              {isStatic ? (
+                <span className="y-chip__toggle">{content}</span>
+              ) : (
+                <button type="button" className="y-chip__toggle" aria-pressed={pressed} onClick={toggle}>{content}</button>
+              )}
               <button type="button" className="y-chip__remove" aria-label={`Удалить: ${c.label}`} onClick={() => onRemove?.(id)}>
                 <Icon name="cross" />
               </button>
+            </span>
+          );
+        if (isStatic)
+          return (
+            <span key={id} className={cx('y-button y-button--S', `y-style--${selected ? 'soft' : 'tertiary'}`, 'y-chip--static')}>
+              {content}
             </span>
           );
         return (
