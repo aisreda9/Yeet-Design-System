@@ -172,7 +172,6 @@ public enum YeetComponent {
     public static let cardRadius: CGFloat = YeetRadius.lg
     public static let sheetBg: Color = YeetColor.bgElevated
     public static let sheetRadius: CGFloat = YeetRadius.xl
-    public static let sheetRadiusBottom: CGFloat = YeetRadius.bar
     public static let tabBarBg: Color = YeetColor.bgElevated
     public static let inputBg: Color = YeetColor.bgSubtle
     /// Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top
