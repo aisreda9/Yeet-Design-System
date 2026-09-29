@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { Button, Icon, IconButton } from '../atoms';
 import { AvatarStack, ChipGroup, Hint, List, ListItem, LoadingState, SegmentControl, Snackbar, StatRow, StatTile, UsageMeter, type Account } from '../molecules';
 import { AccountsSheet, BottomNav, Dialog, Header, ItemArt, ItemCard, OutfitCanvas, Overlay, PhotoArea, Sheet, StatusBar, type CanvasItem, type Garment } from '../organisms';
-import { Grid, Screen, Sticky } from '../templates';
+import { Grid, Row, Screen, Sticky } from '../templates';
 import type { ItemColor } from '../tokens/tokens';
 import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
 import { haptic, type HapticEvent } from '../utils/haptic';
@@ -150,10 +150,10 @@ export function ProfileDemo() {
     open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(close, motionMs('--motion-select')); }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
     <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={layer && <Overlay onClose={close}>{layer}</Overlay>}>
-      <div className="y-profile-bar">
+      <Row gap={0} align="center" justify="space-between">
         <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
         <ChipGroup wrap chips={[{ label: period, dropdown: true }]} onToggle={() => setOpen('period')} />
-      </div>
+      </Row>
       {/* смена аккаунта: содержимое пересоздаётся по ключу и проявляется (appear), а не подменяется мгновенно */}
       <div key={`${me.id}-${period}`} className="y-motion-appear y-stack-8">
         <UsageMeter percent={usage} />
