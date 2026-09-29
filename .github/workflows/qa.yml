@@ -24,9 +24,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm ci
       # До build-storybook: он сам перегенерирует токены и скроет ручную правку
       - name: Сгенерированные токены совпадают с tokens/tokens.json (npm run tokens)
         run: |
+          node --test scripts/tokens/dtcg.test.mjs
           node scripts/build-tokens.mjs
           if [ -n "$(git status --porcelain -- src/tokens tokens native)" ]; then
             git status --porcelain -- src/tokens tokens native
@@ -34,7 +36,6 @@ jobs:
             echo '::error::Сгенерированные файлы не совпадают с генератором. Правь tokens/tokens.json или scripts/build-tokens.mjs, затем `npm run tokens` и закоммить результат.'
             exit 1
           fi
-      - run: npm ci
       - run: npm run typecheck
       - id: build
         run: npm run build-storybook

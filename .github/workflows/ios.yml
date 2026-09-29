@@ -10,6 +10,8 @@ on:
       - 'src/icons/**'
       - 'src/atoms/icon.tsx'
       - 'scripts/build-tokens.mjs'
+      - 'scripts/tokens/**'
+      - 'package-lock.json'
       - 'scripts/build-ios.mjs'
       - '.github/workflows/ios.yml'
   pull_request:
@@ -20,6 +22,8 @@ on:
       - 'src/icons/**'
       - 'src/atoms/icon.tsx'
       - 'scripts/build-tokens.mjs'
+      - 'scripts/tokens/**'
+      - 'package-lock.json'
       - 'scripts/build-ios.mjs'
       - '.github/workflows/ios.yml'
   workflow_dispatch:
@@ -41,7 +45,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      # Генератор использует только встроенные модули Node — npm ci не нужен
+          cache: npm
+      # Генератор токенов — Style Dictionary (devDependency)
+      - run: npm ci
       - name: Сгенерированные файлы актуальны (npm run tokens)
         run: |
           node scripts/build-tokens.mjs
