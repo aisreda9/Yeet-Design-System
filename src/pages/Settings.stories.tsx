@@ -106,3 +106,12 @@ export const LegalTerms: Story = {
   name: 'Legal / Terms of Use / May 2026',
   render: () => <Screen header={<Header type="bar" />}><Prose {...terms} /></Screen>,
 };
+
+export const SignOutDialog: Story = {
+  name: 'Settings / Sign Out / Dialog / Confirmation',
+  render: () => (
+    <Screen header={header} overlay={<Overlay><Dialog tone="destructive" title="Точно хочешь выйти?" description="Тебе потребуется снова войти в аккаунт, чтобы продолжить." cancel="Отменить" confirm="Выйти" /></Overlay>}>
+      <AccountCard account={sima} kind="settings" />
+    </Screen>
+  ),
+};
