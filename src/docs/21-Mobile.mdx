@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Процессы/iOS и Android" />
+<Meta title="Старт/Процессы/iOS и Android" />
 
 # iOS и Android
 
@@ -64,7 +64,7 @@ val scale by animateFloatAsState(if (done) 0.53f else 1f, animationSpec = YeetMo
 ## Правила для нативных компонентов
 
 1. **Имена свойств — как в Figma и в Storybook.** `ChatBubble(from: .user)`, `WeatherCard(temperature:description:icon:)`,
-   `Button(variant: .primary, size: .l)`. Таблица соответствий — «Процессы / Figma ↔ код».
+   `Button(variant: .primary, size: .l)`. Таблица соответствий — «Старт / Процессы / Figma ↔ код».
 2. **Слоты — через content-замыкания.** Sheet, Dialog, InputGroup, ListGroup, Carousel принимают `@ViewBuilder content`
    (SwiftUI) или `content: @Composable () -> Unit` (Compose).
 3. **Цвета — только семантические** (`YeetColor.bgSubtle`), никогда примитивы или hex.

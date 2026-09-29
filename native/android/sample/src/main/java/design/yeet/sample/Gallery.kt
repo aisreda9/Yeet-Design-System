@@ -198,6 +198,7 @@ fun Gallery(
                 }
             }
             item { Section("ItemCard · OutfitCollage") { CardsSection() } }
+            item { Section("OutfitPager · ItemSlots · CropFrame · DetailsScreen") { OrganismsSection() } }
             item {
                 Section("StatTile · WeatherCard") {
                     StatRow {
