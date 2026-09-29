@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Icon } from '../atoms';
 import { icons, type IconName } from '../icons/icons';
 import { itemColors, radii, semanticColors, spaces, textStyles } from '../tokens/tokens';
-import tokenSource from '../../tokens/tokens.json';
+import { tokens as tokenSource } from '../tokens/model';
 import { registry, type Level } from './registry';
 import { mechanics, motions } from '../motion/motion';
 import '../tokens/tokens.css';
