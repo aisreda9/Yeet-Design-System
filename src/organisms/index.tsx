@@ -1,4 +1,4 @@
-import './organisms.css';
+import '../styles.css';
 
 export * from './system';
 export * from './navigation';
