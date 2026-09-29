@@ -6,6 +6,8 @@ import { motionMs } from './gesture';
  * с флагом `leaving`, чтобы CSS доиграл исчезновение. Если во время ухода элемент вернули — уход прерывается
  * и идёт обратно из текущего положения (переходы на transition, а не на keyframes).
  */
+/* eslint-disable react-hooks/refs -- ref намеренно хранит последний показанный узел между рендерами: пока элемент уходит,
+   рендерится он, а не undefined. Через state это лишний рендер на каждое обновление родителя. */
 export function usePresence(node: ReactNode, token = '--motion-exit') {
   const last = useRef<ReactNode>(node);
   const [, rerender] = useReducer((n: number) => n + 1, 0);
@@ -19,6 +21,7 @@ export function usePresence(node: ReactNode, token = '--motion-exit') {
   }, [present, token]);
   return { node: present ? node : last.current, leaving: !present && !!last.current } as const;
 }
+/* eslint-enable react-hooks/refs */
 
 /** Слой уходит (Screen → overlay / floating убраны): Overlay и Snackbar доигрывают исчезновение. */
 export const LeavingContext = createContext(false);

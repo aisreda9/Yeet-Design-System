@@ -2,8 +2,9 @@
 
 .y-screen {
   position: relative; display: flex; flex-direction: column; overflow: hidden;
-  width: var(--screen-width); height: var(--screen-height); border-radius: 56px; /* угол экрана iPhone: низ шторки 48 = 56 − 8 */
+  width: var(--screen-width); height: var(--screen-height); border-radius: 56px; /* угол экрана iPhone: низ шторки 48 = 56 − 8 */ /* stylelint-disable-line unit-disallowed-list -- угол корпуса iPhone, токена нет */
   background: var(--color-bg-canvas); color: var(--color-text-primary);
+  /* stylelint-disable-next-line unit-disallowed-list, color-no-hex -- рамка и тень макета телефона в Storybook, не часть интерфейса */
   box-shadow: 0 0 0 10px #111, 0 30px 80px rgb(0 0 0 / 0.25);
   font-family: var(--font-text);
 }
@@ -23,7 +24,7 @@
 /* Контент прижат к низу: кнопка поверх фото в 20 от края экрана (Search / Photo / Crop) */
 .y-screen__content--end { justify-content: flex-end; padding-bottom: var(--space-20); }
 .y-screen__content--flush { padding-left: 0; padding-right: 0; }
-.y-screen__floating { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 4; display: flex; justify-content: center; }
+.y-screen__floating { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: var(--layer-sticky); display: flex; justify-content: center; }
 
 /* Scroll edges appear only when content is actually underneath */
 .y-screen .y-scroll-edge { transition: opacity var(--motion-fade); }
@@ -32,19 +33,19 @@
 .y-screen:not([data-edge-bottom]) .y-bottom-bar .y-scroll-edge { opacity: 0; }
 
 /* Layout primitives */
-.y-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8) 7px; }
+.y-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8) 7px; } /* stylelint-disable-line unit-disallowed-list -- колонки через 7 из Figma */
 .y-row { display: flex; }
 .y-stack { display: flex; flex-direction: column; }
 
 /* Липкая полоса фильтров (Sticky): прижимается под шапку; content padding-top 8 → top −8 */
 .y-sticky {
   /* top −20: sticky отсчитывается от content-box, а у контента padding-top 20; z-index над затуханием шапки */
-  position: sticky; top: calc(var(--space-20) * -1); z-index: 4; flex-shrink: 0;
+  position: sticky; top: calc(var(--space-20) * -1); z-index: var(--layer-sticky); flex-shrink: 0;
   margin: calc(var(--space-8) * -1) calc(var(--screen-gutter) * -1) 0; padding: var(--space-8) var(--screen-gutter) 0;
   background: var(--color-bg-canvas); display: flex; flex-direction: column; gap: var(--space-16);
 }
 .y-sticky::after {
-  content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24px; pointer-events: none;
+  content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24px; pointer-events: none; /* stylelint-disable-line unit-disallowed-list -- затухание 24 */
   background: linear-gradient(var(--color-bg-canvas), transparent); opacity: 0; transition: opacity var(--motion-fade);
 }
 .y-screen[data-collapsed] .y-sticky::after { opacity: 1; }
@@ -67,16 +68,16 @@
  */
 .y-details__media {
   position: absolute; z-index: 0; left: var(--screen-gutter); right: var(--screen-gutter);
-  top: calc(var(--status-bar-height) + var(--space-8) + 48px + var(--space-20)); /* под шапкой (статус-бар + ряд 48) + 20 = y138 */
+  top: calc(var(--status-bar-height) + var(--space-8) + 48px + var(--space-20)); /* под шапкой (статус-бар + ряд 48) + 20 = y138 */ /* stylelint-disable-line unit-disallowed-list -- ряд шапки 48 */
   transform-origin: 0 0;
   /* обратно фото опускается под панель, только когда долетело */
   transition: transform var(--motion-collapse), opacity var(--motion-fade), z-index 0s linear var(--motion-300);
 }
 .y-details__media > * { transition: border-radius var(--motion-collapse); }
 .y-details[data-collapsed] .y-details__media {
-  z-index: 4; pointer-events: none;
+  z-index: var(--layer-sticky); pointer-events: none;
   /* в центр ряда шапки: y70 = статус-бар + 8 */
-  transform: translate(var(--details-dx, 0px), calc((48px + var(--space-20)) * -1)) scale(var(--details-scale, 0.136));
+  transform: translate(var(--details-dx, 0px), calc((48px + var(--space-20)) * -1)) scale(var(--details-scale, 0.136)); /* stylelint-disable-line unit-disallowed-list -- ряд шапки 48 */
   transition: transform var(--motion-collapse), opacity var(--motion-fade);
 }
 /* скругление миниатюры — как у карточки 48 (radius-md), а не уменьшенные 32 фото */
@@ -93,14 +94,14 @@
   transition: grid-template-rows var(--motion-collapse), margin var(--motion-collapse);
 }
 .y-details__spacer > span { aspect-ratio: 1; min-height: 0; }
-.y-details[data-collapsed] .y-details__spacer { grid-template-rows: 0fr; margin-bottom: calc(25px - var(--space-20)); }
+.y-details[data-collapsed] .y-details__spacer { grid-template-rows: 0fr; margin-bottom: calc(25px - var(--space-20)); } /* stylelint-disable-line unit-disallowed-list -- 25 = порог 24 + 1 */
 /* Панель не короче экрана и уходит под нижнюю панель до низа экрана (Figma: панель y138 → 852):
    свёрнутое состояние держится, даже если в панели мало полей */
-.y-details .y-sheet--panel { min-height: calc(100% + 120px); }
+.y-details .y-sheet--panel { min-height: calc(100% + 120px); } /* stylelint-disable-line unit-disallowed-list -- запас под нижнюю панель */
 /* В миниатюре кнопок нет: «×» фото не нажимается и не показывается */
 .y-details[data-collapsed] .y-details__media button { visibility: hidden; }
 /* Штамп «Надеть»: поверх контента, x225 y676 (справа 20, снизу 28), со скроллом не едет */
-.y-details__stamp { position: absolute; z-index: 4; right: var(--screen-gutter); bottom: 28px; }
+.y-details__stamp { position: absolute; z-index: var(--layer-sticky); right: var(--screen-gutter); bottom: var(--space-28); }
 
 /* ─── Prose: документ из текста (Legal 513:6603, 513:6707) ───
  * H1 → дата 12, разделы через 24, внутри раздела через 12; списки с маркером, пункты через 8. Почта — чёрным с подчёркиванием.
@@ -108,8 +109,8 @@
 .y-prose { display: flex; flex-direction: column; gap: var(--space-24); }
 .y-prose__head, .y-prose__section { display: flex; flex-direction: column; gap: var(--space-12); }
 .y-prose p, .y-prose ul { margin: 0; }
-.y-prose ul { padding-left: 21px; display: flex; flex-direction: column; gap: var(--space-8); }
-.y-prose a { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; } /* зона нажатия ≥ 24 без сдвига строки */
+.y-prose ul { padding-left: 21px; /* stylelint-disable-line unit-disallowed-list -- отступ маркера 21 из Figma */ display: flex; flex-direction: column; gap: var(--space-8); }
+.y-prose a { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: var(--space-4) 0; margin: calc(-1 * var(--space-4)) 0; } /* зона нажатия ≥ 24 без сдвига строки */ /* stylelint-disable-line unit-disallowed-list -- отступ подчёркивания, токена нет */
 /* Длинные слова заголовка на узком экране (320: «конфиденциальности») переносятся по слогам */
 .y-prose h1, .y-prose h2 { hyphens: auto; overflow-wrap: break-word; }
 .y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }
