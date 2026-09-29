@@ -92,7 +92,7 @@ function TodayFlow() {
   const [i, setI] = useState(1);
   const stampFor = useDone();
   return (
-    <Screen header={<Header type="large" title="Твои образы" accent={{ label: 'на каждый день' }} />} bottom={<BottomNav active="today" />}>
+    <Screen header={<Header variant="large" title="Твои образы" accent={{ label: 'на каждый день' }} />} bottom={<BottomNav active="today" />}>
       <OutfitPager
         looks={looks}
         index={i}
@@ -108,7 +108,7 @@ function SurpriseFlow() {
   const [i, setI] = useState(1);
   const stampFor = useDone();
   return (
-    <Screen header={<Header type="bar" titleChip="Удиви меня" onBack={() => {}} actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+    <Screen header={<Header variant="bar" titleChip="Удиви меня" onBack={() => {}} actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <OutfitPager looks={looks} preview={150} index={i} onIndexChange={setI} stamp={stampFor(looks[i].id, 'Сохранить')} skip={<Stamp label="Не нравится" tone="secondary" onClick={() => setI((k) => Math.min(k + 1, looks.length - 1))} />} />
     </Screen>
   );
@@ -119,7 +119,7 @@ function TripsFlow() {
   const stampFor = useDone();
   const list = occasions.map((o, k) => ({ ...looks[k % looks.length], id: o, name: o }));
   return (
-    <Screen header={<Header type="bar" titleChip="С чем носить" onBack={() => {}} actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+    <Screen header={<Header variant="bar" titleChip="С чем носить" onBack={() => {}} actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <OutfitPager axis="x" looks={list} index={i} onIndexChange={setI} aria-label="Образы по поводам" stamp={stampFor(list[i].id, 'Сохранить')} skip={<Stamp label="Не нравится" tone="secondary" />} />
       <div style={{ marginTop: 81 }}>
         <ChipGroup chips={occasions.map((label, k) => ({ label, selected: k === i }))} onToggle={(label) => setI(occasions.indexOf(label))} />

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
+import { expect, userEvent, within } from 'storybook/test';
 import { BottomNav, TabBar, type Tab } from '.';
 import { demoAvatar, unlessBare, Usage, UsageGrid } from '../docs/helpers';
 
@@ -96,5 +96,26 @@ export const Keyboard: Story = {
       await userEvent.tab();
       await expect(fab).toHaveFocus();
     });
+  },
+};
+
+/**
+ * Каскадные слои (`src/styles.css`): стили системы лежат в `@layer yeet.*`, обычный CSS приложения — вне слоёв и
+ * перебивает их без `!important`, даже если селектор системы специфичнее. Здесь `.y-dock > .y-tab-bar { width: 100% }`
+ * (два класса) уступает одному классу потребителя.
+ */
+export const ConsumerClassName: Story = {
+  name: 'className потребителя',
+  tags: ['!autodocs'],
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <>
+      <style>{'.app-tab-bar { width: 240px; }'}</style>
+      <div className="y-dock"><TabBar active="stylist" className="app-tab-bar" /></div>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const bar = canvasElement.querySelector<HTMLElement>('.app-tab-bar')!;
+    await expect(bar.getBoundingClientRect().width).toBe(240);
   },
 };
