@@ -1,31 +1,30 @@
 /* ─── Organisms ─────────────────────────────────────────────────────── */
 
 /* Status bar (system, mockups only) */
-.y-status-bar { height: var(--status-bar-height); display: flex; align-items: center; justify-content: space-between; padding: 21px 24px 19px; color: var(--color-text-primary); font: 600 17px/22px -apple-system, 'SF Pro Text', var(--font-text); }
+.y-status-bar { height: var(--status-bar-height); display: flex; align-items: center; justify-content: space-between; padding: 21px 24px 19px; color: var(--color-text-primary); font: 600 17px/22px -apple-system, 'SF Pro Text', var(--font-text); } /* stylelint-disable-line unit-disallowed-list -- системный статус-бар iOS, только для макета */
 .y-status-bar--on-accent { color: var(--color-text-on-accent); }
 .y-status-bar--on-photo { color: var(--color-text-on-photo); } /* поверх фото: белый в любой теме */
-.y-status-bar__icons { display: inline-flex; gap: 7px; align-items: center; }
+.y-status-bar__icons { display: inline-flex; gap: 7px; align-items: center; } /* stylelint-disable-line unit-disallowed-list -- зазор иконок статус-бара iOS */
 
 /* ─── Header — закреплённая шапка: сплошная подложка + полоса затухания снизу ─── */
-.y-header { position: relative; z-index: 3; background: var(--color-bg-canvas); color: var(--color-text-primary); }
+.y-header { position: relative; z-index: var(--layer-bar); background: var(--color-bg-canvas); color: var(--color-text-primary); }
 .y-header__body { padding: var(--space-8) var(--screen-gutter) 0; display: flex; flex-direction: column; gap: var(--space-8); }
 .y-header__body:has(.y-header__back-title) { padding-bottom: var(--space-4); }
 .y-header__body:has(> .y-input-bar + .y-chip-group) { gap: var(--space-20); } /* поиск: фильтры на 20 ниже поля */
-.y-header__row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 48px; }
+.y-header__row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: var(--size-control-m); }
 /* bar: три колонки — боковые поровну, центр по ширине содержимого; на узком экране заголовок в одну строку с «…» */
-.y-header__row--bar { display: grid; grid-template-columns: minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr); }
+.y-header__row--bar { display: grid; grid-template-columns: minmax(var(--size-control-m), 1fr) minmax(0, auto) minmax(var(--size-control-m), 1fr); }
 .y-header__side { display: flex; gap: var(--space-8); }
 .y-header__side--end { justify-content: flex-end; }
 .y-header__center { position: relative; min-width: 0; display: flex; justify-content: center; }
 .y-header__center > .y-body { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .y-header__center > .y-button { padding: 0 var(--space-20); } /* пилюля заголовка: «Архив вещей» 131×48 */
 /* Пилюля заголовка в две строки (Trip Details): город и даты по левому краю */
-.y-header__chip2 { height: 48px; padding: 0 var(--space-20); border-radius: var(--radius-xl); background: var(--button-tertiary-bg); display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; white-space: nowrap; }
+.y-header__chip2 { height: var(--size-control-m); padding: 0 var(--space-20); border-radius: var(--radius-xl); background: var(--button-tertiary-bg); display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; white-space: nowrap; }
 /* large: с кнопкой справа строка 48 и заголовок по центру; без кнопки — заголовок на y70, как во флоу */
-.y-header__title-row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 36px; }
-.y-header__title-row:has(> .y-icon-button) { min-height: 48px; }
+.y-header__title-row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 36px; } /* stylelint-disable-line unit-disallowed-list -- строка большого заголовка — высота строки H1 36 */
+.y-header__title-row:has(> .y-icon-button) { min-height: var(--size-control-m); }
 .y-header__large-title { transition: opacity var(--motion-fade), transform var(--motion-lift); transform-origin: left center; }
-.y-header__large-title + .y-header__pill ~ * { position: relative; z-index: 1; }
 .y-header__subtitle { margin: var(--space-4) 0; } /* флоу: подзаголовок через 12 от заголовка */
 /* Главная: вторая строка заголовка — повод акцентом с раскрывашкой */
 .y-header__accent { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-8); margin-top: calc(var(--space-8) * -1); padding: 0; border: 0; background: none; color: var(--color-text-accent); cursor: pointer; text-align: left; }
@@ -35,9 +34,9 @@
 
 /* Скролл: большой заголовок уходит в пилюлю по центру (Screen → data-collapsed) */
 .y-header__pill {
-  position: absolute; left: 50%; top: 50%; max-width: 60%; height: 40px; padding: 0 var(--space-16);
+  position: absolute; left: 50%; top: 50%; max-width: 60%; height: var(--size-control-s); padding: 0 var(--space-16);
   display: inline-flex; align-items: center; border-radius: var(--radius-xl); background: var(--color-bg-subtle);
-  font: var(--font-weight-body) 14px/20px var(--font-text); color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font: var(--typography-body); color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   opacity: 0; transform: translate(-50%, -50%) scale(0.8); pointer-events: none;
   transition: opacity var(--motion-fade), transform var(--motion-lift);
 }
@@ -45,11 +44,11 @@
 .y-header__collapse > * { overflow: hidden; min-height: 0; }
 /* Миниатюра по центру шапки при скролле деталей (Figma: Outfit / Item Details / Scrolled) */
 .y-header__on-scroll {
-  width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--card-bg); overflow: hidden; display: grid; place-items: center;
-  opacity: 0; transform: translateY(12px) scale(0.6); transition: opacity var(--motion-fade), transform var(--motion-collapse);
+  width: var(--size-control-m); height: var(--size-control-m); border-radius: var(--radius-md); background: var(--card-bg); overflow: hidden; display: grid; place-items: center;
+  opacity: 0; transform: translateY(var(--space-12)) scale(0.6); transition: opacity var(--motion-fade), transform var(--motion-collapse);
 }
 .y-screen[data-collapsed] .y-header__pill { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.y-screen[data-collapsed] .y-header__large-title { opacity: 0; transform: translateY(-6px) scale(0.92); }
+.y-screen[data-collapsed] .y-header__large-title { opacity: 0; transform: translateY(-6px) scale(0.92); } /* stylelint-disable-line unit-disallowed-list -- сдвиг большого заголовка при сворачивании, токена нет */
 /* Уходящий заголовок гаснет быстрее, чем появляется новый (exit < appear): пилюля — при возврате к началу, большой — при скролле */
 .y-screen:not([data-collapsed]) .y-header__pill,
 .y-screen[data-collapsed] .y-header__large-title { transition: opacity var(--motion-exit), transform var(--motion-exit); }
@@ -59,49 +58,47 @@
 .y-screen[data-collapsed] .y-header__on-scroll { opacity: 1; transform: none; }
 
 /* ─── Нижняя навигация ─── */
-.y-bottom-nav, .y-bottom-bar { position: relative; z-index: 3; background: var(--color-bg-canvas); display: flex; align-items: center; gap: 7px; padding: 0 var(--screen-gutter) var(--space-20); }
+.y-bottom-nav, .y-bottom-bar { position: relative; z-index: var(--layer-bar); background: var(--color-bg-canvas); display: flex; align-items: center; gap: 7px; padding: 0 var(--screen-gutter) var(--space-20); } /* stylelint-disable-line unit-disallowed-list -- зазор 7 между таб-баром и «+» из Figma */
 .y-bottom-nav { container-type: inline-size; }
-/* Тени закреплённой навигации рисуются поверх полосы затухания (ScrollEdge — absolute и иначе перекрывает тень) */
-.y-bottom-nav > .y-tab-bar,
-.y-bottom-nav > .y-bottom-nav__fab,
-.y-bottom-bar > .y-button,
-.y-bottom-bar > .y-icon-button { position: relative; z-index: 1; }
 /* FAB: таб-бар сжимается, «+» выезжает справа (--motion-nav) */
 .y-bottom-nav__fab {
-  flex: none; width: 0; margin-left: -7px; display: grid; justify-items: end; opacity: 0; transform: scale(0.4);
+  flex: none; width: 0; margin-left: -7px; display: grid; justify-items: end; opacity: 0; transform: scale(0.4); /* stylelint-disable-line unit-disallowed-list -- FAB прячется за зазор 7 */
   transition: width var(--motion-nav), margin var(--motion-nav), opacity var(--motion-fade), transform var(--motion-nav);
 }
-.y-bottom-nav__fab.is-open { width: 56px; margin-left: 0; opacity: 1; transform: none; }
+.y-bottom-nav__fab.is-open { width: var(--size-control-xl); margin-left: 0; opacity: 1; transform: none; }
 /* Уход FAB быстрее появления: кнопка гаснет и сжимается за exit, таб-бар расширяется на той же пружине quick */
 .y-bottom-nav__fab:not(.is-open) { visibility: hidden; transition: width var(--motion-nav), margin var(--motion-nav), opacity var(--motion-exit), transform var(--motion-exit), visibility 0s var(--motion-fast); }
 
 /* Tab bar: пилюля выбранной вкладки переезжает между вкладками */
 .y-tab-bar {
-  position: relative; flex: 1; display: flex; gap: 3px; padding: var(--space-4); height: 56px;
+  position: relative; flex: 1; display: flex; gap: 3px; padding: var(--space-4); height: var(--size-control-xl); /* stylelint-disable-line unit-disallowed-list -- зазор вкладок 3 из Figma */
   background: var(--tab-bar-bg); border-radius: var(--radius-bar); box-shadow: var(--shadow-floating);
 }
 @container (max-width: 300px) { .y-tab-bar { gap: 0; } } /* 320 с «+»: каждая вкладка ≥ 40 */
 .y-tab-bar__tab {
-  position: relative; z-index: 1; flex: 1; display: grid; place-items: center; border: 0; border-radius: var(--radius-xl); background: transparent;
+  position: relative; z-index: var(--layer-raised); flex: 1; display: grid; place-items: center; border: 0; border-radius: var(--radius-xl); background: transparent;
   color: var(--color-text-secondary); cursor: pointer; transition: color var(--motion-select); -webkit-tap-highlight-color: transparent;
 }
 /* Нажатие вкладки: сжимается иконка, а не ячейка — пилюля под ней остаётся ровной */
 .y-tab-bar__tab > * { transition: transform var(--motion-press); }
-.y-tab-bar__tab:active > * { transform: scale(var(--gesture-press-scale)); }
 .y-tab-bar__tab[aria-current='page'] { color: var(--color-text-primary); } /* флоу: неактивные иконки серые */
 .y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
-.y-tab-bar__avatar { width: 20px; height: 20px; border: 1.3px solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */
+.y-tab-bar__avatar { width: 20px; height: 20px; border: var(--border-width-icon) solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */ /* stylelint-disable-line unit-disallowed-list -- аватар 20 и буква Roboto Slab 14 в таб-баре из Figma */
 .y-tab-bar__avatar--photo { overflow: hidden; } /* фото профиля в той же обводке 1.3: серой у неактивной вкладки */
 .y-tab-bar__avatar--photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Тени закреплённой навигации рисуются поверх полосы затухания (ScrollEdge — absolute и иначе перекрывает тень) */
+.y-bottom-nav > .y-tab-bar,
+.y-bottom-nav > .y-bottom-nav__fab,
+.y-bottom-bar > .y-button,
+.y-bottom-bar > .y-icon-button { position: relative; z-index: var(--layer-raised); }
 
 /* Нижняя панель стилиста: хэндл, поле, таб-бар */
 .y-dock {
-  position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: var(--space-8);
+  position: relative; z-index: var(--layer-bar); display: flex; flex-direction: column; align-items: center; gap: var(--space-8);
   padding: var(--space-8) var(--screen-gutter) var(--space-20); background: var(--color-bg-elevated);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
 }
-.y-dock > .y-sheet__handle { margin-bottom: 14px; }
 .y-dock > .y-tab-bar { width: 100%; flex: none; }
 
 /* ─── Sheet & Dialog ─── */
@@ -111,15 +108,16 @@
   background: var(--sheet-bg); color: var(--color-text-primary);
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
-.y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--sheet-handle); } /* ≈ 1,5:1 к фону шторки (D8) */
+.y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--sheet-handle); } /* ≈ 1,5:1 к фону шторки (D8) */ /* stylelint-disable-line unit-disallowed-list -- хэндл шторки 48 × 4 (D8) */
+.y-dock > .y-sheet__handle { margin-bottom: 14px; } /* stylelint-disable-line unit-disallowed-list -- хэндл → поле 14 в доке из Figma */
 /* Кнопки футера — равные половины через 7; не влезает подпись — обе на всю ширину, одна под другой, безопасная снизу (C11, D7).
    Ширина по подписи, но не шире футера: длиннее строки — многоточие. Поля 16 вместо 20 — только запас до переноса:
    короткая подпись по центру выглядит так же, а «Сохранить и выйти» при 393 остаётся в половине 165, как в Figma. */
-.y-sheet__footer { display: flex; flex-wrap: wrap; gap: 7px; }
-.y-sheet__footer > .y-button { flex: 1 1 calc(50% - 3.5px); min-width: fit-content; padding-inline: var(--space-16); }
+.y-sheet__footer { display: flex; flex-wrap: wrap; gap: 7px; } /* stylelint-disable-line unit-disallowed-list -- зазор кнопок футера 7 из Figma */
+.y-sheet__footer > .y-button { flex: 1 1 calc(50% - 3.5px); min-width: fit-content; padding-inline: var(--space-16); } /* stylelint-disable-line unit-disallowed-list -- половина зазора 7 */
 .y-sheet__footer-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; }
-.y-sheet__head > .y-icon-button { margin: -8px -8px -8px auto; }
+.y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; } /* stylelint-disable-line unit-disallowed-list -- строка заголовка не ниже иконки 24 */
+.y-sheet__head > .y-icon-button { margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--sheet-title-gap); } /* заголовок → 16 → описание (#58) */
 .y-dialog__more { display: contents; } /* обёртка только для aria-describedby: раскладка как у прямых детей тела */
 /* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
@@ -134,6 +132,7 @@
 /* Высота и прокрутка (SHEETS-AUDIT C1–C3, D2): хэндл, заголовок и футер закреплены, прокручивается только тело.
    Ничего, кроме тела, не сжимается. Тело выходит в края шторки (поля — паддингом), чтобы лента чипсов упиралась в край,
    и на 4 вверх и вниз — чтобы не резать кольцо фокуса. */
+/* stylelint-disable-next-line no-descending-specificity -- `*` у разных родителей, общих элементов с `.y-sheet--modal > … + *` нет; перестановка сдвинула бы отступы шторки */
 .y-sheet > *, .y-sheet__body > * { flex-shrink: 0; }
 .y-sheet__body {
   display: flex; flex-direction: column; gap: inherit; flex-shrink: 1; min-height: 0;
@@ -154,7 +153,7 @@
    Всё на transition + @starting-style, а не на keyframes: появление, уход и смахивание прерываются
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
-  position: absolute; inset: 0; z-index: 5; --y-dim: 1;
+  position: absolute; inset: 0; z-index: var(--layer-overlay); --y-dim: 1;
   /* D5: шторка приезжает на пружине без перелёта — токен --motion-sheet (motion.spring.critical: stiffness 300 как у quick, ζ = 1, 540 мс).
      При «Уменьшении движения» токен сам даёт 1ms. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
   --sheet-spring: var(--motion-sheet);
@@ -186,31 +185,27 @@
 .y-item-card, .y-photo-tile, .y-prompt-card, .y-trip-card, .y-outfit-thumb {
   transition: transform var(--motion-press); -webkit-tap-highlight-color: transparent;
 }
-.y-item-card:active, .y-photo-tile:active, .y-prompt-card:active, .y-trip-card:active, .y-outfit-thumb:active {
-  transform: scale(var(--gesture-press-scale-card));
-  transition-delay: var(--gesture-press-delay); /* карточки живут в скролле: не мигать нажатием при прокрутке; отпускание — без задержки */
-}
 
 .y-item-card {
   position: relative; aspect-ratio: 173 / 172; width: 100%; border-radius: var(--card-radius); background: var(--card-bg);
   display: grid; place-items: center; overflow: hidden; color: var(--color-text-primary); border: 0; padding: 0; cursor: pointer;
 }
 .y-item-card__badge { position: absolute; top: var(--space-16); left: var(--space-16); }
-.y-item-card__check { position: absolute; top: var(--space-16); right: var(--space-16); width: 24px; height: 24px; border-radius: var(--radius-full); display: grid; place-items: center; }
+.y-item-card__check { position: absolute; top: var(--space-16); right: var(--space-16); width: 24px; height: 24px; border-radius: var(--radius-full); display: grid; place-items: center; } /* stylelint-disable-line unit-disallowed-list -- галочка 24 из Figma */
 /* Галочка выбора появляется на пружине, а не мгновенно */
 .y-item-card--selected .y-item-card__check { background: var(--color-accent); color: var(--color-text-on-accent); animation: y-pop var(--motion-drop) both; }
 @keyframes y-pop { from { transform: scale(0.4); opacity: 0; } }
 /* Вещь с «×» (создание образа) */
 .y-item-card-wrap { position: relative; }
-.y-item-card__remove { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--color-text-secondary); display: grid; place-items: center; cursor: pointer; }
+.y-item-card__remove { position: absolute; top: var(--space-4); right: var(--space-4); width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--color-text-secondary); display: grid; place-items: center; cursor: pointer; } /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG) */
 .y-item-art { display: grid; place-items: center; position: relative; }
-.y-item-art__dot { position: absolute; right: 4px; bottom: 4px; }
+.y-item-art__dot { position: absolute; right: var(--space-4); bottom: var(--space-4); }
 .y-item-art--photo { display: block; } /* фото без фона: размер и сдвиг считает balanceArt (визуальный вес + оптический центр) */
 .y-item-art__img { position: absolute; max-width: none; user-select: none; }
 
 .y-product-card { display: flex; flex-direction: column; gap: var(--space-16); color: var(--color-text-primary); }
-.y-product-card__meta { display: flex; flex-direction: column; gap: 2px; }
-.y-product-card__like { position: absolute; top: var(--space-16); right: var(--space-16); width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--color-text-primary); } /* Figma: 24 в 16 от угла, зона нажатия 44 — ::after */
+.y-product-card__meta { display: flex; flex-direction: column; gap: var(--space-2); }
+.y-product-card__like { position: absolute; top: var(--space-16); right: var(--space-16); width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--color-text-primary); } /* Figma: 24 в 16 от угла, зона нажатия 44 — ::after */ /* stylelint-disable-line unit-disallowed-list -- сердце 24 из Figma */
 .y-product-card__like.is-on { color: var(--color-text-accent); } /* тёмная тема: accent на card-bg 2,7 : 1, text-accent — 5 : 1 */
 .y-product-card__like.is-on .y-icon path { fill: currentColor; } /* лайкнутое — залитое сердце */
 /* Лайк: сердце «подпрыгивает» на пружине drop только в момент нажатия (не при загрузке уже лайкнутого) */
@@ -221,18 +216,18 @@
 .y-collage {
   position: relative; flex: none; width: 100%; aspect-ratio: 1; border-radius: var(--card-radius); overflow: hidden;
   background-color: var(--card-bg);
-  padding: 14px;
-  background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px), linear-gradient(var(--card-bg), var(--card-bg));
-  background-size: 10px 10px, auto; background-position: 0 0;
+  padding: 14px; /* stylelint-disable-line unit-disallowed-list -- поле точек 14 от краёв карточки (Figma pattern) */
+  background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px), linear-gradient(var(--card-bg), var(--card-bg)); /* stylelint-disable-line unit-disallowed-list -- точка 2 × 2 (Figma pattern) */
+  background-size: 10px 10px, auto; background-position: 0 0; /* stylelint-disable-line unit-disallowed-list -- клетка 10 × 10 (Figma pattern) */
   background-origin: content-box, border-box; background-clip: content-box, border-box;
 }
 .y-collage--plain { background-image: none; } /* Pattern=None: карточка без точек («Лучшая инвестиция») */
 .y-collage__layer { position: absolute; inset: 0; pointer-events: none; } /* слой вещей: по нему считается масштаб (useFitScale) */
-.y-collage__layer > .y-collage__item { pointer-events: auto; }
 .y-collage__item { position: absolute; transform: translate(-50%, -50%); }
-.y-collage__label { position: absolute; top: var(--space-20); left: var(--space-20); z-index: 1; } /* флоу Trip Details: 20/20 */
+.y-collage__layer > .y-collage__item { pointer-events: auto; }
+.y-collage__label { position: absolute; top: var(--space-20); left: var(--space-20); z-index: var(--layer-raised); } /* флоу Trip Details: 20/20 */
 .y-collage__footer {
-  position: absolute; left: var(--space-8); right: var(--space-8); bottom: var(--space-8); z-index: 1;
+  position: absolute; left: var(--space-8); right: var(--space-8); bottom: var(--space-8); z-index: var(--layer-raised);
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
   padding: var(--space-16) var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-md); /* флоу Analytics: белая плашка без тени */
 }
@@ -247,12 +242,12 @@
   background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--color-bg-elevated) 70%, transparent) 50%, transparent 80%);
   animation: y-shimmer 1.6s var(--ease-standard) infinite;
 }
-.y-photo-area > .y-loading { position: relative; z-index: 1; }
+.y-photo-area > .y-loading { position: relative; z-index: var(--layer-raised); }
 @keyframes y-shimmer { to { translate: 100% 0; } }
 @media (prefers-reduced-motion: reduce) { .y-photo-area::before { animation: none; } }
-.y-photo-area__add { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); font: var(--font-weight-body) 14px/20px var(--font-text); background: none; border: 0; color: inherit; cursor: pointer; }
+.y-photo-area__add { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); font: var(--typography-body); background: none; border: 0; color: inherit; cursor: pointer; }
 .y-photo-area__close { /* «×» 24 серым в 20 от угла: кнопка 44 с иконкой по центру → 10 от края */
-  position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; padding: 0; border: 0; background: none;
+  position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; padding: 0; border: 0; background: none; /* stylelint-disable-line unit-disallowed-list -- «×» 24 в 20 от угла: кнопка 44 → 10 от края */
   display: grid; place-items: center; color: var(--color-text-secondary); cursor: pointer;
 }
 .y-photo-area__close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--radius-full); }
@@ -262,53 +257,58 @@
   display: inline-flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16) var(--space-20);
   background: var(--color-bg-inverse); color: var(--color-text-inverse); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8);
 }
-.y-weather__temp { display: flex; align-items: center; gap: var(--space-8); font: 400 24px/24px var(--font-display); letter-spacing: -0.4px; }
+.y-weather__temp { display: flex; align-items: center; gap: var(--space-8); font: 400 24px/24px var(--font-display); letter-spacing: -0.4px; } /* stylelint-disable-line unit-disallowed-list -- цифра погоды Roboto Slab 24/24 из Figma */
 .y-weather__desc { font-weight: var(--font-weight-body); color: var(--color-text-inverse-secondary); }
 .y-weather__alert { display: block; color: var(--color-text-inverse); }
 .y-weather--tilt { transform: rotate(-10deg); transform-origin: left top; }
 /* Появление погоды на главной: чуть позже коллажа, снизу на 8 pt; translate отдельно от transform — наклон сохраняется */
 .y-today__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
-@keyframes y-weather-in { from { opacity: 0; translate: 0 8px; } }
+@keyframes y-weather-in { from { opacity: 0; translate: 0 var(--space-8); } }
 
 /* Чат: ответ пользователя — светлый акцент, хвост справа снизу */
-.y-bubble { max-width: 265px; padding: var(--space-16) var(--space-20); background: var(--card-bg); color: var(--color-text-primary); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8); }
+.y-bubble { max-width: 265px; padding: var(--space-16) var(--space-20); background: var(--card-bg); color: var(--color-text-primary); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8); } /* stylelint-disable-line unit-disallowed-list -- ширина пузыря 265 из Figma */
 .y-bubble--own { background: var(--color-accent-soft); border-radius: var(--radius-lg) var(--radius-lg) var(--space-8) var(--radius-lg); margin-left: auto; width: fit-content; }
 .y-bubble-row { display: flex; align-items: flex-end; gap: var(--space-4); }
-.y-bubble-row__avatar { flex: none; width: 64px; height: 64px; display: grid; place-items: center; }
+.y-bubble-row__avatar { flex: none; width: 64px; height: 64px; display: grid; place-items: center; } /* stylelint-disable-line unit-disallowed-list -- аватар стилиста 64 из Figma */
 /* Аватар стилиста в чате (во флоу — 3D-персонаж 64; здесь заглушка) */
-.y-stylist-avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--card-bg); color: var(--color-text-primary); }
+.y-stylist-avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--card-bg); color: var(--color-text-primary); } /* stylelint-disable-line unit-disallowed-list -- аватар стилиста 64 из Figma */
 
 /* Превью образа — тоже точечный фон */
 .y-outfit-thumb {
   position: relative; flex: none; padding: 0; border: 0; cursor: pointer; border-radius: var(--radius-lg); overflow: hidden;
-  background-color: var(--card-bg); background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px); background-size: 10px 10px;
+  background-color: var(--card-bg); background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px); background-size: 10px 10px; /* stylelint-disable-line unit-disallowed-list -- точечный фон: точка 2, клетка 10 (Figma pattern) */
 }
 
 .y-prompt-card {
-  position: relative; overflow: hidden; width: 100%; height: 220px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8);
+  position: relative; overflow: hidden; width: 100%; height: 220px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); /* stylelint-disable-line unit-disallowed-list -- высота карточки 220 из Figma */
   padding: var(--space-20); background: var(--card-bg); border: 0; border-radius: var(--radius-lg); cursor: pointer;
   color: var(--color-text-primary); text-align: left;
 }
-.y-prompt-card--wide { grid-column: 1 / -1; height: 172px; }
+.y-prompt-card--wide { grid-column: 1 / -1; height: 172px; } /* stylelint-disable-line unit-disallowed-list -- высота широкой карточки 172 из Figma */
 .y-prompt-card--soon { cursor: default; }
 .y-prompt-card--soon > .y-h3 { color: var(--color-text-secondary); }
 .y-prompt-card__soon { position: absolute; left: var(--space-20); bottom: var(--space-20); }
-.y-prompt-card__art { position: absolute; right: 0; bottom: -40px; }
+.y-prompt-card__art { position: absolute; right: 0; bottom: -40px; } /* stylelint-disable-line unit-disallowed-list -- арт выходит за низ на 40 из Figma */
 
 .y-trip-card {
-  position: relative; width: 100%; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8);
+  position: relative; width: 100%; min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); /* stylelint-disable-line unit-disallowed-list -- высота карточки 220 из Figma */
   padding: var(--space-16); background: var(--card-bg); border: 0; border-radius: var(--radius-lg); cursor: pointer;
   color: var(--color-text-primary); text-align: left; overflow: hidden;
 }
 .y-trip-card--add { align-items: center; justify-content: center; gap: var(--space-12); text-align: center; }
-.y-trip-card__art { position: absolute; left: var(--space-16); right: var(--space-16); bottom: var(--space-20); height: 120px; } /* флоу: вещи 141×120 в 16 от боков и 20 от низа */
+.y-trip-card__art { position: absolute; left: var(--space-16); right: var(--space-16); bottom: var(--space-20); height: 120px; } /* флоу: вещи 141×120 в 16 от боков и 20 от низа */ /* stylelint-disable-line unit-disallowed-list -- вещи 141 × 120 из Figma */
+/* Нажатие карточек (переходы — в начале раздела Cards): после базовых правил карточек (no-descending-specificity) */
+.y-item-card:active, .y-photo-tile:active, .y-prompt-card:active, .y-trip-card:active, .y-outfit-thumb:active {
+  transform: scale(var(--gesture-press-scale-card));
+  transition-delay: var(--gesture-press-delay); /* карточки живут в скролле: не мигать нажатием при прокрутке; отпускание — без задержки */
+}
 
 /* ─── OutfitCanvas: подъём под пальцем ─── */
 .y-canvas { touch-action: none; user-select: none; }
 .y-canvas__item { cursor: grab; border-radius: var(--radius-md); touch-action: none; transition: box-shadow var(--motion-fade), scale var(--motion-drop); } /* отпускание — бросок на пружине quick */
 .y-canvas__item.is-lifted { cursor: grabbing; scale: var(--gesture-lift-scale); box-shadow: var(--shadow-floating); transition: box-shadow var(--motion-fade), scale var(--motion-lift); }
-.y-canvas__item.is-selected { box-shadow: 0 0 0 1.5px var(--color-accent); }
-.y-canvas__item.is-selected.is-lifted { box-shadow: 0 0 0 1.5px var(--color-accent), var(--shadow-floating); }
+.y-canvas__item.is-selected { box-shadow: 0 0 0 var(--border-width-medium) var(--color-accent); }
+.y-canvas__item.is-selected.is-lifted { box-shadow: 0 0 0 var(--border-width-medium) var(--color-accent), var(--shadow-floating); }
 /* Щипок за 40 / 300 %: размер стоит на границе, а сверх неё вещь тянется резинкой (scale) и после отпускания
    возвращается на пружине quick — анимируется transform, а не width / height */
 .y-canvas__item > .y-item-art { transition: scale var(--motion-drop); }
@@ -317,32 +317,33 @@
 
 /* ─── Раскладки экранов ─── */
 /* Главная: превью ↑ коллаж ↓ превью, погода и штамп поверх */
-.y-today { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--space-20); padding-top: 3px; container-type: inline-size; }
-.y-today__weather { position: absolute; left: 20px; top: 76px; z-index: 2; }
+.y-today { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--space-20); padding-top: 3px; container-type: inline-size; } /* stylelint-disable-line unit-disallowed-list -- отступ 3 до превью из Figma */
+.y-today__weather { position: absolute; left: var(--space-20); top: 76px; z-index: var(--layer-float); } /* stylelint-disable-line unit-disallowed-list -- погода на y76 из Figma */
 /* штамп у правого нижнего угла коллажа на любой ширине: коллаж квадратный (100cqw), над ним превью 96 + отступы 3 + 20; штамп заходит на 73 выше низа коллажа */
-.y-today__stamp { position: absolute; right: 20px; top: calc(119px + 100cqw - 73px); z-index: 2; }
+.y-today__stamp { position: absolute; right: var(--space-20); top: calc(119px + 100cqw - 73px); z-index: var(--layer-float); } /* stylelint-disable-line unit-disallowed-list -- штамп: превью 96 + 3 + 20, заходит на 73 (Figma) */
 
 /* Создание образа · выбор вещей: разделы с H2, карусель по центру, соседние карточки выглядывают, разделители с полями 20 */
 .y-slots { display: flex; flex-direction: column; gap: var(--space-20); padding-top: var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating); flex: 1 0 auto; overflow: hidden; }
 .y-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter); }
 .y-slot + .y-slot { position: relative; padding-top: var(--space-20); }
-.y-slot + .y-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* как atom divider: линия с полями 20, не во всю ширину */
+.y-slot + .y-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: var(--border-width-thin); background: var(--color-border-subtle); } /* как atom divider: линия с полями 20, не во всю ширину */
 .y-slot__row { display: flex; justify-content: center; align-items: center; gap: var(--space-8); }
-.y-slot__row > * { flex: none; width: calc((100% - 7px) / 2); } /* ширина колонки сетки: 173 при 393 */
+/* stylelint-disable-next-line no-descending-specificity -- `*` у разных родителей: общих элементов с `.y-sheet--modal > … + *` нет */
+.y-slot__row > * { flex: none; width: calc((100% - 7px) / 2); } /* ширина колонки сетки: 173 при 393 */ /* stylelint-disable-line unit-disallowed-list -- половина зазора сетки 7 */
 .y-slot__add { aspect-ratio: 173 / 172; display: grid; place-items: center; }
-.y-slot__row > .y-slot__add:not(:only-child) { justify-items: start; padding-left: 22px; } /* флоу: «+» в 22 от края слота, рядом с карточкой */
+.y-slot__row > .y-slot__add:not(:only-child) { justify-items: start; padding-left: 22px; } /* флоу: «+» в 22 от края слота, рядом с карточкой */ /* stylelint-disable-line unit-disallowed-list -- «+» в 22 от края слота (Figma) */
 
 /* ─── OutfitPager (#25) ─── */
 /* Геометрия Figma: коллаж 353; стопка — превью в 20 над и под коллажем: 96 на главной (232:1355, scale 0.272), 150 в «Удиви меня» (798:1741);
    лента (463:1534) — шаг 353 + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
 .y-outfit-pager {
-  --pager-size: 353px; --pager-top: 0px; --pager-bleed: var(--space-20);
+  --pager-size: 353px; --pager-top: 0px; --pager-bleed: var(--space-20); /* stylelint-disable-line unit-disallowed-list -- коллаж 353 из Figma; 0px — длина для calc() */
   position: relative; flex: none; width: var(--pager-size); max-width: 100%; margin-inline: auto;
   user-select: none; -webkit-user-select: none; cursor: grab;
 }
 .y-outfit-pager[data-dragging] { cursor: grabbing; }
 .y-outfit-pager--y {
-  --pager-preview: 96; --pager-scale: calc(var(--pager-preview) / 353); --pager-top: calc(var(--pager-preview) * 1px + var(--space-20));
+  --pager-preview: 96; --pager-scale: calc(var(--pager-preview) / 353); --pager-top: calc(var(--pager-preview) * 1px + var(--space-20)); /* stylelint-disable-line unit-disallowed-list -- перевод числа превью в px */
   height: calc(2 * var(--pager-top) + var(--pager-size)); touch-action: none;
 }
 .y-outfit-pager--preview-150 { --pager-preview: 150; }
@@ -354,13 +355,12 @@
 .y-outfit-pager__look:not(.is-current) { cursor: pointer; }
 
 /* Стопка: превью ↔ коллаж на пружине gentle (--motion-swap), палец ведёт 1 : 1 через translate */
-.y-outfit-pager--y .y-outfit-pager__look { translate: 0 var(--drag, 0px); transition: transform var(--motion-swap), opacity var(--motion-fade), translate var(--motion-swap); }
-.y-outfit-pager--y[data-dragging] .y-outfit-pager__look { transition: transform var(--motion-swap), opacity var(--motion-fade), translate 0s; }
+.y-outfit-pager--y .y-outfit-pager__look { translate: 0 var(--drag, 0px); transition: transform var(--motion-swap), opacity var(--motion-fade), translate var(--motion-swap); } /* stylelint-disable-line unit-disallowed-list -- 0px — длина по умолчанию для translate */
 .y-outfit-pager--y .is-current { z-index: 1; }
 .y-outfit-pager--y .is-prev { transform: translateY(calc(-1 * var(--pager-top))) scale(var(--pager-scale)); }
 .y-outfit-pager--y .is-next { transform: translateY(calc(var(--pager-size) + var(--space-20))) scale(var(--pager-scale)); }
-.y-outfit-pager--y .is-above { transform: translateY(calc(-1 * var(--pager-top) - 44px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; }
-.y-outfit-pager--y .is-below { transform: translateY(calc(var(--pager-size) + 107px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; }
+.y-outfit-pager--y .is-above { transform: translateY(calc(-1 * var(--pager-top) - 44px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вверх из Figma Animations */
+.y-outfit-pager--y .is-below { transform: translateY(calc(var(--pager-size) + 107px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вниз из Figma Animations */
 /* у превью радиус 20, как у outfit-thumbnail: до масштаба 20 / scale; бейдж повода на превью не читается — прячем */
 .y-outfit-pager--y .y-outfit-pager__look .y-collage { transition: border-radius var(--motion-swap); }
 .y-outfit-pager--y .y-outfit-pager__look:not(.is-current) .y-collage { border-radius: calc(var(--radius-lg) * 353 / var(--pager-preview)); }
@@ -368,29 +368,33 @@
 .y-outfit-pager__look:not(.is-current) .y-collage__label { opacity: 0; }
 
 /* Лента: трек едет на --motion-page, во время жеста — без перехода */
-.y-outfit-pager--x .y-outfit-pager__track { left: var(--pager-bleed); right: var(--pager-bleed); translate: calc(var(--index, 0) * -1 * (var(--pager-size) + var(--space-20)) + var(--drag, 0px)) 0; transition: translate var(--motion-page); }
+.y-outfit-pager--x .y-outfit-pager__track { left: var(--pager-bleed); right: var(--pager-bleed); translate: calc(var(--index, 0) * -1 * (var(--pager-size) + var(--space-20)) + var(--drag, 0px)) 0; transition: translate var(--motion-page); } /* stylelint-disable-line unit-disallowed-list -- 0px — длина по умолчанию для translate */
 .y-outfit-pager--x[data-dragging] .y-outfit-pager__track { transition: none; }
 .y-outfit-pager--x .y-outfit-pager__look { left: calc(var(--k, 0) * (var(--pager-size) + var(--space-20))); }
+/* Стопка во время жеста: translate без перехода. Здесь, а не у стопки, — после правил ленты (no-descending-specificity) */
+.y-outfit-pager--y[data-dragging] .y-outfit-pager__look { transition: transform var(--motion-swap), opacity var(--motion-fade), translate 0s; }
 
 /* Слоты поверх текущего коллажа: погода над левым верхним углом, штамп «Надеть» у правого нижнего, «Не нравится» — у левого */
-.y-outfit-pager__frame { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: 2; pointer-events: none; }
+.y-outfit-pager__frame { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: var(--layer-float); pointer-events: none; }
+/* stylelint-disable-next-line no-descending-specificity -- `*` у разных родителей: общих элементов с `.y-sheet--modal > … + *` нет */
 .y-outfit-pager__frame > * { position: absolute; pointer-events: auto; cursor: auto; }
-.y-outfit-pager__weather { left: var(--space-20); top: -43px; }
+.y-outfit-pager__weather { left: var(--space-20); top: -43px; } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma) */
 .y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
-.y-outfit-pager__stamp { right: var(--space-20); top: 280px; }
-.y-outfit-pager__skip { left: var(--space-20); top: 321px; }
+.y-outfit-pager__stamp { right: var(--space-20); top: 280px; } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа (Figma) */
+.y-outfit-pager__skip { left: var(--space-20); top: 321px; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа (Figma) */
 /* звезда поворачивается на 180° с каждой сменой образа (Animations «scale»), нажатие и done — своими переходами */
 .y-outfit-pager__stamp .y-stamp__shape { rotate: var(--turn, 0deg); transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select), rotate var(--motion-swap); }
 
 /* Кнопки для клавиатуры и скринридера: в порядке Tab, видны только при фокусе с клавиатуры */
-.y-outfit-pager__nav { position: absolute; right: 0; top: var(--pager-top); z-index: 3; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); opacity: 0; pointer-events: none; transition: opacity var(--motion-fade); }
+.y-outfit-pager__nav { position: absolute; right: 0; top: var(--pager-top); z-index: var(--layer-bar); display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); opacity: 0; pointer-events: none; transition: opacity var(--motion-fade); }
 .y-outfit-pager--x .y-outfit-pager__nav { flex-direction: row; }
 .y-outfit-pager__nav:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 .y-outfit-pager__nav [aria-disabled='true'] { opacity: 0.4; cursor: default; }
-.y-outfit-pager__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; } /* только для скринридера */
+.y-outfit-pager__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; } /* только для скринридера */ /* stylelint-disable-line unit-disallowed-list -- VisuallyHidden 1 × 1 px */
 
 /* ─── Sheet · описание (#27) ─── */
 /* Settings / Currency 513:6256: Body серым 16 под заголовком (через правило title + *), 20 до контента */
+/* stylelint-disable-next-line no-descending-specificity -- должно стоять после .y-sheet__body (та же специфичность, margin-top): перенос выше сдвинул бы тело шторки */
 .y-sheet__description + * { margin-top: var(--space-4); }
 .y-sheet--panel > .y-sheet__description + * { margin-top: 0; } /* в панели gap 20 — описание → контент 20, а не 24 (C14) */
 
@@ -405,10 +409,10 @@
 }
 .y-item-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter) var(--space-20); }
 .y-item-slot + .y-item-slot { position: relative; padding-top: var(--space-20); }
-.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* Flow 2.0: instance divider 353 при 393 — поля 20, цвет как у atom */
+.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: var(--border-width-thin); background: var(--color-border-subtle); } /* Flow 2.0: instance divider 353 при 393 — поля 20, цвет как у atom */
 /* ряд выходит на поля экрана; поля ряда (50 % секции + 20 − 86.5 = 110 при 393) дают первой и последней вещи встать по центру */
 .y-item-slot__row {
-  --slot-card: 173px;
+  --slot-card: 173px; /* stylelint-disable-line unit-disallowed-list -- карточка 173 из Figma */
   position: relative; display: flex; gap: var(--space-8); margin-inline: calc(-1 * var(--screen-gutter));
   padding-inline: calc(50% + var(--screen-gutter) - var(--slot-card) / 2); scroll-padding-inline: calc(50% - var(--slot-card) / 2);
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
@@ -417,7 +421,7 @@
 .y-item-slot__row:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--card-radius); }
 .y-item-slot__item { flex: none; width: var(--slot-card); scroll-snap-align: center; }
 /* «+»: карточка той же ширины без фона, кнопка в 22 от края рядом с последней вещью; в пустой секции — по центру */
-.y-item-slot__add { flex: none; width: var(--slot-card); aspect-ratio: 173 / 172; display: grid; place-items: center start; padding-left: 21px; }
+.y-item-slot__add { flex: none; width: var(--slot-card); aspect-ratio: 173 / 172; display: grid; place-items: center start; padding-left: 21px; } /* stylelint-disable-line unit-disallowed-list -- «+» в 21 от края (Figma) */
 .y-item-slot__row--empty .y-item-slot__add { place-items: center; padding-left: 0; }
 
 /* ─── CropFrame (#27) ─── */
@@ -430,9 +434,10 @@
   border-radius: var(--radius-lg); box-shadow: 0 0 0 100vmax var(--color-bg-overlay);
   transition: box-shadow var(--motion-fade);
 }
-.y-crop.is-active .y-crop__frame { box-shadow: 0 0 0 100vmax var(--color-bg-overlay), inset 0 0 0 1px rgb(255 255 255 / 0.4); }
 .y-crop__frame:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+.y-crop.is-active .y-crop__frame { box-shadow: 0 0 0 100vmax var(--color-bg-overlay), inset 0 0 0 var(--border-width-thin) rgb(255 255 255 / 0.4); }
 /* уголок 32 видимый, зона захвата 44 (углы выходят за рамку на 10) */
+/* stylelint-disable unit-disallowed-list -- уголок 32 видимый, зона захвата 44, выход за рамку на 10: геометрия Figma, токенов нет */
 .y-crop__corner { position: absolute; width: 44px; height: 44px; touch-action: none; }
 .y-crop__corner::before { content: ''; position: absolute; width: 32px; height: 32px; border: 2px solid var(--color-text-on-photo); }
 .y-crop__corner--nw { left: -10px; top: -10px; cursor: nwse-resize; }
@@ -443,5 +448,12 @@
 .y-crop__corner--ne::before { right: 10px; top: 10px; border-width: 2px 2px 0 0; border-top-right-radius: var(--radius-lg); }
 .y-crop__corner--sw::before { left: 10px; bottom: 10px; border-width: 0 0 2px 2px; border-bottom-left-radius: var(--radius-lg); }
 .y-crop__corner--se::before { right: 10px; bottom: 10px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius-lg); }
+/* stylelint-enable unit-disallowed-list */
 /* подсказка в 20 над кнопкой L внизу экрана: 20 + 52 + 20 */
-.y-crop__hint { position: absolute; left: 0; right: 0; bottom: var(--crop-hint-bottom, 92px); z-index: 2; display: flex; justify-content: center; pointer-events: none; }
+.y-crop__hint { position: absolute; left: 0; right: 0; bottom: var(--crop-hint-bottom, 92px); z-index: var(--layer-float); display: flex; justify-content: center; pointer-events: none; } /* stylelint-disable-line unit-disallowed-list -- подсказка: 20 + кнопка 52 + 20 */
+
+/* ─── В конце файла: эти селекторы специфичнее прочих `… > *` (no-descending-specificity) ─── */
+/* Нажатие вкладки: сжимается иконка (переход — у .y-tab-bar__tab > *) */
+.y-tab-bar__tab:active > * { transform: scale(var(--gesture-press-scale)); }
+/* Шапка: кнопки справа от свёрнутой пилюли — над ней */
+.y-header__large-title + .y-header__pill ~ * { position: relative; z-index: var(--layer-raised); }

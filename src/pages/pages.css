@@ -6,9 +6,8 @@
 /* Onboarding / Welcome: заголовок на y70, как у большой шапки (контент начинается на 20 ниже статус-бара) */
 .y-welcome { margin-top: calc(var(--space-12) * -1); }
 
-/* Auth / Sign In: юридическая подпись внизу экрана — 3 строки по центру, ссылки подчёркнуты, 20 от низа */
+/* Auth / Sign In: юридическая подпись внизу экрана — 3 строки по центру, 20 от низа; ссылки — Link */
 .y-legal { margin: auto 0 -4px; text-align: center; }
-.y-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; }
 
 /* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
 .y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; }

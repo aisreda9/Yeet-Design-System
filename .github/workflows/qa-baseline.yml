@@ -1,0 +1,130 @@
+name: QA baseline
+
+# Пересъёмка эталонов qa/baseline/*.png в закреплённом образе Playwright — для тех, у кого нет Docker.
+# Запуск: Actions → QA baseline → Run workflow → ref = ветка PR. Результат — коммит от github-actions[bot] в эту ветку.
+#
+# Механика та же, что в qa.yml: `npm run qa` на ubuntu-latest (там есть Docker) сам перезапускается в образе IMAGE
+# из scripts/qa/lib.mjs (docker run, репозиторий смонтирован в /work, браузер — из образа). Поэтому эталоны
+# побайтно совпадают с тем, что сравнивает CI. Браузеры на хост не ставим: скриншоты снимаются только внутри образа.
+#
+# ВАЖНО: push токеном GITHUB_TOKEN не запускает другие workflow (защита GitHub от рекурсии). После пересъёмки
+# QA Storybook на новом коммите сам не стартует: нужен следующий обычный коммит в ветку или ручной запуск
+# Actions → QA Storybook → Run workflow → та же ветка (у qa.yml есть workflow_dispatch). PAT и секреты не заводим нарочно.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ветка PR, в которую закоммитить эталоны (не main)'
+        required: true
+        type: string
+      stories:
+        description: 'Необязательно: префикс id историй (npm run qa -- --only=…), например organisms-header. Пусто — все истории, лишние эталоны удаляются'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  # Два прогона на одну ветку писали бы друг другу поверх — второй ждёт первого
+  group: ${{ github.workflow }}-${{ inputs.ref }}
+  cancel-in-progress: false
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Входы — только через env, не подстановкой ${{ }} в скрипт (инъекция в shell)
+      STORIES: ${{ inputs.stories }}
+    steps:
+      - name: Проверка входов
+        env:
+          INPUT_REF: ${{ inputs.ref }}
+        run: |
+          REF="${INPUT_REF#refs/heads/}"
+          if [ -z "$REF" ] || [ "$REF" = "main" ]; then
+            echo '::error::ref = main (или пусто): эталоны main переснимаются только через PR. Укажите ветку PR.'
+            exit 1
+          fi
+          if ! git check-ref-format --branch "$REF" >/dev/null 2>&1; then
+            echo "::error::Некорректное имя ветки: $REF"
+            exit 1
+          fi
+          if [ -n "$STORIES" ] && ! printf '%s' "$STORIES" | grep -Eq '^[a-z0-9-]+$'; then
+            echo "::error::stories — префикс id истории (a-z, 0-9, -), получено: $STORIES"
+            exit 1
+          fi
+          echo "BRANCH=$REF" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BRANCH }}
+      - name: ref — существующая ветка этого репозитория
+        run: |
+          if ! git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            echo "::error::Ветки $BRANCH нет в репозитории (тег, коммит или ветка форка не подходят)."
+            exit 1
+          fi
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build-storybook
+      - name: Пересъёмка эталонов (npm run qa -- --update-baseline в закреплённом образе)
+        id: qa
+        run: |
+          set +e
+          args=(--update-baseline --no-devices)
+          [ -n "$STORIES" ] && args+=("--only=$STORIES")
+          npm run qa -- "${args[@]}"
+          code=$?
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          # 0 — чисто; 1 — эталоны сняты, но другие проверки QA нашли ошибки (отчёт дописан до конца) — коммитим
+          # и предупреждаем; иное (2 — не тот образ / нет storybook-static / Docker; падение без отчёта) — стоп.
+          if [ "$code" -eq 1 ] && [ -f qa/out/report.md ]; then
+            echo '::warning::QA нашёл ошибки помимо эталонов — см. qa/out/report.md в summary и артефакте. Эталоны всё равно закоммичены.'
+          elif [ "$code" -ne 0 ]; then
+            echo "::error::npm run qa завершился с кодом $code — эталоны не закоммичены."
+            exit "$code"
+          fi
+      - name: Коммит и push в ветку
+        run: |
+          git add -A -- qa/baseline
+          changes="$(git diff --cached --no-renames --name-status -- qa/baseline)"
+          {
+            echo "## Эталоны qa/baseline — ветка \`$BRANCH\`"
+            echo
+            if [ -z "$changes" ]; then
+              echo 'Изменений нет: эталоны в ветке уже совпадают с закреплённым образом.'
+            else
+              for s in A M D; do
+                case $s in A) title='Добавлено';; M) title='Изменено';; D) title='Удалено';; esac
+                files="$(printf '%s\n' "$changes" | awk -v s="$s" '$1 == s { print $2 }')"
+                [ -z "$files" ] && continue
+                echo "### $title: $(printf '%s\n' "$files" | wc -l)"
+                echo
+                printf '%s\n' "$files" | sed 's/^/- `/; s/$/`/'
+                echo
+              done
+              echo '> Push токеном GITHUB_TOKEN не запускает CI. Перезапустите **QA Storybook** вручную на этой ветке или дождитесь следующего коммита.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ -z "$changes" ] && exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -m 'qa: эталоны пересняты в закреплённом образе (workflow qa-baseline)'
+          if ! git push origin "HEAD:refs/heads/$BRANCH"; then
+            echo "::error::Push отклонён: ветка $BRANCH ушла вперёд во время пересъёмки. Запустите workflow ещё раз."
+            exit 1
+          fi
+      - if: always()
+        run: cat qa/out/report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: qa-baseline-report
+          path: qa/out
