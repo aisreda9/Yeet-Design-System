@@ -88,11 +88,16 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
 ### Доступность
 
 - **TalkBack:** у `IconButton` обязательный `label`; `Icon(title = …)` — иначе декоративная; роли и состояния — `Role.Tab` + selected
-  (SegmentControl, TabBar), `RadioButton` (ListItem Radio), stateDescription (Expandable), `liveRegion` (Snackbar, LoadingState),
-  `heading()` у H1–H3, `paneTitle` у Sheet / Dialog, `error()` у Field.
+  (SegmentControl, TabBar — `selectable` в `selectableGroup`), `RadioButton` (ListItem Radio, RadioList), `Checkbox` через `toggleable`
+  (чипс с `onToggle` / выбором), stateDescription (Expandable, Button `loading` — «Загрузка»), `liveRegion` (Snackbar, LoadingState,
+  ошибка FormField), `heading()` у H1–H3, `paneTitle` у Sheet / Dialog, `error()` у Field (в FormField — с текстом ошибки);
+  «глаз» пароля — переключатель «Показать пароль» / «Скрыть пароль», «×» чипса — отдельная кнопка «Удалить: …».
 - **Масштаб шрифта:** текст в `sp`, высоты кнопок / полей / строк — минимальные (`heightIn`), при крупном шрифте компоненты растут.
-- **Зона нажатия 48 dp:** элементы меньше 48 dp (IconButton S 40, чипсы 40, иконки в Snackbar) расширяют зону нажатия
-  автоматически (`ViewConfiguration.minimumTouchTargetSize`) без изменения раскладки — как `::after` 44 в вебе.
+- **Зона нажатия 48 dp:** элементы меньше 48 dp (IconButton S 40, «+» чипсов, чипсы 40, «×» очистки, кнопка справа в Field,
+  иконки в Snackbar, аватары AvatarStack) — `Modifier.minimumInteractiveComponentSize()`, как у компонентов Material 3: рисуются
+  прежнего размера, в раскладке занимают 48. Где макет задан точно (Field, Snackbar, InputBar, AccountCard), поля уменьшены
+  на выступ зоны — иконки стоят на местах из Figma. Сегменты и вкладки TabBar уже 40–48 во всю высоту контейнера: зона
+  не добавляется, чтобы не раздвигать пилюлю; касание рядом Compose доводит до 48 сам (`minimumTouchTargetSize`), как `::after` 44 в вебе.
 - **Уменьшить движение:** `rememberReduceMotion()` следит за `Settings.Global.ANIMATOR_DURATION_SCALE`
   («Убрать анимацию»); при 0 все переходы — `snap()`, спиннер стоит, подъём без увеличения.
 - **Хаптика** уважает системный «Виброотклик»; `select` — не чаще раза в 50 мс; выключается `YeetTheme(hapticsEnabled = false)`.
@@ -103,18 +108,21 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
 |---|---|---|
 | `<Icon name size title strokeWidth>` | `Icon(IconName.X, size, title, strokeWidth)` | имя `'chevron-up-down'` → `IconName.ChevronUpDown` (`IconName.fromKey`) |
 | `<Logo height>` | `Logo(height, tint)` | |
-| `<Button variant size leftIcon rightIcon fullWidth floating>` | `Button(text, onClick, variant = ButtonStyle.*, size = ControlSize.*, …)` | children → `text` или слот `content` |
-| `<IconButton icon label variant size floating decorative>` | `IconButton(icon, label, onClick, …)` | |
-| `<Stamp label tone icon done>` | `Stamp(label, onClick, tone = StampTone.*, icon, done)` | хаптика `stamp` в пик пружины (120 мс) |
+| `<Button variant size leftIcon rightIcon fullWidth floating loading loadingLabel>` | `Button(text, onClick, variant = ButtonStyle.*, size = ControlSize.*, …, loading, loadingLabel)` | children → `text` или слот `content`; `loading` — спиннер, ширина та же, `aria-busy` → stateDescription |
+| `<IconButton icon label variant size floating decorative loading loadingLabel>` | `IconButton(icon, label, onClick, …, loading, loadingLabel)` | S 40 занимает 48 (`minimumInteractiveComponentSize`) |
+| `<Link href external>` | `Link(text, href = …, onClick = …, variant, color)` | `href` открывает `LocalUriHandler`; `external` не нужен |
+| `<Stamp label tone icon done doneSize>` | `Stamp(label, onClick, tone = StampTone.*, icon, done, doneSize = StampDoneSize.*)` | хаптика `stamp` в пик пружины (120 мс); `doneSize` M 78 / S 56 |
 | `<Badge variant>` | `Badge(text, variant = BadgeVariant.*)` | |
 | `<Avatar size initial src alt color>` | `Avatar(size = AvatarSize.*, initial, src: Painter?, alt, color: YeetItemColor?)` | `src` — `Painter` (загрузка картинок — в приложении) |
 | `<AvatarStack accounts onOpen onAdd>` | `AvatarStack(accounts, onOpen, onAdd)` | |
 | `<Divider label>`, `<ColorDot>`, `<ScrollEdge>`, `<Text variant tone>` | `Divider(label)`, `ColorDot`, `ScrollEdge`, `Text(text, variant, tone)` | `Text(tone = null)` наследует цвет |
-| `<Field label value colorDot trailingIcon onTrailingClick input error onClick>` | `Field(…, input = FieldInput(value, onValueChange, …))` | + `trailingLabel` для TalkBack |
+| `<Field label value colorDot trailingIcon onTrailingClick input error onClick>` | `Field(…, input = FieldInput(value, onValueChange, …, password))` | + `trailingLabel` для TalkBack; `type="password"` → `FieldInput(password = true)` — встроенный «глаз» |
+| `<FormField label hideLabel description error required>` | `FormField(label, description, error, required, hideLabel) { Field(…) }` | `Field` внутри берёт имя и текст ошибки сам; для своего поля — `control.modifier` |
 | `<InputGroup size>` | `InputGroup(size = InputGroupSize.*) { Field(…) }` | разделители рисуются автоматически |
 | `<InputBar placeholder value onChange fieldIcon leading trailing send size>` | `InputBar(…, leading = BarAction(…), send = SendAction(…))` | |
-| `<SegmentControl segments value onChange size fit>` | `SegmentControl(segments = listOf(Segment(…)), value, onChange, size, fit)` | пилюля — пружина `nav` |
-| `<ChipGroup chips onToggle onAdd wrap center>` | `ChipGroup(chips = listOf(Chip(…)), onToggle, onAdd, wrap, center, bleed)` | `bleed` = выход за поля (web: −gutter) |
+| `<SegmentControl segments value defaultValue onChange size fit>` | `SegmentControl(segments = listOf(Segment(…)), value, onChange, size, fit)` | пилюля — пружина `nav`; uncontrolled — перегрузка с `defaultValue` (`rememberSaveable`) |
+| `<ChipGroup chips value defaultValue onValueChange multiple onToggle onRemove onAdd wrap center>` | `ChipGroup(chips = listOf(Chip(…)), onToggle, onAdd, wrap, center, bleed, onRemove)` | `bleed` = выход за поля (web: −gutter); выбор — перегрузки `value` + `onValueChange` и `defaultValue` |
+| `<RadioList options value defaultValue onChange label>` | `RadioList(options = listOf(RadioOption(…)), value, onChange, label)` | uncontrolled — перегрузка с `defaultValue`; стрелки двигает фокус система |
 | `<ListItem type label icon expanded checked description leading trailing onClick>` | `ListItem(label, type = ListItemType.*, …)` | `leading` / `trailing` — слоты |
 | `<ListGroup>` | `ListGroup { ListItem(…) }` | |
 | `<StatTile label value>`, `<StatRow>` | `StatTile(label, value)`, `StatRow { … }` | ширина делится поровну |
