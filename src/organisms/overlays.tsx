@@ -15,7 +15,7 @@ type FooterAction = { label: string; variant?: ButtonStyle; onClick?: () => void
  * Решения дизайна из design/SHEETS-AUDIT.md — каждое переключается одной правкой:
  * D1 — подтверждение (Dialog) без хэндла: плавающая карточка, заголовок на 20 от верха. `true` — хэндл, если слой закрываемый.
  * D6 — рискованное подтверждение (`variant` destructive / danger) закрывается только кнопками и Escape: не свайпом и не тапом по затемнению.
- * D5 — пружина шторки без перелёта: `--sheet-spring` в organisms.css (вернуть `--motion-nav` — там же).
+ * D5 — пружина шторки без перелёта: `--sheet-spring: var(--motion-sheet)` в organisms.css (вернуть `--motion-nav` — там же).
  */
 const DIALOG_HANDLE = false;
 const RISKY_DIALOG_BUTTONS_ONLY = true;
