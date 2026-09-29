@@ -1,20 +1,13 @@
 import type { ComponentType } from 'react';
-import * as creation from '../Creation.stories';
-import * as onboarding from '../Onboarding.stories';
-import * as outfits from '../Outfits.stories';
-import * as profile from '../Profile.stories';
-import * as search from '../Search.stories';
-import * as settings from '../Settings.stories';
-import * as stylist from '../Stylist.stories';
-import * as wardrobe from '../Wardrobe.stories';
 
 /**
  * Реестр экранов прототипа: те же истории, что в «Pages / Экраны флоу», — без копий.
- * Новая история раздела появляется здесь сама (id = имя экспорта); связь с соседями — в `routes.ts`.
+ * Файлы `src/pages/*.stories.tsx` подхватываются сами (id = имя экспорта, имена в разделах не повторяются):
+ * новая история раздела или целый новый файл появляется в списке без правок здесь. Ссылка на неё — запись в `routes.ts`.
  */
-const modules = { ...onboarding, ...outfits, ...creation, ...search, ...stylist, ...profile, ...settings, ...wardrobe };
-type Modules = typeof modules;
-export type ScreenId = Exclude<keyof Modules, 'default'>;
+const files = import.meta.glob<Record<string, unknown>>(['../*.stories.tsx', '!../Prototype.stories.tsx'], { eager: true });
+const modules: Record<string, unknown> = Object.assign({}, ...Object.values(files));
+export type ScreenId = string;
 
 type StoryLike = { name?: string; render?: () => unknown };
 
@@ -27,13 +20,18 @@ export type ScreenDef = {
   overlay: boolean;
 };
 
-/** Истории, где экран — лишь подложка для шторки или диалога: в прототипе показывается только сам слой. */
-const OVERLAYS = new Set<string>(['FilterSheet', 'ItemActions', 'ClearTrash', 'PasswordRecoverySent', 'DeleteAccount', 'CountrySheet', 'CurrencySheet', 'PriceFilter']);
+/**
+ * Шторка или диалог — по имени истории (`… / Sheet / …`, `… / Dialog / …`, правило Figma-имён): в прототипе от такой истории
+ * остаётся только слой поверх текущего экрана. Исключение — шторки, которыми экран управляет сам (профиль: аккаунты, период):
+ * там открывается весь экран с уже открытой шторкой.
+ */
+const NATIVE_SHEETS = new Set<string>(['AccountsMulti', 'AccountsSingle', 'PeriodSheet']);
+const isOverlay = (id: string, name: string) => /\/ (Sheet|Dialog) \//.test(name) && !NATIVE_SHEETS.has(id);
 
 export const screens = Object.fromEntries(
   Object.entries(modules)
     .filter(([id, story]) => id !== 'default' && typeof (story as StoryLike).render === 'function')
-    .map(([id, story]) => [id, { id, name: (story as StoryLike).name ?? id, Component: (story as { render: ComponentType }).render, overlay: OVERLAYS.has(id) }]),
+    .map(([id, story]) => [id, { id, name: (story as StoryLike).name ?? id, Component: (story as { render: ComponentType }).render, overlay: isOverlay(id, (story as StoryLike).name ?? '') }]),
 ) as Record<ScreenId, ScreenDef>;
 
 /** Корневые экраны пяти вкладок таб-бара. */

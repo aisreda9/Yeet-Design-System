@@ -7,6 +7,16 @@ import { auto, globalRoutes, HOME, label, routes, START, type Go, type Nav, type
 import { screens, type ScreenId } from './screens';
 import './prototype.css';
 
+/** Ссылки в `routes.ts` на экраны, которых нет в историях (переименовали или удалили) — в консоль, а не молчаливым тапом в пустоту. */
+if (import.meta.env?.DEV) {
+  const missing = new Set<string>();
+  for (const [from, list] of Object.entries(routes)) {
+    if (!screens[from]) missing.add(from);
+    for (const r of list ?? []) if (typeof r.go === 'string' && !screens[r.go]) missing.add(r.go);
+  }
+  if (missing.size) console.warn(`[prototype] routes.ts ссылается на экраны без истории: ${[...missing].join(', ')}`);
+}
+
 /**
  * Кликабельный прототип приложения: экраны из «Pages / Экраны флоу», связанные переходами.
  *
