@@ -14,10 +14,9 @@
 
 | Что | Узел | Назначение |
 |---|---|---|
-| **Design System 2.0 (Claude)** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Компоненты на коллекции «Yeet DS 2.0» (Light / Dark) — **источник правды для кода** |
-| Claude · DS 2.0 — экраны | [`1168:12824`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1168-12824) | Экраны флоу, собранные из компонентов 2.0 |
-| Claude · DS 2.0 — Dark | [`1173:7887`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1173-7887) | Те же экраны в тёмной теме |
-| New app design | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида, якоря `npm run flow-diff` |
+| **Design System 0.2** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Компоненты на коллекции «Yeet DS 2.0» (Light / Dark) — **источник правды для кода** |
+| Screens Design 0.2 | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Экраны флоу из компонентов DS 0.2, только светлая тема (секция `1168:12824`); тёмные экраны пока не делаем |
+| Screens Design 0.1 | [`1306:22698`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1306-22698) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида, якоря `npm run flow-diff` |
 | Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*`. Читается по id, но `get_metadata` без `nodeId` её не перечисляет — открывать по ссылке |
 
 Правило: **компонент DS — закон, экран — пример использования.** Порядок правки — `CONTRIBUTING.md`. Оригинальные страницы YeetStyle 2.0 не трогаем; писать в Figma — под замком (`TEAM.md` §5).
@@ -149,7 +148,7 @@
 | `--radius-full` | 999 | Аватар, радио |
 | `--radius-overlay` | 48 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) |
 
-Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`, `--sheet-radius-bottom` → `bar`.
+Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`.
 <!-- /gen:radius -->
 
 ### 3.6 Тени

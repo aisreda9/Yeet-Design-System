@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
+import { Link } from '../atoms';
 import { cx } from '../utils/cx';
 
 /** Абзац (строка) · важный абзац чёрным (`{ strong }`) · маркированный список (`{ list }`). */
@@ -17,9 +18,9 @@ export type ProseProps = {
 
 const email = /([\w.+-]+@[\w-]+\.[\w.]+)/g;
 
-/** Почта в тексте становится ссылкой mailto: чёрным с подчёркиванием (Figma Legal). */
+/** Почта в тексте становится ссылкой mailto (`Link`) основным цветом текста (Figma Legal). */
 function linkify(text: string): ReactNode {
-  return text.split(email).map((part, i) => (i % 2 ? <a key={i} href={`mailto:${part}`}>{part}</a> : <Fragment key={i}>{part}</Fragment>));
+  return text.split(email).map((part, i) => (i % 2 ? <Link key={i} href={`mailto:${part}`}>{part}</Link> : <Fragment key={i}>{part}</Fragment>));
 }
 
 function Block({ block }: { block: ProseBlock }) {

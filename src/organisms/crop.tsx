@@ -128,17 +128,20 @@ export function CropFrame({ src, alt = '', children, value, defaultValue = cropD
   return (
     <div ref={(n) => { box.current = n; setRef(ref, n); }} className={cx('y-crop', active && 'is-active', className)} style={{ ...styleProp, ...style }} {...rest} {...root}>
       {src ? <img className="y-crop__photo" src={src} alt={alt} draggable={false} /> : children}
+      {/* Рамка — виджет с клавиатурой (стрелки двигают, «+» / «−» масштабируют): фокус и обработчики у group намеренно */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className="y-crop__frame"
         role="group"
         aria-roledescription="рамка обрезки"
         aria-label={`Рамка: ${pct(rect.w)} × ${pct(rect.h)} % фото, стрелки двигают, плюс и минус масштабируют`}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- см. комментарий над рамкой
         tabIndex={0}
-        onPointerDown={down('move')}
+        onPointerDown={(e) => down('move')(e)}
         onKeyDown={onKeyDown}
       >
         {corners.map((c) => (
-          <span key={c} className={`y-crop__corner y-crop__corner--${c}`} aria-hidden onPointerDown={down(c)} />
+          <span key={c} className={`y-crop__corner y-crop__corner--${c}`} aria-hidden onPointerDown={(e) => down(c)(e)} />
         ))}
       </div>
       {hint !== null && <div className="y-crop__hint"><Hint tone="onPhoto" icon="fingers-pinch">{hint}</Hint></div>}

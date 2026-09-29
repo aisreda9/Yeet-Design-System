@@ -110,7 +110,7 @@
 .y-prose__head, .y-prose__section { display: flex; flex-direction: column; gap: var(--space-12); }
 .y-prose p, .y-prose ul { margin: 0; }
 .y-prose ul { padding-left: 21px; /* stylelint-disable-line unit-disallowed-list -- отступ маркера 21 из Figma */ display: flex; flex-direction: column; gap: var(--space-8); }
-.y-prose a { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: var(--space-4) 0; margin: calc(-1 * var(--space-4)) 0; } /* зона нажатия ≥ 24 без сдвига строки */ /* stylelint-disable-line unit-disallowed-list -- отступ подчёркивания, токена нет */
+.y-prose .y-link { color: var(--color-text-primary); } /* почта — основным цветом среди серого текста; подчёркивание и зона нажатия — у Link */
 /* Длинные слова заголовка на узком экране (320: «конфиденциальности») переносятся по слогам */
 .y-prose h1, .y-prose h2 { hyphens: auto; overflow-wrap: break-word; }
 .y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }
