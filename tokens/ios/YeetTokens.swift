@@ -365,7 +365,7 @@ public struct YeetSpring {
 public enum YeetMotion {
     /// Нажатие кнопки, scale 0.97
     public static let press = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
-    /// Затухание краёв, тосты
+    /// Затухание краёв при скролле, затемнение под шторкой, подписи и тени
     public static let fade = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Фото сворачивается в шапку при скролле
     public static let collapse = Animation.timingCurve(0, 0, 0.58, 1, duration: 0.3)
@@ -417,6 +417,8 @@ public enum YeetGesture {
     public static let rubberBand: CGFloat = 0.55
     /// Время показа snackbar без действия (с действием — 6000)
     public static let snackbar: TimeInterval = 4
+    /// Время показа snackbar с действием
+    public static let snackbarAction: TimeInterval = 6
 }
 
 /// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.

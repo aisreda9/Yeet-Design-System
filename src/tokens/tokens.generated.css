@@ -92,7 +92,7 @@
   --spring-bouncy: linear(0, 0.18, 0.579, 0.988, 1.267, 1.364, 1.306, 1.163, 1.013, 0.907, 0.868, 0.886, 0.937, 0.992, 1.032, 1.048, 1.042, 1.024, 1.004, 0.989, 0.983, 0.984, 0.991, 0.998, 1.004, 1.006, 1.006, 1.004, 1.001, 0.999, 0.998, 0.998, 0.999, 1, 1, 1.001, 1);
   --spring-bouncy-duration: 958ms;
   --motion-press: var(--motion-fast) var(--ease-standard); /* Нажатие кнопки, scale 0.97 */
-  --motion-fade: var(--motion-base) var(--ease-standard); /* Затухание краёв, тосты */
+  --motion-fade: var(--motion-base) var(--ease-standard); /* Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
   --motion-collapse: var(--motion-300) var(--ease-out); /* Фото сворачивается в шапку при скролле */
   --motion-page: var(--motion-300) var(--ease-out); /* Листание образов и поводов по свайпу */
   --motion-nav: var(--spring-quick-duration) var(--spring-quick); /* Таб-бар уступает место FAB */
@@ -116,6 +116,7 @@
   --gesture-swipe-velocity: 500; /* Скорость броска, после которой свайп засчитан при любой дистанции */
   --gesture-rubber-band: 0.55; /* Сопротивление за границей: скролл, масштаб 40–300 на холсте */
   --gesture-snackbar: 4000ms; /* Время показа snackbar без действия (с действием — 6000) */
+  --gesture-snackbar-action: 6000ms; /* Время показа snackbar с действием */
 }
 
 @media (prefers-reduced-motion: reduce) {

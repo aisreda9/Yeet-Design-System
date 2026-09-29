@@ -65,7 +65,9 @@
 .y-drag__cell { position: relative; touch-action: none; user-select: none; }
 .y-drag__cell .y-item-card { pointer-events: none; }
 .y-drag__lift { border-radius: var(--card-radius); transition: scale var(--motion-lift), box-shadow var(--motion-lift), opacity var(--motion-exit); }
-.y-drag__lift.is-pressed { scale: var(--gesture-press-scale-card); transition-duration: var(--gesture-long-press); }
+.y-drag__lift.is-pressed { scale: var(--gesture-press-scale-card); }
+/* Сжатие тянется всё удержание (long-press — порог жеста, его не обнуляем); при «Уменьшении движения» — сразу, через --motion-lift */
+@media (prefers-reduced-motion: no-preference) { .y-drag__lift.is-pressed { transition-duration: var(--gesture-long-press); } }
 .y-drag__lift.is-lifted { scale: var(--gesture-lift-scale); box-shadow: var(--shadow-floating); cursor: grabbing; }
 .y-drag__lift.is-target { scale: var(--gesture-target-scale); box-shadow: 0 0 0 2px var(--color-accent); }
 .y-drag__lift.is-removing { scale: 0.6; opacity: 0; transition: scale var(--motion-exit), opacity var(--motion-exit); }
