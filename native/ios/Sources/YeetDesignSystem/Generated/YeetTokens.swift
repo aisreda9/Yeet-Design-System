@@ -44,7 +44,7 @@ public enum YeetColor {
     public static let bgElevated = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0x1A1A1E, alpha: 1))
     /// Карточки, поля, tertiary-кнопки · Figma ui-colors/light-grey
     public static let bgSubtle = dynamic(UIColor(hex: 0xF7F7F7, alpha: 1), UIColor(hex: 0x26262B, alpha: 1))
-    /// Snackbar, Secondary-кнопка, погода · Figma ui-colors/black
+    /// Snackbar, Secondary-кнопка, погода · Figma ui-colors/bg-inverse
     public static let bgInverse = dynamic(UIColor(hex: 0x000000, alpha: 1), UIColor(hex: 0xF5F5F7, alpha: 1))
     /// Затемнение под модальным sheet · Figma ui-colors/overlay
     public static let bgOverlay = dynamic(UIColor(hex: 0x000000, alpha: 0.4), UIColor(hex: 0x000000, alpha: 0.6))
@@ -53,7 +53,7 @@ public enum YeetColor {
     public static let textPrimary = dynamic(UIColor(hex: 0x000000, alpha: 1), UIColor(hex: 0xF5F5F7, alpha: 1))
     /// Вторичный текст, лейблы, подписи · Figma ui-colors/grey
     public static let textSecondary = dynamic(UIColor(hex: 0x6E6E6E, alpha: 1), UIColor(hex: 0x8E8E93, alpha: 1))
-    /// Текст на inverse-поверхности · Figma ui-colors/white
+    /// Текст на inverse-поверхности · Figma ui-colors/text-inverse
     public static let textInverse = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0x0F0F11, alpha: 1))
     /// Текст и иконки на accent / danger · Figma ui-colors/on-accent
     public static let textOnAccent = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))

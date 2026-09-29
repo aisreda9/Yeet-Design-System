@@ -32,7 +32,7 @@ data class YeetColorScheme(
     val bgElevated: Color,
     /** Карточки, поля, tertiary-кнопки · Figma ui-colors/light-grey */
     val bgSubtle: Color,
-    /** Snackbar, Secondary-кнопка, погода · Figma ui-colors/black */
+    /** Snackbar, Secondary-кнопка, погода · Figma ui-colors/bg-inverse */
     val bgInverse: Color,
     /** Затемнение под модальным sheet · Figma ui-colors/overlay */
     val bgOverlay: Color,
@@ -41,7 +41,7 @@ data class YeetColorScheme(
     val textPrimary: Color,
     /** Вторичный текст, лейблы, подписи · Figma ui-colors/grey */
     val textSecondary: Color,
-    /** Текст на inverse-поверхности · Figma ui-colors/white */
+    /** Текст на inverse-поверхности · Figma ui-colors/text-inverse */
     val textInverse: Color,
     /** Текст и иконки на accent / danger · Figma ui-colors/on-accent */
     val textOnAccent: Color,
