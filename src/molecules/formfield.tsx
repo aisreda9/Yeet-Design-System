@@ -1,4 +1,11 @@
-import { cloneElement, isValidElement, useId, type ComponentPropsWithRef, type ReactElement, type ReactNode } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useId,
+  type ComponentPropsWithRef,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { cx } from '../utils/cx';
 
 /* ─── FormField ─────────────────────────────────────────────────────── */
@@ -43,12 +50,25 @@ export type FormFieldProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
  * ```
  * **Контексты:** вход и регистрация (почта, пароль с ошибкой), профиль (имя), новая вещь (название, цена).
  */
-export function FormField({ label, hideLabel, description, error, required, controlId, children, className, ...rest }: FormFieldProps) {
+export function FormField({
+  label,
+  hideLabel,
+  description,
+  error,
+  required,
+  controlId,
+  children,
+  className,
+  ...rest
+}: FormFieldProps) {
   const auto = useId();
   const id = controlId ?? `${auto}-control`;
-  const labelId = `${auto}-label`, descId = `${auto}-description`, errorId = `${auto}-error`;
+  const labelId = `${auto}-label`,
+    descId = `${auto}-description`,
+    errorId = `${auto}-error`;
   const hasError = error != null && error !== false && error !== '';
-  const describedBy = [description ? descId : undefined, hasError ? errorId : undefined].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [description ? descId : undefined, hasError ? errorId : undefined].filter(Boolean).join(' ') || undefined;
   const control: FormFieldControlProps = {
     id,
     'aria-labelledby': labelId,
@@ -58,11 +78,23 @@ export function FormField({ label, hideLabel, description, error, required, cont
   };
   return (
     <div className={cx('y-form-field', hasError && 'y-form-field--error', className)} {...rest}>
-      <label id={labelId} htmlFor={id} className={cx('y-form-field__label', 'y-caption', hideLabel && 'y-visually-hidden')}>
+      <label
+        id={labelId}
+        htmlFor={id}
+        className={cx('y-form-field__label', 'y-caption', hideLabel && 'y-visually-hidden')}
+      >
         {label}
       </label>
-      {typeof children === 'function' ? children(control) : isValidElement(children) ? cloneElement(children, control) : children}
-      {description && <p id={descId} className="y-form-field__description y-caption">{description}</p>}
+      {typeof children === 'function'
+        ? children(control)
+        : isValidElement(children)
+          ? cloneElement(children, control)
+          : children}
+      {description && (
+        <p id={descId} className="y-form-field__description y-caption">
+          {description}
+        </p>
+      )}
       {/* live-регион живёт всё время: ошибка, появившаяся после отправки, озвучивается */}
       <p id={errorId} className="y-form-field__error y-caption" aria-live="polite">
         {hasError ? error : null}
