@@ -323,7 +323,7 @@
         "paddingLeft": 20,
         "paddingBottom": 20,
         "gap": 16,
-        "borderTopLeftRadius": 32,
+        "borderTopLeftRadius": 48,
         "borderBottomLeftRadius": 48
       }
     },
@@ -360,7 +360,7 @@
       "story": "organisms-dialog--playground",
       "selector": ".y-dialog__text",
       "expect": {
-        "gap": 12
+        "gap": 16
       }
     },
     {
@@ -784,13 +784,13 @@
       }
     },
     {
-      "figma": "Settings / Currency 513:6256 · описание 12 под заголовком",
+      "figma": "Settings / Currency 513:6256 · описание 16 под заголовком",
       "story": "organisms-sheet--description",
       "selector": ".y-sheet__description",
       "expect": {
         "fontSize": 14,
         "lineHeight": 20,
-        "marginTop": -4
+        "marginTop": 0
       }
     },
     {
