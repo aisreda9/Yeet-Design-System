@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { Button, Divider, Logo } from '../atoms';
 import { Field, InputGroup, PhotoTile } from '../molecules';
-import { BottomBar, Dialog, Header, Overlay } from '../organisms';
+import { BottomBar, type CanvasItem, Dialog, Header, OutfitCanvas, Overlay } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
 import './pages.css';
 
@@ -90,3 +91,36 @@ export const PasswordRecoverySent: Story = {
     </Screen>
   ),
 };
+
+export const OnboardingName: Story = {
+  name: 'Onboarding / Name / Focused',
+  render: () => (
+    // «Далее» — BottomBar: при открытой клавиатуре система поднимает его над ней, как в макете
+    <Screen header={<Header type="back" title="Давай знакомиться" />} bottom={<BottomBar label="Далее" />}>
+      <InputGroup>
+        <Field label="Имя" input={{ defaultValue: 'Сим' }} />
+        <Field label="Пол" value="Женский" trailingIcon="chevron-up-down" />
+      </InputGroup>
+    </Screen>
+  ),
+};
+
+/** Первый образ из добавленных вещей: вещи можно двигать и масштабировать (Figma `203:1559`). */
+function FirstOutfitScreen() {
+  const [items, setItems] = useState<CanvasItem[]>([
+    { id: 'skirt', kind: 'bottom', color: 'black', x: 30, y: 56, size: 150 },
+    { id: 'top', kind: 'top', color: 'brown', x: 64, y: 36, size: 130 },
+    { id: 'bag', kind: 'container', color: 'black', x: 76, y: 74, size: 64 },
+  ]);
+  const [selected, setSelected] = useState<string>();
+  return (
+    <Screen
+      header={<Header type="back" title="Пример твоего первого образа" subtitle={<>Можешь поиграться с вещами и подвигать<br />их на карточке образа</>} textAction={{ label: 'Пропустить' }} />}
+      bottom={<BottomBar label="Сохранить образ и завершить" />}
+    >
+      <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} />
+    </Screen>
+  );
+}
+
+export const FirstOutfit: Story = { name: 'Onboarding / First Outfit / Preview', render: () => <FirstOutfitScreen /> };

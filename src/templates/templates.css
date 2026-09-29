@@ -101,3 +101,15 @@
 .y-details[data-collapsed] .y-details__media button { visibility: hidden; }
 /* Штамп «Надеть»: поверх контента, x225 y676 (справа 20, снизу 28), со скроллом не едет */
 .y-details__stamp { position: absolute; z-index: 4; right: var(--screen-gutter); bottom: 28px; }
+
+/* ─── Prose: документ из текста (Legal 513:6603, 513:6707) ───
+ * H1 → дата 12, разделы через 24, внутри раздела через 12; списки с маркером, пункты через 8. Почта — чёрным с подчёркиванием.
+ */
+.y-prose { display: flex; flex-direction: column; gap: var(--space-24); }
+.y-prose__head, .y-prose__section { display: flex; flex-direction: column; gap: var(--space-12); }
+.y-prose p, .y-prose ul { margin: 0; }
+.y-prose ul { padding-left: 21px; display: flex; flex-direction: column; gap: var(--space-8); }
+.y-prose a { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; } /* зона нажатия ≥ 24 без сдвига строки */
+/* Длинные слова заголовка на узком экране (320: «конфиденциальности») переносятся по слогам */
+.y-prose h1, .y-prose h2 { hyphens: auto; overflow-wrap: break-word; }
+.y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }
