@@ -207,7 +207,11 @@ public struct YeetOutfitPager: View {
         }
         .frame(width: side, height: side, alignment: .topLeading)
         .overlay(alignment: .topTrailing) {
-            if let stamp { stamp.offset(x: -YeetSpace.s20, y: 280 * k) }
+            if let stamp {
+                stamp
+                    .environment(\.yeetStampTurn, .degrees(Double(index) * 180))
+                    .offset(x: -YeetSpace.s20, y: 280 * k)
+            }
         }
         .offset(y: top)
         .zIndex(2)
