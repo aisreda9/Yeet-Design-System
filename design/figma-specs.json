@@ -701,6 +701,66 @@
         "width": 337,
         "height": 52
       }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · коллаж 353 в 20 под превью 96",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__look.is-current",
+      "expect": {
+        "width": 353,
+        "height": 353,
+        "top": 116
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · превью предыдущего образа 96",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager--y .y-outfit-pager__look.is-prev",
+      "expect": {
+        "width": 96,
+        "height": 96,
+        "top": 0
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · штамп 148 у правого нижнего угла коллажа",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__stamp",
+      "expect": {
+        "width": 148,
+        "height": 148,
+        "left": 185,
+        "top": 280
+      }
+    },
+    {
+      "figma": "Outfits / Everyday / Sunny 232:1355 · погода над левым верхним углом коллажа",
+      "story": "organisms-outfitpager--playground",
+      "selector": ".y-outfit-pager__weather",
+      "expect": {
+        "left": 20,
+        "top": -43
+      }
+    },
+    {
+      "figma": "Stylist / Outfit of the Day 798:1741 · превью 150, коллаж в 20 под ним",
+      "story": "organisms-outfitpager--in-flow-surprise",
+      "selector": ".y-outfit-pager--preview-150 .y-outfit-pager__look.is-current",
+      "expect": {
+        "width": 353,
+        "top": 170
+      }
+    },
+    {
+      "figma": "Stylist / Trips / List 463:1534 · «Не нравится» 64 у левого нижнего угла",
+      "story": "organisms-outfitpager--in-flow-trips",
+      "selector": ".y-outfit-pager--x .y-outfit-pager__skip",
+      "expect": {
+        "width": 64,
+        "height": 64,
+        "left": 20,
+        "top": 321
+      }
     }
   ]
 }

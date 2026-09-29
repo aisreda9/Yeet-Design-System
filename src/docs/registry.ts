@@ -90,4 +90,7 @@ export const registry: Entry[] = [
   { code: 'CollageLayer', figma: 'слой вещей outfit-collage', figmaId: null, figmaWhy: 'слой внутри outfit-collage 1187:20745, outfit-thumbnail 962:3227, trip-card 1036:5342', level: 'Organisms', section: '07 Content', story: 'Organisms/OutfitCollage' },
   { code: 'StylistDock', figma: 'нижняя панель стилиста (флоу Stylist / Home)', figmaId: null, figmaWhy: 'есть только в макетах флоу: input-bar 942:7282 + tab-bar 962:3217', level: 'Organisms', section: '05 Navigation & scroll', story: 'Pages/Экраны флоу' },
   { code: 'Sticky', figma: 'Pattern / Search Results (шапка с фильтрами)', figmaId: '984:4979', level: 'Templates', section: '10 Screen patterns', story: 'Pages/Экраны флоу', note: 'figmaId — кадр паттерна, не компонент' },
+
+  // Волна 2 · organisms (#25)
+  { code: 'OutfitPager', figma: 'стопка / лента образов (флоу Outfits, Stylist)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 232:1355, 798:1741 (стопка), 463:1534 (лента); Animations «scale» 354:17678', level: 'Organisms', section: '07 Content', story: 'Organisms/OutfitPager', note: 'axis y / x, превью 96 / 150, слоты weather, stamp, skip' },
 ];

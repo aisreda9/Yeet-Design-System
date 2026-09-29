@@ -305,3 +305,60 @@
 .y-slot__row > * { flex: none; width: calc((100% - 7px) / 2); } /* ширина колонки сетки: 173 при 393 */
 .y-slot__add { aspect-ratio: 173 / 172; display: grid; place-items: center; }
 .y-slot__row > .y-slot__add:not(:only-child) { justify-items: start; padding-left: 22px; } /* флоу: «+» в 22 от края слота, рядом с карточкой */
+
+/* ─── OutfitPager (#25) ─── */
+/* Геометрия Figma: коллаж 353; стопка — превью в 20 над и под коллажем: 96 на главной (232:1355, scale 0.272), 150 в «Удиви меня» (798:1741);
+   лента (463:1534) — шаг 353 + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
+.y-outfit-pager {
+  --pager-size: 353px; --pager-top: 0px; --pager-bleed: var(--space-20);
+  position: relative; flex: none; width: var(--pager-size); max-width: 100%; margin-inline: auto;
+  user-select: none; -webkit-user-select: none; cursor: grab;
+}
+.y-outfit-pager[data-dragging] { cursor: grabbing; }
+.y-outfit-pager--y {
+  --pager-preview: 96; --pager-scale: calc(var(--pager-preview) / 353); --pager-top: calc(var(--pager-preview) * 1px + var(--space-20));
+  height: calc(2 * var(--pager-top) + var(--pager-size)); touch-action: none;
+}
+.y-outfit-pager--preview-150 { --pager-preview: 150; }
+.y-outfit-pager--x { height: var(--pager-size); touch-action: pan-y; }
+.y-outfit-pager__viewport { position: absolute; inset: 0; }
+.y-outfit-pager--x .y-outfit-pager__viewport { inset: 0 calc(-1 * var(--pager-bleed)); overflow: hidden; }
+.y-outfit-pager__track { position: absolute; inset: 0; }
+.y-outfit-pager__look { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); transform-origin: top center; }
+.y-outfit-pager__look:not(.is-current) { cursor: pointer; }
+
+/* Стопка: превью ↔ коллаж на пружине gentle (--motion-swap), палец ведёт 1 : 1 через translate */
+.y-outfit-pager--y .y-outfit-pager__look { translate: 0 var(--drag, 0px); transition: transform var(--motion-swap), opacity var(--motion-fade), translate var(--motion-swap); }
+.y-outfit-pager--y[data-dragging] .y-outfit-pager__look { transition: transform var(--motion-swap), opacity var(--motion-fade), translate 0s; }
+.y-outfit-pager--y .is-current { z-index: 1; }
+.y-outfit-pager--y .is-prev { transform: translateY(calc(-1 * var(--pager-top))) scale(var(--pager-scale)); }
+.y-outfit-pager--y .is-next { transform: translateY(calc(var(--pager-size) + var(--space-20))) scale(var(--pager-scale)); }
+.y-outfit-pager--y .is-above { transform: translateY(calc(-1 * var(--pager-top) - 44px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; }
+.y-outfit-pager--y .is-below { transform: translateY(calc(var(--pager-size) + 107px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; }
+/* у превью радиус 20, как у outfit-thumbnail: до масштаба 20 / scale; бейдж повода на превью не читается — прячем */
+.y-outfit-pager--y .y-outfit-pager__look .y-collage { transition: border-radius var(--motion-swap); }
+.y-outfit-pager--y .y-outfit-pager__look:not(.is-current) .y-collage { border-radius: calc(var(--radius-lg) * 353 / var(--pager-preview)); }
+.y-outfit-pager__look .y-collage__label { transition: opacity var(--motion-fade); }
+.y-outfit-pager__look:not(.is-current) .y-collage__label { opacity: 0; }
+
+/* Лента: трек едет на --motion-page, во время жеста — без перехода */
+.y-outfit-pager--x .y-outfit-pager__track { left: var(--pager-bleed); right: var(--pager-bleed); translate: calc(var(--index, 0) * -1 * (var(--pager-size) + var(--space-20)) + var(--drag, 0px)) 0; transition: translate var(--motion-page); }
+.y-outfit-pager--x[data-dragging] .y-outfit-pager__track { transition: none; }
+.y-outfit-pager--x .y-outfit-pager__look { left: calc(var(--k, 0) * (var(--pager-size) + var(--space-20))); }
+
+/* Слоты поверх текущего коллажа: погода над левым верхним углом, штамп «Надеть» у правого нижнего, «Не нравится» — у левого */
+.y-outfit-pager__frame { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: 2; pointer-events: none; }
+.y-outfit-pager__frame > * { position: absolute; pointer-events: auto; cursor: auto; }
+.y-outfit-pager__weather { left: var(--space-20); top: -43px; }
+.y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
+.y-outfit-pager__stamp { right: var(--space-20); top: 280px; }
+.y-outfit-pager__skip { left: var(--space-20); top: 321px; }
+/* звезда поворачивается на 180° с каждой сменой образа (Animations «scale»), нажатие и done — своими переходами */
+.y-outfit-pager__stamp .y-stamp__shape { rotate: var(--turn, 0deg); transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select), rotate var(--motion-swap); }
+
+/* Кнопки для клавиатуры и скринридера: в порядке Tab, видны только при фокусе с клавиатуры */
+.y-outfit-pager__nav { position: absolute; right: 0; top: var(--pager-top); z-index: 3; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); opacity: 0; pointer-events: none; transition: opacity var(--motion-fade); }
+.y-outfit-pager--x .y-outfit-pager__nav { flex-direction: row; }
+.y-outfit-pager__nav:has(:focus-visible) { opacity: 1; pointer-events: auto; }
+.y-outfit-pager__nav [aria-disabled='true'] { opacity: 0.4; cursor: default; }
+.y-outfit-pager__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; } /* только для скринридера */
