@@ -14,6 +14,8 @@ export type Nav = {
   overlay(id: ScreenId): Promise<void>;
   /** Закрыть верхний слой (шторку, диалог) с анимацией ухода. */
   close(): Promise<void>;
+  /** Уйти из цепочки экранов (создание образа) одним «назад» — к экрану, откуда в неё вошли. */
+  leave(ids: ScreenId[]): Promise<void>;
   /** Snackbar над низом экрана. */
   toast(text: string, opts?: { undo?: boolean }): void;
   /** Экран под верхним слоем: откуда открыли шторку. */
@@ -36,6 +38,8 @@ export type Route = {
   name?: string;
   /** Нативный обработчик компонента тоже отрабатывает (шторка закрывается сама), переход идёт параллельно. */
   native?: boolean;
+  /** Не срабатывает, если палец попал в этот вложенный элемент (вещь на холсте — свои жесты). */
+  not?: string;
 };
 
 const ok = (id: ScreenId): Go => id;
@@ -45,8 +49,8 @@ const active = (el: HTMLElement) => el.getAttribute('aria-checked') === 'true';
 
 /** Кнопка по подписи. */
 const btn = (text: string | RegExp, go: Go, extra?: Partial<Route>): Route => ({ sel: 'button', text, go, ...extra });
-/** Действие после закрытия шторки. */
-const closeThen = (fn: (n: Nav) => void | Promise<void>): Go => async (n) => { await n.close(); await fn(n); };
+/** Действие после закрытия шторки; `from` — экран под ней (после закрытия `below()` уже пуст). */
+const closeThen = (fn: (n: Nav, from?: ScreenId) => void | Promise<void>): Go => async (n) => { const from = n.below(); await n.close(); await fn(n, from); };
 
 /* ─── Сегменты «Вещи / Образы / Вишлист» ─────────────────────────────── */
 const topSeg = (self: 'items' | 'outfits' | 'wishlist'): Route[] => ([
@@ -83,6 +87,29 @@ const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
 const addedItem: Go = async (n) => { await n.root('Wardrobe'); n.toast('Вещь добавлена в гардероб'); };
 const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет в макетах');
 
+/* ─── Создание образа: диалоги и фильтр вещей (#54) ──────────────────── */
+const CREATION: ScreenId[] = ['OutfitItems', 'Canvas', 'CanvasDefault', 'CanvasHint', 'OutfitCriteria'];
+/** «Назад» с выбранными вещами — сначала диалог несохранённых изменений. */
+const exitAsk = btn('Назад', (n) => n.overlay('ExitDialog'));
+const shuffleAsk = btn('Перемешать', (n) => n.overlay('ShuffleDialog'));
+/** Чипсы фильтра в панели «Гардероб» под холстом. */
+const itemFilter: Route = { sel: '.y-sheet .y-chip-group button', go: (n) => n.overlay('ItemFilterSheet') };
+/** Долгое нажатие на пустой холст — очистить образ; вещь на холсте держит свои жесты. */
+const clearAsk: Route = { sel: '.y-canvas', on: 'long', not: '.y-canvas__item', name: 'Холст образа', go: (n) => n.overlay('ClearDialog') };
+
+/* ─── Профиль: фото и год рождения (#54) ─────────────────────────────── */
+const editProfile = (avatar: 'AvatarAddSheet' | 'AvatarReplaceSheet'): Route[] => [
+  { sel: '.y-avatar', name: 'Изменить фото профиля', go: (n) => n.overlay(avatar) },
+  { sel: '.y-field', text: /^Год рождения/, go: (n) => n.overlay('BirthYearSheet') },
+];
+const photoPicked = closeThen(async (n, from) => { if (from !== 'ProfileEditAvatar') await n.swap('ProfileEditAvatar'); n.toast('Фото профиля обновлено'); });
+
+/**
+ * Диалоги, которые закрываются и тапом по затемнению, и смахиванием (правило #89): подтверждения без риска.
+ * Рискованные (`tone` destructive / danger: очистить, выйти из аккаунта, удалить) — только кнопками и Escape.
+ */
+export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'ShuffleDialog', 'ExitDialog']);
+
 /** Переходы конкретных экранов: элемент → куда. Порядок важен: побеждает первое совпадение. */
 export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Запуск и онбординг */
@@ -110,8 +137,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   OutfitsNoFilterResults: [...topSeg('outfits'), filters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   FilterSheet: [
-    btn('Применить', closeThen((n) => { const b = n.below(); if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); })),
-    btn('Сбросить', closeThen((n) => { const b = n.below(); if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); })),
+    btn('Применить', closeThen((n, b) => { if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); })),
+    btn('Сбросить', closeThen((n, b) => { if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); })),
   ],
   ItemActions: [
     { sel: '.y-list-item', text: 'Создать образ', go: closeThen((n) => n.push('OutfitItems')) },
@@ -174,8 +201,23 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   TripDetails: [openOutfit],
 
   /* Создание образа */
-  OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), btn('Перемешать', (n) => n.toast('Вещи перемешаны'))],
-  Canvas: [btn('Далее', 'OutfitCriteria'), ...steps('Коллаж'), btn('Перемешать', (n) => n.toast('Вещи перемешаны'))],
+  OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), shuffleAsk, exitAsk],
+  Canvas: [btn('Далее', 'OutfitCriteria'), ...steps('Коллаж'), shuffleAsk, exitAsk, itemFilter, clearAsk],
+  CanvasDefault: [...steps('Коллаж'), btn('Перемешать', (n) => n.toast('Вещи перемешаны')), itemFilter],
+  CanvasHint: [...steps('Коллаж'), btn('Перемешать', (n) => n.toast('Вещи перемешаны')), itemFilter],
+  ShuffleDialog: [
+    btn('Перемешать', closeThen((n) => n.toast('Вещи перемешаны'))),
+    btn('Сохранить и начать', closeThen((n) => n.toast('Образ сохранён, вещи перемешаны'))),
+  ],
+  ExitDialog: [
+    btn('Выйти', closeThen((n) => n.leave(CREATION))),
+    btn('Сохранить и выйти', closeThen(async (n) => { await n.leave(CREATION); n.toast('Образ сохранён'); })),
+  ],
+  ClearDialog: [btn('Отмена', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('CanvasDefault'); n.toast('Образ очищен'); }))],
+  ItemFilterSheet: [
+    btn('Использовать', closeThen((n, from) => { if (from !== 'Canvas') return n.swap('Canvas'); })),
+    btn('Очистить', closeThen((n) => n.toast('Фильтр сброшен'))),
+  ],
   OutfitCriteria: [btn('Создать образ', async (n) => { await n.root('OutfitsPopulated'); n.toast('Образ создан'); }), ...steps('Описание')],
 
   /* Новая вещь: без фото → загрузка (сама) → фото добавлено → «Добавить» */
@@ -192,6 +234,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   AccountsMulti: [btn('Настройки', 'Settings', { native: true }), btn('Редактировать профиль', 'ProfileEdit', { native: true }), { sel: '.y-overlay button', text: 'Добавить аккаунт', go: 'SignIn', native: true }],
   AccountsSingle: [btn('Настройки', 'Settings', { native: true }), btn('Редактировать профиль', 'ProfileEdit', { native: true }), { sel: '.y-overlay button', text: 'Добавить аккаунт', go: 'SignIn', native: true }],
   Settings: [
+    // «Выйти» внутри строки аккаунта — раньше самой строки
+    btn('Выйти', (n) => n.overlay('SignOutDialog')),
     { sel: '.y-account', go: ok('ProfileEdit') },
     btn('Корзина вещей', 'TrashPopulated'),
     { sel: '.y-field', text: /^Страна/, go: (n) => n.overlay('CountrySheet') },
@@ -203,6 +247,15 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
   CountrySheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Страна изменена')) }],
   CurrencySheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Валюта изменена')) }],
+  SignOutDialog: [btn('Отменить', sheet), btn('Выйти', closeThen((n) => n.root('SignIn')))],
+  ProfileEdit: editProfile('AvatarAddSheet'),
+  ProfileEditAvatar: editProfile('AvatarReplaceSheet'),
+  BirthYearSheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Год рождения изменён')) }],
+  AvatarAddSheet: [{ sel: '.y-photo-tile', go: photoPicked }],
+  AvatarReplaceSheet: [
+    { sel: '.y-photo-tile', go: photoPicked },
+    btn('Удалить фотографию', closeThen(async (n, from) => { if (from !== 'ProfileEdit') await n.swap('ProfileEdit'); n.toast('Фото профиля удалено'); })),
+  ],
   DeleteAccount: [btn('Отменить', sheet), btn('Удалить', closeThen(async (n) => { await n.root('OnboardingWelcome'); n.toast('Аккаунт деактивирован на 14 дней'); }))],
 };
 
@@ -217,6 +270,8 @@ export const globalRoutes: Route[] = [
     },
   },
   { sel: 'button', text: 'Назад', go: (n) => n.back() },
+  // крестик шторки: в истории у него пустой onClose
+  { sel: '.y-overlay button', text: 'Закрыть', go: (n) => n.close() },
 ];
 
 /** Экран, который сам уходит дальше: сплэш и загрузка фото. */

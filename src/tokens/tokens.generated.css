@@ -91,8 +91,10 @@
   --spring-quick-duration: 744ms;
   --spring-bouncy: linear(0, 0.18, 0.579, 0.988, 1.267, 1.364, 1.306, 1.163, 1.013, 0.907, 0.868, 0.886, 0.937, 0.992, 1.032, 1.048, 1.042, 1.024, 1.004, 0.989, 0.983, 0.984, 0.991, 0.998, 1.004, 1.006, 1.006, 1.004, 1.001, 0.999, 0.998, 0.998, 0.999, 1, 1, 1.001, 1);
   --spring-bouncy-duration: 958ms;
+  --spring-critical: linear(0, 0.028, 0.096, 0.184, 0.279, 0.373, 0.462, 0.543, 0.615, 0.678, 0.732, 0.779, 0.818, 0.851, 0.878, 0.901, 0.919, 0.935, 0.947, 0.957, 0.966, 0.972, 0.978, 0.982, 0.986, 0.989, 0.991, 0.993, 0.994, 0.995, 0.996, 0.997, 0.998, 0.998, 0.999, 0.999, 1);
+  --spring-critical-duration: 540ms;
   --motion-press: var(--motion-fast) var(--ease-standard); /* Нажатие кнопки, scale 0.97 */
-  --motion-fade: var(--motion-base) var(--ease-standard); /* Затухание краёв, тосты */
+  --motion-fade: var(--motion-base) var(--ease-standard); /* Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
   --motion-collapse: var(--motion-300) var(--ease-out); /* Фото сворачивается в шапку при скролле */
   --motion-page: var(--motion-300) var(--ease-out); /* Листание образов и поводов по свайпу */
   --motion-nav: var(--spring-quick-duration) var(--spring-quick); /* Таб-бар уступает место FAB */
@@ -104,6 +106,7 @@
   --motion-return: var(--spring-gentle-duration) var(--spring-gentle); /* Отмена перетаскивания: вещь возвращается туда, откуда взяли */
   --motion-appear: var(--motion-base) var(--ease-standard); /* Появление: snackbar, подсказка, диалог */
   --motion-exit: var(--motion-fast) var(--ease-standard); /* Исчезновение: быстрее появления, чтобы не мешать */
+  --motion-sheet: var(--spring-critical-duration) var(--spring-critical); /* Шторка: появление и возврат после смахивания, без перелёта */
   --gesture-press-scale: 0.97; /* Нажатие кнопки, чипса, иконки */
   --gesture-press-scale-card: 0.98; /* Нажатие карточки: чем больше объект, тем меньше сжатие */
   --gesture-press-scale-stamp: 0.94; /* Нажатие штампа */
@@ -116,11 +119,12 @@
   --gesture-swipe-velocity: 500; /* Скорость броска, после которой свайп засчитан при любой дистанции */
   --gesture-rubber-band: 0.55; /* Сопротивление за границей: скролл, масштаб 40–300 на холсте */
   --gesture-snackbar: 4000ms; /* Время показа snackbar без действия (с действием — 6000) */
+  --gesture-snackbar-action: 6000ms; /* Время показа snackbar с действием */
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-press: 1ms linear; --motion-fade: 1ms linear; --motion-collapse: 1ms linear; --motion-page: 1ms linear; --motion-nav: 1ms linear; --motion-stamp: 1ms linear; --motion-swap: 1ms linear; --motion-select: 1ms linear; --motion-lift: 1ms linear; --motion-drop: 1ms linear; --motion-return: 1ms linear; --motion-appear: 1ms linear; --motion-exit: 1ms linear;
+    --motion-press: 1ms linear; --motion-fade: 1ms linear; --motion-collapse: 1ms linear; --motion-page: 1ms linear; --motion-nav: 1ms linear; --motion-stamp: 1ms linear; --motion-swap: 1ms linear; --motion-select: 1ms linear; --motion-lift: 1ms linear; --motion-drop: 1ms linear; --motion-return: 1ms linear; --motion-appear: 1ms linear; --motion-exit: 1ms linear; --motion-sheet: 1ms linear;
     --gesture-lift-scale: 1; --gesture-target-scale: 1;
   }
 }

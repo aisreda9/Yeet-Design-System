@@ -1,11 +1,7 @@
 package design.yeet.ds.organisms
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -92,10 +88,9 @@ import design.yeet.ds.theme.yeetFloatingShadow
 import design.yeet.tokens.YeetComponent
 import design.yeet.tokens.YeetGesture
 import design.yeet.tokens.YeetHapticEvent
-import design.yeet.tokens.YeetMotionScheme
+import design.yeet.tokens.YeetMotion
 import design.yeet.tokens.YeetRadius
 import design.yeet.tokens.YeetSpace
-import design.yeet.tokens.YeetSpring
 import design.yeet.tokens.sheetBg
 import design.yeet.tokens.sheetHandle
 import kotlinx.coroutines.Job
@@ -437,18 +432,15 @@ internal class OverlayController {
 
 internal val LocalOverlay = staticCompositionLocalOf<OverlayController?> { null }
 
-/** Появление и возврат шторки — пружина quick без перелёта (D5); «уменьшить движение» — мгновенно. */
-private fun YeetMotionScheme.sheet(): AnimationSpec<Float> =
-    if (reduced) snap() else spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = YeetSpring.quickStiffness)
-
 /**
  * Модальный слой (web: Overlay): затемнение `bgOverlay` и прижатая к низу плавающая шторка.
  *
  * **Геометрия.** 8 от краёв слева и справа; снизу `max(8, навигационная панель)`, над клавиатурой — 8 от клавиатуры (D3, D4);
  * сверху не выше «статус-бар + 8» (D2) — высокая шторка прокручивает тело, шапка и футер на месте.
  *
- * **Движение.** Шторка выезжает на пружине quick без перелёта (D5), [Dialog] — `appear`; уход — `exit`, целиком за край
- * из текущего положения. «Уменьшить движение» (`ANIMATOR_DURATION_SCALE = 0`) — всё мгновенно.
+ * **Движение.** Шторка выезжает на пружине без перелёта `sheet` (`motion.spring.critical`, D5), [Dialog] — `appear`;
+ * уход — `exit`, целиком за край из текущего положения. «Уменьшить движение» (`ANIMATOR_DURATION_SCALE = 0`) — слой
+ * появляется и уходит растворением `fade` (240 мс) без сдвига, как на iOS; возврат после смахивания — мгновенно.
  *
  * **Смахивание.** С хэндла, шапки и футера — сразу; из тела — только когда тело прокручено в начало (nested scroll:
  * тело сначала докручивается к началу, остаток жеста тянет шторку). Вниз 1 : 1, вверх — с сопротивлением.
@@ -500,9 +492,10 @@ fun Overlay(
             offset = 0f
             // ждём первый замер: до него шторка не видна и не прыгает в конечное положение на кадр
             snapshotFlow { sheetHeight }.first { it > 0f }
-            enter.animateTo(1f, if (controller.dialog) motion.appear() else motion.sheet())
+            // «уменьшить движение» — растворение fade вместо сдвига (как iOS: YeetMotion.fade + .opacity)
+            enter.animateTo(1f, if (motion.reduced) YeetMotion.fade() else if (controller.dialog) motion.appear() else motion.sheet())
         } else if (inWindow) {
-            enter.animateTo(0f, motion.exit())
+            enter.animateTo(0f, if (motion.reduced) YeetMotion.fade() else motion.exit())
             inWindow = false
             offset = 0f
         }
@@ -614,8 +607,9 @@ fun Overlay(
                     .fillMaxWidth()
                     .onSizeChanged { sheetHeight = it.height.toFloat() }
                     .graphicsLayer {
-                        alpha = if (sheetHeight > 0f) 1f else 0f
-                        translationY = offset + (1f - enter.value) * (sheetHeight + bottomGap)
+                        // «уменьшить движение»: enter — прозрачность, а не сдвиг за край
+                        alpha = if (sheetHeight <= 0f) 0f else if (motion.reduced) enter.value.coerceIn(0f, 1f) else 1f
+                        translationY = offset + (if (motion.reduced) 0f else (1f - enter.value) * (sheetHeight + bottomGap))
                     }
                     // тап по шторке не закрывает слой (и не делает шторку «кнопкой» для TalkBack)
                     .pointerInput(Unit) { detectTapGestures { } }

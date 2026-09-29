@@ -9,9 +9,10 @@
   align-items: center;
   justify-content: center;
   flex: none;
+  flex-shrink: 0; /* Кнопка не сжимается во flex-контейнере: высота всегда по размеру (в колонке её сплющивало до 20px) */
   border: 0;
   border-radius: var(--radius-xl);
-  font: var(--font-weight-body) 14px/20px var(--font-text);
+  font: var(--typography-body);
   white-space: nowrap;
   cursor: pointer;
   background: var(--y-bg);
@@ -25,12 +26,10 @@
 .y-icon-button:disabled { opacity: 0.4; cursor: default; transform: none; }
 /* :focus-visible у кнопок — общее кольцо, src/utils/a11y.css */
 
-/* Кнопка не сжимается во flex-контейнере: высота всегда по размеру (в колонке её сплющивало до 20px) */
-.y-button, .y-icon-button { flex-shrink: 0; }
-.y-button--XL { height: 56px; padding: 0 var(--space-24); gap: var(--space-12); }
-.y-button--L  { height: 52px; padding: 0 var(--space-20); gap: var(--space-12); }
-.y-button--M  { height: 48px; padding: 0 var(--space-16); gap: var(--space-8); }
-.y-button--S  { height: 40px; padding: 0 var(--space-12); gap: var(--space-8); }
+.y-button--XL { height: var(--size-control-xl); padding: 0 var(--space-24); gap: var(--space-12); }
+.y-button--L  { height: var(--size-control-l); padding: 0 var(--space-20); gap: var(--space-12); }
+.y-button--M  { height: var(--size-control-m); padding: 0 var(--space-16); gap: var(--space-8); }
+.y-button--S  { height: var(--size-control-s); padding: 0 var(--space-12); gap: var(--space-8); }
 .y-button--full { width: 100%; min-width: 0; }
 /* В рядах кнопки на всю ширину делят место поровну; в колонке — просто на всю ширину */
 :where(.y-bottom-bar, .y-row, .y-sheet__footer, .y-bottom-nav) > .y-button--full { flex: 1 1 0%; }
@@ -44,10 +43,10 @@
 @media (prefers-reduced-motion: reduce) { .y-button__spinner { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
 @keyframes y-pulse { to { opacity: 0.4; } }
 
-.y-icon-button--XL { width: 56px; height: 56px; }
-.y-icon-button--L  { width: 52px; height: 52px; }
-.y-icon-button--M  { width: 48px; height: 48px; }
-.y-icon-button--S  { width: 40px; height: 40px; }
+.y-icon-button--XL { width: var(--size-control-xl); height: var(--size-control-xl); }
+.y-icon-button--L  { width: var(--size-control-l); height: var(--size-control-l); }
+.y-icon-button--M  { width: var(--size-control-m); height: var(--size-control-m); }
+.y-icon-button--S  { width: var(--size-control-s); height: var(--size-control-s); }
 
 .y-style--primary     { --y-bg: var(--button-primary-bg);     --y-fg: var(--button-primary-fg); }
 .y-style--secondary   { --y-bg: var(--button-secondary-bg);   --y-fg: var(--button-secondary-fg); }
@@ -59,8 +58,9 @@
 
 /* Badge */
 .y-badge {
+  /* stylelint-disable-next-line unit-disallowed-list -- высота бейджа 24 из Figma, токена размера нет */
   display: inline-flex; align-items: center; height: 24px; padding: 0 var(--space-8);
-  border-radius: var(--radius-sm); font: 400 12px/16px var(--font-text);
+  border-radius: var(--radius-sm); font: var(--typography-caption);
   background: var(--y-bg); color: var(--y-fg);
 }
 .y-badge--primary   { --y-bg: var(--color-accent);      --y-fg: var(--color-text-on-accent); }
@@ -78,17 +78,19 @@
 }
 .y-avatar--initial { background: var(--color-accent); color: var(--color-text-on-accent); }
 .y-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.y-avatar--L { width: 96px; height: 96px; font: 380 32px/36px var(--font-display); }
-.y-avatar--M { width: 40px; height: 40px; font: 400 19px/24px var(--font-display); letter-spacing: -0.3px; } /* флоу: буква H3 */
-.y-avatar--S { width: 24px; height: 24px; font: 400 12px/16px var(--font-text); }
+/* stylelint-disable unit-disallowed-list -- размеры аватара 96 / 40 / 24 из Figma, токенов размера аватара нет */
+.y-avatar--L { width: 96px; height: 96px; font: var(--typography-h1); }
+.y-avatar--M { width: 40px; height: 40px; font: var(--typography-h3); letter-spacing: var(--typography-h3-letter-spacing); } /* флоу: буква H3 */
+.y-avatar--S { width: 24px; height: 24px; font: var(--typography-caption); }
+/* stylelint-enable unit-disallowed-list */
 
 /* Divider */
-.y-divider { height: 1px; border: 0; margin: 0; background: var(--color-border-subtle); width: 100%; }
+.y-divider { height: var(--border-width-thin); border: 0; margin: 0; background: var(--color-border-subtle); width: 100%; }
 
 /* Color dot — item colour swatch */
 .y-color-dot {
   display: inline-block; flex: none; border-radius: var(--radius-full);
-  box-shadow: inset 0 0 0 1px var(--color-border-subtle);
+  box-shadow: inset 0 0 0 var(--border-width-thin) var(--color-border-subtle);
 }
 
 /* Scroll edge — fades content under fixed chrome; works in both themes (mask over canvas colour) */
@@ -96,8 +98,8 @@
   position: absolute; left: 0; right: 0; pointer-events: none;
   background: var(--color-bg-canvas);
 }
-.y-scroll-edge--top    { -webkit-mask-image: linear-gradient(to bottom, #000, transparent); mask-image: linear-gradient(to bottom, #000, transparent); }
-.y-scroll-edge--bottom { -webkit-mask-image: linear-gradient(to top, #000, transparent);    mask-image: linear-gradient(to top, #000, transparent); }
+.y-scroll-edge--top    { -webkit-mask-image: linear-gradient(to bottom, black, transparent); mask-image: linear-gradient(to bottom, black, transparent); }
+.y-scroll-edge--bottom { -webkit-mask-image: linear-gradient(to top, black, transparent);    mask-image: linear-gradient(to top, black, transparent); }
 
 /* Text */
 .y-text--secondary { color: var(--color-text-secondary); }
@@ -108,12 +110,12 @@
 
 /* Stamp — star-shaped main action on a collage */
 .y-stamp {
-  --stamp-size: 148px;
+  --stamp-size: 148px; /* stylelint-disable-line unit-disallowed-list -- размер штампа из Figma, токена нет */
   position: relative; display: inline-grid; place-items: center; flex: none;
   width: var(--stamp-size); height: var(--stamp-size); padding: 0; border: 0; background: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.y-stamp--S { --stamp-size: 64px; } /* Figma stamp · Secondary: 64, иконка 29 */
+.y-stamp--S { --stamp-size: 64px; } /* stylelint-disable-line unit-disallowed-list */ /* Figma stamp · Secondary: 64, иконка 29 */
 .y-stamp--primary { --y-bg: var(--button-primary-bg); --y-fg: var(--button-primary-fg); }
 .y-stamp--secondary { --y-bg: var(--button-secondary-bg); --y-fg: var(--button-secondary-fg); }
 .y-stamp__shape {
@@ -122,37 +124,41 @@
   transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select);
 }
 .y-stamp__label, .y-stamp__done {
-  position: relative; grid-area: 1 / 1; color: var(--y-fg); font: var(--font-weight-body) 14px/20px var(--font-text);
+  position: relative; grid-area: 1 / 1; color: var(--y-fg); font: var(--typography-body);
   transition: opacity var(--motion-fade), transform var(--motion-stamp);
 }
 .y-stamp__done { opacity: 0; transform: scale(0.6); }
 /* Figma (флоу Outfits / Everyday): подпись штампа (и иконка малого штампа) наклонена на 15° по часовой (rotation −15 в Figma) */
 .y-stamp__label { rotate: 15deg; }
-.y-stamp:active .y-stamp__shape { scale: var(--gesture-press-scale-stamp); }
 .y-stamp:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 50%; }
 /* done: 148 → 78 (×0.53), поворот −60°, чёрный, текст → «отменить». doneSize S: 148 → 56 (×0.378, детали образа 440:3008) */
 .y-stamp--done .y-stamp__shape { transform: scale(var(--stamp-done-scale, 0.53)) rotate(-60deg); color: var(--button-secondary-bg); }
 .y-stamp--done-S { --stamp-done-scale: 0.378; }
-.y-stamp--done .y-stamp__done { color: var(--button-secondary-fg); }
+.y-stamp--done .y-stamp__done { color: var(--button-secondary-fg); opacity: 1; transform: none; }
 .y-stamp--done .y-stamp__label { opacity: 0; transform: scale(0.6); }
-.y-stamp--done .y-stamp__done { opacity: 1; transform: none; }
+/* Нажатие — после «выполнено»: свойство scale, а не transform, поэтому порядок на вид не влияет */
+.y-stamp:active .y-stamp__shape { scale: var(--gesture-press-scale-stamp); }
 
 /* Разделитель с подписью «или»: линии border-subtle, подпись Caption серым, отступы 12 */
 .y-divider-label { display: flex; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); }
-.y-divider-label::before, .y-divider-label::after { content: ''; flex: 1; height: 1px; background: var(--color-border-subtle); }
+.y-divider-label::before, .y-divider-label::after { content: ''; flex: 1; height: var(--border-width-thin); background: var(--color-border-subtle); }
 
 /* Зона нажатия ≥ 44 без изменения вида (HIG 44 pt, Material 48 dp): невидимый ::after выходит за края мелкого элемента.
    :where — нулевая специфичность, собственное position компонента (absolute у лайка) не перебивается. */
 :where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-link, .y-avatar-stack__people, .y-tab-bar__tab) { position: relative; }
 :where(.y-button, .y-icon-button, .y-list-item, .y-header__accent, .y-snackbar button, .y-legal a, .y-link, .y-avatar-stack__people, .y-tab-bar__tab)::after {
   content: ''; position: absolute;
+  /* stylelint-disable unit-disallowed-list -- 44 — минимум зоны нажатия (HIG), 0px нужен в min() с длиной; токенов нет */
   top: min(0px, calc((100% - 44px) / 2)); bottom: min(0px, calc((100% - 44px) / 2));
   left: min(0px, calc((100% - 44px) / 2)); right: min(0px, calc((100% - 44px) / 2));
+  /* stylelint-enable unit-disallowed-list */
 }
 /* Соседи без зазора не делят зону: вкладки таб-бара на 320 (gap 0) растут только по вертикали — ширина ячейки и есть её зона */
 @container (max-width: 300px) { .y-tab-bar__tab::after { left: 0; right: 0; } }
 
 /* Link — инлайн-ссылка в тексте (юридическая подпись входа, диалог удаления, e-mail в Legal): цвет текста вокруг, подчёркивание, видимый фокус */
+/* stylelint-disable unit-disallowed-list -- толщина и отступ подчёркивания ссылки, скругление фокуса: токенов нет */
 .y-link { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; border-radius: 2px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .y-link:visited { color: inherit; } /* посещённая ссылка не перекрашивается: цвет задаёт текст, а не история браузера */
 .y-link:hover { text-decoration-thickness: 2px; }
+/* stylelint-enable unit-disallowed-list */
