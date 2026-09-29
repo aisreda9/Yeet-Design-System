@@ -47,7 +47,7 @@ export const registry: Entry[] = [
   { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Divider', status: 'stable' },
   { code: 'ColorDot', figma: 'color', figmaId: '1182:15916', level: 'Atoms', section: '01 Foundations', story: 'Atoms/ColorDot', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'ScrollEdge', figma: 'scroll-edge', figmaId: '965:3491', level: 'Atoms', section: '05 Navigation & scroll', story: 'Templates/Screen', status: 'beta', statusWhy: 'своей истории нет, показан в Templates/Screen' },
-  { code: 'Link', figma: null, figmaId: null, figmaWhy: 'компонента ещё нет, в макетах — подчёркнутый текст (203:1372, 517:7004, 513:6603); соберёт #33', level: 'Atoms', section: '02 Actions', story: 'Atoms/Link', status: 'alpha', statusWhy: 'нет компонента в Figma (#33), ещё не на экранах' },
+  { code: 'Link', figma: 'link', figmaId: '1209:21285', level: 'Atoms', section: '02 Actions', story: 'Atoms/Link', note: 'State: Default / Focus; в макетах — 203:1372, 517:7004, 513:6603', status: 'alpha', statusWhy: 'ещё не на экранах (Delete Account, Legal — #50–#54)' },
 
   { code: 'Field', figma: 'input (+ input-value)', figmaId: '1182:20099', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup', note: 'Multiline 104 («Комментарий»)', status: 'stable' },
   { code: 'InputGroup', figma: 'input-group', figmaId: '942:7264', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup', status: 'stable' },
