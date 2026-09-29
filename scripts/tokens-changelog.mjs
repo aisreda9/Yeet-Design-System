@@ -1,5 +1,7 @@
-// CHANGELOG токенов: дифф ЗНАЧЕНИЙ tokens/tokens.json между двумя ревизиями (тегами).
-// Описания (role, use, about, $description…) не считаются — только то, что попадает в CSS / Swift / Kotlin.
+// CHANGELOG токенов: дифф того, что получают потребители, между двумя ревизиями (тегами).
+// Сравнивается сгенерированный src/tokens/tokens.generated.css — CSS-переменные по темам и брендам и классы
+// типографики. Swift и Kotlin генерируются из той же модели под теми же именами, поэтому дифф CSS — это контракт.
+// Смена формата tokens/tokens.json без изменения результата (например, переход на DTCG) здесь не видна — так и нужно.
 //
 //   node scripts/tokens-changelog.mjs                  # последний тег v* → рабочее дерево
 //   node scripts/tokens-changelog.mjs v0.3.0 v0.4.0    # между тегами
@@ -8,19 +10,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
-const FILE = 'tokens/tokens.json';
-const META = new Set([
-  '$description',
-  'role',
-  'use',
-  'about',
-  'name',
-  'figma',
-  'source',
-  'fallback',
-  'file',
-  'android',
-]);
+const FILE = 'src/tokens/tokens.generated.css';
 
 const argv = process.argv.slice(2);
 const write = argv.includes('--write');
@@ -40,84 +30,78 @@ function lastTag(before) {
 }
 
 function readAt(ref) {
-  if (!ref) return JSON.parse(readFileSync(FILE, 'utf8'));
+  if (!ref) return readFileSync(FILE, 'utf8');
   try {
-    return JSON.parse(git('show', `${ref}:${FILE}`));
+    return git('show', `${ref}:${FILE}`);
   } catch {
-    return {}; // файла в этой ревизии не было
+    return ''; // файла в этой ревизии не было
   }
 }
 
-// DTCG-значения приводим к записи прежнего формата: цвет → `#HEX` / `#HEX@alpha`, размер и время в px / ms → число
-const norm = (v) => {
-  if (Array.isArray(v)) return v.map(norm);
-  if (v === null || typeof v !== 'object') return v;
-  if (typeof v.hex === 'string') return v.alpha != null && v.alpha !== 1 ? `${v.hex}@${v.alpha}` : v.hex;
-  if ('value' in v && 'unit' in v && Object.keys(v).length === 2)
-    return ['px', 'ms'].includes(v.unit) ? v.value : `${v.value}${v.unit}`;
-  return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, norm(x)]));
-};
+/** Селектор блока → область: '' (база и светлая тема), 'dark', 'brand lime', 'brand lime dark', 'reduced-motion'. */
+function scopeOf(selector, media) {
+  if (media) return media.includes('reduced-motion') ? 'reduced-motion' : media.trim();
+  const brand = selector.match(/\[data-brand='([^']+)'\]/)?.[1];
+  const dark = /\[data-theme='dark'\](?!\))/.test(selector);
+  if (brand) return `brand ${brand}${dark ? ' dark' : ''}`;
+  return dark ? 'dark' : '';
+}
 
-const fmt = (raw) => {
-  const v = norm(raw);
-  return Array.isArray(v) && v.every((x) => typeof x !== 'object')
-    ? `[${v.join(', ')}]`
-    : typeof v === 'object' && v !== null
-      ? JSON.stringify(v)
-      : String(v);
-};
+/** Карта `область → (имя → значение)`: CSS-переменные и классы `.y-*` (типографика). */
+function parse(css) {
+  const scopes = new Map();
+  const put = (scope, name, value) => {
+    if (!scopes.has(scope)) scopes.set(scope, new Map());
+    scopes.get(scope).set(name, value.replace(/\s+/g, ' ').trim());
+  };
+  const block = (selector, body, media) => {
+    const sel = selector.trim();
+    if (sel.startsWith('@')) return; // @font-face
+    const scope = scopeOf(sel, media);
+    const decls = body
+      .split(';')
+      .map((d) => d.trim())
+      .filter(Boolean);
+    if (sel.startsWith('.')) {
+      put(scope, sel, decls.join('; '));
+      return;
+    }
+    for (const d of decls) {
+      const m = d.match(/^(--[\w-]+)\s*:\s*([\s\S]+)$/);
+      if (m) put(scope, m[1], m[2]);
+    }
+  };
+  let rest = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  rest = rest.replace(/@media([^{]+)\{((?:[^{}]*\{[^{}]*\})*[^{}]*)\}/g, (_, media, inner) => {
+    for (const [, sel, body] of inner.matchAll(/([^{}]+)\{([^{}]*)\}/g)) block(sel, body, media);
+    return '';
+  });
+  for (const [, sel, body] of rest.matchAll(/([^{}]+)\{([^{}]*)\}/g)) block(sel, body);
+  return scopes;
+}
 
-/**
- * Плоская карта путь → значение. Тёмная тема — отдельный ключ `путь@dark`.
- * Понимает оба формата tokens.json:
- * - прежний: `{ light, dark }` внутри токена, мета-поля (role, use…) пропускаются;
- * - DTCG: `$value` + `$extensions["com.yeet"].modes.dark`, прочие `$`-поля пропускаются.
- * Смена формата меняет и пути — первый релиз после неё покажет большой дифф, это ожидаемо.
- */
-function flatten(node, prefix = '', out = new Map(), dark = false) {
-  const key = (p) => (dark ? `${p}@dark` : p);
-  if (node === null || typeof node !== 'object' || (Array.isArray(node) && node.every((v) => typeof v !== 'object'))) {
-    out.set(key(prefix), fmt(node));
-    return out;
-  }
-  if ('$value' in node) {
-    out.set(key(prefix), fmt(node.$value));
-    const modeDark = node.$extensions?.['com.yeet']?.modes?.dark;
-    if (modeDark !== undefined) out.set(`${prefix}@dark`, fmt(modeDark));
-    return out;
-  }
-  for (const [k, v] of Object.entries(node)) {
-    if (META.has(k) || k.startsWith('$')) continue;
-    if (k === 'light') flatten(v, prefix, out, dark);
-    else if (k === 'dark') flatten(v, prefix, out, true);
-    else flatten(v, prefix ? `${prefix}.${k}` : k, out, dark);
+/** `var(--x)` → итоговое значение: сначала в своей области, потом в базе. */
+function resolver(scopes) {
+  const base = scopes.get('') ?? new Map();
+  const resolve = (v, scope, depth = 0) =>
+    depth > 8
+      ? v
+      : v.replace(/var\((--[\w-]+)(?:,\s*([^)]*))?\)/g, (m, name, fallback) => {
+          const hit = scopes.get(scope)?.get(name) ?? base.get(name) ?? fallback;
+          return hit === undefined ? m : resolve(hit, scope, depth + 1);
+        });
+  return resolve;
+}
+
+/** Плоская карта `имя · область` → { raw, value }. */
+function flatten(css) {
+  const scopes = parse(css);
+  const resolve = resolver(scopes);
+  const out = new Map();
+  for (const [scope, vars] of scopes) {
+    for (const [name, raw] of vars) out.set(scope ? `${name} · ${scope}` : name, { raw, value: resolve(raw, scope) });
   }
   return out;
-}
-
-/** Ссылку `{группа.имя}` разворачиваем в итоговое значение: замена hex на ту же ссылку — не изменение. */
-function resolver(map) {
-  const find = (ref, dark) => {
-    const [group, ...rest] = ref.split('.');
-    const name = rest.join('.');
-    const pick = (keys) => {
-      const own = keys.filter((k) => k.endsWith('@dark') === dark);
-      return (own.length ? own : keys.filter((k) => !k.endsWith('@dark'))).map((k) => map.get(k));
-    };
-    if (map.has(ref)) return pick([ref, `${ref}@dark`].filter((k) => map.has(k)));
-    // color.accent → color.<подгруппа>.accent
-    return pick(
-      [...map.keys()].filter((k) => k.startsWith(`${group}.`) && `.${k.replace(/@dark$/, '')}.`.includes(`.${name}.`)),
-    );
-  };
-  const resolve = (v, dark, depth = 0) =>
-    depth > 5
-      ? v
-      : v.replace(/\{([^}]+)\}/g, (m, ref) => {
-          const vals = find(ref, dark);
-          return vals.length ? vals.map((x) => resolve(x, dark, depth + 1)).join(' / ') : m;
-        });
-  return (v, k = '') => resolve(v, k.endsWith('@dark'));
 }
 
 const to = toArg ?? null; // null — рабочее дерево
@@ -125,60 +109,33 @@ const from = fromArg ?? lastTag(to);
 const a = flatten(readAt(from));
 const b = flatten(readAt(to));
 
-let added = [...b.keys()].filter((k) => !a.has(k));
-let removed = [...a.keys()].filter((k) => !b.has(k));
-const ra = resolver(a);
-const rb = resolver(b);
-const changed = [...b.keys()].filter((k) => a.has(k) && ra(a.get(k), k) !== rb(b.get(k), k));
-
-// Перенос: путь другой, значение то же (item.black.value → item.black, color.Поверхности.bg-canvas → color.bg-canvas).
-// Для приложений это всё равно переименование, но в журнале отделяем его от удаления.
-const leaf = (k) =>
-  k
-    .replace(/@dark$/, '')
-    .replace(/\.value$/, '')
-    .split('.')
-    .pop() + (k.endsWith('@dark') ? '@dark' : '');
-const moved = [];
-for (const k of removed) {
-  const to = added.find((n) => leaf(n) === leaf(k) && ra(a.get(k), k) === rb(b.get(n), n));
-  if (to) {
-    moved.push([k, to]);
-    added = added.filter((n) => n !== to);
-  }
-}
-removed = removed.filter((k) => !moved.some(([m]) => m === k));
-const shown = (v, r, k) => (r(v, k) === v ? code(v) : `${code(v)} → ${code(r(v, k))}`);
+const added = [...b.keys()].filter((k) => !a.has(k));
+const removed = [...a.keys()].filter((k) => !b.has(k));
+const changed = [...b.keys()].filter((k) => a.has(k) && a.get(k).value !== b.get(k).value);
 
 const code = (s) => '`' + s.replace(/`/g, "'").replace(/\|/g, '\\|') + '`';
+const shown = ({ raw, value }) => (raw === value ? code(raw) : `${code(raw)} → ${code(value)}`);
+
 const lines = [];
 const title = `Токены: ${from ?? 'начало'} → ${to ?? 'текущее'}`;
 if (!from) {
   lines.push(`Первый релиз с журналом токенов: ${b.size} значений.`);
-} else if (!added.length && !removed.length && !changed.length && !moved.length) {
+} else if (!added.length && !removed.length && !changed.length) {
   lines.push('Значения токенов не менялись.');
 } else {
-  if (moved.length) {
-    lines.push(
-      `**Перенесены (${moved.length})** — значение то же, путь новый (для приложений это переименование):`,
-      '',
-    );
-    for (const [k, n] of moved) lines.push(`- ${code(k)} → ${code(n)}`);
-    lines.push('');
-  }
   if (removed.length) {
     lines.push(`**Удалены (${removed.length})** — ломающее изменение, нужен major:`, '');
-    for (const k of removed) lines.push(`- ${code(k)} (было ${code(a.get(k))})`);
+    for (const k of removed) lines.push(`- ${code(k)} (было ${shown(a.get(k))})`);
     lines.push('');
   }
   if (changed.length) {
     lines.push(`**Изменены (${changed.length}):**`, '', '| Токен | Было | Стало |', '|---|---|---|');
-    for (const k of changed) lines.push(`| ${code(k)} | ${shown(a.get(k), ra, k)} | ${shown(b.get(k), rb, k)} |`);
+    for (const k of changed) lines.push(`| ${code(k)} | ${shown(a.get(k))} | ${shown(b.get(k))} |`);
     lines.push('');
   }
   if (added.length) {
     lines.push(`**Добавлены (${added.length}):**`, '');
-    for (const k of added) lines.push(`- ${code(k)} = ${shown(b.get(k), rb, k)}`);
+    for (const k of added) lines.push(`- ${code(k)} = ${shown(b.get(k))}`);
     lines.push('');
   }
 }
