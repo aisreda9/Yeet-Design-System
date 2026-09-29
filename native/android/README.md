@@ -100,6 +100,7 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
   не добавляется, чтобы не раздвигать пилюлю; касание рядом Compose доводит до 48 сам (`minimumTouchTargetSize`), как `::after` 44 в вебе.
 - **Уменьшить движение:** `rememberReduceMotion()` следит за `Settings.Global.ANIMATOR_DURATION_SCALE`
   («Убрать анимацию»); при 0 все переходы — `snap()`, спиннер стоит, подъём без увеличения.
+- **Жесты дублируются:** листание `OutfitPager` и `ItemSlot`, рамка `CropFrame` — действиями TalkBack (`customActions`) и клавиатурой.
 - **Хаптика** уважает системный «Виброотклик»; `select` — не чаще раза в 50 мс; выключается `YeetTheme(hapticsEnabled = false)`.
 
 ## React ↔ Compose
@@ -137,9 +138,13 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
 | `<ItemCard kind color image discount label name selected onClick onRemove>` | `ItemCard(Garment.*, …, image: Painter?)` | |
 | `<OutfitCollage items label footer>`, `CollageItem` | `OutfitCollage(items, label, footer)`, `CollageItem(kind, x, y, size, color, src)` | `x`, `y` — % |
 | `<WeatherCard temperature description weather icon alert tilt>` | `WeatherCard(…, weather = Weather.*, icon, weatherIcon: Painter?, alert, tilt)` | цветные SVG погоды не портированы (фильтры / маски не поддерживаются VectorDrawable) — передайте `weatherIcon` |
+| `<OutfitPager looks axis preview index onIndexChange weather stamp skip disabled>` | `OutfitPager(looks: List<PagerLook>, index, onIndexChange, axis = PagerAxis.Y / X, preview, enabled, weather, stamp, skip)` | состояние только поднятое (нет `defaultIndex`); кнопки «Предыдущий / Следующий образ» для клавиатуры → действия TalkBack + стрелки / Home / End; звезда штампа не поворачивается (API `Stamp` не трогаем) |
+| `<ItemSlots>` + `<ItemSlot title index onIndexChange onAdd addLabel>{карточки}</ItemSlot>` | `ItemSlots { ItemSlot(title, itemCount, index = …, onIndexChange = …, onAdd = …) { k -> ItemCard(…) } }` | children → `itemCount` + слот `item(k)`; `scroll-snap` → своя `FlingBehavior` (снап по центру, бросок ≥ 1 вещь) |
+| `<CropFrame src value onChange hint min>`, `CropRect`, `cropDefault` | `CropFrame(value, onValueChange, photo: Painter?, hint, min) { фон }`, `CropRect.Default` | `Hint` без тона `onPhoto`; клавиатура + действия TalkBack «Сдвинуть …», «Увеличить / Уменьшить рамку» |
+| `<DetailsScreen media thumb title titleChip actions onBack bottom stamp>` (templates) | `DetailsScreen(media, thumb, title, titleChip, actions, onBack, bottom, stamp, scrollState) { панель }` | сворачивание фото в миниатюру 48 — по `ScrollState` с гистерезисом 24 / 8 (web: `Screen[data-collapsed]`), морф в `graphicsLayer` |
 
 Не портировано (нет в объёме этой версии): RangeSlider, Carousel, BarChart, UsageMeter, PhotoTile, PhotoArea,
-ProductCard, TripCard, StylistPromptCard, ChatBubble, OutfitCanvas, StylistDock, Flag, WeatherIcon, сворачивание шапки при скролле.
+ProductCard, TripCard, StylistPromptCard, ChatBubble, OutfitCanvas, StylistDock, Flag, WeatherIcon, сворачивание шапки `Large` в пилюлю при скролле (сворачивание фото деталей — `DetailsScreen`).
 
 ## Превью
 
