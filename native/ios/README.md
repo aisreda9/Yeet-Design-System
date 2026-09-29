@@ -175,7 +175,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
   рискованный диалог (`destructive`, `danger`) закрывается только кнопками и «escape»;
 - шторка — пружина без перелёта, диалог — `YeetMotion.appear`, уход — `YeetMotion.exit`, при Reduce Motion — растворение.
 
-Радиус, отступ сверху и хэндл — токены `YeetRadius.overlay`, `YeetComponent.sheetTopGap`, `YeetComponent.sheetHandle`; пружина без перелёта пока локальная (`YeetOverlayToken.spring`, TODO #92).
+Радиус, отступ сверху и хэндл — токены `YeetRadius.overlay`, `YeetComponent.sheetTopGap`, `YeetComponent.sheetHandle`; пружина без перелёта — `YeetMotion.sheet` (`motion.spring.critical`, ζ = 1).
 
 ## Доступность
 

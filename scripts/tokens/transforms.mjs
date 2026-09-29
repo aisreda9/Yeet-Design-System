@@ -25,13 +25,18 @@ export function rgba(c) {
 }
 const ms = (d) => (d.unit === 's' ? d.value * 1000 : d.value);
 
+/** Смещение пружины из 0 в 1 за s секунд: недодемпфированная (ζ < 1), критическая (ζ = 1, damping 2·√(k·m) с точностью до округления) и передемпфированная. */
+export function springAt({ mass, stiffness, damping }, s) {
+  const w0 = Math.sqrt(stiffness / mass), z = damping / (2 * Math.sqrt(stiffness * mass));
+  if (Math.abs(1 - z) < 1e-4) return 1 - (1 + w0 * s) * Math.exp(-w0 * s);
+  if (z > 1) { const wd = w0 * Math.sqrt(z * z - 1); return 1 - Math.exp(-z * w0 * s) * (Math.cosh(wd * s) + ((z * w0) / wd) * Math.sinh(wd * s)); }
+  const wd = w0 * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w0 * s) * (Math.cos(wd * s) + ((z * w0) / wd) * Math.sin(wd * s));
+}
+
 /** Пружина (mass, stiffness, damping) → CSS linear() по 37 точкам за её длительность. */
 export function springLinear({ mass, stiffness, damping, duration }) {
-  const w0 = Math.sqrt(stiffness / mass), z = damping / (2 * Math.sqrt(stiffness * mass)), wd = w0 * Math.sqrt(1 - z * z);
-  const pts = Array.from({ length: 37 }, (_, i) => {
-    const s = ((i / 36) * duration) / 1000;
-    return 1 - Math.exp(-z * w0 * s) * (Math.cos(wd * s) + ((z * w0) / wd) * Math.sin(wd * s));
-  });
+  const pts = Array.from({ length: 37 }, (_, i) => springAt({ mass, stiffness, damping }, ((i / 36) * duration) / 1000));
   pts[0] = 0; pts[36] = 1;
   return `linear(${pts.map((p) => +p.toFixed(3)).join(', ')})`;
 }

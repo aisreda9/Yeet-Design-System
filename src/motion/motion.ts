@@ -12,7 +12,11 @@ export const curves: Curve[] = [
 export function sample(c: Curve, t: number): number {
   if (c.kind === 'spring' && c.spring) {
     const { k, c: d } = c.spring;
-    const w0 = Math.sqrt(k), z = d / (2 * w0), wd = w0 * Math.sqrt(1 - z * z), s = (t * c.duration) / 1000;
+    const w0 = Math.sqrt(k), z = d / (2 * w0), s = (t * c.duration) / 1000;
+    // критическое затухание (ζ = 1, `motion.spring.critical`) и перезатухание — отдельные формулы, как springAt в scripts/tokens/transforms.mjs
+    if (Math.abs(1 - z) < 1e-4) return 1 - (1 + w0 * s) * Math.exp(-w0 * s);
+    if (z > 1) { const wd = w0 * Math.sqrt(z * z - 1); return 1 - Math.exp(-z * w0 * s) * (Math.cosh(wd * s) + ((z * w0) / wd) * Math.sinh(wd * s)); }
+    const wd = w0 * Math.sqrt(1 - z * z);
     return 1 - Math.exp(-z * w0 * s) * (Math.cos(wd * s) + ((z * w0) / wd) * Math.sin(wd * s));
   }
   const [x1, y1, x2, y2] = c.bezier!;
@@ -51,9 +55,9 @@ const finger = 'палец ведёт 1 : 1, доводка мгновенная
 
 export const mechanics: Mechanic[] = [
   // Слои
-  { group: 'Слои', name: 'Шторка: появление', what: 'снизу из-за края (100 % + 8), затемнение проявляется', token: '--motion-nav · --motion-fade', duration: '744 мс quick · 240 мс', haptic: '—', reduced: instant, where: 'Overlay + Sheet / Dialog / AccountsSheet', on: 'экран' },
-  { group: 'Слои', name: 'Шторка: уход', what: 'вниз за край целиком, затемнение гаснет; из текущего положения', token: '--motion-exit', duration: '150 мс', haptic: '—', reduced: instant, where: 'Overlay, Screen → overlay', on: 'экран' },
-  { group: 'Слои', name: 'Шторка: смахивание', what: '1 : 1 вниз, вверх — резинка 0.55; > 30 % высоты или бросок > 500 pt/с — закрыть, иначе назад', token: '--gesture-swipe-distance · --gesture-swipe-velocity · --gesture-rubber-band · --motion-nav', duration: 'возврат 744 мс quick', haptic: 'threshold — один раз на пороге', reduced: finger, where: 'Overlay (onClose)', on: 'экран' },
+  { group: 'Слои', name: 'Шторка: появление', what: 'снизу из-за края (100 % + 8), затемнение проявляется; диалог — appear 240 мс standard, без пружины', token: '--motion-sheet (пружина без перелёта, ζ = 1; в web пока литерал --sheet-spring в organisms.css, на токен — после #58) · --motion-fade', duration: '540 мс · 240 мс', haptic: '—', reduced: 'шторка и диалог — растворение 240 мс без сдвига (как на iOS; web — на --motion-base + --ease-standard, т. к. --motion-* обнуляются; Android приводится к этому)', where: 'Overlay + Sheet / Dialog / AccountsSheet', on: 'экран' },
+  { group: 'Слои', name: 'Шторка: уход', what: 'вниз за край целиком, затемнение гаснет; из текущего положения', token: '--motion-exit', duration: '150 мс', haptic: '—', reduced: 'растворение 240 мс без сдвига, как появление', where: 'Overlay, Screen → overlay', on: 'экран' },
+  { group: 'Слои', name: 'Шторка: смахивание', what: '1 : 1 вниз, вверх — резинка 0.55; > 30 % высоты или бросок > 500 pt/с — закрыть, иначе назад', token: '--gesture-swipe-distance · --gesture-swipe-velocity · --gesture-rubber-band · --motion-sheet', duration: 'возврат 540 мс без перелёта', haptic: 'threshold — один раз на пороге', reduced: finger, where: 'Overlay (onClose)', on: 'экран' },
   { group: 'Слои', name: 'Переход экрана push / pop', what: 'новый экран справа, старый сдвигается на 30 % и темнеет; назад — свайпом от края', token: '--motion-page', duration: '300 мс ease-out', haptic: 'threshold на пороге свайпа назад', reduced: instant, where: 'нативная навигация (демо)', on: 'демо' },
   // Навигация
   { group: 'Навигация', name: 'Таб-бар: пилюля', what: 'подложка переезжает к вкладке (transform + width)', token: '--motion-nav', duration: '744 мс quick', haptic: 'select', reduced: instant, where: 'TabBar', on: 'компонент' },
@@ -74,7 +78,7 @@ export const mechanics: Mechanic[] = [
   { group: 'Главная', name: 'Штамп «Не нравится»', what: 'нажатие 0.94, образ уходит', token: '--gesture-press-scale-stamp · --motion-exit', duration: '150 мс', haptic: 'skip', reduced: instant, where: 'Stamp secondary', on: 'компонент' },
   { group: 'Главная', name: 'Погода', what: 'проявляется снизу на 8 pt после коллажа (+160 мс), наклон сохраняется', token: '--motion-appear', duration: '240 мс', haptic: '—', reduced: instant, where: 'WeatherCard на главной', on: 'экран' },
   // Детали
-  { group: 'Детали', name: 'Сворачивание фото', what: 'фото 353 → миниатюра 48 по центру шапки, панель деталей поднимается под шапку; порог скролла 24 px', token: '--motion-collapse', duration: '300 мс ease-out', haptic: '—', reduced: 'сразу 0 или 1, без морфа за скроллом', where: 'Детали вещи / образа (Figma «new things»)', on: 'демо', hook: 'usePhotoCollapse' },
+  { group: 'Детали', name: 'Сворачивание фото', what: 'фото 353 → миниатюра 48 по центру шапки, панель деталей поднимается под шапку; порог скролла 24 px, обратно — ниже 8 (гистерезис, ADR 0004)', token: '--motion-collapse', duration: '300 мс ease-out', haptic: '—', reduced: 'сразу 0 или 1, без морфа за скроллом', where: 'Детали вещи / образа (Figma «new things»)', on: 'демо', hook: 'usePhotoCollapse' },
   // Обратная связь
   { group: 'Обратная связь', name: 'Snackbar', what: 'снизу 16 pt + прозрачность; уход 8 pt; сам — через 4 с (с «Отменить» 6 с), пауза под курсором и фокусом', token: '--motion-appear / --motion-exit · --gesture-snackbar', duration: '240 / 150 мс', haptic: '—', reduced: instant, where: 'Snackbar autoHide, Screen → floating', on: 'экран' },
   { group: 'Обратная связь', name: 'Подсказка', what: 'прозрачность + сдвиг 8 pt', token: '--motion-appear', duration: '240 мс', haptic: '—', reduced: instant, where: 'Hint', on: 'экран' },
@@ -85,7 +89,7 @@ export const mechanics: Mechanic[] = [
   { group: 'Перетаскивание', name: 'Сетка: перестановка', what: 'долгое нажатие 400 мс → подъём; цель 1.02; соседи съезжают (FLIP); мимо — назад', token: '--gesture-long-press · --motion-drop · --motion-return', duration: '744 мс quick · 1022 мс gentle', haptic: 'lift, target, drop', reduced: 'без масштаба, только тень и обводка', where: 'DragGrid', on: 'демо' },
   { group: 'Перетаскивание', name: 'Сетка: в корзину', what: 'сжатие 0.6 + исчезновение, snackbar «Отменить»', token: '--motion-exit · --gesture-snackbar', duration: '150 мс', haptic: 'delete', reduced: instant, where: 'DragGrid', on: 'демо' },
   // Профиль и листание
-  { group: 'Профиль', name: 'Аккаунты', what: 'шторка из стопки аватаров; переключение — шторка уходит, профиль сменяется проявлением', token: '--motion-nav / --motion-exit · --motion-appear', duration: '744 / 150 / 240 мс', haptic: 'select при переключении', reduced: instant, where: 'AvatarStack, AccountsSheet', on: 'экран' },
+  { group: 'Профиль', name: 'Аккаунты', what: 'шторка из стопки аватаров; переключение — шторка уходит, профиль сменяется проявлением', token: '--motion-sheet / --motion-exit · --motion-appear', duration: '540 / 150 / 240 мс', haptic: 'select при переключении', reduced: instant, where: 'AvatarStack, AccountsSheet', on: 'экран' },
   { group: 'Профиль', name: 'Период', what: 'выбор чипса виден 150 мс, затем шторка уходит', token: '--motion-select → --motion-exit', duration: '150 + 150 мс', haptic: 'select', reduced: instant, where: 'Профиль / Статистика', on: 'экран' },
   { group: 'Листание', name: 'Поводы, карусель', what: 'лента за пальцем; > 30 % или бросок — следующий; края — резинка; карусель — нативный snap', token: '--motion-page · жесты', duration: '300 мс ease-out', haptic: 'threshold на пороге', reduced: finger, where: 'Стилист, Поездки, Carousel', on: 'демо', hook: 'useSwipePager' },
 ];
