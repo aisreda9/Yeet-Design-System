@@ -279,7 +279,8 @@ for (const story of stories) {
     writeFileSync(join(outDir, 'screens', file), shot);
     screens++;
     shotFiles.add(file);
-    if (!visual) continue;
+    // интерактивные истории (прототип) с анимациями и панелью — без пиксельного эталона: экраны в них те же, что в Pages/*, и покрыты там
+    if (!visual || story.tags?.includes('no-visual')) continue;
     if (args['update-baseline']) {
       // эталон переписывается, только если картинка действительно другая: субпороговый шум (затемнение, панели)
       // иначе давал бы бинарные правки PNG и конфликты между параллельными PR

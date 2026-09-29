@@ -1,0 +1,37 @@
+/* ─── Прототип: рамка телефона, слои экранов, панель ───────────────────── */
+.y-proto { display: flex; flex-wrap: wrap; gap: var(--space-40, 40px); align-items: flex-start; justify-content: center; }
+
+/* Рамка рисует скругление и тень сама, экраны внутри — плоские слои */
+.y-proto__frame {
+  position: relative; isolation: isolate; overflow: hidden; flex: none;
+  width: var(--screen-width); height: var(--screen-height); border-radius: 56px;
+  background: var(--color-bg-canvas); box-shadow: 0 0 0 10px #111, 0 30px 80px rgb(0 0 0 / 0.25);
+}
+.y-proto__layer { position: absolute; inset: 0; overflow: hidden; background: var(--color-bg-canvas); }
+.y-proto__layer[data-buried] { visibility: hidden; }
+.y-proto__layer .y-screen { width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
+
+/* Шторка и диалог: от истории остаётся только слой, подложка — предыдущий экран */
+.y-proto__layer--overlay { background: transparent; }
+.y-proto__layer--overlay .y-screen { background: transparent; }
+.y-proto__layer--overlay .y-screen > :not(.y-overlay) { visibility: hidden; }
+
+/* Затемнение нижнего экрана при переходе push / pop */
+.y-proto__dim { position: absolute; inset: 0; z-index: 10; background: #000; opacity: 0; pointer-events: none; }
+
+.y-proto__toast { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 30; display: flex; justify-content: center; pointer-events: none; }
+.y-proto__toast > * { pointer-events: auto; }
+
+/* Переходы: курсор и подсветка по запросу */
+.y-proto [data-proto-link] { cursor: pointer; }
+.y-proto__frame[data-hotspots] [data-proto-link] { outline: 2px dashed var(--color-accent); outline-offset: -2px; background-image: linear-gradient(color-mix(in srgb, var(--color-accent) 12%, transparent), color-mix(in srgb, var(--color-accent) 12%, transparent)); }
+
+.y-proto__panel { width: 260px; display: flex; flex-direction: column; gap: var(--space-12); color: var(--color-text-primary); }
+.y-proto__panel h2, .y-proto__panel p, .y-proto__panel ul { margin: 0; }
+.y-proto__actions { display: flex; gap: var(--space-8); }
+.y-proto__btn { flex: 1; min-height: 44px; padding: 0 var(--space-16); border: 0; border-radius: 22px; background: var(--color-bg-subtle); color: var(--color-text-primary); font: inherit; cursor: pointer; }
+.y-proto__btn:focus-visible, .y-proto__select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.y-proto__panel label { display: flex; flex-direction: column; gap: var(--space-4); }
+.y-proto__btn[aria-pressed=true] { background: var(--color-accent); color: var(--color-text-on-accent); }
+.y-proto__select { height: 44px; padding: 0 var(--space-12); border: 1px solid var(--color-border-subtle, transparent); border-radius: 12px; background: var(--color-bg-subtle); color: var(--color-text-primary); font: inherit; }
+.y-proto__hints { padding-left: var(--space-16); display: flex; flex-direction: column; gap: var(--space-4); }
