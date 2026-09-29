@@ -195,7 +195,8 @@ export function PageStackDemo() {
   };
   const up = (e: PointerEvent<HTMLDivElement>) => {
     if (!g.current) return;
-    const dx = e.clientX - g.current.x, v = speed.current.get().x;
+    speed.current.add(e.clientX, e.clientY, e.timeStamp); // точка отпускания: после паузы бросок не засчитывается
+    const dx = e.clientX - g.current.x, v = speed.current.get(e.timeStamp).x;
     const back = dx > g.current.w * gesture.swipeDistance || (v > gesture.swipeVelocity && dx > 0);
     g.current = null;
     push(!back);
