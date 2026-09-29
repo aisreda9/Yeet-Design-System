@@ -14,25 +14,45 @@ export function Badge({ variant = 'primary', children, className }: BadgeProps) 
 
 /* ─── Avatar ────────────────────────────────────────────────────────── */
 
-export type AvatarProps = { size?: 'S' | 'M' | 'L'; initial?: string; src?: string; alt?: string; /** Фон буквы: у каждого аккаунта свой цвет (флоу Profile / Accounts: «Т» оранжевым). По умолчанию — акцент. */ color?: ItemColor; className?: string };
+export type AvatarProps = {
+  size?: 'S' | 'M' | 'L';
+  initial?: string;
+  src?: string;
+  /** Чей аватар — для скринридера: «Сима». Без имени аватар декоративный и не озвучивается (буква одна ничего не говорит). */
+  name?: string;
+  /** @deprecated Используйте `name`: он озвучивается и у фото, и у буквы. */
+  alt?: string;
+  /** Фон буквы: у каждого аккаунта свой цвет (флоу Profile / Accounts: «Т» оранжевым). По умолчанию — акцент. */
+  color?: ItemColor;
+  className?: string;
+};
 
 /** Аватар: L 96 (профиль), M 40 (аккаунты, настройки, чат), S 24. Без фото — буква Roboto Slab или иконка камеры. */
-export function Avatar({ size = 'M', initial, src, alt = '', color, className }: AvatarProps) {
+export function Avatar({ size = 'M', initial, src, name, alt, color, className }: AvatarProps) {
+  const label = name ?? (alt || undefined);
   return (
-    <span className={cx('y-avatar', `y-avatar--${size}`, !src && initial && 'y-avatar--initial', className)} style={color && !src ? { background: `var(--yeet-item-${color})`, color: `var(--yeet-on-item-${color})` } : undefined}>
-      {src ? <img src={src} alt={alt} /> : initial ? initial : <Icon name="camera" size={size === 'S' ? 14 : 24} />}
+    <span
+      className={cx('y-avatar', `y-avatar--${size}`, !src && initial && 'y-avatar--initial', className)}
+      style={color && !src ? { background: `var(--yeet-item-${color})`, color: `var(--yeet-on-item-${color})` } : undefined}
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+    >
+      {src ? <img src={src} alt="" /> : initial ? initial : <Icon name="camera" size={size === 'S' ? 14 : 24} />}
     </span>
   );
 }
 
 /* ─── Divider ───────────────────────────────────────────────────────── */
 
-/** Разделитель 1px `--color-border-subtle`. */
-/** Линия-разделитель. С `label` — «— или —» между способами входа (флоу Auth / Sign In). */
+/**
+ * Линия-разделитель 1px `--color-border-subtle`. С `label` — «— или —» между способами входа (флоу Auth / Sign In):
+ * подпись читается скринридером как обычный текст (у `role="separator"` содержимое не озвучивается), линии — декор.
+ */
 export function Divider({ label, className }: { label?: string; className?: string }) {
   if (label)
     return (
-      <div className={cx('y-divider-label', className)} role="separator">
+      <div className={cx('y-divider-label', className)}>
         <span className="y-caption">{label}</span>
       </div>
     );

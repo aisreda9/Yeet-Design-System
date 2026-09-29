@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { Icon } from '../atoms';
 import { Snackbar } from '../molecules';
 import { ItemCard, type Garment } from '../organisms';
@@ -36,6 +36,16 @@ export function DragGrid() {
   const timer = useRef<number>(0);
   const nodes = useRef(new Map<string, HTMLElement>());
   const rects = useRef(new Map<string, DOMRect>());
+  // Отложенное удаление и кадры FLIP: при размонтировании снимаем, чтобы не трогать state и узлы после ухода
+  const later = useRef({ timeouts: new Set<number>(), frames: new Set<number>() });
+  useEffect(() => {
+    const { timeouts, frames } = later.current;
+    return () => {
+      window.clearTimeout(timer.current);
+      timeouts.forEach((t) => window.clearTimeout(t));
+      frames.forEach((f) => cancelAnimationFrame(f));
+    };
+  }, []);
 
   // FLIP: запомнили старые позиции → после перестановки сдвигаем назад и отпускаем на пружине
   const snapshot = () => nodes.current.forEach((n, id) => rects.current.set(id, n.getBoundingClientRect()));
@@ -48,10 +58,12 @@ export function DragGrid() {
       if (!dx && !dy) return;
       n.style.transition = 'none';
       n.style.transform = `translate(${dx}px, ${dy}px)`;
-      requestAnimationFrame(() => {
+      const f = requestAnimationFrame(() => {
+        later.current.frames.delete(f);
         n.style.transition = 'transform var(--motion-drop)';
         n.style.transform = '';
       });
+      later.current.frames.add(f);
     });
     rects.current.clear();
   }, [cells]);
@@ -71,6 +83,7 @@ export function DragGrid() {
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     start.current = { x: e.clientX, y: e.clientY };
     setPressed(id);
+    window.clearTimeout(timer.current); // второй палец не оставляет висящий таймер первого
     timer.current = window.setTimeout(() => { setLifted(id); setPressed(null); haptic('lift'); }, LONG_PRESS);
   };
   const move = (e: PointerEvent) => {
@@ -93,12 +106,14 @@ export function DragGrid() {
       // уходит сжимаясь (exit, 150 мс), потом соседи съезжают на освободившееся место
       setRemoving(id);
       haptic('delete');
-      window.setTimeout(() => {
+      const t = window.setTimeout(() => {
+        later.current.timeouts.delete(t);
         snapshot();
         setRemoved(cells.find((c) => c.id === id) ?? null);
         setCells((cs) => cs.filter((c) => c.id !== id));
         setRemoving(null);
       }, motionMs('--motion-exit'));
+      later.current.timeouts.add(t);
     } else if (over) {
       haptic('drop');
       snapshot();

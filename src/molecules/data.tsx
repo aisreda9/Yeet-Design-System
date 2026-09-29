@@ -59,10 +59,11 @@ export type Bar = { value: number; icon?: IconName; color?: ItemColor; label: st
  * **Контексты:** Профиль / Аналитика — категории, цвета, сезоны.
  */
 export function BarChart({ bars, height = 300 }: { bars: Bar[]; height?: number }) {
-  const values = bars.map((b) => b.value);
-  const min = Math.min(...values), max = Math.max(...values);
+  // Пустой список и нечисловые значения не дают NaN в высоте: Math.min() без аргументов — Infinity
+  const values = bars.map((b) => b.value).filter(Number.isFinite);
+  const min = values.length ? Math.min(...values) : 0, max = values.length ? Math.max(...values) : 0;
   const MIN_H = 100;
-  const h = (v: number) => (max === min ? height : MIN_H + ((height - MIN_H) * (v - min)) / (max - min));
+  const h = (v: number) => (!Number.isFinite(v) ? MIN_H : max === min ? height : MIN_H + ((height - MIN_H) * (v - min)) / (max - min));
   return (
     <div className="y-bar-chart" style={{ height }} role="list">
       {bars.map((b) => (
@@ -77,13 +78,15 @@ export function BarChart({ bars, height = 300 }: { bars: Bar[]; height?: number 
 
 /* ─── UsageMeter ────────────────────────────────────────────────────── */
 
+const clampPercent = (p: number) => (Number.isFinite(p) ? Math.min(100, Math.max(0, p)) : 0);
+
 /** Доля используемого гардероба: число H1 + точечная сетка, закрашенная акцентом. Профиль / Аналитика. */
 export function UsageMeter({ percent, label = 'гардероба используется' }: { percent: number; label?: string }) {
   const total = 120;
-  const on = Math.round((percent / 100) * total);
+  const on = Math.round((clampPercent(percent) / 100) * total);
   return (
     <div className="y-usage-meter">
-      <span className="y-h1">{percent}%</span>
+      <span className="y-h1">{Number.isFinite(percent) ? percent : 0}%</span>
       <span className="y-caption y-text--secondary">{label}</span>
       <div className="y-usage-meter__dots" aria-hidden>
         {Array.from({ length: total }, (_, i) => (
