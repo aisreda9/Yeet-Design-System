@@ -18,22 +18,27 @@ public struct YeetFieldInput {
 
 /// Строка поля (React: `Field`; Figma: `input` + `input-value`). Живёт внутри `YeetInputGroup`.
 /// Три паттерна: ввод текста, «ключ — значение» с выбором в sheet, пароль с глазом.
+/// Пароль (`input.isSecure` без своего `onTrailingClick`) — глаз справа встроен: показывает и скрывает пароль,
+/// VoiceOver слышит «Показать пароль» / «Скрыть пароль». Кнопка справа — зона 44 без изменения вида.
 public struct YeetField: View {
     private let label: String
     private let value: String?
     private let colorDot: YeetItemColor?
     private let trailingIcon: YeetIconName?
     private let onTrailingClick: (() -> Void)?
+    private let trailingLabel: String?
     private let input: YeetFieldInput?
     private let error: Bool
     private let onClick: (() -> Void)?
     @Environment(\.yeetInputGroupSize) private var groupSize
+    @State private var revealed = false
 
     /// - Parameters:
     ///   - label: лейбл слева (серый); в режиме ввода — плейсхолдер и подпись для VoiceOver.
     ///   - value: выбранное значение справа (режим «ключ — значение»).
     ///   - colorDot: свотч цвета вещи перед значением.
     ///   - trailingIcon: `chevronUpDown` — выбор, `eye` — пароль, `externalLink` — ссылка.
+    ///   - trailingLabel: имя кнопки справа для VoiceOver («Открыть сайт»). По умолчанию — по иконке.
     ///   - input: поле ввода вместо статичного лейбла.
     public init(
         label: String,
@@ -41,6 +46,7 @@ public struct YeetField: View {
         colorDot: YeetItemColor? = nil,
         trailingIcon: YeetIconName? = nil,
         onTrailingClick: (() -> Void)? = nil,
+        trailingLabel: String? = nil,
         input: YeetFieldInput? = nil,
         error: Bool = false,
         onClick: (() -> Void)? = nil
@@ -50,12 +56,15 @@ public struct YeetField: View {
         self.colorDot = colorDot
         self.trailingIcon = trailingIcon
         self.onTrailingClick = onTrailingClick
+        self.trailingLabel = trailingLabel
         self.input = input
         self.error = error
         self.onClick = onClick
     }
 
     private var minHeight: CGFloat { groupSize?.fieldHeight ?? 56 }
+    /// Встроенный глаз пароля.
+    private var password: Bool { input?.isSecure == true && onTrailingClick == nil }
     private var contentColor: Color { error ? YeetColor.textDanger : YeetColor.textPrimary }
 
     public var body: some View {
@@ -93,7 +102,14 @@ public struct YeetField: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            if let trailingIcon {
+            if password {
+                Button { revealed.toggle() } label: {
+                    YeetIcon(name: revealed ? .eyeOff : .eye, size: 20)
+                }
+                .buttonStyle(YeetPressStyle())
+                .yeetHitArea(height: 20)
+                .accessibilityLabel(Text(revealed ? "Скрыть пароль" : "Показать пароль"))
+            } else if let trailingIcon {
                 trailing(trailingIcon)
             }
         }
@@ -109,7 +125,7 @@ public struct YeetField: View {
     private func inputField(_ input: YeetFieldInput) -> some View {
         let prompt = Text(label).foregroundColor(YeetColor.textSecondary)
         Group {
-            if input.isSecure {
+            if input.isSecure && !revealed {
                 SecureField("", text: input.text, prompt: prompt)
             } else {
                 TextField("", text: input.text, prompt: prompt)
@@ -129,7 +145,7 @@ public struct YeetField: View {
             Button(action: onTrailingClick) { glyph }
                 .buttonStyle(YeetPressStyle())
                 .yeetHitArea(height: 24)
-                .accessibilityLabel(Text(Self.trailingLabel(icon)))
+                .accessibilityLabel(Text(trailingLabel ?? Self.trailingLabel(icon)))
         } else {
             glyph
         }
@@ -186,23 +202,19 @@ public struct YeetInputGroup<Content: View>: View {
 private struct FieldPreview: View {
     @State private var email = ""
     @State private var password = "secret"
-    @State private var visible = false
 
     var body: some View {
         VStack(spacing: 24) {
             YeetInputGroup {
                 YeetField(label: "Почта", input: YeetFieldInput(text: $email, keyboardType: .emailAddress, textContentType: .emailAddress))
-                YeetField(
-                    label: "Пароль",
-                    trailingIcon: visible ? .eyeOff : .eye,
-                    onTrailingClick: { visible.toggle() },
-                    input: YeetFieldInput(text: $password, isSecure: !visible, textContentType: .password)
-                )
+                // глаз встроен: показывает и скрывает пароль
+                YeetField(label: "Пароль", input: YeetFieldInput(text: $password, isSecure: true, textContentType: .password))
             }
             YeetInputGroup(size: .l) {
                 YeetField(label: "Категория", value: "Верх", trailingIcon: .chevronUpDown, onClick: {})
                 YeetField(label: "Цвет", value: "Красный", colorDot: .red, trailingIcon: .chevronUpDown, onClick: {})
                 YeetField(label: "Страна", value: "Россия")
+                YeetField(label: "Сайт магазина", trailingIcon: .externalLink, onTrailingClick: {}, trailingLabel: "Открыть сайт магазина")
             }
             YeetInputGroup {
                 YeetField(label: "Почта", input: YeetFieldInput(text: .constant("wrong@")), error: true)
@@ -213,5 +225,6 @@ private struct FieldPreview: View {
     }
 }
 
-#Preview("Field / InputGroup") { FieldPreview() }
+#Preview("Field / InputGroup · Light") { FieldPreview().preferredColorScheme(.light) }
+#Preview("Field / InputGroup · Dark") { FieldPreview().preferredColorScheme(.dark) }
 #endif
