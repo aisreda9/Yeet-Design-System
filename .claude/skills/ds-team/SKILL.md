@@ -29,6 +29,7 @@ description: Оркестрация агентов дизайн-системы Y
 | `ds-motion-engineer`    | Компоненты · `motion`                                           | `src/motion/`; спецификация токенов — для token-engineer              |
 | `ds-figma-builder`      | Figma-синхронизация                                             | Figma DS 2.0 / Flow 2.0 под замком, `figmaId` в `registry.ts`         |
 | `ds-content-editor`     | тексты                                                          | тексты в зонах из брифа                                               |
+| `ds-critic`             | слепой критик вида (Gauntlet Loop)                              | ничего (вердикт)                                                      |
 | `ds-qa`                 | QA · `qa`                                                       | `design/figma-specs.json`, `qa/baseline`, журнал `design/QA.md`       |
 | `ds-docs-keeper`        | Документация · `docs`                                           | `src/docs/`, `DESIGN.md`, `README.md`, ADR                            |
 
@@ -38,9 +39,10 @@ description: Оркестрация агентов дизайн-системы Y
 2. **Аудит** — параллельно, одним сообщением: `ds-figma-auditor` + при необходимости `ds-qa` (текущее состояние) и `ds-content-editor`.
 3. **План.** Находки по классу (FIGMA-RULES §8): `решение дизайна` — сразу вопросом владельцу в #6 и не блокировать остальное; `баг Figma` — builder (если есть замок) или отдельный issue; `баг кода` / `неточность спеки` — исполнителям в своих зонах; находки в чужих зонах — отдельными issues.
 4. **Реализация.** Порядок: token-engineer → component-engineer / motion-engineer; builder — параллельно, если не меняет значения, которые берёт код. **Два агента не правят один файл одновременно** — пересекающиеся задачи последовательно.
-5. **Гейт QA.** `ds-qa` — полный прогон. Ошибки — обратно исполнителю с таблицей находок. Максимум 3 круга; дальше — в PR «что блокирует».
-6. **Документация.** `ds-docs-keeper`: сводка изменений, ADR, если поменялось правило.
-7. **Сдача.**
+5. **Слепой критик (Gauntlet Loop).** Для экранов флоу и организмов, меняющих вид: `ds-critic` получает **только** эталон (узел Figma: кадр Screens Design 0.1 или компонент DS 0.2) и результат (id истории), плюс список уже решённых исключений. Никаких заметок, объяснений и отчёта строителя в брифе. `НЕ ПРОШЁЛ` — таблица расхождений обратно строителю (без вердикта «почему»), новый круг; максимум 3 круга, дальше — в PR «что блокирует». Мелкие правки без изменения вида (lint, типы, реестр) критика не проходят.
+6. **Гейт QA.** `ds-qa` — полный прогон. Ошибки — обратно исполнителю с таблицей находок. Максимум 3 круга; дальше — в PR «что блокирует».
+7. **Документация.** `ds-docs-keeper`: сводка изменений, ADR, если поменялось правило.
+8. **Сдача.**
    - `git fetch origin && git merge origin/main` (не rebase запушенной ветки) → `npm run tokens` (если трогали токены) → `npm run typecheck` → `npm run lint` → `npm run build-storybook` → push.
    - В PR — раздел **«Передача»**: что сделано, что нет, что проверить, что дальше. Снять `status:in-progress`, PR — Ready for review.
    - Figma — `🔓 Figma свободна` в #6.
@@ -51,10 +53,10 @@ description: Оркестрация агентов дизайн-системы Y
 | Задача                             | Агенты (→ по порядку, ∥ параллельно)                                                                                                                                     | Зоны                        |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- |
 | Новый компонент                    | auditor → builder 🔒 ∥ token-engineer (если нужны токены) → component-engineer ∥ content-editor → qa → docs-keeper                                                       | Figma, tokens?, уровень, qa |
-| Сверка компонента с Figma          | auditor → component-engineer ∥ token-engineer → qa → docs-keeper                                                                                                         | уровень, tokens?            |
+| Сверка компонента с Figma          | auditor → component-engineer ∥ token-engineer → critic (если меняется вид) → qa → docs-keeper                                                                            | уровень, tokens?            |
 | Изменение токена / темы            | auditor (`get_variable_defs`) → token-engineer → qa → builder 🔒 (если меняется Figma) → docs-keeper                                                                     | tokens                      |
 | Шторка / диалог по единому правилу | auditor (FIGMA-RULES §7, `design/SHEETS-AUDIT.md`) → token-engineer (`--radius-overlay`, `--sheet-*`) → component-engineer (`organisms`) ∥ builder 🔒 → qa → docs-keeper | tokens, organisms, Figma    |
-| Экран флоу на компонентах 2.0      | auditor (узел флоу) → builder 🔒 (Flow 2.0) ∥ component-engineer (`screens`) ∥ content-editor → qa (`flow-diff`) → docs-keeper                                           | screens, Figma              |
+| Экран флоу на компонентах 2.0      | auditor (узел флоу) → builder 🔒 (Flow 2.0) ∥ component-engineer (`screens`) ∥ content-editor → **critic** → qa (`flow-diff`) → docs-keeper                              | screens, Figma              |
 | Итерация QA                        | qa → auditor (подтвердить спеки) → component-engineer / token-engineer → qa → docs-keeper                                                                                | qa + по находкам            |
 | Анимация / жест                    | auditor (`get_motion_context`) → motion-engineer → token-engineer (новый переход) → component-engineer (если разметка) → qa → docs-keeper                                | motion, tokens?             |
 | Аудит текстов                      | content-editor → component-engineer (если истории) → qa (`flow-diff`)                                                                                                    | по файлам                   |

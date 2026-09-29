@@ -1,9 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ComponentPropsWithRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Button, IconButton, type ButtonStyle } from '../atoms';
 import { cx } from '../utils/cx';
 import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
+import { useFocusScope } from '../utils/useFocusScope';
 import { LeavingContext, usePresence } from '../utils/usePresence';
+import { setRef } from './refs';
 
 /* ─── Sheet & Dialog ────────────────────────────────────────────────── */
 
@@ -12,8 +14,8 @@ type FooterAction = { label: string; variant?: ButtonStyle; onClick?: () => void
 /*
  * Решения дизайна из design/SHEETS-AUDIT.md — каждое переключается одной правкой:
  * D1 — подтверждение (Dialog) без хэндла: плавающая карточка, заголовок на 20 от верха. `true` — хэндл, если слой закрываемый.
- * D6 — рискованное подтверждение (`tone` destructive / danger) закрывается только кнопками и Escape: не свайпом и не тапом по затемнению.
- * D5 — пружина шторки без перелёта: `--sheet-spring` в organisms.css (вернуть `--motion-nav` — там же).
+ * D6 — рискованное подтверждение (`variant` destructive / danger) закрывается только кнопками и Escape: не свайпом и не тапом по затемнению.
+ * D5 — пружина шторки без перелёта: `--sheet-spring: var(--motion-sheet)` в organisms.css (вернуть `--motion-nav` — там же).
  */
 const DIALOG_HANDLE = false;
 const RISKY_DIALOG_BUTTONS_ONLY = true;
@@ -51,14 +53,16 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
   );
 }
 
-export type SheetProps = {
+export type SheetProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'children'> & {
   title?: string;
-  /** Абзац-пояснение под заголовком: Body серым, 12 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
+  /** Абзац-пояснение под заголовком: Body серым, 16 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
   description?: ReactNode;
   /**
-   * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана).
+   * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 48 на все углы (`--radius-overlay`, концентрично углу экрана).
    * `panel` — постоянная панель деталей во всю ширину, 32 сверху, с тенью.
    */
+  variant?: 'modal' | 'panel';
+  /** @deprecated Используйте `variant`: `type` в системе — атрибут HTML. */
   type?: 'modal' | 'panel';
   footer?: [FooterAction, FooterAction];
   /**
@@ -73,16 +77,16 @@ export type SheetProps = {
    * `false` — панель без хэндла (Outfit Creation / Item Selection).
    */
   handle?: boolean;
-  className?: string;
   children?: ReactNode;
 };
 
 /**
  * Bottom sheet — основа всех выборов, действий и фильтров. Всё временное открывается sheet'ом, а не новым экраном.
- * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
+ * Хэндл → 16 → заголовок H3 → 16 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
-export function Sheet({ title, description, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
+export function Sheet({ title, description, variant, type: legacyType, footer, onClose, label, handle = !onClose, className, children, onKeyDown, ...rest }: SheetProps) {
+  const type = variant ?? legacyType ?? 'modal';
   const layer = useLayerOptions({ onDismiss: onClose });
   const titleId = useId();
   const descId = useId();
@@ -94,6 +98,8 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
   const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
   const desc = description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>;
   return (
+    // Escape закрывает модальную шторку: слушатель у самого dialog, как в паттерне ARIA
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
       className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)}
       role={modal ? 'dialog' : undefined}
@@ -101,7 +107,8 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
       aria-labelledby={title ? titleId : undefined}
       aria-label={title ? undefined : label}
       aria-describedby={description ? descId : undefined}
-      onKeyDown={modal ? onEscape(layer?.dismiss ?? onClose) : undefined}
+      {...rest}
+      onKeyDown={(e) => { onKeyDown?.(e); if (modal) onEscape(layer?.dismiss ?? onClose)(e); }}
     >
       {handle && <span className="y-sheet__handle" aria-hidden />}
       {onClose ? (
@@ -131,12 +138,14 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
   );
 }
 
-export type DialogProps = {
+export type DialogProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'children'> & {
   /**
    * `default` — Tertiary + Primary («Выйти / Сохранить и выйти»).
    * `destructive` — необратимое действие серым слева, безопасная «Отмена» синей справа («Очистить / Отмена»).
    * `danger` — удаление аккаунта: красная Destructive слева, «Отменить» синей справа.
    */
+  variant?: 'default' | 'destructive' | 'danger';
+  /** @deprecated Используйте `variant`: `tone` в системе — окраска относительно фона, а здесь это вид подтверждения. */
   tone?: 'default' | 'destructive' | 'danger';
   title: string;
   description?: ReactNode;
@@ -152,7 +161,7 @@ export type DialogProps = {
   /** Хэндл (Figma: dialog · Show Handle). По умолчанию нет (решение D1): подтверждение — плавающая карточка, заголовок на 20 от верха. */
   handle?: boolean;
   /**
-   * Закрывается ли свайпом и тапом по затемнению. По умолчанию — только нерискованный (`tone="default"`, решение D6):
+   * Закрывается ли свайпом и тапом по затемнению. По умолчанию — только нерискованный (`variant="default"`, решение D6):
    * `destructive` и `danger` закрываются только кнопками и Escape. Escape работает всегда.
    */
   dismissible?: boolean;
@@ -164,7 +173,8 @@ export type DialogProps = {
  * Одна кнопка (нет `cancel`) — уведомление: Tertiary L на всю ширину.
  * В слое `Overlay` фокус при открытии — на безопасном действии (правая кнопка), Escape — `onCancel`.
  */
-export function Dialog({ tone = 'default', title, description, cancel, confirm, onCancel, onConfirm, handle, dismissible, children }: DialogProps) {
+export function Dialog({ variant, tone: legacyTone, title, description, cancel, confirm, onCancel, onConfirm, handle, dismissible, className, children, onKeyDown, ...rest }: DialogProps) {
+  const tone = variant ?? legacyTone ?? 'default';
   const risky = tone !== 'default';
   const loose = dismissible ?? !(risky && RISKY_DIALOG_BUTTONS_ONLY);
   const layer = useLayerOptions({ onDismiss: onCancel, swipe: loose, backdrop: loose });
@@ -173,13 +183,16 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
   const showHandle = handle ?? (DIALOG_HANDLE && !!layer?.dismiss && loose);
   const described = [description && `${id}-text`, children && `${id}-more`].filter(Boolean).join(' ');
   return (
+    // Escape закрывает диалог: слушатель у самого alertdialog, как в паттерне ARIA
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
-      className={cx('y-sheet', 'y-sheet--modal', !showHandle && 'y-sheet--no-handle')}
+      className={cx('y-sheet', 'y-sheet--modal', !showHandle && 'y-sheet--no-handle', className)}
       role="alertdialog"
       aria-modal={!!layer || undefined}
       aria-labelledby={`${id}-title`}
       aria-describedby={described || undefined}
-      onKeyDown={onEscape(cancelAll)}
+      {...rest}
+      onKeyDown={(e) => { onKeyDown?.(e); onEscape(cancelAll)(e); }}
     >
       {showHandle && <span className="y-sheet__handle" aria-hidden />}
       <div className="y-sheet__body">
@@ -203,7 +216,7 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
   );
 }
 
-export type OverlayProps = {
+export type OverlayProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
   /** Показан ли слой. Без `open` — показан, пока смонтирован. */
   open?: boolean;
   /** Запрос закрыть: смахивание, тап по затемнению, Escape. Вызывается сразу, уход доигрывает сам слой. */
@@ -240,20 +253,8 @@ export function Overlay({ open, ...props }: OverlayProps) {
   return presence.node ? <OverlayLayer {...props} controlled leaving={presence.leaving} /> : null;
 }
 
-/** Последний ввод — клавиатура? Слой, открытый мышью, пальцем или сразу на экране, не рисует кольцо фокуса при открытии. */
-let keyboardInput = false;
-if (typeof document !== 'undefined') {
-  document.addEventListener('keydown', (e) => { if (!e.metaKey && !e.altKey && !e.ctrlKey) keyboardInput = true; }, true);
-  document.addEventListener('pointerdown', () => { keyboardInput = false; }, true);
-}
-
-const TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-const FIELD = 'input, textarea, select, [role=slider], [contenteditable]';
-const tabbables = (root: HTMLElement) =>
-  [...root.querySelectorAll<HTMLElement>(TABBABLE)].filter((el) => el.tabIndex >= 0 && !el.closest('[inert]') && el.getClientRects().length > 0);
-
-function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: leavingProp }: Omit<OverlayProps, 'open'> & { controlled?: boolean; leaving?: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
+function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: leavingProp, ref: refProp, className, ...rest }: Omit<OverlayProps, 'open'> & { controlled?: boolean; leaving?: boolean }) {
+  const ref = useRef<HTMLDivElement | null>(null);
   const leavingFromScreen = useContext(LeavingContext);
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -282,39 +283,8 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     window.setTimeout(() => { onClose(); setClosing(false); }, motionMs('--motion-exit'));
   }, [controlled, onClose, onOpenChange]);
 
-  // Модальность: фокус внутрь, фон inert; при уходе — фон обратно и фокус туда, откуда открыли
-  useEffect(() => {
-    const o = ref.current;
-    if (!o || leaving) return;
-    const opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
-    const background = [...(o.parentElement?.children ?? [])].filter((el): el is HTMLElement => el !== o && el instanceof HTMLElement && !el.inert);
-    background.forEach((el) => { el.inert = true; });
-    const focusInto = () => {
-      if (o.contains(document.activeElement)) return;
-      const s = sheet() ?? o;
-      // поле и ползунок не берут фокус при открытии: на телефоне поле подняло бы клавиатуру
-      const target = s.querySelector<HTMLElement>('[data-autofocus]') ?? tabbables(s).find((el) => !el.closest(FIELD)) ?? s;
-      if (target === s && !s.hasAttribute('tabindex')) s.tabIndex = -1;
-      if (!keyboardInput) {
-        // кольцо фокуса — только когда пользователь идёт с клавиатуры (focus({ focusVisible }) Chromium пока не умеет)
-        target.dataset.focusQuiet = '';
-        const loud = () => { delete target.dataset.focusQuiet; target.removeEventListener('blur', loud); o.removeEventListener('keydown', loud); };
-        target.addEventListener('blur', loud);
-        o.addEventListener('keydown', loud);
-      }
-      target.focus({ preventScroll: true });
-    };
-    focusInto();
-    // Sheet → Dialog в том же слое («Удалить навсегда» → подтверждение): фокус ушёл бы в body вместе со старой шторкой (C6)
-    const swap = new MutationObserver(focusInto);
-    swap.observe(o, { childList: true });
-    return () => {
-      swap.disconnect();
-      background.forEach((el) => { el.inert = false; });
-      const active = document.activeElement;
-      if (opener?.isConnected && (!active || active === document.body || o.contains(active))) opener.focus({ preventScroll: true });
-    };
-  }, [leaving]);
+  // Модальность: фокус внутрь, фон inert, Tab по кругу; при уходе — фон обратно и фокус туда, откуда открыли
+  const trapFocus = useFocusScope(ref, { active: !leaving, initial: sheet });
 
   // Тело прокрутки — touch-action: pan-y, браузер сам ведёт прокрутку. Когда тело в самом верху и палец идёт вниз,
   // жест забирает шторка: отменённый touchmove не даёт браузеру начать прокрутку (и pointercancel) — pointermove идут дальше.
@@ -344,14 +314,7 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     if (e.key === 'Escape' && !e.defaultPrevented && closable) {
       e.preventDefault();
       close();
-    } else if (e.key === 'Tab') {
-      // фокус-ловушка: по кругу внутри слоя
-      const list = tabbables(o);
-      const first = list[0], last = list[list.length - 1], active = document.activeElement;
-      if (!first) { e.preventDefault(); return; }
-      if (e.shiftKey && (active === first || !list.includes(active as HTMLElement))) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && (active === last || !list.includes(active as HTMLElement))) { e.preventDefault(); first.focus(); }
-    }
+    } else trapFocus(e);
   };
 
   const place = (offset: number) => {
@@ -413,9 +376,12 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
   };
 
   return (
+    // Слой затемнения: жест смахивания (pointer) и Escape для всего слоя; с клавиатуры закрывают Escape и кнопки шторки
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      ref={ref}
-      className={cx('y-overlay', leaving && 'is-leaving', dragging && 'is-dragging')}
+      {...rest}
+      ref={(n) => { ref.current = n; setRef(refProp, n); }}
+      className={cx('y-overlay', leaving && 'is-leaving', dragging && 'is-dragging', className)}
       onKeyDown={keys}
       onPointerDown={down}
       onPointerMove={move}

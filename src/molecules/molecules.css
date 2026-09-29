@@ -74,15 +74,16 @@ span.y-field__trailing { cursor: inherit; }
 /* SegmentControl: пилюля активного сегмента (inverse) переезжает между пунктами */
 .y-segment {
   position: relative; flex-shrink: 0; display: flex; gap: var(--space-4); padding: var(--space-4); width: 100%;
-  background: var(--color-bg-subtle); border-radius: var(--radius-xl);
+  background: var(--color-bg-subtle); border-radius: var(--radius-xl); height: var(--seg-h);
 }
-.y-segment--S { height: var(--size-control-s); } .y-segment--M { height: var(--size-control-m); } .y-segment--L { height: var(--size-control-l); } .y-segment--XL { height: var(--size-control-xl); }
+.y-segment--S { --seg-h: var(--size-control-s); } .y-segment--M { --seg-h: var(--size-control-m); } .y-segment--L { --seg-h: var(--size-control-l); } .y-segment--XL { --seg-h: var(--size-control-xl); }
 .y-segment > .y-button,
 .y-segment > .y-icon-button { position: relative; z-index: 1; flex: 1; width: auto; height: 100%; }
-.y-segment > .y-icon-button:not([aria-checked='true']) { color: var(--color-text-secondary); }
-.y-segment--fit { width: auto; align-self: flex-start; }
+.y-segment--fit { width: fit-content; align-self: flex-start; }
 .y-segment--fit > .y-button { flex: none; }
-.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--button-inverse-bg); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
+.y-segment--fit > .y-icon-button { flex: none; width: calc(var(--seg-h) - var(--space-8)); } /* иконка: квадрат height − 8 (M 40), а не 36 */
+.y-segment > .y-icon-button:not([aria-checked='true']) { color: var(--color-text-secondary); }
+.y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-canvas); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 
 /* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
 .y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; } /* stylelint-disable-line unit-disallowed-list -- ширина текста 353 из Figma */
@@ -107,6 +108,9 @@ span.y-field__trailing { cursor: inherit; }
 .y-chip__toggle,
 .y-chip__remove { display: inline-flex; align-items: center; align-self: stretch; padding: 0; border: 0; border-radius: var(--radius-xl); background: none; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .y-chip__toggle { gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-16); }
+.y-chip--static,
+.y-chip__toggle:is(span) { cursor: default; }
+.y-chip--static:active { transform: none; }
 .y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
 .y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */
 .y-chip__remove > .y-icon { width: 20px; height: 20px; } /* stylelint-disable-line unit-disallowed-list -- иконка 20 */

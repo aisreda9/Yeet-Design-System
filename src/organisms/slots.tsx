@@ -6,7 +6,7 @@ import { useReducedMotion } from '../motion';
 
 /**
  * Выбор вещей в образ (Outfit Creation / Item Selection `414:1459`, пустой `414:1541`): панель с секциями «Верх / Низ / Обувь»,
- * между секциями — разделитель во всю ширину. Фон `elevated`, радиус сверху, тень — как у панели шторки.
+ * между секциями — разделитель с полями 20. Фон `elevated`, радиус сверху, тень — как у панели шторки.
  */
 export type ItemSlotsProps = ComponentPropsWithRef<'div'>;
 

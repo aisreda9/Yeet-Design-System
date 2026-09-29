@@ -172,7 +172,6 @@ public enum YeetComponent {
     public static let cardRadius: CGFloat = YeetRadius.lg
     public static let sheetBg: Color = YeetColor.bgElevated
     public static let sheetRadius: CGFloat = YeetRadius.xl
-    public static let sheetRadiusBottom: CGFloat = YeetRadius.bar
     public static let tabBarBg: Color = YeetColor.bgElevated
     public static let inputBg: Color = YeetColor.bgSubtle
     /// Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top
@@ -360,6 +359,8 @@ public struct YeetSpring {
     public static let quick = YeetSpring(mass: 1, stiffness: 300, damping: 20, duration: 0.744)
     /// Figma Bouncy
     public static let bouncy = YeetSpring(mass: 1, stiffness: 600, damping: 15, duration: 0.958)
+    /// Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
+    public static let critical = YeetSpring(mass: 1, stiffness: 300, damping: 34.641, duration: 0.54)
 }
 
 public enum YeetMotion {
@@ -389,6 +390,8 @@ public enum YeetMotion {
     public static let appear = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Исчезновение: быстрее появления, чтобы не мешать
     public static let exit = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
+    /// Шторка: появление и возврат после смахивания, без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
+    public static let sheet = YeetSpring.critical.animation
 }
 
 /// Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации).

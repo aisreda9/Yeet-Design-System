@@ -19,7 +19,7 @@ import { HapticTable, MechanicsTable, MotionTable } from './blocks';
 | Переход | Figma | Сейчас | Что осталось |
 |---|---|---|---|
 | Таб-бар → FAB | [`458:1256`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1256) → [`458:1342`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=458-1342) | на экране: `BottomNav fab` на Гардеробе и Вишлисте | вкладки на экранах не переключаются |
-| Сворачивание фото | [`354:17405`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17405) → [`354:17449`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17449) | на экране: `DetailsScreen` — детали вещи и образа, новая вещь; переход по порогу 24 pt | в демо фото ведётся скроллом (`usePhotoCollapse`), на экране — переход по порогу |
+| Сворачивание фото | [`354:17405`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17405) → [`354:17449`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17449) | на экране: `DetailsScreen` — детали вещи и образа, новая вещь; переход по порогу 24 pt, обратно — ниже 8 (ADR 0004) | в демо фото ведётся скроллом (`usePhotoCollapse`), на экране — переход по порогу |
 | Смена образа | [`354:17678`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17678) → [`354:17767`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17767) | в компоненте: `OutfitPager` (`useSwipePager`) | Главная пока статична — `OutfitPager` на неё не поставлен |
 | Штамп «Надеть» | [`354:17504`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17504) → [`354:17591`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17591) | в компоненте: `Stamp done`, слот `stamp` у `OutfitPager` и `DetailsScreen` | на экранах штамп без `onClick` / `done` |
 | Листание образов и поводов | [`798:2215`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2215) → [`798:2274`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=798-2274) → [`799:2433`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=799-2433) | в компоненте: `OutfitPager axis="x"` | экрана «С чем носить» нет |
@@ -36,7 +36,7 @@ import { HapticTable, MechanicsTable, MotionTable } from './blocks';
 3. **Один характер на действие.** Bouncy — только штамп: это момент радости («Надеть»). Навигация — quick,
    смена контента — gentle.
 4. **Уважай `prefers-reduced-motion`.** При включённой настройке все `--motion-*` становятся мгновенными
-   (это уже заложено в токенах).
+   (это уже заложено в токенах). Исключение — шторка и диалог: появляются и уходят растворением 240 мс без сдвига (см. «Шторка и диалог»).
 
 5. **Только transform и opacity.** Двигаем `transform` / `translate` / `scale` / `rotate` и `opacity`; `filter` — редко.
    Исключения, где меняется раскладка, названы явно: ширина таб-бара при появлении FAB и высота шапки при скролле.
@@ -108,7 +108,7 @@ _Figma «default → things» [`458:1256`](https://www.figma.com/design/1LAkot5W
 
 | Фаза | Что происходит | Токены | Хаптика |
 |---|---|---|---|
-| Появление | шторка снизу из-за края (100 % + 8 — она плавающая), затемнение проявляется; контент нажимается сразу, не дожидаясь конца пружины. Пружина без перелёта: жёсткость quick, ζ = 1, 540 мс — пока литерал `--sheet-spring` в `Overlay`, токена нет. Диалог — `appear` 240 мс standard, без пружины | пружина шторки, `--motion-fade`; диалог — `--motion-appear` | — |
+| Появление | шторка снизу из-за края (100 % + 8 — она плавающая), затемнение проявляется; контент нажимается сразу, не дожидаясь конца пружины. Пружина без перелёта: жёсткость quick, ζ = 1, 540 мс — `--motion-sheet` (`motion.spring.critical`; в web `Overlay` берёт его через `--sheet-spring` в `organisms.css`). При «Уменьшении движения» шторка и диалог появляются и уходят растворением 240 мс, без сдвига (как на iOS; web — на `--motion-base` + `--ease-standard`, т. к. `--motion-*` обнуляются; Android приводится к этому). Диалог — `appear` 240 мс standard, без пружины | `--motion-sheet`, `--motion-fade`; диалог — `--motion-appear` | — |
 | Смахивание | 1 : 1 за пальцем после сдвига 10 pt; вверх — резинка 0.55; затемнение гаснет пропорционально | `--gesture-touch-slop`, `--gesture-rubber-band` | `threshold` один раз, когда пройдено 30 % высоты |
 | Отпускание | дальше 30 % или бросок > 500 pt/с — уход; иначе назад на той же пружине без перелёта (540 мс) | `--gesture-swipe-distance`, `--gesture-swipe-velocity` | — |
 | Уход | за край целиком из текущего положения, быстрее появления; тап по затемнению и Esc — так же | `--motion-exit` | — |
@@ -214,7 +214,7 @@ Push — новый экран справа, прежний сдвигается
 
 1. **Вибрирует смена состояния, а не касание.** Обычная кнопка, карточка, строка списка — без хаптики: ответа анимацией достаточно.
 2. **Одно событие — один импульс,** в момент визуального пика: подъём — вместе с scale 1.04, штамп — в пик пружины, порог — когда он пройден. Обратное движение без вибрации.
-3. **Не чаще 1 раза в 50 мс.** Слайдер и перетаскивание по сетке тикают на каждом шаге, но не сливаются в дребезг.
+3. **Не чаще 1 раза в 50 мс** — для тиков `select` и `target`. Слайдер и перетаскивание по сетке тикают на каждом шаге, но не сливаются в дребезг; остальные события не прореживаются.
 4. **Сила по смыслу:** selection — выбор, light — лёгкое подтверждение, medium — «взял в руку», success / warning / error — итог действия.
 5. **Уважай систему.** iOS сам выключает хаптику, если она выключена в настройках; на Android `performHapticFeedback` учитывает настройку «Вибрация при касании». Своих переключателей не нужно.
 6. **Веб (Storybook)** — только `navigator.vibrate` в Android Chrome для демо; в продукте хаптика нативная.

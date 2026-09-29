@@ -139,6 +139,27 @@
       }
     },
     {
+      "figma": "segment-control · Size=M, Fit, Icon (414:1519)",
+      "story": "molecules-segmentcontrol--icons-fit",
+      "selector": ".y-segment--M",
+      "expect": {
+        "width": 136,
+        "height": 48,
+        "paddingLeft": 4,
+        "gap": 4,
+        "borderRadius": 32
+      }
+    },
+    {
+      "figma": "segment-control · M Fit Icon · кнопка 40×40",
+      "story": "molecules-segmentcontrol--icons-fit",
+      "selector": ".y-segment--M > .y-icon-button",
+      "expect": {
+        "width": 40,
+        "height": 40
+      }
+    },
+    {
       "figma": "chip-group",
       "story": "molecules-chipgroup--playground",
       "selector": ".y-chip-group",
@@ -302,7 +323,7 @@
         "paddingLeft": 20,
         "paddingBottom": 20,
         "gap": 16,
-        "borderTopLeftRadius": 32,
+        "borderTopLeftRadius": 48,
         "borderBottomLeftRadius": 48
       }
     },
@@ -339,7 +360,7 @@
       "story": "organisms-dialog--playground",
       "selector": ".y-dialog__text",
       "expect": {
-        "gap": 12
+        "gap": 16
       }
     },
     {
@@ -763,13 +784,13 @@
       }
     },
     {
-      "figma": "Settings / Currency 513:6256 · описание 12 под заголовком",
+      "figma": "Settings / Currency 513:6256 · описание 16 под заголовком",
       "story": "organisms-sheet--description",
       "selector": ".y-sheet__description",
       "expect": {
         "fontSize": 14,
         "lineHeight": 20,
-        "marginTop": -4
+        "marginTop": 0
       }
     },
     {
