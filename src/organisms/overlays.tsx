@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Button, IconButton, type ButtonStyle } from '../atoms';
 import { cx } from '../utils/cx';
 import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
@@ -9,8 +9,28 @@ import { LeavingContext, usePresence } from '../utils/usePresence';
 
 type FooterAction = { label: string; variant?: ButtonStyle; onClick?: () => void };
 
+/*
+ * Решения дизайна из design/SHEETS-AUDIT.md — каждое переключается одной правкой:
+ * D1 — подтверждение (Dialog) без хэндла: плавающая карточка, заголовок на 20 от верха. `true` — хэндл, если слой закрываемый.
+ * D6 — рискованное подтверждение (`tone` destructive / danger) закрывается только кнопками и Escape: не свайпом и не тапом по затемнению.
+ * D5 — пружина шторки без перелёта: `--sheet-spring` в organisms.css (вернуть `--motion-nav` — там же).
+ */
+const DIALOG_HANDLE = false;
+const RISKY_DIALOG_BUTTONS_ONLY = true;
+
+/** Что шторка сообщает слою: колбэк любого закрытия и можно ли закрыть свайпом / тапом по затемнению. */
+type LayerOptions = { onDismiss?: () => void; swipe?: boolean; backdrop?: boolean };
+
 /** Модальный слой вокруг шторки: закрыть его с анимацией ухода (`Overlay` с `onClose` / `onOpenChange`). */
-const OverlayContext = createContext<{ dismiss?: () => void } | null>(null);
+const OverlayContext = createContext<{ dismiss?: () => void; register: (options: LayerOptions) => () => void } | null>(null);
+
+/** Шторка регистрирует в слое свой колбэк закрытия (`onClose` / `onCancel`) и запреты жестов: закрытие любым путём идёт через него. */
+function useLayerOptions({ onDismiss, swipe = true, backdrop = true }: LayerOptions) {
+  const layer = useContext(OverlayContext);
+  const register = layer?.register;
+  useEffect(() => register?.({ onDismiss, swipe, backdrop }), [register, onDismiss, swipe, backdrop]);
+  return layer;
+}
 
 /** Escape внутри шторки: закрывает её и не даёт закрыть слой второй раз. */
 const onEscape = (close?: () => void) => (e: KeyboardEvent) => {
@@ -23,7 +43,7 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
   return (
     <div className="y-sheet__footer">
       {actions.map((a, i) => (
-        <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick} data-autofocus={(focusLast && i === actions.length - 1) || undefined}>
+        <Button key={i} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick} data-autofocus={(focusLast && i === actions.length - 1) || undefined}>
           <span className="y-sheet__footer-label">{a.label}</span>
         </Button>
       ))}
@@ -63,10 +83,13 @@ export type SheetProps = {
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
 export function Sheet({ title, description, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
-  const layer = useContext(OverlayContext);
+  const layer = useLayerOptions({ onDismiss: onClose });
   const titleId = useId();
   const descId = useId();
   const modal = type === 'modal';
+  useEffect(() => {
+    if (import.meta.env.DEV && modal && !title && !label) console.warn('Sheet: у модальной шторки нет имени — передайте `title` или `label`.');
+  }, [modal, title, label]);
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
   const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
   const desc = description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>;
@@ -84,7 +107,7 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
       {onClose ? (
         <div className="y-sheet__head">
           {h2}
-          <IconButton icon="cross" label="Закрыть" variant="ghost" size="S" onClick={onClose} />
+          <IconButton icon="cross" label="Закрыть" variant="ghost" size="S" onClick={layer?.dismiss ?? onClose} />
         </div>
       ) : (
         h2
@@ -120,9 +143,19 @@ export type DialogProps = {
   /** Без `cancel` — диалог-уведомление с одной кнопкой `confirm` Tertiary на всю ширину («Ок!»). */
   cancel?: string;
   confirm: string;
-  /** Отмена: кнопка `cancel` и Escape. Без неё Escape закрывает слой `Overlay`, если тот закрываемый. */
+  /**
+   * Отмена — при любом закрытии, кроме `confirm`: кнопка `cancel`, Escape, а у нерискованного диалога и свайп, и тап по затемнению.
+   * В закрываемом слое `Overlay` слой уходит с анимацией сам, `onCancel` вызывается вместе с его `onOpenChange(false)`.
+   */
   onCancel?: () => void;
   onConfirm?: () => void;
+  /** Хэндл (Figma: dialog · Show Handle). По умолчанию нет (решение D1): подтверждение — плавающая карточка, заголовок на 20 от верха. */
+  handle?: boolean;
+  /**
+   * Закрывается ли свайпом и тапом по затемнению. По умолчанию — только нерискованный (`tone="default"`, решение D6):
+   * `destructive` и `danger` закрываются только кнопками и Escape. Escape работает всегда.
+   */
+  dismissible?: boolean;
   children?: ReactNode;
 };
 
@@ -131,26 +164,30 @@ export type DialogProps = {
  * Одна кнопка (нет `cancel`) — уведомление: Tertiary L на всю ширину.
  * В слое `Overlay` фокус при открытии — на безопасном действии (правая кнопка), Escape — `onCancel`.
  */
-export function Dialog({ tone = 'default', title, description, cancel, confirm, onCancel, onConfirm, children }: DialogProps) {
-  const layer = useContext(OverlayContext);
-  const id = useId();
+export function Dialog({ tone = 'default', title, description, cancel, confirm, onCancel, onConfirm, handle, dismissible, children }: DialogProps) {
   const risky = tone !== 'default';
+  const loose = dismissible ?? !(risky && RISKY_DIALOG_BUTTONS_ONLY);
+  const layer = useLayerOptions({ onDismiss: onCancel, swipe: loose, backdrop: loose });
+  const id = useId();
+  const cancelAll = layer?.dismiss ?? onCancel; // через слой: уход с анимацией и onCancel один раз
+  const showHandle = handle ?? (DIALOG_HANDLE && !!layer?.dismiss && loose);
+  const described = [description && `${id}-text`, children && `${id}-more`].filter(Boolean).join(' ');
   return (
     <section
-      className="y-sheet y-sheet--modal"
+      className={cx('y-sheet', 'y-sheet--modal', !showHandle && 'y-sheet--no-handle')}
       role="alertdialog"
       aria-modal={!!layer || undefined}
       aria-labelledby={`${id}-title`}
-      aria-describedby={description ? `${id}-text` : undefined}
-      onKeyDown={onEscape(onCancel ?? layer?.dismiss)}
+      aria-describedby={described || undefined}
+      onKeyDown={onEscape(cancelAll)}
     >
-      <span className="y-sheet__handle" aria-hidden />
+      {showHandle && <span className="y-sheet__handle" aria-hidden />}
       <div className="y-sheet__body">
         <div className="y-dialog__text">
           <h2 id={`${id}-title`} className="y-h3">{title}</h2>
           {description && <p id={`${id}-text`} className="y-body y-text--secondary">{description}</p>}
         </div>
-        {children}
+        {children && <div id={`${id}-more`} className="y-dialog__more">{children}</div>}
       </div>
       <Footer
         focusLast // безопасное действие всегда справа
@@ -158,8 +195,8 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
           !cancel
             ? [{ label: confirm, variant: 'tertiary', onClick: onConfirm }]
             : risky
-            ? [{ label: confirm, variant: tone === 'danger' ? 'destructive' : 'tertiary', onClick: onConfirm }, { label: cancel, onClick: onCancel }]
-            : [{ label: cancel, onClick: onCancel }, { label: confirm, onClick: onConfirm }]
+            ? [{ label: confirm, variant: tone === 'danger' ? 'destructive' : 'tertiary', onClick: onConfirm }, { label: cancel, onClick: cancelAll }]
+            : [{ label: cancel, onClick: cancelAll }, { label: confirm, onClick: onConfirm }]
         }
       />
     </section>
@@ -226,15 +263,19 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
   const dragged = useRef(false);
   const leaving = closing || leavingFromScreen || !!leavingProp;
   const closable = !!(onClose || onOpenChange);
+  const options = useRef<LayerOptions>({});
   const sheet = () => ref.current?.querySelector<HTMLElement>('.y-sheet') ?? null;
 
+  // Один путь закрытия для свайпа, затемнения, Escape, крестика и «Отмены»: колбэк шторки (onClose / onCancel), затем слой
   const close = useCallback(() => {
+    options.current.onDismiss?.();
     if (controlled) {
       // уход доигрывает сам слой (open → false); если родитель оставил слой открытым — ничего не происходит
       onOpenChange?.(false);
       onClose?.();
       return;
     }
+    onOpenChange?.(false); // без open уход доигрывает Screen, когда родитель уберёт слой (C9)
     if (!onClose) return;
     setClosing(true);
     // родитель убирает слой; если оставил (закрытие отклонено) — шторка возвращается
@@ -248,7 +289,8 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     const opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
     const background = [...(o.parentElement?.children ?? [])].filter((el): el is HTMLElement => el !== o && el instanceof HTMLElement && !el.inert);
     background.forEach((el) => { el.inert = true; });
-    if (!o.contains(document.activeElement)) {
+    const focusInto = () => {
+      if (o.contains(document.activeElement)) return;
       const s = sheet() ?? o;
       // поле и ползунок не берут фокус при открытии: на телефоне поле подняло бы клавиатуру
       const target = s.querySelector<HTMLElement>('[data-autofocus]') ?? tabbables(s).find((el) => !el.closest(FIELD)) ?? s;
@@ -261,8 +303,13 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
         o.addEventListener('keydown', loud);
       }
       target.focus({ preventScroll: true });
-    }
+    };
+    focusInto();
+    // Sheet → Dialog в том же слое («Удалить навсегда» → подтверждение): фокус ушёл бы в body вместе со старой шторкой (C6)
+    const swap = new MutationObserver(focusInto);
+    swap.observe(o, { childList: true });
     return () => {
+      swap.disconnect();
       background.forEach((el) => { el.inert = false; });
       const active = document.activeElement;
       if (opener?.isConnected && (!active || active === document.body || o.contains(active))) opener.focus({ preventScroll: true });
@@ -284,6 +331,12 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     o.addEventListener('touchmove', touchmove, { passive: false });
     return () => o.removeEventListener('touchmove', touchmove);
   }, []);
+
+  const register = useCallback((o: LayerOptions) => {
+    options.current = o;
+    return () => { if (options.current === o) options.current = {}; };
+  }, []);
+  const layer = useMemo(() => ({ dismiss: closable ? close : undefined, register }), [closable, close, register]);
 
   const keys = (e: KeyboardEvent<HTMLDivElement>) => {
     const o = ref.current;
@@ -318,7 +371,7 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
   const down = (e: PointerEvent<HTMLDivElement>) => {
     dragged.current = false;
     const s = sheet(), t = e.target as Element;
-    if (!closable || leaving || !s || !s.contains(t) || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (!closable || leaving || !s || !s.contains(t) || options.current.swipe === false || (e.pointerType === 'mouse' && e.button !== 0)) return;
     if (t.closest('input, textarea, select, [role=slider]')) return; // поле и ползунок — свои жесты
     // прокрученное тело (и любой скролл внутри него) сначала докручивается к началу — включая саму шторку (C2)
     for (let a: Element | null = t; a; a = a === s ? null : a.parentElement) if (a.scrollTop > 0) return;
@@ -370,9 +423,11 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
       onPointerCancel={up}
       // после смахивания отпускание пальца не должно стать нажатием
       onClickCapture={(e) => { if (dragged.current) { e.stopPropagation(); dragged.current = false; } }}
-      onClick={closable ? (e) => e.target === e.currentTarget && close() : undefined}
+      // нажатие на затемнение не уводит фокус из слоя в body — иначе у незакрываемого тапом диалога пропал бы Escape
+      onMouseDown={(e) => { if (e.target === e.currentTarget) e.preventDefault(); }}
+      onClick={closable ? (e) => e.target === e.currentTarget && options.current.backdrop !== false && close() : undefined}
     >
-      <OverlayContext.Provider value={{ dismiss: closable ? close : undefined }}>{children}</OverlayContext.Provider>
+      <OverlayContext.Provider value={layer}>{children}</OverlayContext.Provider>
     </div>
   );
 }
