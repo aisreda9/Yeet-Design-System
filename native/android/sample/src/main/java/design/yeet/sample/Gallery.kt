@@ -213,6 +213,7 @@ fun Gallery(
             item {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Logo(tint = c.textSecondary, height = 24.dp) }
             }
+            item { A11yApiSections() }
         }
 
         Header(
