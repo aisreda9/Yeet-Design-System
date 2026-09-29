@@ -242,8 +242,9 @@ const rub = (v: number) => `${v.toLocaleString('ru-RU')} ₽`;
  */
 export function RangeSlider({ min, max, value, onChange, step = 100, histogram, format = rub, label }: RangeSliderProps) {
   const [lo, hi] = value;
-  const pct = (v: number) => ((v - min) / (max - min)) * 100;
-  const area = histogram && histogramPath(histogram);
+  // min = max (одна цена в выдаче): доля 0, а не NaN %
+  const pct = (v: number) => (max > min ? Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100)) : 0);
+  const area = histogram?.length ? histogramPath(histogram) : undefined;
   return (
     <div className="y-range" style={{ ['--lo' as string]: `${pct(lo)}%`, ['--hi' as string]: `${pct(hi)}%` }}>
       {area && (
@@ -272,6 +273,7 @@ export function RangeSlider({ min, max, value, onChange, step = 100, histogram, 
 
 /** Сглаженная площадь гистограммы в координатах 100×40. */
 function histogramPath(bins: number[]): string {
+  if (bins.length === 1) bins = [bins[0], bins[0]]; // одна корзина — ровная площадь, а не деление на 0
   const top = Math.max(...bins, 1);
   const pts = bins.map((b, i) => [(i / (bins.length - 1)) * 100, 40 - (b / top) * 36] as const);
   const d = pts.map(([x, y], i) => {
