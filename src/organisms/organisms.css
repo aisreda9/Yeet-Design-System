@@ -155,9 +155,9 @@
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
   position: absolute; inset: 0; z-index: 5; --y-dim: 1;
-  /* D5: шторка приезжает на пружине без перелёта — stiffness 300 как у quick, но ζ = 1 (x = 1 − (1 + ωt)·e^−ωt, 540 мс до 0,1 %).
-     TODO(tokens): токен motion.spring.critical → --motion-sheet. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
-  --sheet-spring: 540ms linear(0, 0.059, 0.184, 0.326, 0.462, 0.58, 0.678, 0.756, 0.818, 0.865, 0.901, 0.927, 0.947, 0.962, 0.972, 0.98, 0.986, 0.99, 0.993, 0.995, 0.996, 0.997, 0.998, 0.999, 1);
+  /* D5: шторка приезжает на пружине без перелёта — токен --motion-sheet (motion.spring.critical: stiffness 300 как у quick, ζ = 1, 540 мс).
+     При «Уменьшении движения» токен сам даёт 1ms. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
+  --sheet-spring: var(--motion-sheet);
   /* верх высокой шторки — под статус-баром + 8 (D2): токен --sheet-top-gap */
   display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
 }
@@ -169,7 +169,6 @@
    палец вниз забирает жест шторки (touchmove в OverlayLayer). Лента чипсов — горизонталь своя, вертикаль — телу / шторке (C1, C4). */
 .y-overlay .y-sheet { transition: transform var(--sheet-spring); touch-action: none; }
 .y-overlay .y-sheet[role='alertdialog'] { transition: transform var(--motion-appear); } /* диалог — 240 мс standard, без пружины (C7) */
-@media (prefers-reduced-motion: reduce) { .y-overlay { --sheet-spring: 1ms linear; } }
 .y-overlay .y-sheet__body { touch-action: pan-y; }
 .y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
