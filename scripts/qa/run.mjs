@@ -2,24 +2,53 @@
  * QA-прогон Storybook: каждая история × светлая / тёмная тема.
  *
  *   npm run build-storybook && npm run qa            — проверки + отчёт qa/out/report.md
- *   npm run qa -- --update-baseline                  — принять текущие скриншоты как эталон
+ *   npm run qa -- --update-baseline                  — принять текущие скриншоты как эталон (qa/baseline, в git)
  *   npm run qa -- --only=organisms-header            — только истории с этим префиксом
+ *   npm run qa -- --no-docker                        — без образа: всё, кроме сравнения скриншотов
+ *   npm run qa -- --tap-min=40                       — порог зоны нажатия для предупреждения (по умолчанию 44)
+ *   npm run qa -- --diff-px=20                       — допуск визуальной разницы в пикселях (по умолчанию 0)
+ *
+ * Скриншоты сравниваются с эталоном только в закреплённом образе Playwright (IMAGE в lib.mjs): если скрипт
+ * запущен не в нём и есть Docker, он перезапускает себя в образе. В CI без Docker — ошибка, а не «0 расхождений».
  *
  * Ошибка (exit 1): упавшая история, ошибка в консоли, отклонение от design/figma-specs.json,
  * перекрытая или обрезанная тень, текст вылез из блока, элемент вылез за экран, визуальная
- * разница с эталоном выше порога. Предупреждение: мелкая зона нажатия, замечания axe.
+ * разница с эталоном выше порога, нет эталона, axe serious / critical, зона нажатия < 24.
+ * Предупреждение: зона нажатия < 44, axe moderate / minor.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
-import { root, startStorybook, storyIndex } from './lib.mjs';
+import { IMAGE, hasDocker, imageMatchesPlaywright, inImage, rerunInImage, root, startStorybook, storyIndex } from './lib.mjs';
 
 const outDir = join(root, 'qa/out');
 const baseDir = join(root, 'qa/baseline');
-const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
+const argv = process.argv.slice(2);
+const args = Object.fromEntries(argv.map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const THEMES = ['light', 'dark'];
-const DIFF_LIMIT = 0.001; // 0.1 % пикселей
+// Окружение закреплено, поэтому повторный снимок совпадает с эталоном побайтно: любой пиксель, отличающийся сильнее
+// threshold 0.1 (сглаживание pixelmatch не считает), — регрессия. Относительный порог 0.1 % пропускал сдвиг иконки на 2 px
+// в больших витринах «В флоу» (155 px из 568 тыс.).
+const DIFF_MAX_PX = Number(args['diff-px'] ?? 0);
+const TAP_MIN = Number(args['tap-min'] ?? 44); // iOS HIG 44 pt; Android 48 dp расширяется в нативе
+/** axe: эти уровни — ошибка, остальные — предупреждение (QA.md: 0 нарушений serious и выше). */
+const AXE_ERRORS = new Set(['critical', 'serious']);
+/**
+ * Известные нарушения, которые пока не валят CI: `${check}|${story}` → ссылка на issue.
+ * Попадают в отчёт отдельным разделом. Как только нарушение исчезло — скрипт попросит убрать запись.
+ */
+const KNOWN = {};
+
+/* ─── Окружение: скриншоты — только в закреплённом образе ────────────── */
+if (!inImage() && !args['no-docker']) {
+  if (hasDocker()) process.exit(rerunInImage('scripts/qa/run.mjs', argv));
+  console.warn(`Docker не найден: скриншоты с эталоном не сравниваются (${IMAGE.split('@')[0]}).`);
+}
+const pw = imageMatchesPlaywright();
+if (inImage() && !pw.ok) { console.error(`playwright-core ${pw.version} не совпадает с образом ${IMAGE}: обновите IMAGE в scripts/qa/lib.mjs и эталоны.`); process.exit(2); }
+const visual = inImage();
+if (args['update-baseline'] && !visual) { console.error('Эталоны снимаются только в закреплённом образе: запустите с Docker, без --no-docker.'); process.exit(2); }
 
 /* ─── Сервер и браузер (scripts/qa/lib.mjs) ─────────────────────────── */
 const { origin, browser, close } = await startStorybook();
@@ -33,12 +62,22 @@ mkdirSync(join(outDir, 'screens'), { recursive: true });
 mkdirSync(join(outDir, 'diff'), { recursive: true });
 if (args['update-baseline']) mkdirSync(baseDir, { recursive: true });
 
+/** Число пикселей, отличающихся сильнее threshold 0.1, или null, если размер другой. */
+function pixelDiff(a, b, out) {
+  if (a.width !== b.width || a.height !== b.height) return null;
+  return pixelmatch(a.data, b.data, out?.data ?? null, a.width, a.height, { threshold: 0.1 });
+}
+let rewritten = 0;
+
 /** @type {{level:'error'|'warn', check:string, story:string, theme:string, detail:string}[]} */
 const issues = [];
-const add = (level, check, story, theme, detail) => issues.push({ level, check, story, theme, detail });
+const add = (level, check, story, theme, detail) => {
+  const known = level === 'error' ? KNOWN[`${check}|${story}`] : undefined;
+  issues.push({ level: known ? 'known' : level, check, story, theme, detail: known ? `${detail} — ${known}` : detail });
+};
 
 /* ─── Проверки внутри страницы ───────────────────────────────────────── */
-function audit() {
+function audit(TAP_MIN) {
   const out = [];
   const root = document.querySelector('#storybook-root');
   const all = [...root.querySelectorAll('*')].filter((el) => {
@@ -154,7 +193,7 @@ function audit() {
       const grow = after.content !== 'none' && after.position === 'absolute' ? { w: -parseFloat(after.left) - parseFloat(after.right), h: -parseFloat(after.top) - parseFloat(after.bottom) } : { w: 0, h: 0 };
       const size = Math.min(hit.width + Math.max(0, grow.w || 0), hit.height + Math.max(0, grow.h || 0));
       if (size < 24) out.push(['error', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < 24`]);
-      else if (size < 40) out.push(['warn', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < 40 — расширить hit-area в нативе`]);
+      else if (size < TAP_MIN) out.push(['warn', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < ${TAP_MIN} — расширить hit-area`]);
     }
   }
   return out;
@@ -192,11 +231,14 @@ page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Fa
 page.on('response', (r) => { if (r.status() >= 400 && !/favicon/.test(r.url())) add('error', `HTTP ${r.status()}`, current.story, current.theme, r.url().replace(origin, '')); });
 
 const specResults = [];
-let screens = 0, diffs = 0;
+let screens = 0, diffs = 0, compared = 0;
+const shotFiles = new Set();
 for (const story of stories) {
   for (const theme of THEMES) {
     current = { story: story.id, theme };
     await page.goto(`${origin}/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story&globals=theme:${theme}`, { waitUntil: 'networkidle' });
+    // рендер и play-функция (фокус, ввод) доиграли — иначе скриншот ловит промежуточное состояние
+    await page.waitForFunction(() => ['finished', 'errored', 'aborted'].includes(window.__STORYBOOK_PREVIEW__?.currentRender?.phase ?? 'finished'), null, { timeout: 10_000 }).catch(() => add('error', 'история не доиграла', current.story, current.theme, 'play-функция не завершилась за 10 с'));
     await page.evaluate(() => document.fonts.ready);
     await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' });
     await page.waitForTimeout(80);
@@ -207,13 +249,13 @@ for (const story of stories) {
     if (state.error) { add('error', 'история упала', story.id, theme, state.error.slice(0, 200)); continue; }
     if (state.empty) { add('error', 'пустая история', story.id, theme, ''); continue; }
 
-    for (const [level, check, detail] of await page.evaluate(audit)) add(level, check, story.id, theme, detail);
+    for (const [level, check, detail] of await page.evaluate(audit, TAP_MIN)) add(level, check, story.id, theme, detail);
 
     if (!args['no-axe']) {
       await page.addScriptTag({ content: axeSource });
       // Витрина из нескольких экранов (шапки, таб-бары рядом) — уникальность ориентиров проверяется только на одиночном экране
       const axe = await page.evaluate(async () => { const many = document.querySelectorAll('#storybook-root header, #storybook-root nav').length > 1 && document.querySelectorAll('#storybook-root .y-screen').length !== 1; return (await window.axe.run('#storybook-root', { resultTypes: ['violations'], rules: { region: { enabled: false }, 'page-has-heading-one': { enabled: false }, 'landmark-one-main': { enabled: false }, 'landmark-unique': { enabled: !many }, 'landmark-no-duplicate-banner': { enabled: !many } } })).violations.map((v) => [v.id, v.impact, v.nodes.length, v.nodes[0]?.target.join(' ')]); });
-      for (const [id, impact, n, target] of axe) add(impact === 'critical' ? 'error' : 'warn', `axe: ${id}`, story.id, theme, `${impact} ×${n} ${target}`);
+      for (const [id, impact, n, target] of axe) add(AXE_ERRORS.has(impact) ? 'error' : 'warn', `axe: ${id}`, story.id, theme, `${impact} ×${n} ${target}`);
     }
 
     if (theme === 'light') {
@@ -236,19 +278,36 @@ for (const story of stories) {
     const shot = await target.screenshot();
     writeFileSync(join(outDir, 'screens', file), shot);
     screens++;
-    if (args['update-baseline']) writeFileSync(join(baseDir, file), shot);
-    else if (existsSync(join(baseDir, file))) {
+    shotFiles.add(file);
+    if (!visual) continue;
+    if (args['update-baseline']) {
+      // эталон переписывается, только если картинка действительно другая: субпороговый шум (затемнение, панели)
+      // иначе давал бы бинарные правки PNG и конфликты между параллельными PR
+      const prev = existsSync(join(baseDir, file)) ? pixelDiff(PNG.sync.read(readFileSync(join(baseDir, file))), PNG.sync.read(shot)) : null;
+      if (prev === null || prev > DIFF_MAX_PX) { writeFileSync(join(baseDir, file), shot); rewritten++; }
+    }
+    else if (!existsSync(join(baseDir, file))) { add('error', 'нет эталона', story.id, theme, `qa/baseline/${file} — новая история? \`npm run qa -- --update-baseline\``); diffs++; }
+    else {
+      compared++;
       const a = PNG.sync.read(readFileSync(join(baseDir, file)));
       const b = PNG.sync.read(shot);
-      if (a.width !== b.width || a.height !== b.height) { add('error', 'визуальная разница', story.id, theme, `размер ${a.width}×${a.height} → ${b.width}×${b.height}`); diffs++; continue; }
       const diff = new PNG({ width: a.width, height: a.height });
-      const n = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0.1 });
-      if (n / (a.width * a.height) > DIFF_LIMIT) {
+      const n = pixelDiff(a, b, diff);
+      if (n === null) { add('error', 'визуальная разница', story.id, theme, `размер ${a.width}×${a.height} → ${b.width}×${b.height}`); diffs++; continue; }
+      if (n > DIFF_MAX_PX) {
         writeFileSync(join(outDir, 'diff', file), PNG.sync.write(diff));
-        add('error', 'визуальная разница', story.id, theme, `${(100 * n / (a.width * a.height)).toFixed(2)} % пикселей`);
+        add('error', 'визуальная разница', story.id, theme, `${n} px (${(100 * n / (a.width * a.height)).toFixed(3)} %) — qa/out/diff/${file}`);
         diffs++;
       }
     }
+  }
+}
+
+// эталон без истории (история удалена или переименована) — эталоны должны отражать ровно текущий Storybook
+if (visual && !args.only && existsSync(baseDir)) {
+  for (const f of readdirSync(baseDir).filter((f) => f.endsWith('.png') && !shotFiles.has(f))) {
+    if (args['update-baseline']) { rmSync(join(baseDir, f)); rewritten++; continue; }
+    add('error', 'лишний эталон', f.replace(/--(light|dark)\.png$/, ''), f.match(/--(\w+)\.png$/)?.[1] ?? '', `qa/baseline/${f} — истории нет; \`npm run qa -- --update-baseline\``);
   }
 }
 
@@ -262,7 +321,7 @@ if (!args['no-devices']) {
       await page.evaluate(() => document.fonts.ready);
       await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
       await page.waitForTimeout(80);
-      for (const [level, check, detail] of await page.evaluate(audit)) add(level, check, story.id, current.theme, detail);
+      for (const [level, check, detail] of await page.evaluate(audit, TAP_MIN)) add(level, check, story.id, current.theme, detail);
     }
   }
 }
@@ -278,17 +337,25 @@ for (const i of issues) {
 const list = [...merged.values()];
 const errors = list.filter((i) => i.level === 'error');
 const warns = list.filter((i) => i.level === 'warn');
+const knownList = list.filter((i) => i.level === 'known');
+// запись в KNOWN, которая больше ничего не гасит, — ошибка: исключения не должны переживать починку
+if (!args.only) for (const k of Object.keys(KNOWN)) if (!knownList.some((i) => `${i.check}|${i.story}` === k)) errors.push({ level: 'error', check: 'устаревшее исключение', story: k.split('|')[1], theme: '', detail: `уберите из KNOWN в run.mjs: ${k}` });
+const visualLine = visual
+  ? args['update-baseline'] ? `эталоны: снято ${screens}, изменено и удалено ${rewritten}` : `визуальная регрессия: сравнено ${compared}/${screens}, расхождений ${diffs}`
+  : `визуальная регрессия: **не проверялась** (нет закреплённого образа${process.env.CI ? '' : ', локальный прогон'})`;
+if (!visual && process.env.CI) errors.push({ level: 'error', check: 'визуальная регрессия не проверена', story: '—', theme: '', detail: `в CI нужен Docker для ${IMAGE.split('@')[0]}` });
 const specOk = specResults.filter((s) => s.ok).length;
 const byCheck = (arr) => Object.entries(arr.reduce((m, i) => ((m[i.check] = (m[i.check] ?? 0) + 1), m), {})).sort((a, b) => b[1] - a[1]);
 
 const md = [
   `# QA Storybook`,
   ``,
-  `Историй: **${stories.length}** × ${THEMES.length} темы · скриншотов: ${screens} · спеки Figma: **${specOk}/${specResults.length}** · визуальных расхождений: ${diffs}`,
+  `Историй: **${stories.length}** × ${THEMES.length} темы · скриншотов: ${screens} · спеки Figma: **${specOk}/${specResults.length}** · ${visualLine} · зона нажатия ≥ ${TAP_MIN}`,
   ``,
-  `**Ошибок: ${errors.length}** · предупреждений: ${warns.length}`,
+  `**Ошибок: ${errors.length}** · известных: ${knownList.length} · предупреждений: ${warns.length}`,
   ``,
   ...(errors.length ? [`## Ошибки`, ``, `| Проверка | История | Тема | Детали |`, `|---|---|---|---|`, ...errors.map((i) => `| ${i.check} | \`${i.story}\` | ${i.theme} | ${i.detail.replace(/\|/g, '\\|')} |`), ``] : []),
+  ...(knownList.length ? [`## Известные нарушения (не валят CI)`, ``, `| Проверка | История | Тема | Детали |`, `|---|---|---|---|`, ...knownList.map((i) => `| ${i.check} | \`${i.story}\` | ${i.theme} | ${i.detail.replace(/\|/g, '\\|')} |`), ``] : []),
   `## Предупреждения по типам`,
   ``,
   ...byCheck(warns).map(([k, n]) => `- ${k}: ${n}`),
@@ -303,7 +370,7 @@ const md = [
 writeFileSync(join(outDir, 'report.md'), md);
 writeFileSync(join(outDir, 'report.json'), JSON.stringify({ stories: stories.length, specs: specResults, issues: list }, null, 2));
 
-console.log(`Историй ${stories.length} · спеки ${specOk}/${specResults.length} · ошибок ${errors.length} · предупреждений ${warns.length}`);
+console.log(`Историй ${stories.length} · спеки ${specOk}/${specResults.length} · ${visualLine.replace(/\*\*/g, '')} · ошибок ${errors.length} · известных ${knownList.length} · предупреждений ${warns.length}`);
 for (const [k, n] of byCheck(errors)) console.log(`  ✗ ${k}: ${n}`);
 for (const [k, n] of byCheck(warns)) console.log(`  · ${k}: ${n}`);
 console.log(`Отчёт: qa/out/report.md`);
