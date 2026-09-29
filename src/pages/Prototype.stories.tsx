@@ -78,7 +78,7 @@ export const ProfileOverlays: Story = {
     await tap(root, within(await dialog(c, 'Точно хочешь выйти?')).getByRole('button', { name: 'Отменить' }));
     await gone(c, 'alertdialog');
 
-    await tap(root, c.getByRole('button', { name: /sima@space\.com/ }));
+    await tap(root, root.querySelector('.y-account')!); // строка со своей кнопкой «Выйти» — не role=button
     await c.findByText('Редактирование профиля');
     await tap(root, await c.findByRole('button', { name: 'Изменить фото профиля' }));
     await tap(root, within(await sheet(c, 'Фото профиля')).getAllByRole('button')[0]);

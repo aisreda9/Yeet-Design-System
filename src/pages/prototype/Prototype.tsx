@@ -365,6 +365,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               if (!n.hasAttribute('data-proto-link')) n.setAttribute('data-proto-link', r.on === 'long' ? 'long' : '');
               if (!n.matches(INTERACTIVE) && !n.hasAttribute('tabindex')) {
                 n.tabIndex = 0;
+                // карточка со своими контролами (лайк, «Выйти», поле) — с клавиатуры по Enter, но не кнопка: кнопка в кнопке — nested-interactive
+                if (n.querySelector(INTERACTIVE)) return;
                 n.setAttribute('role', 'button');
                 n.removeAttribute('aria-hidden'); // декоративный аватар становится кнопкой «Изменить фото»
                 if (!n.hasAttribute('aria-label')) n.setAttribute('aria-label', r.name ?? (label(n) || 'Открыть'));
