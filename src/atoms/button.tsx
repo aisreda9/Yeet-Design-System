@@ -97,6 +97,12 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
   icon?: IconName;
   /** Действие выполнено: штамп сжимается до 78, поворачивается на −60°, чернеет и показывает «отменить» (флоу: Wear Action Active). */
   done?: boolean;
+  /**
+   * До какого размера сжимается выполненный штамп: `M` — 78 (главная, Outfits / Everyday `252:286`),
+   * `S` — 56 (детали образа, Outfit Details / Variant 02 `440:3008`: плавающая кнопка в углу поверх панели, «отменить» 20).
+   * Габарит кнопки не меняется (148), двигает её в угол экран.
+   */
+  doneSize?: 'M' | 'S';
 };
 
 /**
@@ -107,7 +113,7 @@ export type StampProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children
  *
  * **Контексты:** Образы на сегодня — «Надеть»; Стилист / С чем носить — «Сохранить» + малый чёрный штамп «Не нравится» (палец вниз).
  */
-export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, className, onClick, ...rest }: StampProps) {
+export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, doneSize = 'M', className, onClick, ...rest }: StampProps) {
   const size = tone === 'secondary' ? 'S' : 'L';
   const was = useRef(done);
   useEffect(() => {
@@ -123,7 +129,7 @@ export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, clas
       type="button"
       aria-label={done ? `Отменить: ${label}` : label}
       aria-pressed={done}
-      className={cx('y-stamp', `y-stamp--${size}`, `y-stamp--${tone}`, done && 'y-stamp--done', className)}
+      className={cx('y-stamp', `y-stamp--${size}`, `y-stamp--${tone}`, done && 'y-stamp--done', doneSize === 'S' && 'y-stamp--done-S', className)}
       onClick={(e) => { if (tone === 'secondary') haptic('skip'); onClick?.(e); }}
       {...rest}
     >
@@ -131,7 +137,7 @@ export function Stamp({ label, tone = 'primary', icon = 'thumb-down', done, clas
         <path d={stampStar} fill="currentColor" />
       </svg>
       <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={29} /> : label}</span>
-      <span className="y-stamp__done" aria-hidden><Icon name="undo" /></span>
+      <span className="y-stamp__done" aria-hidden><Icon name="undo" size={doneSize === 'S' ? 20 : 24} /></span>
     </button>
   );
 }

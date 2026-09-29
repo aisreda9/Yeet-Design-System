@@ -31,10 +31,10 @@ export const registry: Entry[] = [
   { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', section: '02 Actions', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp' },
   { code: 'Badge', figma: 'badge', figmaId: '942:7125', level: 'Atoms', section: '02 Actions', story: 'Atoms/Badge' },
   { code: 'Avatar', figma: 'avatar', figmaId: '968:3666', level: 'Atoms', section: '07 Content', story: 'Atoms/Avatar', note: 'Content: Empty / Initial / Photo' },
-  { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Text' },
+  { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', section: '09 System', story: 'Atoms/Divider' },
   { code: 'ColorDot', figma: 'color', figmaId: '1182:15916', level: 'Atoms', section: '01 Foundations', story: 'Atoms/ColorDot' },
-  { code: 'Text', figma: 'text styles', figmaId: null, figmaWhy: 'текстовые стили Figma, не компонент', level: 'Atoms', section: '01 Foundations', story: 'Atoms/Text' },
   { code: 'ScrollEdge', figma: 'scroll-edge', figmaId: '965:3491', level: 'Atoms', section: '05 Navigation & scroll', story: 'Templates/Screen' },
+  { code: 'Link', figma: null, figmaId: null, figmaWhy: 'компонента ещё нет, в макетах — подчёркнутый текст (203:1372, 517:7004, 513:6603); соберёт #33', level: 'Atoms', section: '02 Actions', story: 'Atoms/Link' },
 
   { code: 'Field', figma: 'input (+ input-value)', figmaId: '1182:20099', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup', note: 'Multiline 104 («Комментарий»)' },
   { code: 'InputGroup', figma: 'input-group', figmaId: '942:7264', level: 'Molecules', section: '03 Inputs', story: 'Molecules/Field & InputGroup' },
@@ -90,4 +90,10 @@ export const registry: Entry[] = [
   { code: 'CollageLayer', figma: 'слой вещей outfit-collage', figmaId: null, figmaWhy: 'слой внутри outfit-collage 1187:20745, outfit-thumbnail 962:3227, trip-card 1036:5342', level: 'Organisms', section: '07 Content', story: 'Organisms/OutfitCollage' },
   { code: 'StylistDock', figma: 'нижняя панель стилиста (флоу Stylist / Home)', figmaId: null, figmaWhy: 'есть только в макетах флоу: input-bar 942:7282 + tab-bar 962:3217', level: 'Organisms', section: '05 Navigation & scroll', story: 'Pages/Экраны флоу' },
   { code: 'Sticky', figma: 'Pattern / Search Results (шапка с фильтрами)', figmaId: '984:4979', level: 'Templates', section: '10 Screen patterns', story: 'Pages/Экраны флоу', note: 'figmaId — кадр паттерна, не компонент' },
+
+  // Волна 2 · organisms (#25)
+  { code: 'OutfitPager', figma: 'стопка / лента образов (флоу Outfits, Stylist)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 232:1355, 798:1741 (стопка), 463:1534 (лента); Animations «scale» 354:17678', level: 'Organisms', section: '07 Content', story: 'Organisms/OutfitPager', note: 'axis y / x, превью 96 / 150, слоты weather, stamp, skip' },
+  { code: 'ItemSlots', figma: 'выбор вещей в образ (флоу Outfit Creation)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 414:1459 (ряды 414:1476, 414:1499, пустой 414:1491), 414:1541', level: 'Organisms', section: '07 Content', story: 'Organisms/ItemSlots', note: 'ItemSlots + ItemSlot: ряд со снапом, «+» в конце' },
+  { code: 'CropFrame', figma: 'рамка обрезки (флоу Search / Photo / Crop)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, кадр 261:1590 — плоская картинка', level: 'Organisms', section: '07 Content', story: 'Organisms/CropFrame', note: 'затемнение, уголки, перемещение, углы, щипок' },
+  { code: 'StylistAvatar', figma: 'аватар стилиста 64 (флоу Stylist)', figmaId: null, figmaWhy: 'иллюстрация в макетах 413:846 (слой 699:2534), 699:2858; не компонент', level: 'Organisms', section: '07 Content', story: 'Organisms/ChatBubble', note: 'ChatBubble avatar={true}' },
 ];

@@ -33,6 +33,8 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
 
 export type SheetProps = {
   title?: string;
+  /** Абзац-пояснение под заголовком: Body серым, 12 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
+  description?: ReactNode;
   /**
    * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана).
    * `panel` — постоянная панель деталей во всю ширину, 32 сверху, с тенью.
@@ -60,9 +62,10 @@ export type SheetProps = {
  * Хэндл → 16 → заголовок H3 → 12 → контент → 16 → пара кнопок L через 7.
  * Контент: `ListItem` (действия, радио, категории), `ChipGroup` (фильтры), `PhotoTile` (фото), `InputBar` (поиск), `AccountCard` (аккаунты).
  */
-export function Sheet({ title, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
+export function Sheet({ title, description, type = 'modal', footer, onClose, label, handle = !onClose, className, children }: SheetProps) {
   const layer = useContext(OverlayContext);
   const titleId = useId();
+  const descId = useId();
   const modal = type === 'modal';
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
   const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
@@ -73,6 +76,7 @@ export function Sheet({ title, type = 'modal', footer, onClose, label, handle = 
       aria-modal={(modal && !!layer) || undefined} // модальна только в слое Overlay; в документации — обычный блок
       aria-labelledby={title ? titleId : undefined}
       aria-label={title ? undefined : label}
+      aria-describedby={description ? descId : undefined}
       onKeyDown={modal ? onEscape(layer?.dismiss ?? onClose) : undefined}
     >
       {handle && <span className="y-sheet__handle" aria-hidden />}
@@ -84,6 +88,7 @@ export function Sheet({ title, type = 'modal', footer, onClose, label, handle = 
       ) : (
         h2
       )}
+      {description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>}
       {children}
       {footer && <Footer actions={footer} />}
     </section>

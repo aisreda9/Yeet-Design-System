@@ -1,0 +1,39 @@
+/* ─── Экраны флоу ────────────────────────────────────────────────────────
+ * Только то, что специфично одному экрану и не повторяется в системе.
+ * Раскладка — шаблоны (Screen, Grid, Row, Stack, Sticky), отступы — токены.
+ */
+
+/* Onboarding / Welcome: заголовок на y70, как у большой шапки (контент начинается на 20 ниже статус-бара) */
+.y-welcome { margin-top: calc(var(--space-12) * -1); }
+
+/* Auth / Sign In: юридическая подпись внизу экрана — 3 строки по центру, ссылки подчёркнуты, 20 от низа */
+.y-legal { margin: auto 0 -4px; text-align: center; }
+.y-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; }
+
+/* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
+.y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; }
+
+/* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
+.y-item-looks { gap: var(--space-20); }
+
+/* Search / Text / No Results Filtered: блок ниже центра — текст на y460 */
+.y-search-empty { margin-top: 66px; }
+
+/* Search / Discover: блоки через 32 — фото → поле 32, подзаголовок шапки → фото 28 */
+.y-discover-photos { margin-top: var(--space-8); }
+.y-discover-query { margin-top: var(--space-12); }
+
+/* Stylist / Home: сообщения прижаты к низу панели, над полем ввода */
+.y-chat-spacer { flex: 1; min-height: 180px; }
+
+/* Settings / Main: подвал (513:4818) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
+.y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
+.y-settings-footer .y-caption { margin: 0; }
+.y-settings-footer .y-button { margin-top: var(--space-20); }
+
+/* Profile / Overview: аккаунты и период — ряд 40 на y122 */
+.y-profile-bar { margin-top: calc(var(--space-4) * -1); }
+/* Панель профиля: блоки аналитики через 32, сводка (699:6406: счётчик + плитки) → лента 24 */
+.y-sheet--panel.y-profile-panel { gap: var(--space-32); }
+.y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
+.y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */
