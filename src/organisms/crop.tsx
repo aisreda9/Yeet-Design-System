@@ -1,7 +1,8 @@
-import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { useRef, useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Hint } from '../molecules';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
+import { setRef } from './refs';
 
 /** Рамка в долях контейнера 0…1: левый верхний угол, ширина, высота. */
 export type CropRect = { x: number; y: number; w: number; h: number };
@@ -9,7 +10,7 @@ export type CropRect = { x: number; y: number; w: number; h: number };
 /** Рамка из флоу Search / Photo / Crop `261:1590`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
 export const cropDefault: CropRect = { x: 20 / 393, y: 315 / 852, w: 353 / 393, h: 226 / 852 };
 
-export type CropFrameProps = {
+export type CropFrameProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onChange' | 'defaultValue'> & {
   /** Фото под рамкой (cover). Вместо него можно передать `children`. */
   src?: string;
   alt?: string;
@@ -23,7 +24,6 @@ export type CropFrameProps = {
   hint?: ReactNode;
   /** Минимальная сторона рамки, px. */
   min?: number;
-  className?: string;
 };
 
 type Drag = { mode: 'move' | 'nw' | 'ne' | 'sw' | 'se'; x: number; y: number; start: CropRect };
@@ -39,7 +39,7 @@ const corners = ['nw', 'ne', 'sw', 'se'] as const;
  * Клавиатура: рамка в порядке Tab; стрелки двигают (Shift — шаг крупнее), `+` / `−` масштабируют.
  * Геометрия в долях контейнера, поэтому рамка остаётся на месте при любой ширине экрана.
  */
-export function CropFrame({ src, alt = '', children, value, defaultValue = cropDefault, onChange, hint = 'Перемещай и масштабируй рамку', min = 64, className }: CropFrameProps) {
+export function CropFrame({ src, alt = '', children, value, defaultValue = cropDefault, onChange, hint = 'Перемещай и масштабируй рамку', min = 64, ref, className, style: styleProp, ...rest }: CropFrameProps) {
   const [own, setOwn] = useState(defaultValue);
   const rect = value ?? own;
   const box = useRef<HTMLDivElement>(null);
@@ -126,7 +126,7 @@ export function CropFrame({ src, alt = '', children, value, defaultValue = cropD
   const pct = (v: number) => Math.round(v * 100);
 
   return (
-    <div ref={box} className={cx('y-crop', active && 'is-active', className)} style={style} {...root}>
+    <div ref={(n) => { box.current = n; setRef(ref, n); }} className={cx('y-crop', active && 'is-active', className)} style={{ ...styleProp, ...style }} {...rest} {...root}>
       {src ? <img className="y-crop__photo" src={src} alt={alt} draggable={false} /> : children}
       <div
         className="y-crop__frame"

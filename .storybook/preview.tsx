@@ -1,5 +1,5 @@
 import type { Decorator, Preview } from '@storybook/react-vite';
-import '../src/tokens/tokens.css';
+import '../src/styles.css';
 import './preview.css';
 import { tokens } from '../src/tokens/model';
 
