@@ -18,7 +18,7 @@ export const gesture = {
   rubberBand: g['rubber-band'].value,
   /** Показ snackbar без действия / с действием, мс. */
   snackbar: g.snackbar.value,
-  snackbarAction: 6000,
+  snackbarAction: g['snackbar-action'].value,
 } as const;
 
 /**
