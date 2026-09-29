@@ -22,7 +22,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 | Claude · DS 2.0 — экраны | [`1168:12824`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1168-12824) | Экраны флоу, собранные из компонентов 2.0 |
 | Claude · DS 2.0 — Dark | [`1173:7887`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1173-7887) | Те же экраны в тёмной теме |
 | New app design | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида |
-| Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*` (§3.7). Страница есть и читается по id (5 пар кадров), но `get_metadata` без `nodeId` её не перечисляет — открывать по ссылке |
+| Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*` (§3.7) |
 
 Правило: **компонент DS — закон, экран — пример использования.** Правка начинается с компонента в Figma, затем тот же компонент в коде (Storybook), затем экраны.
 
@@ -30,7 +30,7 @@ Figma-файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJq
 - **«Yeet DS 2.0»** — основная: исправленные имена, заполненная тёмная тема, новые токены `on-accent`, `overlay`, `radius/100`.
 - «Yeet Design System» — исходная, используется экранами флоу; тёмная тема в ней не заполнена.
 
-Страница 2.0 разбита на секции: **00 Обзор** (Changelog, Theme preview) · **01 Foundations** · **02 Actions** · **03 Inputs** · **04 Selection** · **05 Navigation & scroll** · **06 Overlays** · **07 Content** · **08 States** · **09 System** · **10 Screen patterns** · **11 Motion**.
+Страница 2.0 разбита на секции: **00 Обзор** (Changelog, Theme preview) · **01 Foundations** · **02 Actions** · **03 Inputs** · **04 Selection** · **05 Navigation & scroll** · **06 Overlays** · **07 Content** · **08 States** · **09 System** · **10 Screen patterns**.
 В каждой секции слева — компонент со всеми вариантами, справа — «В флоу»: все случаи его использования с реальными текстами экранов.
 
 ---
