@@ -33,8 +33,6 @@ export default tseslint.config(
     rules: {
       // В коде принято `cond ? a() : b()` и `x && f()` как инструкции
       '@typescript-eslint/no-unused-expressions': ['error', { allowTernary: true, allowShortCircuit: true }],
-      '@typescript-eslint/no-unused-vars': 'warn', // scripts/build-tokens.mjs, scripts/qa/flow-diff.mjs
-      'no-irregular-whitespace': 'warn', // scripts/qa/flow-diff.mjs
     },
   },
   {
