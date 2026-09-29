@@ -56,6 +56,8 @@ export function SegmentControl({ segments, value: valueProp, defaultValue, onCha
     select(segments[to]);
   };
   return (
+    // Фокусируются сегменты (roving tabindex), а не сама группа: так по паттерну ARIA radiogroup
+    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
     <div ref={setRef} className={cx('y-segment', `y-segment--${size}`, fit && 'y-segment--fit', className)} role="radiogroup" aria-label={label} onKeyDown={onKeyDown} {...rest}>
       <span className="y-segment__pill" style={pill} aria-hidden />
       {segments.map((s, i) => {
