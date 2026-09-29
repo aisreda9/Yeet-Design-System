@@ -115,13 +115,14 @@
 /* Смена содержимого (аккаунт, период, готовое фото): проявление снизу на 8 pt */
 .y-motion-appear { animation: y-occ-in var(--motion-appear) backwards; }
 
-/* Переход между экранами: новый справа, старый сдвигается на 30 % и темнеет. --stack: 0 — закрыт, 1 — открыт */
+/* Переход между экранами: новый справа, старый сдвигается на 30 % и темнеет. --stack: 0 — закрыт, 1 — открыт.
+   Затемнение — 14 %, как push в прототипе (Prototype.tsx, PROTOTYPE-FIGMA.md): overlay 40 % × 0.35 (в тёмной теме — 21 %) */
 .y-stack { position: relative; }
 .y-stack__page { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--color-bg-canvas); transition: translate var(--motion-page); }
 .y-stack__page--under { translate: calc(var(--stack) * -30%) 0; }
 .y-stack__page--under::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--color-bg-overlay);
-  opacity: calc(var(--stack) * 0.5); transition: opacity var(--motion-page);
+  opacity: calc(var(--stack) * 0.35); transition: opacity var(--motion-page);
 }
 .y-stack__page--top { translate: calc((1 - var(--stack)) * 100%) 0; touch-action: pan-y; }
 /* тень только у открытого экрана: закрытый стоит за правым краем, и его тень не должна заглядывать в кадр */
