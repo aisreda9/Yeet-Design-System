@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { useState } from 'react';
 import { Field, FormField, InputGroup } from '.';
 import { Button } from '../atoms';
@@ -72,4 +73,39 @@ export const Validation: Story = {
   parameters: { controls: { disable: true } },
   name: 'Проверка при отправке',
   render: () => <SignInDemo />,
+};
+
+/** Клавиатура: Enter в поле отправляет форму; ошибка появляется в live-регионе и связана с полем через `aria-describedby`. */
+export const Keyboard: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Клавиатура',
+  render: () => <SignInDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('textbox', { name: 'Почта' });
+    const describedBy = () => (field.getAttribute('aria-describedby') ?? '').split(' ').map((id) => document.getElementById(id)?.textContent ?? '');
+    await step('Имя, описание и обязательность связаны с полем', async () => {
+      await userEvent.tab();
+      await expect(field).toHaveFocus();
+      await expect(field).toHaveAccessibleDescription('Пришлём код для входа');
+      await expect(field).toHaveAttribute('aria-required', 'true');
+      await expect(field).not.toHaveAttribute('aria-invalid');
+    });
+    await step('Enter с неверным адресом: ошибка в aria-describedby и live-регионе', async () => {
+      await userEvent.type(field, 'sima@mail{Enter}');
+      await waitFor(() => expect(field).toHaveAttribute('aria-invalid', 'true'));
+      await expect(describedBy()).toEqual(['Пришлём код для входа', 'Проверьте адрес: нужен вид name@mail.ru']);
+      await expect(field).toHaveAccessibleDescription('Пришлём код для входа Проверьте адрес: нужен вид name@mail.ru');
+      await expect(canvasElement.querySelector('[aria-live="polite"]')).toHaveTextContent('Проверьте адрес');
+      await expect(field).toHaveFocus();
+    });
+    await step('Исправить и отправить кнопкой с клавиатуры — ошибка уходит', async () => {
+      await userEvent.type(field, '.ru');
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name: 'Получить код' })).toHaveFocus();
+      await userEvent.keyboard('{Enter}');
+      await waitFor(() => expect(field).not.toHaveAttribute('aria-invalid'));
+      await expect(field).toHaveAccessibleDescription('Пришлём код для входа');
+    });
+  },
 };
