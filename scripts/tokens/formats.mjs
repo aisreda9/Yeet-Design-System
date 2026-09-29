@@ -2,7 +2,7 @@
 // Значения берутся уже преобразованными трансформами платформы (scripts/tokens/transforms.mjs),
 // структура (группы, бренды, метаданные) — из исходного DTCG-дерева.
 import { EXT, isRef, refPath } from './dtcg.mjs';
-import { pascal } from './transforms.mjs';
+import { camel, kotlinName, pascal, swiftName } from './transforms.mjs';
 
 export const HEADER = 'Сгенерировано scripts/build-tokens.mjs из tokens/tokens.json — не редактировать вручную.';
 
@@ -23,6 +23,16 @@ function view(dictionary, source) {
   const groupNode = (id) => id.split('.').reduce((n, k) => n[k], source);
   return { get, list, x, inMode, orig, refKey, key, keys, groupNode, source };
 }
+
+/** Категории токенов 2.0 (фаза 2): выводятся отдельным блоком в конце каждого файла, существующий вывод не меняется. */
+const EXTRA_GROUPS = ['opacity', 'layer', 'size', 'focus-ring', 'border-width', 'breakpoint'];
+/** Все токены группы с вложенными подгруппами, в порядке файла. */
+function deep(v, id) {
+  const node = v.groupNode(id);
+  return v.keys(node).flatMap((k) => ('$value' in node[k] ? [v.get(`${id}.${k}`)] : deep(v, `${id}.${k}`)));
+}
+/** Имя члена enum/object: путь без группы в camelCase ("size.control.s" → "controlS"). */
+const member = (t) => camel(t.path.slice(1).join('-'));
 
 const colorGroups = (v) => v.keys(v.source.color).map((g) => ({ title: v.groupNode(`color.${g}`).$description, tokens: v.list(`color.${g}`) }));
 const brands = (v) => v.keys(v.source.brand).map((id) => ({ id, ...v.x(v.groupNode(`brand.${id}`)).brand, tokens: v.list(`brand.${id}`) }));
@@ -83,6 +93,17 @@ export function css({ dictionary }, source) {
     const o = v.orig(t);
     L.push(`.y-${v.key(t)} { font: var(--font-weight-${v.key(t)}) ${o.fontSize.value}px/${Math.round(o.fontSize.value * o.lineHeight)}px var(--${v.get(refPath(o.fontFamily)).name}); letter-spacing: ${o.letterSpacing.value}px; margin: 0; }`);
   }
+  // Токены 2.0: только новые переменные. Ссылки на семантические цвета — в блоке, который пересчитывается с темой и брендом.
+  const extra = EXTRA_GROUPS.flatMap((g) => deep(v, g));
+  L.push('', '/* Токены 2.0: прозрачность, слои, размеры контролов, фокус, толщина линий, составная типографика, брейкпоинты */', ':root {');
+  for (const t of extra) if (t.$type !== 'color') { const o = v.orig(t); L.push(`  --${t.name}: ${isRef(o) ? `var(--${v.get(refPath(o)).name})` : t.$value}; /* ${t.$description} */`); }
+  for (const t of v.list('typography')) {
+    const o = v.orig(t);
+    L.push(`  --typography-${v.key(t)}: var(--font-weight-${v.key(t)}) ${o.fontSize.value}px/${Math.round(o.fontSize.value * o.lineHeight)}px var(--${v.get(refPath(o.fontFamily)).name});`, `  --typography-${v.key(t)}-letter-spacing: ${o.letterSpacing.value}px;`);
+  }
+  L.push('}', '', ':root,\n[data-theme],\n[data-brand] {');
+  for (const t of extra) if (t.$type === 'color') L.push(`  --${t.name}: var(--${v.get(refPath(v.orig(t))).name}); /* ${t.$description} */`);
+  L.push('}');
   return L.join('\n') + '\n';
 }
 
@@ -204,6 +225,19 @@ export function swift({ dictionary, options }, source) {
   const shT = v.get('shadow.floating'), sh = shT.$value, shDark = v.inMode(shT, 'dark').$value;
   L.push('public enum YeetShadow {', `    /// ${shT.$description}`, `    public static let floatingColor = dynamic(UIColor(hex: ${sh.color}), UIColor(hex: ${shDark.color}))`, `    public static let floatingRadius: CGFloat = ${sh.blur / 2}`, `    public static let floatingX: CGFloat = ${sh.x}`, `    public static let floatingY: CGFloat = ${sh.y}`, '}', '');
   L.push('public extension View {', `    /// ${shT.$description}`, '    func yeetFloatingShadow() -> some View {', '        shadow(color: YeetShadow.floatingColor, radius: YeetShadow.floatingRadius, x: YeetShadow.floatingX, y: YeetShadow.floatingY)', '    }', '}');
+  // Токены 2.0
+  for (const g of EXTRA_GROUPS) {
+    const node = v.groupNode(g);
+    L.push('', ...(node.$description ? [`/// ${node.$description}`] : []), `public enum Yeet${pascal(g)} {`);
+    for (const t of deep(v, g)) {
+      const o = v.orig(t), name = swiftName(member(t));
+      const decl = t.$type === 'color' ? `Color = YeetColor.${v.get(refPath(o)).name}`
+        : t.$type === 'number' ? `Double = ${t.$value}`
+        : `CGFloat = ${isRef(o) ? v.get(refPath(o)).$value : t.$value}`;
+      L.push(`    /// ${t.$description}`, `    public static let ${name}: ${decl}`);
+    }
+    L.push('}');
+  }
   return L.join('\n') + '\n';
 }
 
@@ -305,6 +339,20 @@ export function kotlin({ dictionary }, source) {
   L.push('        }', '}', '');
   const shT = v.get('shadow.floating'), sh = shT.$value, shDark = v.inMode(shT, 'dark').$value;
   L.push(`/** ${shT.$description}: y ${sh.y}, blur ${sh.blur}. В Compose — Modifier.yeetFloatingShadow() из модуля native/android (или Modifier.shadow(elevation = ${sh.blur / 4}.dp)). */`, 'object YeetShadow {', `    val floatingLight = ${sh.color}`, `    val floatingDark = ${shDark.color}`, `    val floatingElevation = ${sh.blur / 4}.dp`, `    val floatingOffsetX = ${sh.x}.dp`, `    val floatingOffsetY = ${sh.y}.dp`, `    /** Размытие как в CSS / Figma (blur radius). */`, `    val floatingBlur = ${sh.blur}.dp`, '}');
+  // Токены 2.0
+  for (const g of EXTRA_GROUPS) {
+    const node = v.groupNode(g), tokens = deep(v, g);
+    L.push('');
+    for (const t of tokens.filter((x) => x.$type === 'color'))
+      L.push(`/** ${t.$description} */`, `val YeetColorScheme.${camel(t.path.join('-'))}: Color get() = ${v.get(refPath(v.orig(t))).name}`);
+    L.push(...(node.$description ? [`/** ${node.$description} */`] : []), `object Yeet${pascal(g)} {`);
+    for (const t of tokens) {
+      if (t.$type === 'color') continue;
+      const o = v.orig(t), name = kotlinName(member(t));
+      L.push(`    /** ${t.$description} */`, t.$type === 'number' ? `    const val ${name} = ${t.$value}f` : `    val ${name} = ${isRef(o) ? v.get(refPath(o)).$value : t.$value}`);
+    }
+    L.push('}');
+  }
   return L.join('\n') + '\n';
 }
 
