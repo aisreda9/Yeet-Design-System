@@ -2,8 +2,9 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Icon } from '../atoms';
 import { icons, type IconName } from '../icons/icons';
 import { itemColors, radii, semanticColors, spaces, textStyles } from '../tokens/tokens';
-import tokenSource from '../../tokens/tokens.json';
-import { registry, type Level } from './registry';
+import { tokens as tokenSource } from '../tokens/model';
+import { registry, type Level, type Status } from './registry';
+import { statusMeta } from './status';
 import { mechanics, motions } from '../motion/motion';
 import '../tokens/tokens.css';
 
@@ -167,14 +168,38 @@ const levels: { level: string; what: string; rule: string; items: string[] }[] =
 
 const figmaNode = (id: string) => `https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=${id.replace(':', '-')}`;
 
+/** Бейдж зрелости компонента — тот же, что в сайдбаре Storybook. */
+export function StatusBadge({ status }: { status: Status }) {
+  const m = statusMeta[status];
+  return <span title={m.rule} style={{ font: '500 11px/16px var(--font-text)', padding: '1px 8px', borderRadius: 8, color: m.color, background: m.bg, whiteSpace: 'nowrap' }}>{m.label}</span>;
+}
+
+/** Легенда статусов с числом компонентов в каждом. */
+export function StatusLegend() {
+  return (
+    <DocTable
+      head={['Статус', 'Компонентов', 'Что значит']}
+      rows={(Object.keys(statusMeta) as Status[]).map((s) => [
+        <StatusBadge status={s} />,
+        <Muted>{registry.filter((e) => e.status === s).length}</Muted>,
+        <span>{statusMeta[s].rule}</span>,
+      ])}
+    />
+  );
+}
+
 /** Таблица соответствия Figma ↔ код из `registry.ts`. */
 export function ComponentRegistry() {
   return (
     <DocTable
-      head={['Уровень', 'Код', 'Figma', 'Секция Figma', 'Storybook']}
+      head={['Уровень', 'Код', 'Статус', 'Figma', 'Секция Figma', 'Storybook']}
       rows={registry.map((e) => [
         <Muted>{e.level}</Muted>,
         <Code>{`<${e.code}>`}</Code>,
+        <span>
+          <StatusBadge status={e.status} />
+          {e.statusWhy && <div style={cap}>{e.statusWhy}</div>}
+        </span>,
         <span style={mono}>
           {e.figma ?? '—'}
           {e.figmaId ? (
@@ -246,9 +271,10 @@ export function MotionTable() {
 export function MechanicsTable() {
   return (
     <DocTable
-      head={['Механика', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
+      head={['Механика', 'Где сейчас', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
       rows={mechanics.map((m) => [
         <span style={{ fontWeight: 500 }}>{m.name}<div style={cap}>{m.group} · {m.where}</div></span>,
+        <span>{m.on}{m.hook && <div style={cap}><Code>{m.hook}</Code></div>}</span>,
         m.what,
         <Code>{m.token}</Code>,
         <Muted>{m.duration}</Muted>,

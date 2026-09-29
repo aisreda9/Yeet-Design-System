@@ -9,7 +9,7 @@ const meta = {
   args: { label: '' },
   argTypes: { label: { control: 'text' } },
   render: ({ label }) => <div style={{ width: 313 }}><Divider label={label || undefined} /></div>,
-  parameters: { docs: { description: { component: 'Разделитель 1px `--color-border-subtle`. С `label` — «— или —» между способами входа. Figma: `divider`.' } } },
+  parameters: { docs: { description: { component: 'Разделитель 1px `--color-border-subtle`. С `label` — «— или —» между способами входа: подпись читается скринридером как текст, линии — декор. Figma: `divider`.' } } },
 } satisfies Meta<typeof Divider>;
 export default meta;
 type Story = StoryObj<typeof meta>;

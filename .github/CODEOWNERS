@@ -1,0 +1,59 @@
+# Владельцы по зонам из .github/team.json (правила команды — TEAM.md).
+# Последнее совпадение выигрывает, поэтому общие зоны (infra) — сверху, узкие — ниже.
+# Сейчас у всех зон один владелец; когда появятся люди по зонам — заменить @indiekola в нужном блоке.
+
+*                                   @indiekola
+
+# infra
+/.gitignore                         @indiekola
+/.gitattributes                     @indiekola
+/package.json                       @indiekola
+/package-lock.json                  @indiekola
+/tsconfig.json                      @indiekola
+/.storybook/                        @indiekola
+/.github/                           @indiekola
+/.claude/                           @indiekola
+/scripts/                           @indiekola
+/CLAUDE.md                          @indiekola
+/AGENTS.md                          @indiekola
+/TEAM.md                            @indiekola
+
+# tokens
+/tokens/                            @indiekola
+/src/tokens/                        @indiekola
+/scripts/build-tokens.mjs           @indiekola
+
+# atoms
+/src/atoms/                         @indiekola
+/src/icons/                         @indiekola
+/src/utils/                         @indiekola
+
+# molecules
+/src/molecules/                     @indiekola
+
+# organisms
+/src/organisms/                     @indiekola
+
+# motion
+/src/motion/                        @indiekola
+
+# screens
+/src/pages/                         @indiekola
+/src/templates/                     @indiekola
+/design/figma-flows.json            @indiekola
+
+# docs
+/src/docs/                          @indiekola
+/DESIGN.md                          @indiekola
+/README.md                          @indiekola
+/CONTRIBUTING.md                    @indiekola
+/design/adr/                        @indiekola
+/.github/CODEOWNERS                 @indiekola
+
+# qa
+/scripts/qa/                        @indiekola
+/scripts/check-contrast.mjs         @indiekola
+/design/QA.md                       @indiekola
+/design/figma-specs.json            @indiekola
+/.github/workflows/qa.yml           @indiekola
+/qa/                                @indiekola

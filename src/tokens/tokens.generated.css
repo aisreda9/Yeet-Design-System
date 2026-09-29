@@ -388,3 +388,46 @@
 .y-h3 { font: var(--font-weight-h3) 19px/24px var(--font-display); letter-spacing: -0.3px; margin: 0; }
 .y-body { font: var(--font-weight-body) 14px/20px var(--font-text); letter-spacing: 0px; margin: 0; }
 .y-caption { font: var(--font-weight-caption) 12px/16px var(--font-text); letter-spacing: 0px; margin: 0; }
+
+/* Токены 2.0: прозрачность, слои, размеры контролов, фокус, толщина линий, составная типографика, брейкпоинты */
+:root {
+  --opacity-disabled: 0.4; /* Недоступная кнопка, иконка, стрелка пейджера */
+  --opacity-pressed: 0.64; /* Нажатая строка списка */
+  --layer-base: 0; /* Подложка: медиа под сворачивающейся шапкой */
+  --layer-raised: 1; /* Над соседями: вкладка таб-бара, подпись коллажа, текущий образ */
+  --layer-float: 2; /* Поверх контента: погода и штамп на «Сегодня», подсказка кропа, перетаскиваемая вещь */
+  --layer-bar: 3; /* Шапка, таб-бар, нижняя панель, стрелки пейджера */
+  --layer-sticky: 4; /* Плавающие и прилипающие элементы экрана, штамп в деталях */
+  --layer-overlay: 5; /* Затемнение и модальные sheet / dialog */
+  --size-control-s: 40px; /* S: чипсы, компактные кнопки, свёрнутая шапка */
+  --size-control-m: 48px; /* M: поле ввода в панели, заголовок-чипс, сегмент M */
+  --size-control-l: 52px; /* L: snackbar, чат, строка списка без группы */
+  --size-control-xl: 56px; /* XL: главная кнопка, поле, таб-бар, строка в группе */
+  --focus-ring-width: 2px; /* Толщина outline */
+  --focus-ring-offset: 2px; /* Отступ снаружи: кнопки, чипсы, ссылки */
+  --focus-ring-offset-inset: -2px; /* Кольцо внутри: элемент у края экрана или внутри карточки */
+  --border-width-thin: 1px; /* Разделители, обводка свотча, волосяная рамка кропа */
+  --border-width-icon: 1.3px; /* Линия иконок ui-icons (24 × 24) и кольцо аватара в таб-баре */
+  --border-width-medium: 1.5px; /* Кольцо фокуса поля ввода, выделение вещи на холсте */
+  --border-width-thick: 2px; /* Уголки кропа, кольцо стопки аватаров, цель перетаскивания */
+  --breakpoint-container-compact: 300px; /* Контейнер таб-бара (CSS @container): уже — на экране 320 с кнопкой «+» вкладки идут без зазора */
+  --breakpoint-compact: 320px; /* Самый узкий экран (iPhone SE) */
+  --breakpoint-regular: var(--screen-width); /* Базовый экран макетов (iPhone 15/16) */
+  --breakpoint-large: 430px; /* Широкий экран (Pro Max) */
+  --typography-h1: var(--font-weight-h1) 32px/36px var(--font-display);
+  --typography-h1-letter-spacing: -1px;
+  --typography-h2: var(--font-weight-h2) 24px/28px var(--font-display);
+  --typography-h2-letter-spacing: -0.4px;
+  --typography-h3: var(--font-weight-h3) 19px/24px var(--font-display);
+  --typography-h3-letter-spacing: -0.3px;
+  --typography-body: var(--font-weight-body) 14px/20px var(--font-text);
+  --typography-body-letter-spacing: 0px;
+  --typography-caption: var(--font-weight-caption) 12px/16px var(--font-text);
+  --typography-caption-letter-spacing: 0px;
+}
+
+:root,
+[data-theme],
+[data-brand] {
+  --focus-ring-color: var(--color-text-accent); /* Цвет кольца */
+}

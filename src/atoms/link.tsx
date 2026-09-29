@@ -1,9 +1,9 @@
-import type { ComponentProps } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 import { cx } from '../utils/cx';
 
 /* ─── Link ──────────────────────────────────────────────────────────── */
 
-export type LinkProps = ComponentProps<'a'> & {
+export type LinkProps = ComponentPropsWithRef<'a'> & {
   href: string;
   /**
    * Внешняя ссылка: открывается в новой вкладке с `rel="noopener noreferrer"`.

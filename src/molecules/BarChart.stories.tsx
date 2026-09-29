@@ -30,3 +30,16 @@ export const InFlow: Story = {
     </UsageGrid>
   ),
 };
+
+/** Пустые данные и нечисловые значения: высоты без NaN, график просто пуст / капсулы минимальной высоты. */
+export const EdgeCases: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Крайние случаи',
+  tags: ['bare'],
+  render: () => (
+    <UsageGrid min={353}>
+      <Usage screen="нет данных" note="bars = []"><BarChart bars={[]} height={160} /></Usage>
+      <Usage screen="все равны" note="полная высота"><BarChart bars={[{ label: 'Верх', icon: 'top', value: 4 }, { label: 'Низ', icon: 'bottom', value: 4 }]} height={160} /></Usage>
+    </UsageGrid>
+  ),
+};

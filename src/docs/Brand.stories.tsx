@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import tokens from '../../tokens/tokens.json';
+import { tokens } from '../tokens/model';
 import { Badge, Button, Logo, Stamp } from '../atoms';
 import { ChipGroup, SegmentControl, Snackbar } from '../molecules';
 import { BottomNav, ItemCard, StatusBar } from '../organisms';
