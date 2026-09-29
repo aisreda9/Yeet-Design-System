@@ -6,6 +6,7 @@ import { cx } from '../utils/cx';
 import { useFitScale } from '../utils/useFitScale';
 import { haptic } from '../utils/haptic';
 import { balanceArt, collageBalance, layoutCollage, measureArt, type ArtContext, type ArtMeta } from '../utils/artBalance';
+import stylistAvatar from './art/stylist-avatar.png';
 
 /* ─── Cards ─────────────────────────────────────────────────────────── */
 
@@ -235,12 +236,17 @@ export function WeatherCard({ temperature, description, weather = 'sunny', icon,
 }
 
 /** Сообщение в чате со стилистом. `from="user"` — сообщение пользователя (blue, справа). Figma: chat-bubble · From. */
-export function ChatBubble({ from = 'stylist', avatar, children }: { from?: 'stylist' | 'user'; /** Аватар стилиста 64 слева, выровнен по низу (флоу Stylist / Home). */ avatar?: ReactNode; children: ReactNode }) {
+/** Аватар ИИ-стилиста 64: иллюстрация из флоу Stylist (`413:846`, `699:2858`). Декоративный — имя стилиста уже в тексте. */
+export function StylistAvatar({ size = 64 }: { size?: number }) {
+  return <img className="y-stylist-face" src={stylistAvatar} width={size} height={size} alt="" draggable={false} />;
+}
+
+export function ChatBubble({ from = 'stylist', avatar, children }: { from?: 'stylist' | 'user'; /** Аватар 64 слева, выровнен по низу (флоу Stylist / Home). `true` — аватар стилиста по умолчанию (`StylistAvatar`). */ avatar?: ReactNode | true; children: ReactNode }) {
   const bubble = <div className={cx('y-bubble', 'y-body', from === 'user' && 'y-bubble--own')}>{children}</div>;
   if (!avatar) return bubble;
   return (
     <div className="y-bubble-row">
-      <span className="y-bubble-row__avatar" aria-hidden>{avatar}</span>
+      <span className="y-bubble-row__avatar" aria-hidden>{avatar === true ? <StylistAvatar /> : avatar}</span>
       {bubble}
     </div>
   );
