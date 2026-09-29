@@ -7,11 +7,11 @@ const meta = {
   title: 'Atoms/Stamp',
   component: Stamp,
   tags: ['autodocs'],
-  args: { label: 'Надеть', tone: 'primary', done: false, doneSize: 'M', icon: 'thumb-down' },
+  args: { label: 'Надеть', variant: 'primary', done: false, doneSize: 'M', icon: 'thumb-down' },
   argTypes: {
-    tone: { control: 'inline-radio', options: ['primary', 'secondary'] },
+    variant: { control: 'inline-radio', options: ['primary', 'secondary'] },
     doneSize: { control: 'inline-radio', options: ['M', 'S'] },
-    icon: { control: 'select', options: ['thumb-down', 'cross', 'plus'], if: { arg: 'tone', eq: 'secondary' } },
+    icon: { control: 'select', options: ['thumb-down', 'cross', 'plus'], if: { arg: 'variant', eq: 'secondary' } },
   },
   parameters: {
     docs: {
@@ -41,7 +41,7 @@ export const InFlow: Story = {
       <Usage screen="Outfits / Everyday" note="после нажатия — отменить, 78"><Stamp label="Надеть" done /></Usage>
       <Usage screen="Outfit Details" note="после нажатия — отменить, 56"><Stamp label="Надеть" done doneSize="S" /></Usage>
       <Usage screen="Stylist / С чем носить" note="сохранить образ"><Stamp label="Сохранить" /></Usage>
-      <Usage screen="Stylist / С чем носить" note="не нравится, secondary 64"><Stamp label="Не нравится" tone="secondary" /></Usage>
+      <Usage screen="Stylist / С чем носить" note="не нравится, secondary 64"><Stamp label="Не нравится" variant="secondary" /></Usage>
     </UsageGrid>
   ),
 };
