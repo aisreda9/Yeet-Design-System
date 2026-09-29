@@ -71,6 +71,12 @@ public extension View {
         return contentShape(Rectangle().inset(by: -max(0, (44 - side) / 2)))
     }
 
+    /// Зона касания ≥ 44 по высоте, а по ширине — не больше `maxSideSlop` с каждой стороны: соседи через маленький зазор
+    /// (сегменты через 4, вкладки на 320) не делят одну зону.
+    func yeetHitArea(height: CGFloat, maxSideSlop: CGFloat) -> some View {
+        contentShape(YeetSlopRect(dx: -maxSideSlop, dy: -max(0, (44 - height) / 2)))
+    }
+
     /// Анимация токена с учётом «Уменьшения движения»: при включённом — мгновенно.
     func yeetAnimation<V: Equatable>(_ animation: Animation, value: V) -> some View {
         modifier(YeetAnimationModifier(animation: animation, value: value))
@@ -99,6 +105,16 @@ public func yeetWithAnimation<Result>(_ animation: Animation, reduceMotion: Bool
 }
 
 // MARK: - Формы
+
+/// Прямоугольник, расширенный на `dx` / `dy` (отрицательные — наружу): форма нажатия без изменения вида.
+struct YeetSlopRect: Shape {
+    var dx: CGFloat
+    var dy: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        Path(rect.insetBy(dx: dx, dy: dy))
+    }
+}
 
 /// Прямоугольник с отдельным радиусом каждого угла (iOS 16: `UnevenRoundedRectangle` появился только в iOS 17).
 /// Sheet Modal — 32 сверху и 48 снизу, карточка погоды — 20 / 20 / 20 / 8.
