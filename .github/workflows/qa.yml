@@ -59,8 +59,12 @@ jobs:
         # И после падения QA, но не когда сборка не дошла до конца — иначе ошибка сборки тонет в ERR_MODULE_NOT_FOUND
         if: always() && steps.build.outcome == 'success'
         run: npm run flow-diff -- --strict
+      - name: Покрытие экранов (кадры Figma ↔ истории) и пути story реестра
+        # Пробелы покрытия — предупреждение (волна 2 доливает экраны), мёртвый путь в registry.ts — ошибка
+        if: always() && steps.build.outcome == 'success'
+        run: node scripts/qa/coverage.mjs
       - if: always()
-        run: cat qa/out/report.md qa/out/flow-diff.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+        run: cat qa/out/report.md qa/out/flow-diff.md qa/out/coverage.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
       - if: always()
         uses: actions/upload-artifact@v4
         with:

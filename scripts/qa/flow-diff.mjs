@@ -2,16 +2,19 @@
  * Сверка экранов Storybook с флоу Figma по текстовым якорям (design/figma-flows.json).
  * node scripts/qa/flow-diff.mjs [slug ...] [--tol=2] [--strict]
  * Требует собранный storybook-static. Отчёт: qa/out/flow-diff.md. --strict — код выхода 1 при расхождениях.
+ * Слаг без истории (или без `.y-screen`) — ошибка всегда: такой экран не сверен.
  */
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { openStory, root, startStorybook } from './lib.mjs';
+import { openStory, root, startStorybook, storyIndex } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const tol = Number(args.find((a) => a.startsWith('--tol='))?.slice(6) ?? 2);
 const strict = args.includes('--strict');
 const only = args.filter((a) => !a.startsWith('--'));
 const { frames, known = {} } = JSON.parse(readFileSync(join(root, 'design/figma-flows.json'), 'utf8'));
+const unknown = only.filter((s) => !frames[s]);
+if (unknown.length) { console.error(`Нет в design/figma-flows.json: ${unknown.join(', ')}`); process.exit(2); }
 
 // Осознанные замены цветов (контраст AA): цвет флоу → цвет кода.
 const colorAlias = { '777777': '6e6e6e', ff4230: 'cc291b' };
@@ -32,11 +35,15 @@ const page = await sb.browser.newPage({ viewport: { width: 1000, height: 1000 },
 
 const lines = ['# Сверка экранов с флоу Figma', '', `Допуск ${tol} px. Цвета ${Object.entries(colorAlias).map(([a, b]) => `#${a}→#${b}`).join(', ')} считаются совпадающими (контраст).`, ''];
 let total = 0, bad = 0, missing = 0, accepted = 0;
-const summary = [];
+const summary = [], noStory = [];
+const storyIds = new Set(storyIndex().map((e) => e.id));
 
 for (const [slug, frame] of Object.entries(frames)) {
   if (only.length && !only.includes(slug)) continue;
-  await openStory(page, sb.origin, `pages-экраны-флоу--${slug}`);
+  const id = `pages-экраны-флоу--${slug}`;
+  // Нет истории — явная ошибка, а не «не найдено N якорей»
+  if (!storyIds.has(id)) { noStory.push(slug); summary.push(`${slug.padEnd(20)} нет истории ${id}`); lines.push(`## ${slug} (${frame.id})`, '', `**Ошибка:** истории \`${id}\` нет в Storybook — экран не сверен. Переименована или удалена история? Слаг в \`design/figma-flows.json\` = id истории.`, ''); continue; }
+  await openStory(page, sb.origin, id);
   await page.waitForTimeout(150);
   const texts = await page.evaluate(() => {
     const screen = document.querySelector('.y-screen');
@@ -91,7 +98,7 @@ for (const [slug, frame] of Object.entries(frames)) {
     }
     return out;
   });
-  if (!texts) { lines.push(`## ${slug}`, '', 'Нет `.y-screen` — история не найдена.', ''); continue; }
+  if (!texts) { noStory.push(slug); summary.push(`${slug.padEnd(20)} нет .y-screen`); lines.push(`## ${slug} (${frame.id})`, '', `**Ошибка:** в истории \`${id}\` нет \`.y-screen\` — экран не сверен. Экран флоу собирается через \`Screen\`.`, ''); continue; }
   const used = new Set();
   const rows = [], okRows = [];
   let screenBad = 0;
@@ -135,9 +142,10 @@ for (const [slug, frame] of Object.entries(frames)) {
 }
 
 await sb.close();
-lines.splice(4, 0, `Итого якорей ${total}: расхождений ${bad}, не найдено ${missing}, осознанных ${accepted}.`, '');
+lines.splice(4, 0, `Итого якорей ${total}: расхождений ${bad}, не найдено ${missing}, осознанных ${accepted}.${noStory.length ? ` **Экранов без истории: ${noStory.length}** (${noStory.join(', ')}).` : ''}`, '');
 mkdirSync(join(root, 'qa/out'), { recursive: true });
 writeFileSync(join(root, 'qa/out/flow-diff.md'), lines.join('\n'));
 console.log(summary.join('\n'));
 console.log(`\nЯкорей ${total}: расхождений ${bad}, не найдено ${missing}, осознанных ${accepted}. Отчёт: qa/out/flow-diff.md`);
-if (strict && (bad || missing)) process.exit(1);
+if (noStory.length) console.error(`Экраны без истории (не сверены): ${noStory.join(', ')}`);
+if (noStory.length || (strict && (bad || missing))) process.exit(1);

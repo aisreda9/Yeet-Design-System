@@ -9,7 +9,7 @@ import { Grid, Screen } from '../templates';
 import { ItemCard } from '.';
 import { Flag } from '../atoms';
 
-type Args = { title: string; type: 'modal' | 'panel'; footer: boolean; handle: boolean; content: 'actions' | 'chips' | 'photo' };
+type Args = { title: string; description: string; type: 'modal' | 'panel'; footer: boolean; handle: boolean; content: 'actions' | 'chips' | 'photo' };
 
 const content = {
   actions: <List><ListItem icon="ai" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List>,
@@ -20,11 +20,11 @@ const content = {
 const meta: Meta<Args> = {
   title: 'Organisms/Sheet',
   tags: ['autodocs'],
-  args: { title: 'Название вещи', type: 'modal', footer: false, handle: true, content: 'actions' },
-  argTypes: { type: { control: 'inline-radio', options: ['modal', 'panel'] }, content: { control: 'inline-radio', options: ['actions', 'chips', 'photo'] } },
+  args: { title: 'Название вещи', description: '', type: 'modal', footer: false, handle: true, content: 'actions' },
+  argTypes: { description: { control: 'text' }, type: { control: 'inline-radio', options: ['modal', 'panel'] }, content: { control: 'inline-radio', options: ['actions', 'chips', 'photo'] } },
   decorators: [unlessBare(onOverlay)],
-  parameters: { docs: { description: { component: 'Bottom sheet. **Modal** — плавающая карточка: 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана), паддинг 8/20/20; хэндл 48×4 → 16 → H3 → 12 → слот Content → 16 → пара кнопок L через 7. **Panel** — панель деталей во всю ширину, 32 сверху, тень. `handle={false}` — без хэндла, контент на 20 от верха (панель выбора вещей); `onClose` — «×» Ghost S справа от заголовка вместо хэндла. Высокая модальная шторка не выше экрана, контент прокручивается. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Show Handle, Show Close, Title, слот Content.' } } },
-  render: ({ title, type, footer, handle, content: c }) => <Sheet title={title || undefined} type={type} handle={handle} footer={footer ? [{ label: 'Сбросить' }, { label: 'Применить' }] : undefined}>{content[c]}</Sheet>,
+  parameters: { docs: { description: { component: 'Bottom sheet. **Modal** — плавающая карточка: 8 от краёв экрана, радиус 32 сверху и 48 снизу (концентрично углу экрана), паддинг 8/20/20; хэндл 48×4 → 16 → H3 → 12 → слот Content → 16 → пара кнопок L через 7. **Panel** — панель деталей во всю ширину, 32 сверху, тень. `handle={false}` — без хэндла, контент на 20 от верха (панель выбора вещей); `onClose` — «×» Ghost S справа от заголовка вместо хэндла. `description` — абзац Body серым под заголовком: 12 от заголовка, 20 до контента (Валюта). Высокая модальная шторка не выше экрана, контент прокручивается. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Show Handle, Show Close, Title, слот Content.' } } },
+  render: ({ title, description, type, footer, handle, content: c }) => <Sheet title={title || undefined} description={description || undefined} type={type} handle={handle} footer={footer ? [{ label: 'Сбросить' }, { label: 'Применить' }] : undefined}>{content[c]}</Sheet>,
 };
 export default meta;
 type Story = StoryObj<Args>;
@@ -43,6 +43,44 @@ export const InFlow: Story = {
       <Usage screen="Outfit Creation / Item Filter" note="с крестиком, без хэндла">{onOverlay(() => <Sheet title="Низ" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}><ChipGroup chips={[{ label: 'Все' }, { label: 'Джинсы', selected: true }, { label: 'Брюки' }, { label: 'Легинсы' }]} /><Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="green" selected /></Grid></Sheet>)}</Usage>
       <Usage screen="Outfit Creation / Item Selection" note="панель без хэндла (Show Handle=false)"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Гардероб" handle={false}><ChipGroup chips={[{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }]} /></Sheet></div></Usage>
       <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p></Sheet></div></Usage>
+    </UsageGrid>
+  ),
+};
+
+const currencies: [string, string, string][] = [['ru', 'Российский рубль', '₽ · RUB'], ['us', 'Доллар США', '$ · USD'], ['eu', 'Евро', '€ · EUR'], ['kz', 'Казахский тенге', '₸ · KZT'], ['by', 'Белорусский рубль', 'BYN']];
+
+export const Description: Story = {
+  name: 'С описанием',
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Settings / Currency `513:6256`: пояснение под заголовком — Body серым, 12 от заголовка и 20 до списка; шторка ссылается на него через `aria-describedby`.' } } },
+  render: () => (
+    <Sheet title="Валюта" description="Цены пересчитываются по курсу ЦБ на 10 августа 2026 и помечаются как примерные. Сохранённая цена не меняется.">
+      <List>{currencies.map(([code, label, trailing], k) => <ListItem key={code} type="radio" label={label} checked={k === 0} trailing={trailing} />)}</List>
+    </Sheet>
+  ),
+};
+
+/** Пресет «Действия»: Sheet + List из ListItem action. Отдельного ActionSheet нет — во флоу 9 таких шторок. */
+const actions = {
+  item: <List><ListItem icon="collage" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List>,
+  wishlist: <List><ListItem icon="external-link" label="Перейти по ссылке" /><ListItem icon="collage" label="Создать образ" /><ListItem icon="bag-check" label="Переместить в гардероб" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="trash" label="Удалить" /></List>,
+  archive: <List><ListItem icon="undo" label="Вернуть в гардероб" /><ListItem icon="trash" label="Удалить" /></List>,
+  trash: <List><ListItem icon="undo" label="Вернуть в гардероб" /><ListItem icon="trash" label="Удалить навсегда" /></List>,
+  occasion: <List><ListItem icon="pen" label="Редактировать" /><ListItem icon="trash" label="Удалить навсегда" /></List>,
+  add: <List><ListItem icon="wardrobe" label="Вещь" /><ListItem icon="collage" label="Образ" /></List>,
+};
+
+export const Actions: Story = {
+  name: 'Действия',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Шторка действий — это `Sheet` с заголовком (имя вещи или повода) и `List` из `ListItem` action с иконкой 24; необратимое действие — последним. Отдельного компонента ActionSheet нет. Кадры: вещь `551:3746`, `555:4123`; вишлист `305:1528`; архив `337:2567`; корзина `555:4098`; повод `305:1472`, `456:1053`, `349:8618`; «Добавить в вишлист» `455:1007`.' } } },
+  render: () => (
+    <UsageGrid min={393}>
+      <Usage screen="Wardrobe / Item / Actions" note="551:3746 · 555:4123">{onOverlay(() => <Sheet title="Название вещи">{actions.item}</Sheet>)}</Usage>
+      <Usage screen="Wishlist / Item / Actions" note="305:1528">{onOverlay(() => <Sheet title="Название вещи">{actions.wishlist}</Sheet>)}</Usage>
+      <Usage screen="Archive / Item / Actions" note="337:2567">{onOverlay(() => <Sheet title="Название вещи">{actions.archive}</Sheet>)}</Usage>
+      <Usage screen="Trash / Item / Actions" note="555:4098">{onOverlay(() => <Sheet title="Название вещи">{actions.trash}</Sheet>)}</Usage>
+      <Usage screen="Occasion / Actions" note="305:1472 · 456:1053 (в 349:8618 — «Удалить»)">{onOverlay(() => <Sheet title="Повод образа">{actions.occasion}</Sheet>)}</Usage>
+      <Usage screen="Wishlist / Add" note="455:1007">{onOverlay(() => <Sheet title="Добавить в вишлист">{actions.add}</Sheet>)}</Usage>
     </UsageGrid>
   ),
 };
