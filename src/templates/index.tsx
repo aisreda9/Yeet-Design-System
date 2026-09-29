@@ -136,3 +136,4 @@ export function Stack({ gap = 8, align, className, children }: { gap?: number; a
 }
 
 export { DetailsScreen, type DetailsScreenProps } from './details';
+export { Prose, type ProseBlock, type ProseProps, type ProseSection } from './prose';
