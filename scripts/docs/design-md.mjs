@@ -1,7 +1,7 @@
 // Таблицы DESIGN.md из tokens/tokens.json: цвета, контраст, цвета вещей, типографика, отступы, радиусы, тень, анимации.
 // Блоки размечены в DESIGN.md комментариями <!-- gen:имя --> … <!-- /gen:имя -->, всё между ними перезаписывается.
 // Запуск: npm run docs-tokens — обновить DESIGN.md; npm run docs-tokens -- --check — только сверить (код выхода 1, если отстал).
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -143,7 +143,9 @@ const blocks = {
   },
 
   screens: () => {
-    const src = readFileSync(join(root, 'src/pages/Pages.stories.tsx'), 'utf8');
+    // экраны разложены по разделам: src/pages/<Раздел>.stories.tsx
+    const dir = join(root, 'src/pages');
+    const src = readdirSync(dir).filter((f) => f.endsWith('.stories.tsx')).map((f) => readFileSync(join(dir, f), 'utf8')).join('\n');
     return String((src.match(/^export const \w+: Story\b/gm) ?? []).length);
   },
 };
