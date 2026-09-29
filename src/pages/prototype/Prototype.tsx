@@ -147,6 +147,9 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         const l = layersRef.current;
         return l[l.length - 1]?.overlay ? l[l.length - 2]?.id : undefined;
       },
+      stack() {
+        return layersRef.current.map((l) => l.id);
+      },
       scrollTop() {
         el(top())?.querySelector('.y-screen__content')?.scrollTo({ top: 0, behavior: 'smooth' });
       },
@@ -411,6 +414,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               ref={(node) => { if (node) els.current.set(l.key, node); else els.current.delete(l.key); }}
               className={cx('y-proto__layer', l.overlay && 'y-proto__layer--overlay')}
               data-proto-layer={l.key}
+              data-screen={l.id}
               data-buried={!visible || undefined}
               inert={l.key === belowOverlay || !visible}
             >

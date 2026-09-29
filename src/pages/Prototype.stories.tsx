@@ -92,3 +92,138 @@ export const ProfileOverlays: Story = {
     await gone(c, 'dialog');
   },
 };
+
+/* ─── Play: цепочки #136 — новая вещь, онбординг, стилист, поездка, поиск ─ */
+
+/** Верхний экран стека (`data-screen` у слоя прототипа). */
+const at = async (root: HTMLElement, id: ScreenId, timeout = 2000) => {
+  await waitFor(() => expect([...root.querySelectorAll<HTMLElement>('.y-proto__layer')].at(-1)?.dataset.screen).toBe(id), { timeout });
+  await idle(root);
+};
+const topEl = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.y-proto__layer')].at(-1)!;
+const topLayer = (root: HTMLElement) => within(topEl(root));
+const q = (root: HTMLElement, sel: string) => topEl(root).querySelector<HTMLElement>(sel)!;
+const back = (root: HTMLElement) => tap(root, topLayer(root).getByRole('button', { name: 'Назад' }));
+/** «Добавить» внизу формы — не «+» у тегов. */
+const submit = (root: HTMLElement) => topLayer(root).getAllByRole('button', { name: 'Добавить' }).find((b) => b.matches('.y-button--full'))!;
+
+/** Новая вещь: FAB → без фото → фото → загрузка (сама) → фото добавлено → «Добавить» → гардероб со snackbar. */
+export const NewItemChain: Story = {
+  name: 'Цепочка: новая вещь',
+  args: { start: 'Wardrobe' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    const fab = () => q(root, '.y-bottom-nav__fab button');
+    await tap(root, fab());
+    await at(root, 'NewItemNoPhotoV2');
+    await back(root);
+    await at(root, 'Wardrobe');
+
+    await tap(root, fab());
+    await at(root, 'NewItemNoPhotoV2');
+    await tap(root, q(root, '.y-photo-area__add'));
+    await at(root, 'NewItem');
+    await at(root, 'NewItemPhotoV2', 5000);
+    await tap(root, submit(root));
+    await at(root, 'Wardrobe');
+    await c.findByText('Вещь добавлена в гардероб');
+  },
+};
+
+/** Онбординг: вход → имя → первая вещь (или «Пропустить») → первый образ → главная. С каждого шага — «Назад». */
+export const OnboardingChain: Story = {
+  name: 'Цепочка: онбординг',
+  args: { start: 'SignIn' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await tap(root, await c.findByRole('button', { name: 'Войти' }));
+    await at(root, 'OnboardingName');
+    await back(root);
+    await at(root, 'SignIn');
+    await tap(root, c.getByRole('button', { name: 'Войти' }));
+    await at(root, 'OnboardingName');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Далее' }));
+    await at(root, 'FirstItemPrompt');
+
+    await tap(root, topLayer(root).getByRole('button', { name: 'Пропустить' }));
+    await at(root, 'FirstOutfit');
+    await back(root);
+    await at(root, 'FirstItemPrompt');
+
+    await tap(root, q(root, '.y-photo-tile'));
+    await at(root, 'NewItem');
+    await at(root, 'NewItemPhotoV2', 5000);
+    await tap(root, submit(root));
+    await at(root, 'FirstOutfit');
+    await c.findByText('Первая вещь добавлена');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Сохранить образ и завершить' }));
+    await at(root, 'Today');
+  },
+};
+
+/** Стилист: «Удиви меня» → стопка до конца → «образы закончились» → «Показать еще»; «С чем носить» → вещь из образа. */
+export const StylistChain: Story = {
+  name: 'Цепочка: стилист',
+  args: { start: 'StylistHome' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const card = (name: RegExp) => [...topEl(root).querySelectorAll<HTMLElement>('.y-prompt-card')].find((e) => name.test(e.textContent ?? ''))!;
+    await tap(root, card(/^Удиви меня/));
+    await at(root, 'OutfitOfTheDay');
+    const skip = () => topLayer(root).getByRole('button', { name: 'Не нравится' });
+    await tap(root, skip()); // второй образ → третий, последний
+    await expect(topLayer(root).getByRole('button', { name: 'Следующий образ' })).toHaveAttribute('aria-disabled', 'true');
+    await tap(root, skip());
+    await at(root, 'OutfitOfTheDayEmpty');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Показать еще' }));
+    await at(root, 'OutfitOfTheDay');
+    await back(root);
+    await at(root, 'StylistHome');
+
+    await tap(root, card(/^С чем носить/));
+    await at(root, 'WhatToWear');
+    await tap(root, q(root, '.y-item-card'));
+    await at(root, 'WardrobeItemDetails');
+    await back(root);
+    await at(root, 'WhatToWear');
+    await back(root);
+    await at(root, 'StylistHome');
+  },
+};
+
+/** Поездка: вкладки «Образы» ↔ «Вещи», вещь → детали и обратно. */
+export const TripChain: Story = {
+  name: 'Цепочка: вещи поездки',
+  args: { start: 'Trips' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    await tap(root, [...topEl(root).querySelectorAll('.y-trip-card')].find((e) => /^Бразилиа/.test(e.textContent ?? ''))!);
+    await at(root, 'TripDetails');
+    await tap(root, topLayer(root).getByRole('radio', { name: /^Вещи/ }));
+    await at(root, 'TripItems');
+    await tap(root, q(root, '.y-item-card'));
+    await at(root, 'WardrobeItemDetails');
+    await back(root);
+    await at(root, 'TripItems');
+    await tap(root, topLayer(root).getByRole('radio', { name: /^Образы/ }));
+    await at(root, 'TripDetails');
+    await back(root);
+    await at(root, 'Trips');
+  },
+};
+
+/** Поиск: поле на «Discover» → фокус с подсказками → результаты; «Назад» с фокуса. */
+export const SearchChain: Story = {
+  name: 'Цепочка: фокус поиска',
+  args: { start: 'SearchDiscover' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const field = () => q(root, '.y-input-bar__field');
+    await tap(root, field());
+    await at(root, 'SearchFocused');
+    await back(root);
+    await at(root, 'SearchDiscover');
+    await tap(root, field());
+    await at(root, 'SearchFocused');
+    const chip = [...topEl(root).querySelectorAll<HTMLElement>('.y-chip-group > .y-button')].find((b) => !/^Белое платье/.test(b.textContent ?? ''))!;
+    await tap(root, chip);
+    await at(root, 'SearchResults');
+  },
+};

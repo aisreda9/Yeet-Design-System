@@ -20,6 +20,8 @@ export type Nav = {
   toast(text: string, opts?: { undo?: boolean }): void;
   /** Экран под верхним слоем: откуда открыли шторку. */
   below(): ScreenId | undefined;
+  /** Экраны в стеке снизу вверх: откуда пришли в общую цепочку (онбординг или гардероб). */
+  stack(): ScreenId[];
   /** Прокрутить контент экрана к началу (повторное нажатие на активную вкладку). */
   scrollTop(): void;
 };
@@ -79,16 +81,28 @@ const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): 
 /** Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ. */
 const today: Route[] = [{ sel: '.y-outfit-thumb', go: ok('OutfitDetails') }, openOutfit];
 
-/** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. */
+/** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. Чипсы на фокусе — не кнопки. */
 const noResults = /^Белое платье/;
 const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
-  { sel: '.y-chip-group button', text: noResults, go: empty },
-  { sel: '.y-chip-group button', go: results },
+  { sel: '.y-chip-group > .y-button', text: noResults, go: empty },
+  { sel: '.y-chip-group > .y-button', go: results },
 ];
 
-/** Вещь добавлена: в гардероб с подтверждением. */
-const addedItem: Go = async (n) => { await n.root('Wardrobe'); n.toast('Вещь добавлена в гардероб'); };
 const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет в макетах');
+const howItWorks: Route = btn('Как это работает', comingSoon);
+/** Кнопка «Добавить» внизу формы новой вещи (не «+» у тегов). */
+const addItem = (go: Go): Route => ({ sel: '.y-button--full', text: 'Добавить', go });
+/** Вещь добавлена: в онбординге — к первому образу, иначе в гардероб с подтверждением. */
+const addedItem: Go = async (n) => {
+  if (n.stack().includes('FirstItemPrompt')) { await n.push('FirstOutfit'); n.toast('Первая вещь добавлена'); return; }
+  await n.root('Wardrobe');
+  n.toast('Вещь добавлена в гардероб');
+};
+/** «Не нравится» на последнем образе стопки: образы закончились. Штамп листает сам, пока есть следующий. */
+const lastSkip: Route = {
+  sel: '.y-stamp', text: 'Не нравится', native: true,
+  go: (n, el) => { if (el.closest('.y-outfit-pager')?.querySelector('[aria-label="Следующий образ"][aria-disabled=true]')) return n.swap('OutfitOfTheDayEmpty'); },
+};
 
 /* ─── Создание образа: диалоги и фильтр вещей (#54) ──────────────────── */
 const CREATION: ScreenId[] = ['OutfitItems', 'Canvas', 'CanvasDefault', 'CanvasHint', 'OutfitCriteria'];
@@ -180,7 +194,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
 
   /* Поиск в сторах */
   SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchFocused') }],
-  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty')],
+  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty'), btn('Поиск по фото', 'PhotoCrop')],
   SearchResults: [
     { sel: '.y-chip-group button', text: 'Цена', go: (n) => n.overlay('PriceFilter') },
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
@@ -202,11 +216,13 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   Trips: [
     { sel: '.y-trip-card--add', go: (n) => n.toast('Создание поездки пока без макета') },
     { sel: '.y-trip-card', go: ok('TripDetails') },
-    btn('Как это работает', comingSoon),
+    howItWorks,
   ],
   TripDetails: [{ sel: '.y-segment [role=radio]', text: /^Вещи/, go: (n) => n.swap('TripItems') }, openOutfit],
   TripItems: [{ sel: '.y-segment [role=radio]', text: /^Образы/, go: (n) => n.swap('TripDetails') }, openItem],
-  OutfitOfTheDayEmpty: [btn('Показать еще', (n) => n.swap('OutfitOfTheDay'))],
+  OutfitOfTheDay: [lastSkip, howItWorks],
+  OutfitOfTheDayEmpty: [btn('Показать еще', (n) => n.swap('OutfitOfTheDay')), howItWorks],
+  WhatToWear: [openItem, howItWorks],
 
   /* Создание образа */
   OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), shuffleAsk, exitAsk],
@@ -231,10 +247,10 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Новая вещь: без фото → загрузка (сама) → фото добавлено → «Добавить» */
   NewItemNoPhotoV1: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItemLoadingV1') }],
   NewItemNoPhotoV2: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItem') }],
-  NewItemPhotoV1: [btn('Добавить', addedItem)],
-  NewItemPhotoV2: [btn('Добавить', addedItem)],
-  NewItemCompletedV1: [btn('Добавить', addedItem)],
-  NewItemCompletedV2: [btn('Добавить', addedItem)],
+  NewItemPhotoV1: [addItem(addedItem)],
+  NewItemPhotoV2: [addItem(addedItem)],
+  NewItemCompletedV1: [addItem(addedItem)],
+  NewItemCompletedV2: [addItem(addedItem)],
 
   /* Профиль и настройки */
   ProfileAnalytics: [openItem, openOutfit, btn('Настройки', 'Settings', { native: true }), btn('Редактировать профиль', 'ProfileEdit', { native: true }), { sel: '.y-overlay button', text: 'Добавить аккаунт', go: 'SignIn', native: true }],
