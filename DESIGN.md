@@ -1,7 +1,7 @@
 # Yeet Design System
 
 Указатель по дизайн-системе приложения **YeetStyle (yeet)** — умного гардероба: что где лежит, ID страниц Figma и сводные таблицы токенов.
-Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->84<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
+Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->86<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
 здесь она не дублируется. Storybook публикуется на GitHub Pages (`.github/workflows/storybook.yml`); локально — `npm ci && npm run storybook`.
 
 > Таблицы токенов ниже **генерируются** из `tokens/tokens.json` (`npm run docs-tokens`, проверка — `npm run docs-tokens -- --check`): блоки между `<!-- gen:… -->` руками не правятся.
