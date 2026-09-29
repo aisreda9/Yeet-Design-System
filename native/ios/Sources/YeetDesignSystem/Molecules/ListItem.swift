@@ -66,12 +66,23 @@ public struct YeetListItem: View {
                     row
                 }
                 .buttonStyle(YeetRowStyle(highlight: inGroup))
+                .modifier(YeetListHitArea(inGroup: inGroup))
                 .accessibilityAddTraits(type == .radio && checked ? [.isSelected] : [])
                 .accessibilityValue(accessibilityState)
             }
         }
         .overlay(alignment: .top) {
             if inGroup { YeetRowDivider() }
+        }
+    }
+
+    /// Строка вне группы — 24 по высоте: зона нажатия 44 заходит в зазор 20 до соседей, вид не меняется.
+    private struct YeetListHitArea: ViewModifier {
+        let inGroup: Bool
+
+        @ViewBuilder
+        func body(content: Content) -> some View {
+            if inGroup { content } else { content.yeetHitArea(height: 24) }
         }
     }
 
@@ -198,5 +209,6 @@ private struct ListPreview: View {
     }
 }
 
-#Preview("ListItem") { ListPreview() }
+#Preview("ListItem · Light") { ListPreview().preferredColorScheme(.light) }
+#Preview("ListItem · Dark") { ListPreview().preferredColorScheme(.dark) }
 #endif

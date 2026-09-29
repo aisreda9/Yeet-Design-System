@@ -182,6 +182,7 @@ fun Gallery(
                     }
                 }
             }
+            item { Section("Шторки · единое правило") { SheetRulesSection() } }
             item {
                 Section("AccountCard") {
                     AccountCard(accounts[0], kind = AccountCardKind.Current)
@@ -214,6 +215,7 @@ fun Gallery(
             item {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Logo(tint = c.textSecondary, height = 24.dp) }
             }
+            item { A11yApiSections() }
         }
 
         Header(
