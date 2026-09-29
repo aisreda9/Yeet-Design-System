@@ -1,6 +1,7 @@
 html, body { background: var(--color-bg-canvas); }
 .sb-canvas { background: var(--color-bg-canvas); color: var(--color-text-primary); padding: 24px; min-width: 360px; font-family: var(--font-text); }
 .sb-show-main.sb-main-fullscreen .sb-canvas { min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
-.docs-story .sb-canvas { padding: 16px; }
+.sb-show-main .docs-story .sb-canvas { padding: 16px; min-height: 0; min-width: 0; }
+.sbdocs .docs-story { align-content: safe center; } /* Docs: шире блока — прокрутка вбок, а не срез с обеих сторон */
 /* «Ресурсы»: кнопка скачивания архива — как Button Primary L */
 a.y-download { display: inline-flex; align-items: center; height: 52px; padding: 0 20px; border-radius: 32px; background: var(--button-primary-bg); color: var(--button-primary-fg) !important; font: 460 14px/20px var(--font-text); text-decoration: none; }
