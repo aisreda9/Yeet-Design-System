@@ -88,10 +88,9 @@
 .y-divider { height: var(--border-width-thin); border: 0; margin: 0; background: var(--color-border-subtle); width: 100%; }
 
 /* Color dot — item colour swatch */
-.y-color-dot {
-  display: inline-block; flex: none; border-radius: var(--radius-full);
-  box-shadow: inset 0 0 0 var(--border-width-thin) var(--color-border-subtle);
-}
+.y-color-dot { display: inline-block; flex: none; border-radius: var(--radius-full); }
+/* Обводка только у светлых (white, beige) — по Figma color-dot */
+.y-color-dot--outlined { box-shadow: inset 0 0 0 var(--border-width-thin) var(--color-border-subtle); }
 
 /* Scroll edge — fades content under fixed chrome; works in both themes (mask over canvas colour) */
 .y-scroll-edge {

@@ -6,14 +6,39 @@ const meta = {
   title: 'Atoms/Logo',
   component: Logo,
   tags: ['autodocs'],
-  args: { height: 48 },
-  argTypes: { height: { control: { type: 'range', min: 16, max: 96 } } },
-  parameters: { docs: { description: { component: 'Словесный знак yeet. Цвет наследуется от родителя: on-accent на синем (Splash), on-photo поверх фото (Search / Photo), secondary в подвале Настроек. Figma: `yeet` (logos) · Tone.' } } },
+  args: { size: 'L' },
+  argTypes: { size: { control: 'inline-radio', options: ['L', 'S'] }, height: { control: { type: 'range', min: 16, max: 96 } } },
+  parameters: { docs: { description: { component: 'Словесный знак yeet. Figma: `yeet` (logos) · Size (L 136×88, знак 130×60 / S 61×40, знак 58×26.8) · Tone (Default / On Dark / Muted).\n\nЦвет наследуется от родителя (`currentColor`), пропа `tone` нет: Default — primary, On Dark — on-accent на синем (Splash) или on-photo поверх фото, Muted — secondary в подвале Настроек.\n\n`height` — устаревший: оставлен для экранов, где высота знака не совпадает с L / S. В новом коде бери `size`.' } } },
 } satisfies Meta<typeof Logo>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Sizes: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Размеры',
+  render: () => (
+    <UsageGrid min={200}>
+      <Usage screen="Size L" note="рамка 136×88"><Logo size="L" /></Usage>
+      <Usage screen="Size S" note="рамка 61×40"><Logo size="S" /></Usage>
+    </UsageGrid>
+  ),
+};
+
+export const Tones: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Тона',
+  render: () => (
+    <UsageGrid min={200}>
+      <Usage screen="Default" note="text-primary"><div style={{ color: 'var(--color-text-primary)' }}><Logo size="L" /></div></Usage>
+      <Usage screen="On Dark" note="on-accent на синем">
+        <div style={{ background: 'var(--color-accent)', color: 'var(--color-text-on-accent)', padding: 16, borderRadius: 20 }}><Logo size="L" /></div>
+      </Usage>
+      <Usage screen="Muted" note="text-secondary"><div style={{ color: 'var(--color-text-secondary)' }}><Logo size="L" /></div></Usage>
+    </UsageGrid>
+  ),
+};
 
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
