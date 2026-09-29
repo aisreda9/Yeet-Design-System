@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '../atoms';
 import { demoAvatar, demoPhoto } from '../docs/helpers';
 import { ChipGroup, EmptyState, Hint, InputBar, PhotoTile, RangeSlider } from '../molecules';
-import { BottomNav, Header, Overlay, ProductCard, Sheet } from '../organisms';
+import { BottomNav, CropFrame, Header, Overlay, ProductCard, Sheet } from '../organisms';
 import { Grid, Row, Screen } from '../templates';
 import { shoes } from './data';
 import './pages.css';
@@ -83,8 +83,8 @@ export const PriceFilter: Story = { name: 'Search / Results / Sheet / Price Filt
 export const PhotoCrop: Story = {
   name: 'Search / Photo / Crop',
   render: () => (
-    // поверх фото всё белое: статус-бар, подсказка без подложки
-    <Screen background="photo" photo={demoPhoto} end>
+    // рамка обрезки на всё фото (CropFrame); поверх всё белое: статус-бар, подсказка без подложки
+    <Screen background="photo" className="y-crop-screen" backdrop={<div className="y-crop-layer"><CropFrame src={demoPhoto} hint={null} /></div>} end>
       <Row justify="center"><Hint tone="onPhoto" icon="fingers-pinch">Выдели вещь, которую ищем</Hint></Row>
       <Button size="L" fullWidth>Найти похожие</Button>
     </Screen>

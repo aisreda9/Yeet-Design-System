@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type ReactNode } from 'react';
-import { IconButton } from '../atoms';
 import { ChipGroup, Field, InputGroup, LoadingState, SegmentControl, Snackbar } from '../molecules';
-import { BottomBar, type CanvasItem, Dialog, type Garment, Header, ItemCard, OutfitCanvas, Overlay, PhotoArea, Sheet } from '../organisms';
+import { BottomBar, type CanvasItem, Dialog, type Garment, Header, ItemCard, ItemSlot, ItemSlots, OutfitCanvas, Overlay, PhotoArea, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Screen } from '../templates';
 import { SCROLLED, useScrolled } from './scroll';
 import type { ItemColor } from '../tokens/tokens';
@@ -35,24 +34,23 @@ const steps = (value: string, size: 'S' | 'M' = 'S') => (
   <SegmentControl size={size} fit={size === 'M'} value={value} segments={[{ value: 'items', icon: 'wardrobe', ariaLabel: 'Гардероб' }, { value: 'canvas', icon: 'collage', ariaLabel: 'Коллаж' }, { value: 'info', icon: 'info', ariaLabel: 'Описание' }]} />
 );
 
-export const OutfitItems: Story = {
-  name: 'Outfit Creation / Item Selection / Ready to Continue',
-  render: () => {
-    const add = <span className="y-slot__add"><IconButton icon="plus" label="Добавить вещь" size="L" /></span>;
-    return (
-      <Screen header={<Header type="bar" center={steps('items', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={<BottomBar label="Далее" />} flush>
-        {/* флоу: разделы в панели, выбранная вещь по центру, «+» справа, соседние выглядывают */}
-        <div className="y-slots">
-          <section className="y-slot"><h2 className="y-h2">Верх</h2><div className="y-slot__row"><span /><ItemCard kind="top" color="green" onRemove={() => {}} />{add}</div></section>
-          <section className="y-slot"><h2 className="y-h2">Низ</h2><div className="y-slot__row">{add}</div></section>
-          <section className="y-slot"><h2 className="y-h2">Обувь</h2><div className="y-slot__row"><ItemCard kind="shoe" color="beige" onRemove={() => {}} /><ItemCard kind="shoe" color="brown" onRemove={() => {}} />{add}</div></section>
-        </div>
-      </Screen>
-    );
-  },
-};
+/** Выбор вещей (Figma `414:1459`, пустой `414:1541`): панель `ItemSlots`, выбранная вещь по центру ряда, «+» в конце. */
+function ItemSelectionScreen({ empty }: { empty?: boolean }) {
+  return (
+    <Screen header={<Header type="bar" center={steps('items', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={empty ? undefined : <BottomBar label="Далее" />} flush>
+      <ItemSlots>
+        <ItemSlot title="Верх" onAdd={() => {}}>{!empty && <ItemCard kind="top" color="green" onRemove={() => {}} />}</ItemSlot>
+        <ItemSlot title="Низ" onAdd={() => {}} />
+        <ItemSlot title="Обувь" index={1} onAdd={() => {}}>{!empty && [<ItemCard key="beige" kind="shoe" color="beige" onRemove={() => {}} />, <ItemCard key="brown" kind="shoe" color="brown" onRemove={() => {}} />]}</ItemSlot>
+      </ItemSlots>
+    </Screen>
+  );
+}
 
-/** Коллаж образа. `filtered` — выбраны фильтры и первые вещи, внизу «Далее»; иначе холст пуст (Figma `414:1679`). */
+export const OutfitItems: Story = { name: 'Outfit Creation / Item Selection / Ready to Continue', render: () => <ItemSelectionScreen /> };
+// в макете кадр назван «Items Selected», но все слоты пустые
+export const OutfitItemsEmpty: Story = { name: 'Outfit Creation / Item Selection / Items Selected', render: () => <ItemSelectionScreen empty /> };
+
 function CanvasScreen({ filtered, hint: withHint = filtered, overlay }: { filtered?: boolean; hint?: boolean; overlay?: ReactNode }) {
   const wardrobe: { id: string; kind: Garment; color: ItemColor }[] = [
     { id: 'bottom', kind: 'bottom', color: 'green' }, { id: 'shoes', kind: 'shoe', color: 'brown' },
