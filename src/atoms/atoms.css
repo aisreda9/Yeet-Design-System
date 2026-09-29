@@ -23,8 +23,7 @@
 .y-icon-button:active { transform: scale(var(--gesture-press-scale)); }
 .y-button:disabled,
 .y-icon-button:disabled { opacity: 0.4; cursor: default; transform: none; }
-.y-button:focus-visible,
-.y-icon-button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+/* :focus-visible у кнопок — общее кольцо, src/utils/a11y.css */
 
 /* Кнопка не сжимается во flex-контейнере: высота всегда по размеру (в колонке её сплющивало до 20px) */
 .y-button, .y-icon-button { flex-shrink: 0; }
@@ -37,6 +36,13 @@
 :where(.y-bottom-bar, .y-row, .y-sheet__footer, .y-bottom-nav) > .y-button--full { flex: 1 1 0%; }
 .y-button--floating,
 .y-icon-button--floating { box-shadow: var(--shadow-floating); }
+/* loading: содержимое прозрачное (ширина та же), по центру — спиннер цветом текста стиля; нажатие не сжимает */
+:is(.y-button, .y-icon-button).y-button--loading { color: transparent; cursor: progress; }
+:is(.y-button, .y-icon-button).y-button--loading:active { transform: none; }
+.y-button__spinner { position: absolute; inset: 0; margin: auto; color: var(--y-fg); animation: y-spin 1.2s linear infinite; }
+@keyframes y-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .y-button__spinner { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
+@keyframes y-pulse { to { opacity: 0.4; } }
 
 .y-icon-button--XL { width: 56px; height: 56px; }
 .y-icon-button--L  { width: 52px; height: 52px; }
@@ -150,4 +156,3 @@
 .y-link { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; border-radius: 2px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .y-link:visited { color: inherit; } /* посещённая ссылка не перекрашивается: цвет задаёт текст, а не история браузера */
 .y-link:hover { text-decoration-thickness: 2px; }
-.y-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }

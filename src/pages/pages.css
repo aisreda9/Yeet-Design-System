@@ -12,6 +12,8 @@
 
 /* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
 .y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; }
+/* Пустые Архив, Корзина, поиск по гардеробу (шапка 118, низа нет): блок по центру экрана (y426), а не области под шапкой */
+.y-empty-bar { flex: 1; display: grid; place-items: center; padding-bottom: calc(118px - var(--space-24) + var(--space-20)); }
 
 /* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
 .y-item-looks { gap: var(--space-20); }
