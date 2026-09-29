@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { IconButton } from '../atoms';
 import { ChipGroup, Field, InputGroup, LoadingState, SegmentControl, Snackbar } from '../molecules';
 import { BottomBar, type CanvasItem, type Garment, Header, ItemCard, OutfitCanvas, PhotoArea, Sheet } from '../organisms';
-import { Grid, Screen } from '../templates';
+import { DetailsScreen, Grid, Screen } from '../templates';
 import type { ItemColor } from '../tokens/tokens';
 import './pages.css';
 
@@ -21,14 +21,11 @@ type Story = StoryObj<typeof meta>;
 export const NewItem: Story = {
   name: 'New Item / Removing Background',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Новая вещь" />} flush>
-      <div className="y-gutter"><PhotoArea><LoadingState label="Удаляем фон" /></PhotoArea></div>
-      {/* как во флоу: детали в панели под фото, заголовок H2 */}
-      <Sheet type="panel" title="Детали новой вещи">
-        <InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup>
-        <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
-      </Sheet>
-    </Screen>
+    // как во флоу: детали в панели под фото, заголовок H2; при скролле фото уходит в миниатюру вместо пилюли (349:10770)
+    <DetailsScreen media={<PhotoArea><LoadingState label="Удаляем фон" /></PhotoArea>} titleChip="Новая вещь" actions={[]} title="Детали новой вещи">
+      <InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup>
+      <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
+    </DetailsScreen>
   ),
 };
 

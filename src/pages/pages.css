@@ -16,9 +16,6 @@
 /* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
 .y-item-looks { gap: var(--space-20); }
 
-/* Wardrobe / Outfit Details: штамп «Надеть» заходит на статистику и теги (x225, y676 экрана) */
-.y-outfit-stamp { position: absolute; top: 160px; right: var(--space-20); z-index: 2; }
-
 /* Search / Text / No Results Filtered: блок ниже центра — текст на y460 */
 .y-search-empty { margin-top: 66px; }
 

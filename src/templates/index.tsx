@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
 import { LeavingContext, usePresence } from '../utils/usePresence';
@@ -27,6 +27,14 @@ export type ScreenProps = {
   background?: 'canvas' | 'accent' | 'photo';
   /** Фото для `background="photo"`. */
   photo?: string;
+  /**
+   * Слой над фоном и под контентом, вне скролла (`position: absolute` внутри экрана):
+   * фото деталей, которое сворачивается в шапку (`DetailsScreen`).
+   */
+  backdrop?: ReactNode;
+  /** Скролл-контейнер экрана — для хуков скролла и историй в прокрученном состоянии. */
+  scrollRef?: RefObject<HTMLElement | null>;
+  className?: string;
   children?: ReactNode;
 };
 
@@ -37,8 +45,9 @@ export type ScreenProps = {
  * Полосы затухания появляются, только когда под краем действительно есть контент:
  * верхняя — после начала скролла, нижняя — пока список не докручен до конца.
  */
-export function Screen({ header, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, children }: ScreenProps) {
-  const ref = useRef<HTMLElement>(null);
+export function Screen({ header, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
+  const own = useRef<HTMLElement>(null);
+  const ref = scrollRef ?? own;
   const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false });
   const frame = useRef(0);
   const update = useCallback(() => {
@@ -65,17 +74,18 @@ export function Screen({ header, bottom, overlay, floating, floatingOffset = 132
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => { ro.disconnect(); cancelAnimationFrame(frame.current); };
-  }, [update]);
+  }, [update, ref]);
   // убранные overlay и floating доигрывают уход (--motion-exit), а не исчезают мгновенно
   const layer = usePresence(overlay);
   const toast = usePresence(floating);
 
   return (
     <div
-      className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`)}
+      className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`, className)}
       style={photo ? { ['--screen-photo' as string]: `url("${photo}")` } : undefined}
       data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={edges.collapsed || undefined}>
       {header ?? <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />}
+      {backdrop}
       <main ref={ref} onScroll={onScroll} tabIndex={0} /* прокрутка с клавиатуры */ className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush')}>
         {children}
       </main>
@@ -124,3 +134,5 @@ export function Row({ gap = 8, align, justify, children }: { gap?: number; align
 export function Stack({ gap = 8, align, className, children }: { gap?: number; align?: CSSProperties['alignItems']; className?: string; children: ReactNode }) {
   return <div className={cx('y-stack', className)} style={{ gap, alignItems: align }}>{children}</div>;
 }
+
+export { DetailsScreen, type DetailsScreenProps } from './details';

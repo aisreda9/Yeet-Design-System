@@ -60,3 +60,44 @@
 .y-screen__content:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
+
+/* ─── DetailsScreen: панель наезжает на фото, фото → миниатюра 48 в шапке ───
+ * Figma «new things» 354:17405 → 354:17449. Состояние — Screen[data-collapsed] (24 pt скролла, обратно ≤ 8).
+ * Фото лежит слоем вне скролла: в покое под панелью (z 0, панель позже в дереве), при сворачивании — над шапкой (z 4).
+ */
+.y-details__media {
+  position: absolute; z-index: 0; left: var(--screen-gutter); right: var(--screen-gutter);
+  top: calc(var(--status-bar-height) + var(--space-8) + 48px + var(--space-20)); /* под шапкой (статус-бар + ряд 48) + 20 = y138 */
+  transform-origin: 0 0;
+  /* обратно фото опускается под панель, только когда долетело */
+  transition: transform var(--motion-collapse), opacity var(--motion-fade), z-index 0s linear var(--motion-300);
+}
+.y-details__media > * { transition: border-radius var(--motion-collapse); }
+.y-details[data-collapsed] .y-details__media {
+  z-index: 4; pointer-events: none;
+  /* в центр ряда шапки: y70 = статус-бар + 8 */
+  transform: translate(var(--details-dx, 0px), calc((48px + var(--space-20)) * -1)) scale(var(--details-scale, 0.136));
+  transition: transform var(--motion-collapse), opacity var(--motion-fade);
+}
+/* скругление миниатюры — как у карточки 48 (radius-md), а не уменьшенные 32 фото */
+.y-details[data-collapsed] .y-details__media > * { border-radius: calc(var(--radius-md) / var(--details-scale, 0.136)); }
+/* своя миниатюра (thumb) проявляется в шапке, фото на подлёте гаснет */
+.y-details--thumb[data-collapsed] .y-details__media { opacity: 0; }
+/* пилюля «Новая вещь» уступает место миниатюре */
+.y-details .y-header__center > :not(.y-header__on-scroll) { transition: opacity var(--motion-fade); }
+.y-details[data-collapsed] .y-header__center > :not(.y-header__on-scroll) { opacity: 0; }
+.y-details .y-header__center:has(> .y-header__on-scroll) > :not(.y-header__on-scroll) { position: absolute; }
+/* Место фото в потоке: схлопывается. Остаток 25 = порог 24 + 1: прокрутка на порог ставит панель ровно на y138 */
+.y-details__spacer {
+  display: grid; grid-template-rows: 1fr; margin: 0 var(--screen-gutter); overflow: hidden;
+  transition: grid-template-rows var(--motion-collapse), margin var(--motion-collapse);
+}
+.y-details__spacer > span { aspect-ratio: 1; min-height: 0; }
+.y-details[data-collapsed] .y-details__spacer { grid-template-rows: 0fr; margin-bottom: calc(25px - var(--space-20)); }
+/* Панель не короче экрана и уходит под нижнюю панель до низа экрана (Figma: панель y138 → 852):
+   свёрнутое состояние держится, даже если в панели мало полей */
+.y-details .y-sheet--panel { min-height: calc(100% + 120px); }
+/* В миниатюре кнопок нет: «×» фото не нажимается и не показывается */
+.y-details[data-collapsed] .y-details__media button { visibility: hidden; }
+/* Штамп «Надеть»: поверх контента, x225 y676 (справа 20, снизу 28), со скроллом не едет */
+.y-details__stamp { position: absolute; z-index: 4; right: var(--screen-gutter); bottom: 28px; }
