@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import { StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
 import { LeavingContext, usePresence } from '../utils/usePresence';
-import './templates.css';
+import '../styles.css';
 
 export type ScreenProps = {
   /** Закреплённая шапка (`Header`). Если нет — рисуется статус-бар. */

@@ -1,5 +1,4 @@
-import '../utils/a11y.css';
-import './atoms.css';
+import '../styles.css'; // все стили системы в каскадных слоях: src/styles.css
 
 export * from './icon';
 export * from './button';

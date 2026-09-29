@@ -61,7 +61,7 @@ export const InFlow: Story = {
     <Usage screen="Search / Photo / Crop" note="261:1590">
       <div style={{ position: 'relative', width: 'var(--screen-width)', height: 'var(--screen-height)', borderRadius: 56, overflow: 'hidden' }}>
         <CropFrame src={demoPhoto} />
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 3 }}><StatusBar onPhoto /></div>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 3 }}><StatusBar tone="onPhoto" /></div>
         <div style={{ position: 'absolute', left: 20, top: 70, zIndex: 3 }}><IconButton icon="chevron-left" label="Назад" variant="inverse" /></div>
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, zIndex: 3 }}><Button size="L" fullWidth>Найти похожее</Button></div>
       </div>
