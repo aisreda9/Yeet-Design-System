@@ -48,14 +48,14 @@ Animations `354:17404` не видна в `get_metadata` без `nodeId` — о�
 
 Тема — `data-theme="dark"`, бренд — `data-brand` (эксперимент, только web — [ADR 0002](./adr/0002-brand-palettes-experiment.md)). Компоненты о теме не знают.
 
-**Перевод переменных Figma → код** — таблица в Storybook «Процессы / Figma ↔ код» (`src/docs/20-Figma.mdx`), точное соответствие — `$extensions["com.yeet"].figma` у токена.
+**Перевод переменных Figma → код** — таблица в Storybook «Старт / Процессы / Figma ↔ код» (`src/docs/20-Figma.mdx`), точное соответствие — `$extensions["com.yeet"].figma` у токена.
 Значения нет в токенах — не хардкодить: задача для роли «Токены». Осознанная замена цвета ради контраста ([ADR 0006](./adr/0006-contrast-tokens.md)) — `colorAlias` в `scripts/qa/flow-diff.mjs`.
 
 ## 3. Компоненты
 
 - Слои `tokens → atoms → molecules → organisms → templates → pages`; импорт только вниз и через `index.tsx` слоя (`import { Button } from '../atoms'`).
 - Новый компонент — **в свой файл** (`src/molecules/account.tsx`), экспорт — одной строкой в `index.tsx` слоя (горячий файл, `TEAM.md` §4).
-- Пропсы = свойства компонента Figma по смыслу, значения вариантов — в нижнем регистре (`variant="primary"`, `size="L"`). Таблица — «Процессы / Figma ↔ код».
+- Пропсы = свойства компонента Figma по смыслу, значения вариантов — в нижнем регистре (`variant="primary"`, `size="L"`). Таблица — «Старт / Процессы / Figma ↔ код».
 - Слот в Figma = `children` в коде. Инстансы внутри узла — существующие компоненты, а не новые `div`.
 - Функциональные компоненты, именованный экспорт, `XxxProps`, JSDoc на русском; нативные атрибуты — `...rest`, классы — `cx`. Утилиты — `src/utils` (`cx`, `plural`, `useFitScale`, `useSlidingPill`, `usePresence`, `useControllableState`, `gesture`, `haptic`, `VisuallyHidden`), не копировать.
 - Реестр `src/docs/registry.ts`: `figmaId` (node-id на `942:5666`) или `null` + `figmaWhy`; `status` по факту ([ADR 0007](./adr/0007-component-status.md)).
