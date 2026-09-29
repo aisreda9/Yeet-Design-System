@@ -27,6 +27,18 @@ public enum YeetStampDoneSize: String, CaseIterable, Identifiable {
     var undoIcon: CGFloat { self == .s ? 20 : 24 }
 }
 
+private struct YeetStampTurnKey: EnvironmentKey {
+    static let defaultValue: Angle = .zero
+}
+
+extension EnvironmentValues {
+    /// Дополнительный поворот звезды штампа (без подписи): `YeetOutfitPager` задаёт 180° × индекс образа.
+    var yeetStampTurn: Angle {
+        get { self[YeetStampTurnKey.self] }
+        set { self[YeetStampTurnKey.self] = newValue }
+    }
+}
+
 /// Скруглённая 12-лучевая звезда штампа (`shapes / main-action`).
 public struct YeetStarShape: Shape {
     public init() {}
@@ -47,6 +59,7 @@ public struct YeetStamp: View {
     private let doneSize: YeetStampDoneSize
     private let action: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.yeetStampTurn) private var turn
 
     /// - Parameters:
     ///   - label: текст действия: «Надеть», «Сохранить». У `secondary` не показывается (только иконка), но озвучивается.
@@ -79,6 +92,9 @@ public struct YeetStamp: View {
                     .fill(done ? YeetComponent.buttonSecondaryBg : tone.background)
                     .scaleEffect(done ? doneSize.scale : 1)
                     .rotationEffect(.degrees(done ? -60 : 0))
+                    // в пейджере образов звезда поворачивается на 180° с каждой сменой образа (Animations «scale»)
+                    .rotationEffect(turn)
+                    .animation(reduceMotion ? nil : YeetMotion.swap, value: turn)
                 Group {
                     if tone == .secondary {
                         YeetIcon(name: icon, size: 29)
