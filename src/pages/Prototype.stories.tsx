@@ -4,7 +4,7 @@ import type { ScreenId } from './prototype/screens';
 
 /* Кликабельный прототип: все экраны «Pages / Экраны флоу», связанные переходами и жестами. Карта переходов — prototype/routes.ts. */
 const meta = {
-  title: 'Прототип/Приложение',
+  title: 'Старт/Прототип',
   component: Prototype,
   tags: ['no-visual'], // без пиксельного эталона: экраны те же, что в Pages/* (scripts/qa/run.mjs)
   parameters: {

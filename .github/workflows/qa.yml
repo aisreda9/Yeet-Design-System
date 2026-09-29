@@ -71,3 +71,31 @@ jobs:
         with:
           name: qa-report
           path: qa/out
+
+  play:
+    name: Play-тесты историй
+    # Каждая история — тест в headless Chromium (vitest + @storybook/addon-vitest); упавший play = красный CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Версия Playwright
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Кэш браузеров Playwright
+        id: pw-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Play-тесты (npm run test-storybook)
+        run: npm run test-storybook -- --reporter=default --reporter=github-actions

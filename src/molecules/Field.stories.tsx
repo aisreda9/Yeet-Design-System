@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Field, InputGroup } from '.';
 import { unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
 import { itemColors } from '../tokens/tokens';
@@ -62,4 +64,61 @@ export const InFlow: Story = {
       <Usage screen="Auth / Sign In" note="ошибка"><InputGroup><Field label="Пароль" input={{ type: 'password', defaultValue: '12345' }} error /></InputGroup></Usage>
     </UsageGrid>
   ),
+};
+
+function KeyboardDemo() {
+  const [opened, setOpened] = useState(0);
+  return (
+    <div style={{ display: 'grid', gap: 12, width: 353 }}>
+      <InputGroup>
+        <Field label="Название" input={{ defaultValue: 'Кожаная сумка' }} />
+        <Field label="Страна" value="Россия" trailingIcon="chevron-up-down" onClick={() => setOpened((n) => n + 1)} />
+        <Field label="Пароль" input={{ type: 'password', defaultValue: 'yeet-2026' }} />
+      </InputGroup>
+      <span className="y-caption y-text--secondary">Выбор страны открыт: {opened}</span>
+    </div>
+  );
+}
+
+/** Клавиатура: Tab по полю, строке-выбору и глазу пароля; Enter и пробел открывают выбор; глаз показывает и скрывает пароль. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true } },
+  render: () => <KeyboardDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const opened = (n: number) => expect(canvas.getByText(/Выбор страны открыт/)).toHaveTextContent(`Выбор страны открыт: ${n}`);
+    await step('Tab: поле ввода, затем строка-выбор', async () => {
+      await userEvent.tab();
+      await expect(canvas.getByRole('textbox', { name: 'Название' })).toHaveFocus();
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name: /Страна/ })).toHaveFocus();
+    });
+    await step('Enter и пробел открывают выбор', async () => {
+      await userEvent.keyboard('{Enter}');
+      await opened(1);
+      await userEvent.keyboard(' ');
+      await opened(2);
+    });
+    await step('Пароль скрыт, глаз показывает и скрывает его', async () => {
+      await userEvent.tab();
+      const password = canvasElement.querySelector<HTMLInputElement>('input[aria-label="Пароль"]')!;
+      await expect(password).toHaveFocus();
+      await expect(password).toHaveAttribute('type', 'password');
+      await userEvent.tab();
+      const eye = canvas.getByRole('button', { name: 'Показать пароль' });
+      await expect(eye).toHaveFocus();
+      await expect(eye).toHaveAttribute('aria-pressed', 'false');
+      await userEvent.keyboard('{Enter}');
+      await expect(password).toHaveAttribute('type', 'text');
+      const hide = canvas.getByRole('button', { name: 'Скрыть пароль' });
+      await expect(hide).toHaveAttribute('aria-pressed', 'true');
+      await expect(hide).toHaveFocus();
+      await userEvent.keyboard(' ');
+      await expect(password).toHaveAttribute('type', 'password');
+      await expect(canvas.getByRole('button', { name: 'Показать пароль' })).toHaveFocus();
+      await opened(2);
+    });
+  },
 };

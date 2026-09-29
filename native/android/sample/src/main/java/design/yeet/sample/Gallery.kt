@@ -198,6 +198,7 @@ fun Gallery(
                 }
             }
             item { Section("ItemCard · OutfitCollage") { CardsSection() } }
+            item { Section("OutfitPager · ItemSlots · CropFrame · DetailsScreen") { OrganismsSection() } }
             item {
                 Section("StatTile · WeatherCard") {
                     StatRow {
@@ -214,6 +215,7 @@ fun Gallery(
             item {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Logo(tint = c.textSecondary, height = 24.dp) }
             }
+            item { A11yApiSections() }
         }
 
         Header(

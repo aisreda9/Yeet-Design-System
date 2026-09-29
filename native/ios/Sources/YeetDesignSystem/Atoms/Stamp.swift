@@ -4,14 +4,39 @@ import SwiftUI
 public enum YeetStampTone: String, CaseIterable, Identifiable {
     /// Главное действие: синий 148 с текстом.
     case primary
-    /// Вспомогательное: чёрный 48 с иконкой («Не нравится»).
+    /// Вспомогательное: чёрный 64 с белой иконкой 29, наклонённой как подпись («Не нравится»).
     case secondary
 
     public var id: String { rawValue }
 
-    var side: CGFloat { self == .secondary ? 48 : 148 }
+    var side: CGFloat { self == .secondary ? 64 : 148 }
     var background: Color { self == .secondary ? YeetComponent.buttonSecondaryBg : YeetComponent.buttonPrimaryBg }
     var foreground: Color { self == .secondary ? YeetComponent.buttonSecondaryFg : YeetComponent.buttonPrimaryFg }
+}
+
+/// До какого размера сжимается выполненный штамп (React: `StampProps.doneSize`). Габарит кнопки (148) не меняется.
+public enum YeetStampDoneSize: String, CaseIterable, Identifiable {
+    /// 78 — главная (Outfits / Everyday `252:286`), «отменить» 24.
+    case m = "M"
+    /// 56 — детали образа (Outfit Details / Variant 02 `440:3008`): плавающая кнопка в углу поверх панели, «отменить» 20.
+    case s = "S"
+
+    public var id: String { rawValue }
+
+    var scale: CGFloat { self == .s ? 0.378 : 0.53 }
+    var undoIcon: CGFloat { self == .s ? 20 : 24 }
+}
+
+private struct YeetStampTurnKey: EnvironmentKey {
+    static let defaultValue: Angle = .zero
+}
+
+extension EnvironmentValues {
+    /// Дополнительный поворот звезды штампа (без подписи): `YeetOutfitPager` задаёт 180° × индекс образа.
+    var yeetStampTurn: Angle {
+        get { self[YeetStampTurnKey.self] }
+        set { self[YeetStampTurnKey.self] = newValue }
+    }
 }
 
 /// Скруглённая 12-лучевая звезда штампа (`shapes / main-action`).
@@ -24,25 +49,36 @@ public struct YeetStarShape: Shape {
 }
 
 /// Штамп — фирменная кнопка главного действия поверх коллажа, одна на экран (React: `Stamp`).
-/// Нажатие анимируется пружиной `YeetMotion.stamp` (bouncy); `done` — штамп сжимается до 78, поворачивается на −60°,
+/// Нажатие анимируется пружиной `YeetMotion.stamp` (bouncy); `done` — штамп сжимается до 78 (или 56, `doneSize: .s`), поворачивается на −60°,
 /// чернеет и показывает «отменить». Хаптика: `stamp` в пик пружины (~120 мс), у `secondary` — `skip` на нажатии.
 public struct YeetStamp: View {
     private let label: String
     private let tone: YeetStampTone
     private let icon: YeetIconName
     private let done: Bool
+    private let doneSize: YeetStampDoneSize
     private let action: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.yeetStampTurn) private var turn
 
     /// - Parameters:
     ///   - label: текст действия: «Надеть», «Сохранить». У `secondary` не показывается (только иконка), но озвучивается.
     ///   - icon: иконка малого штампа (`secondary`).
     ///   - done: действие выполнено.
-    public init(label: String, tone: YeetStampTone = .primary, icon: YeetIconName = .thumbDown, done: Bool = false, action: @escaping () -> Void) {
+    ///   - doneSize: до какого размера сжимается выполненный штамп: `.m` 78, `.s` 56.
+    public init(
+        label: String,
+        tone: YeetStampTone = .primary,
+        icon: YeetIconName = .thumbDown,
+        done: Bool = false,
+        doneSize: YeetStampDoneSize = .m,
+        action: @escaping () -> Void
+    ) {
         self.label = label
         self.tone = tone
         self.icon = icon
         self.done = done
+        self.doneSize = doneSize
         self.action = action
     }
 
@@ -54,11 +90,14 @@ public struct YeetStamp: View {
             ZStack {
                 YeetStarShape()
                     .fill(done ? YeetComponent.buttonSecondaryBg : tone.background)
-                    .scaleEffect(done ? 0.53 : 1)
+                    .scaleEffect(done ? doneSize.scale : 1)
                     .rotationEffect(.degrees(done ? -60 : 0))
+                    // в пейджере образов звезда поворачивается на 180° с каждой сменой образа (Animations «scale»)
+                    .rotationEffect(turn)
+                    .animation(reduceMotion ? nil : YeetMotion.swap, value: turn)
                 Group {
                     if tone == .secondary {
-                        YeetIcon(name: icon, size: 20)
+                        YeetIcon(name: icon, size: 29)
                     } else {
                         Text(label).yeetText(YeetType.body).lineLimit(1)
                     }
@@ -68,7 +107,7 @@ public struct YeetStamp: View {
                 .rotationEffect(.degrees(15))
                 .opacity(done ? 0 : 1)
                 .scaleEffect(done ? 0.6 : 1)
-                YeetIcon(name: .undo)
+                YeetIcon(name: .undo, size: doneSize.undoIcon)
                     .foregroundStyle(YeetComponent.buttonSecondaryFg)
                     .opacity(done ? 1 : 0)
                     .scaleEffect(done ? 1 : 0.6)
@@ -95,6 +134,7 @@ private struct StampPreview: View {
     var body: some View {
         HStack(spacing: 24) {
             YeetStamp(label: "Надеть", done: done) { done.toggle() }
+            YeetStamp(label: "Сохранить", done: done, doneSize: .s) { done.toggle() }
             YeetStamp(label: "Не нравится", tone: .secondary) {}
         }
         .padding(20)
@@ -102,5 +142,6 @@ private struct StampPreview: View {
     }
 }
 
-#Preview("Stamp") { StampPreview() }
+#Preview("Stamp · Light") { StampPreview().preferredColorScheme(.light) }
+#Preview("Stamp · Dark") { StampPreview().preferredColorScheme(.dark) }
 #endif

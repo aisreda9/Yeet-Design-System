@@ -14,11 +14,11 @@ native/ios/
     │   └── YeetWeather.swift         цветные иконки погоды (asset-каталог)
     ├── Resources/                    ← npm run tokens: шрифты Inter / Roboto Slab (+ лицензии), Weather.xcassets
     ├── Foundation/                   нажатие, зона касания 44, Reduce Motion, формы, перенос строк
-    ├── Atoms/                        Icon, Button, IconButton, Badge, Avatar, ColorDot, Logo, Stamp
-    ├── Molecules/                    ChipGroup, SegmentControl, ListItem, ListGroup, Field, InputGroup, InputBar,
-    │                                 Snackbar, EmptyState, StatTile, AccountCard, AvatarStack
+    ├── Atoms/                        Icon, Button, IconButton, Badge, Avatar, ColorDot, Logo, Stamp, Link
+    ├── Molecules/                    ChipGroup, SegmentControl, ListItem, ListGroup, RadioList, Field, InputGroup, FormField,
+    │                                 InputBar, Snackbar, EmptyState, StatTile, AccountCard, AvatarStack
     └── Organisms/                    Sheet, Dialog, Overlay, AccountsSheet, Header, TabBar, BottomNav,
-                                      ItemCard, OutfitCollage, WeatherCard
+                                      ItemCard, OutfitCollage, WeatherCard, OutfitPager, ItemSlots, CropFrame, DetailsScreen
 ```
 
 У каждого компонента есть `#Preview` (Xcode 15+): откройте `native/ios/Package.swift` в Xcode и выберите файл компонента.
@@ -107,6 +107,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 Параметры совпадают с props один в один. Отличия, продиктованные платформой:
 
 - `value` + `onChange` (контролируемое состояние) → `Binding` (`value: $x`, `active: $tab`, `query: $text`);
+  `defaultValue` (неуправляемое) → отдельный `init(defaultValue:onChange:)`, выбор хранится в `@State` компонента;
 - `children` → `@ViewBuilder content` или строка первым аргументом (`YeetButton("Войти")`, `YeetBadge("-10%")`);
 - `ReactNode`-слоты `leading` / `trailing` / `center` → `AnyView`; `footer` коллажа → `@ViewBuilder`;
 - строковые URL картинок (`src`, `image`, `photo`) → `Image` — загрузку и кеш делает приложение;
@@ -117,18 +118,21 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `Icon` | `YeetIcon` | `name: YeetIconName`, `size` 24, `title`, `strokeWidth` 1.3 |
 | `Logo` | `YeetLogo` | `height` |
 | `ColorDot` | `YeetColorDot` | `color: YeetItemColor`, `size` |
-| `Button` | `YeetButton` | `variant: YeetButtonStyle`, `size: YeetControlSize` (`.s .m .l .xl`), `leftIcon`, `rightIcon`, `fullWidth`, `floating`, `action` |
-| `IconButton` | `YeetIconButton` | `icon`, `label`, `variant` (.tertiary), `size` (.m), `floating`, `decorative`, `action` |
+| `Button` | `YeetButton` | `variant: YeetButtonStyle`, `size: YeetControlSize` (`.s .m .l .xl`), `leftIcon`, `rightIcon`, `fullWidth`, `floating`, `isLoading`, `loadingLabel`, `action` |
+| `IconButton` | `YeetIconButton` | `icon`, `label`, `variant` (.tertiary), `size` (.m), `floating`, `decorative`, `isLoading`, `loadingLabel`, `action` |
+| `Link` | `YeetLink` / `Text(yeetMarkdown:)` | `title`, `destination: URL`; ссылка внутри абзаца — Markdown + `.tint` |
 | `Badge` | `YeetBadge` | `variant: YeetBadgeVariant` (primary, danger, secondary, muted, tertiary, ghost) |
 | `Avatar` | `YeetAvatar` | `size: YeetAvatarSize`, `initial`, `src: Image?`, `alt`, `color` |
 | `AvatarStack` | `YeetAvatarStack` | `accounts: [YeetAccount]`, `onOpen`, `onAdd` |
-| `Stamp` | `YeetStamp` | `label`, `tone: YeetStampTone`, `icon` (.thumbDown), `done`, `action` |
-| `Chip` (тип) | `YeetChip` + `YeetChipButton` | `label`, `selected`, `removable`, `colorDot`, `dropdown` |
-| `ChipGroup` | `YeetChipGroup` | `chips`, `onToggle`, `onAdd`, `wrap`, `center` |
-| `SegmentControl` / `Segment` | `YeetSegmentControl` / `YeetSegment` | `segments`, `value: Binding<String>`, `size`, `fit` |
+| `Stamp` | `YeetStamp` | `label`, `tone: YeetStampTone` (= React `variant`), `icon` (.thumbDown), `done`, `doneSize: YeetStampDoneSize` (`.m` 78, `.s` 56), `action` |
+| `Chip` (тип) | `YeetChip` + `YeetChipButton` | `label`, `value`, `selected`, `removable`, `colorDot`, `dropdown` |
+| `ChipGroup` | `YeetChipGroup` | `chips`, `selection: Binding<Set<String>>?` / `defaultSelection`, `multiple`, `onToggle`, `onRemove`, `onAdd`, `wrap`, `center` |
+| `SegmentControl` / `Segment` | `YeetSegmentControl` / `YeetSegment` | `segments`, `value: Binding<String>` или `defaultValue` + `onChange`, `size`, `fit`, `label` |
+| `RadioList` / `RadioOption` | `YeetRadioList` / `YeetRadioOption` | `options`, `selection: Binding<String?>` или `defaultValue` + `onChange`, `label` |
 | `ListItem` | `YeetListItem` | `type: YeetListItemType` (action, expandable, radio), `label`, `icon`, `expanded`, `checked`, `description`, `leading`, `trailing`, `onClick` |
 | `List` / `ListGroup` | `YeetList` / `YeetListGroup` | `content` |
-| `Field` | `YeetField` | `label`, `value`, `colorDot`, `trailingIcon`, `onTrailingClick`, `input: YeetFieldInput?`, `error`, `onClick` |
+| `Field` | `YeetField` | `label`, `value`, `colorDot`, `trailingIcon`, `onTrailingClick`, `trailingLabel`, `input: YeetFieldInput?` (`isSecure` — глаз встроен), `error`, `onClick` |
+| `FormField` | `YeetFormField` | `label`, `hideLabel`, `description`, `error: String?`, `required`, `content` |
 | `InputGroup` | `YeetInputGroup` | `size: YeetInputGroupSize` (.m .l .xl), `content` |
 | `InputBar` | `YeetInputBar` | `placeholder`, `value: Binding<String>`, `fieldIcon`, `leading` / `trailing: YeetBarAction`, `send: YeetSendAction`, `size` |
 | `Snackbar` | `YeetSnackbar` | `onClose`, `onUndo`, `content`; переход `.transition(.yeetSnackbar)` |
@@ -146,6 +150,10 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `ItemCard` | `YeetItemCard` | `kind`, `color`, `image`, `discount`, `label`, `name`, `selected: Bool?`, `onClick`, `onRemove` |
 | `OutfitCollage` / `CollageLayer` | `YeetOutfitCollage` / `YeetCollageLayer` | `items: [YeetCollageItem]`, `label`, `footer` |
 | `WeatherCard` / `WeatherIcon` | `YeetWeatherCard` / `YeetWeatherIcon` | `temperature`, `description`, `weather: YeetWeather`, `icon`, `alert`, `tilt` |
+| `OutfitPager` / `PagerLook` | `YeetOutfitPager` / `YeetPagerLook` | `looks`, `axis: Axis` (`.vertical` стопка, `.horizontal` лента), `preview` (96 / 150), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `weather`, `stamp`, `skip`, `disabled`, `label` |
+| `ItemSlots` / `ItemSlot` | `YeetItemSlots` / `YeetItemSlot` | `title`, `items` + `card: (Item) -> View` (вместо `children`), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `onAdd`, `addLabel` |
+| `CropFrame` / `CropRect` | `YeetCropFrame` / `YeetCropRect` | `rect: Binding<YeetCropRect>` или `defaultRect`, `onChange`, `hint`, `minSide` (= `min`), `photo` |
+| `DetailsScreen` (template) | `YeetDetailsScreen` | `title`, `titleChip`, `actions`, `onBack`, `thumb`, `bottom`, `stamp`, `media`, `content` |
 
 Токены: `--color-*` → `YeetColor.*`, `--button-*` / `--card-*` / `--sheet-*` → `YeetComponent.*`, `--space-N` → `YeetSpace.sN`,
 `--radius-*` → `YeetRadius.*`, `.y-h1…caption` → `YeetType.*` + `.yeetText(_:)`, `--motion-*` → `YeetMotion.*`,
@@ -153,7 +161,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 
 Пока не перенесены (есть в React): `RangeSlider`, `Carousel`, `BarChart`, `UsageMeter`, `Hint`, `LoadingState`, `PhotoTile`,
 `PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`, бренд-темы (`data-brand`),
-сворачивание шапки при скролле.
+сворачивание большого заголовка шапки при скролле (сворачивание фото в `YeetDetailsScreen` есть).
 
 ## Шторки и диалоги
 
@@ -167,7 +175,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
   рискованный диалог (`destructive`, `danger`) закрывается только кнопками и «escape»;
 - шторка — пружина без перелёта, диалог — `YeetMotion.appear`, уход — `YeetMotion.exit`, при Reduce Motion — растворение.
 
-Пока токенов `radius-overlay`, `sheet-top-gap`, `sheet-handle` нет в `tokens.json`, их значения — в `YeetOverlayToken` (`Organisms/Sheet.swift`, TODO #92).
+Радиус, отступ сверху и хэндл — токены `YeetRadius.overlay`, `YeetComponent.sheetTopGap`, `YeetComponent.sheetHandle`; пружина без перелёта пока локальная (`YeetOverlayToken.spring`, TODO #92).
 
 ## Доступность
 
@@ -176,7 +184,10 @@ YeetHaptic.select()                                       // tokens.motion.hapti
   закрываются жестом «escape» (Z двумя пальцами); Snackbar с текстом озвучивается при появлении.
 - **Dynamic Type:** `yeetText(_:)` масштабирует размер, межстрочный интервал и трекинг по кривой `textStyle` стиля
   (H1 — `.largeTitle`, H2 — `.title`, H3 — `.title3`, Body — `.body`, Caption — `.caption`); кнопки растут по высоте (`minHeight`).
-- **Зона касания ≥ 44 pt:** `yeetHitArea` расширяет форму нажатия мелких элементов (кнопки S 40, «×», иконки в snackbar) без изменения вида.
+- **Зона касания ≥ 44 pt:** `yeetHitArea` расширяет форму нажатия мелких элементов (кнопки S 40, «×», иконки в snackbar,
+  строки списка 24, глаз пароля, ссылки) без изменения вида; `yeetHitArea(height:maxSideSlop:)` — соседи через малый зазор (сегменты) не делят зону.
+- **Загрузка:** `isLoading` у кнопок — спиннер вместо содержимого, ширина та же, повторное нажатие не срабатывает, VoiceOver слышит «Загрузка»;
+  при Reduce Motion спиннер пульсирует, а не вращается.
 - **Reduce Motion:** пилюли, штамп, sheet, FAB и галочки меняются мгновенно, нажатие без сжатия
   (`@Environment(\.accessibilityReduceMotion)`; для своих экранов — `.yeetAnimation(_:value:)` и `yeetWithAnimation(_:reduceMotion:_:)`).
 

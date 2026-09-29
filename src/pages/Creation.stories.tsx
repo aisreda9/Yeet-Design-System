@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { IconButton } from '../atoms';
 import { ChipGroup, Field, InputGroup, LoadingState, SegmentControl, Snackbar } from '../molecules';
-import { BottomBar, type CanvasItem, type Garment, Header, ItemCard, OutfitCanvas, PhotoArea, Sheet } from '../organisms';
+import { BottomBar, type CanvasItem, Dialog, type Garment, Header, ItemCard, OutfitCanvas, Overlay, PhotoArea, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Screen } from '../templates';
 import { SCROLLED, useScrolled } from './scroll';
 import type { ItemColor } from '../tokens/tokens';
@@ -53,7 +53,7 @@ export const OutfitItems: Story = {
 };
 
 /** Коллаж образа. `filtered` — выбраны фильтры и первые вещи, внизу «Далее»; иначе холст пуст (Figma `414:1679`). */
-function CanvasScreen({ filtered, hint: withHint = filtered }: { filtered?: boolean; hint?: boolean }) {
+function CanvasScreen({ filtered, hint: withHint = filtered, overlay }: { filtered?: boolean; hint?: boolean; overlay?: ReactNode }) {
   const wardrobe: { id: string; kind: Garment; color: ItemColor }[] = [
     { id: 'bottom', kind: 'bottom', color: 'green' }, { id: 'shoes', kind: 'shoe', color: 'brown' },
     { id: 'top', kind: 'top', color: 'green' }, { id: 'glasses', kind: 'accessories', color: 'black' },
@@ -65,7 +65,7 @@ function CanvasScreen({ filtered, hint: withHint = filtered }: { filtered?: bool
   const toggle = (w: (typeof wardrobe)[number]) =>
     setItems((cur) => (cur.some((c) => c.id === w.id) ? cur.filter((c) => c.id !== w.id) : [...cur, { ...w, ...spots[w.id] }]));
   return (
-    <Screen header={<Header type="bar" center={steps('canvas', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={filtered ? <BottomBar label="Далее" /> : undefined} flush>
+    <Screen header={<Header type="bar" center={steps('canvas', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={filtered ? <BottomBar label="Далее" /> : undefined} overlay={overlay && <Overlay>{overlay}</Overlay>} flush>
       <div className="y-gutter">
         <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
       </div>
@@ -150,3 +150,36 @@ export const NewItemFocusedV2: Story = { name: 'New Item / Details / Name Focuse
 export const NewItemCompletedV1: Story = { name: 'New Item / Details / Completed Variant 01', render: () => <NewItemScreen state="completed" variant={1} /> };
 export const NewItemCompletedV2: Story = { name: 'New Item / Details / Completed Variant 02', render: () => <NewItemScreen state="completed" variant={2} /> };
 export const NewItemLoadingV1: Story = { name: 'New Item / Photo / Removing Background Variant 01', render: () => <NewItemScreen state="loading" variant={1} /> };
+
+/* ─── Создание образа: диалоги и шторка фильтра (#30) ───────────────── */
+
+export const ShuffleDialog: Story = {
+  name: 'Outfit Creation / Shuffle / Dialog / Unsaved Changes',
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Перемешать образ?" description="Сохраните текущий образ, прежде чем перемешать вещи" cancel="Перемешать" confirm="Сохранить и начать" />} />,
+};
+
+export const ExitDialog: Story = {
+  name: 'Outfit Creation / Exit / Dialog / Unsaved Changes',
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" />} />,
+};
+
+export const ClearDialog: Story = {
+  name: 'Outfit Creation / Clear / Dialog / Confirmation',
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog tone="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отмена" confirm="Очистить" />} />,
+};
+
+export const ItemFilterSheet: Story = {
+  name: 'Outfit Creation / Item Filter / Sheet / Bottoms',
+  render: () => (
+    <CanvasScreen
+      filtered
+      hint={false}
+      overlay={
+        <Sheet title="Низ" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}>
+          <ChipGroup chips={['Все', 'Джинсы', 'Брюки', 'Леггинсы', 'Джоггеры', 'Аксессуары'].map((label) => ({ label, selected: label === 'Джинсы' }))} />
+          <Grid>{(['green', 'black', 'blue', 'beige'] as ItemColor[]).map((color, i) => <ItemCard key={i} kind="bottom" color={color} selected={i < 3} />)}</Grid>
+        </Sheet>
+      }
+    />
+  ),
+};

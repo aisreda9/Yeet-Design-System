@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { useState } from 'react';
 import { Button } from '.';
 import { Matrix, Usage, UsageGrid } from '../docs/helpers';
@@ -135,4 +136,40 @@ export const LoadingOnPress: Story = {
   parameters: { controls: { disable: true } },
   name: 'Загрузка по нажатию',
   render: () => <LoadingDemo />,
+};
+
+/** Клавиатура: Enter и пробел нажимают кнопку; во время `loading` — `aria-busy`, повтор заблокирован, фокус на кнопке. */
+export const LoadingKeyboard: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Загрузка с клавиатуры',
+  render: () => <LoadingDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: /Войти/ });
+    const sent = (n: number) => expect(canvas.getByText(/Запросов отправлено/)).toHaveTextContent(`Запросов отправлено: ${n}`);
+    await step('Enter: запрос ушёл, кнопка занята, но в фокусе', async () => {
+      await userEvent.tab();
+      await expect(button).toHaveFocus();
+      await expect(button).not.toHaveAttribute('aria-busy');
+      await userEvent.keyboard('{Enter}');
+      await sent(1);
+      await expect(button).toHaveAttribute('aria-busy', 'true');
+      await expect(button).toHaveAttribute('aria-disabled', 'true');
+      await expect(button).toHaveAccessibleName('Войти Входим');
+      await expect(button).toHaveFocus();
+    });
+    await step('Повтор во время загрузки заблокирован', async () => {
+      await userEvent.keyboard('{Enter}');
+      await userEvent.keyboard(' ');
+      await userEvent.click(button);
+      await sent(1);
+      await expect(button).toHaveFocus();
+    });
+    await step('Загрузка кончилась — пробел снова отправляет', async () => {
+      await waitFor(() => expect(button).not.toHaveAttribute('aria-busy'), { timeout: 5000 });
+      await userEvent.keyboard(' ');
+      await sent(2);
+      await waitFor(() => expect(button).not.toHaveAttribute('aria-busy'), { timeout: 5000 });
+    });
+  },
 };

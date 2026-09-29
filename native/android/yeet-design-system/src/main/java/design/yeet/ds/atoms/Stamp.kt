@@ -50,6 +50,12 @@ import kotlinx.coroutines.launch
  */
 enum class StampTone(val size: Dp) { Primary(148.dp), Secondary(48.dp) }
 
+/**
+ * До какого размера сжимается выполненный штамп (web: `doneSize`). Габарит кнопки не меняется (148).
+ * `M` — 78 (×0.53, главная: Outfits / Everyday), `S` — 56 (×0.378, детали образа: плавающая кнопка в углу поверх панели, «отменить» 20).
+ */
+enum class StampDoneSize(val scale: Float, val undoIconSize: Dp) { M(0.53f, 24.dp), S(0.378f, 20.dp) }
+
 /** Пик пружины bouncy — момент хаптики «stamp» (токены: ~120 мс после нажатия). */
 private const val StampHapticDelayMs = 120L
 
@@ -62,6 +68,7 @@ private const val StampHapticDelayMs = 120L
  * @param label текст действия: «Надеть», «Сохранить». У `Secondary` не показывается (только иконка), но озвучивается.
  * @param icon иконка малого штампа (`Secondary`), по умолчанию `ThumbDown`.
  * @param done действие выполнено (флоу: Wear Action Active).
+ * @param doneSize размер выполненного штампа: `M` — 78, `S` — 56 (детали образа).
  */
 @Composable
 fun Stamp(
@@ -71,6 +78,7 @@ fun Stamp(
     tone: StampTone = StampTone.Primary,
     icon: IconName = IconName.ThumbDown,
     done: Boolean = false,
+    doneSize: StampDoneSize = StampDoneSize.M,
 ) {
     val c = YeetTheme.colors
     val motion = YeetTheme.motion
@@ -80,7 +88,7 @@ fun Stamp(
     val pressed by interaction.collectIsPressedAsState()
 
     val press by animateFloatAsState(if (pressed) YeetGesture.pressScaleStamp else 1f, motion.press(), label = "stampPress")
-    val shapeScale by animateFloatAsState(if (done) 0.53f else 1f, motion.stamp(), label = "stampScale")
+    val shapeScale by animateFloatAsState(if (done) doneSize.scale else 1f, motion.stamp(), label = "stampScale")
     val rotation by animateFloatAsState(if (done) -60f else 0f, motion.stamp(), label = "stampRotation")
     val labelScale by animateFloatAsState(if (done) 0.6f else 1f, motion.stamp(), label = "labelScale")
     val labelAlpha by animateFloatAsState(if (done) 0f else 1f, motion.fade(), label = "labelAlpha")
@@ -146,7 +154,7 @@ fun Stamp(
                     scaleY = doneScale
                 },
             ) {
-                Icon(IconName.Undo, tint = c.buttonSecondaryFg)
+                Icon(IconName.Undo, size = doneSize.undoIconSize, tint = c.buttonSecondaryFg)
             }
         }
     }
@@ -159,6 +167,7 @@ private fun StampPreview() = YeetPreviewSurface {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
         Stamp(label = "Надеть", onClick = { done = !done }, done = done)
         Stamp(label = "Надеть", onClick = {}, done = true)
+        Stamp(label = "Надеть", onClick = {}, done = true, doneSize = StampDoneSize.S)
         Stamp(label = "Не нравится", onClick = {}, tone = StampTone.Secondary)
     }
 }
