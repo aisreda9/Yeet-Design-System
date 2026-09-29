@@ -126,6 +126,13 @@ export function validate(tree) {
       for (const p of checkValue(t.type, mv, mr)) err(t.id, `modes.${mode}: ${p}`);
       refs.push(...mr.map(([to, type]) => ({ from: `${t.id} (modes.${mode})`, to, type })));
     }
+    // after: размер отсчитывается от другого размера (web — calc(after + $value))
+    const after = ext(t).after;
+    if (after !== undefined) {
+      if (t.type !== 'dimension') err(t.id, 'after — только у dimension');
+      else if (!isRef(after)) err(t.id, 'after — ссылка на dimension-токен');
+      else refs.push({ from: `${t.id} (after)`, to: refPath(after), type: 'dimension' });
+    }
   }
   // Ссылки: цель существует, это токен, тип совпадает
   for (const r of refs) {

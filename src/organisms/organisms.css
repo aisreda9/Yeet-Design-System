@@ -121,6 +121,7 @@
 .y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; }
 .y-sheet__head > .y-icon-button { margin: -8px -8px -8px auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--space-12); }
+.y-dialog__more { display: contents; } /* обёртка только для aria-describedby: раскладка как у прямых детей тела */
 /* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
    радиус 32 сверху и 48 снизу — концентрично углу экрана 56; хэндл → 16 → заголовок → 12 → контент */
 .y-sheet--modal { gap: var(--space-16); border-radius: var(--sheet-radius) var(--sheet-radius) var(--sheet-radius-bottom) var(--sheet-radius-bottom); }
@@ -129,6 +130,7 @@
 .y-sheet--modal > .y-sheet__head { margin-top: var(--space-12); } /* без хэндла заголовок на 20 от верха */
 .y-sheet--no-handle { padding-top: var(--space-20); } /* Show Handle=false: контент на 20 от верха */
 .y-sheet--no-handle > .y-sheet__head { margin-top: 0; }
+.y-sheet__handle + .y-sheet__head { margin-top: 0; } /* хэндл и крестик вместе: заголовок на 16 под хэндлом, как без крестика (C14) */
 /* Высота и прокрутка (SHEETS-AUDIT C1–C3, D2): хэндл, заголовок и футер закреплены, прокручивается только тело.
    Ничего, кроме тела, не сжимается. Тело выходит в края шторки (поля — паддингом), чтобы лента чипсов упиралась в край,
    и на 4 вверх и вниз — чтобы не резать кольцо фокуса. */
@@ -153,6 +155,9 @@
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
   position: absolute; inset: 0; z-index: 5; --y-dim: 1;
+  /* D5: шторка приезжает на пружине без перелёта — stiffness 300 как у quick, но ζ = 1 (x = 1 − (1 + ωt)·e^−ωt, 540 мс до 0,1 %).
+     TODO(tokens): токен motion.spring.critical → --motion-sheet. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
+  --sheet-spring: 540ms linear(0, 0.059, 0.184, 0.326, 0.462, 0.58, 0.678, 0.756, 0.818, 0.865, 0.901, 0.927, 0.947, 0.962, 0.972, 0.98, 0.986, 0.99, 0.993, 0.995, 0.996, 0.997, 0.998, 0.999, 1);
   /* верх высокой шторки — под статус-баром + 8 (D2). TODO(tokens): перенести в токен --sheet-top-gap */
   --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8));
   display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
@@ -163,7 +168,9 @@
 }
 /* Жест шторки — с хэндла, шапки и футера (touch-action: none). Тело прокручивает браузер (pan-y); из самого верха тела
    палец вниз забирает жест шторки (touchmove в OverlayLayer). Лента чипсов — горизонталь своя, вертикаль — телу / шторке (C1, C4). */
-.y-overlay .y-sheet { transition: transform var(--motion-nav); touch-action: none; }
+.y-overlay .y-sheet { transition: transform var(--sheet-spring); touch-action: none; }
+.y-overlay .y-sheet[role='alertdialog'] { transition: transform var(--motion-appear); } /* диалог — 240 мс standard, без пружины (C7) */
+@media (prefers-reduced-motion: reduce) { .y-overlay { --sheet-spring: 1ms linear; } }
 .y-overlay .y-sheet__body { touch-action: pan-y; }
 .y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
@@ -386,6 +393,7 @@
 /* ─── Sheet · описание (#27) ─── */
 /* Settings / Currency 513:6256: Body серым 12 под заголовком (через правило title + *), 20 до контента */
 .y-sheet__description + * { margin-top: var(--space-4); }
+.y-sheet--panel > .y-sheet__description + * { margin-top: 0; } /* в панели gap 20 — описание → контент 20, а не 24 (C14) */
 
 /* ─── Аватар стилиста (#27) ─── */
 .y-stylist-face { display: block; object-fit: contain; user-select: none; }
