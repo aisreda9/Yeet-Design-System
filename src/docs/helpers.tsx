@@ -20,9 +20,12 @@ export function Usage({ screen, note, children, width }: { screen: string; note?
   );
 }
 
-/** Сетка карточек «В флоу». */
+/**
+ * Сетка карточек «В флоу». В истории — `min(1100px, 90vw)` (100 % там схлопнул бы сетку до контента),
+ * в Docs холст задаёт `--usage-grid-width: 100%` (`.storybook/preview.css`), иначе сетка шире блока и режется.
+ */
 export function UsageGrid({ children, min = 220 }: { children: ReactNode; min?: number }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`, gap: '32px 28px', width: 'min(1100px, 90vw)' }}>{children}</div>;
+  return <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`, gap: '32px 28px', width: 'var(--usage-grid-width, min(1100px, 90vw))', maxWidth: 1100 }}>{children}</div>;
 }
 
 /** Таблица вариантов: строки × колонки. */
@@ -78,9 +81,12 @@ export const unlessBare = (decorator: Decorator): Decorator => (Story, ctx) => (
 
 export const withWidth = (width: number) => (Story: () => ReactNode) => <div style={{ width }}><Story /></div>;
 
-/** Декоратор: sheet / dialog на затемнении, как на экране. */
+/**
+ * Декоратор: sheet / dialog на затемнении, как на экране. Ширина — из переключателя «Экран» (`--screen-width`, 320–430),
+ * чтобы ошибки ширины были видны на уровне организма; в узком окне Docs не шире холста.
+ */
 export const onOverlay = (Story: () => ReactNode) => (
-  <div style={{ width: 393, background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
+  <div style={{ width: 'var(--screen-width, 393px)', maxWidth: '100%', background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
 );
 
 /**
