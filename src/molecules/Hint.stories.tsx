@@ -17,7 +17,6 @@ export const Playground: Story = {};
 
 /** Подсказка поверх фото: белым, без пилюли, иконка 24 через 8. */
 export const OnPhoto: Story = {
-  name: 'On Photo',
   args: { tone: 'onPhoto', icon: 'fingers-pinch', children: 'Выдели вещь на фото' },
   render: (args) => (
     <div style={{ width: 353, height: 200, borderRadius: 20, overflow: 'hidden', display: 'grid', placeItems: 'end center', padding: 20, background: `center / cover url("${demoPhoto}")` }}>

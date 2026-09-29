@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AccountCard, AvatarStack, type Account } from '.';
-import { Avatar } from '../atoms';
+import { Avatar, type AvatarColor } from '../atoms';
 import { demoAvatar, unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
 import { avatarPalette, itemColors } from '../tokens/tokens';
 
@@ -55,7 +55,7 @@ export const Colors: Story = {
   render: () => (
     <UsageGrid min={120}>
       {avatarPalette.map((c) => (
-        <Usage key={c} screen={itemColors.find(([id]) => id === c)?.[1] ?? c} note={c}><Avatar size="M" initial="Т" color={c} /></Usage>
+        <Usage key={c} screen={itemColors.find(([id]) => id === c)?.[1] ?? c} note={c}><Avatar size="M" initial="Т" color={c as AvatarColor} /></Usage>
       ))}
     </UsageGrid>
   ),

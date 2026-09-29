@@ -127,7 +127,7 @@ export type StampProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & {
    * `primary` — главное действие, синий 148 с текстом; `secondary` — вспомогательное, чёрный 64 с белой иконкой 29, повёрнутой как подпись (rotation −15 в Figma), — «Не нравится».
    */
   variant?: 'primary' | 'secondary';
-  /** @deprecated Используйте `variant`: `tone` в системе — окраска относительно фона, а здесь это роль штампа. */
+  /** @deprecated Бери `variant`: `tone` в системе — окраска относительно фона, а здесь это роль штампа. */
   tone?: 'primary' | 'secondary';
   /** Иконка малого штампа (`secondary`), по умолчанию `thumb-down`. */
   icon?: IconName;
