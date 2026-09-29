@@ -15,7 +15,7 @@
 | Что | Узел | Назначение |
 |---|---|---|
 | **Design System 0.2** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Компоненты на коллекции «Yeet DS 2.0» (Light / Dark) — **источник правды для кода** |
-| Screen Design 2.0 | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Экраны флоу из компонентов DS 0.2, только светлая тема (секция `1168:12824`); тёмные экраны пока не делаем |
+| Screens Design 0.2 | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Экраны флоу из компонентов DS 0.2, только светлая тема (секция `1168:12824`); тёмные экраны пока не делаем |
 | Screens Design 0.1 | [`1306:22698`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1306-22698) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида, якоря `npm run flow-diff` |
 | Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*`. Читается по id, но `get_metadata` без `nodeId` её не перечисляет — открывать по ссылке |
 
