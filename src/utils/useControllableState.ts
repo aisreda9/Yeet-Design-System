@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 export type ControllableStateProps<T> = {
   /** Значение снаружи (controlled). `undefined` — компонент хранит значение сам (uncontrolled). */
@@ -19,12 +19,14 @@ export type ControllableStateProps<T> = {
  * ```
  */
 export function useControllableState<T>({ value, defaultValue, onChange }: ControllableStateProps<T>) {
-  const controlled = useRef(value !== undefined).current;
+  const [controlled] = useState(value !== undefined);
   const [inner, setInner] = useState(defaultValue);
   const current = controlled ? (value as T) : inner;
   // свежие значения без пересоздания setter: его можно отдавать в зависимости эффектов
   const latest = useRef({ current, onChange });
-  latest.current = { current, onChange };
+  useLayoutEffect(() => {
+    latest.current = { current, onChange };
+  });
   const set = useCallback(
     (next: T | ((prev: T) => T)) => {
       const prev = latest.current.current;
