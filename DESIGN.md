@@ -10,7 +10,7 @@
 
 ## 1. Figma
 
-Файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e) (`fileKey: 1LAkot5WySMWhwiiFJqJ0e`). Ссылки с пояснениями — Storybook «Процессы / Ресурсы».
+Файл: [YeetStyle 2.0](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e) (`fileKey: 1LAkot5WySMWhwiiFJqJ0e`). Ссылки с пояснениями — Storybook «Старт / Процессы / Ресурсы».
 
 | Что | Узел | Назначение |
 |---|---|---|
@@ -39,11 +39,11 @@
 | Движение, жесты, хаптика | Foundations / Анимации | `16-Motion.mdx`, `src/motion/motion.ts` |
 | Тексты и тон (гендерно-нейтрально) | Foundations / Тексты и тон | `15-Tone.mdx` |
 | Компоненты: варианты, «В флоу», спецификация | Atoms / Molecules / Organisms / Templates | `src/<уровень>/*.stories.tsx` |
-| Реестр Figma ↔ код, статус зрелости | Процессы / Figma ↔ код | `src/docs/registry.ts`, `src/docs/status.ts` |
+| Реестр Figma ↔ код, статус зрелости | Старт / Процессы / Figma ↔ код | `src/docs/registry.ts`, `src/docs/status.ts` |
 | Экраны флоу | Pages / Экраны флоу | `src/pages/` (документация экранов — PR #50–#54) |
-| Нативные платформы | Процессы / iOS и Android | `native/ios`, `native/android`, `21-Mobile.mdx` |
+| Нативные платформы | Старт / Процессы / iOS и Android | `native/ios`, `native/android`, `21-Mobile.mdx` |
 | Быстрый старт: запуск, подключение, ассеты, проверки | Старт / Быстрый старт | `00-QuickStart.mdx` |
-| Ресурсы: ссылки, выгрузки | Процессы / Ресурсы | `22-Resources.mdx` |
+| Ресурсы: ссылки, выгрузки | Старт / Процессы / Ресурсы | `22-Resources.mdx` |
 | Как вносить изменения, чек-лист PR | — | `CONTRIBUTING.md` |
 | Параллельная работа, зоны, замок Figma | — | `TEAM.md`, `.github/team.json`, `.github/CODEOWNERS` |
 | Принятые решения | — | `design/adr/` |

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
 import { SegmentControl } from '.';
+import { Button } from '../atoms';
 import { Matrix, unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
 
 const meta = {
@@ -59,4 +61,57 @@ export const Uncontrolled: Story = {
   parameters: { controls: { disable: true } },
   name: 'Без состояния снаружи',
   render: () => <SegmentControl label="Раздел гардероба" defaultValue="outfits" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wishlist', label: 'Вишлист' }]} />,
+};
+
+/** Клавиатура (APG Radio Group): Tab попадает в выбранный сегмент, стрелки по кругу и Home / End выбирают, Tab уходит из группы. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div style={{ display: 'grid', gap: 12, width: 353 }}>
+      <SegmentControl label="Раздел гардероба" defaultValue="outfits" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wishlist', label: 'Вишлист' }]} />
+      <Button variant="tertiary" size="S">После группы</Button>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('radiogroup', { name: 'Раздел гардероба' });
+    const radio = (name: string) => within(group).getByRole('radio', { name });
+    /** Выбран, в фокусе и единственный с tabIndex 0 (roving tabindex). */
+    const current = async (name: string) => {
+      await expect(radio(name)).toHaveAttribute('aria-checked', 'true');
+      await expect(radio(name)).toHaveFocus();
+      await expect(within(group).getAllByRole('radio', { checked: true })).toHaveLength(1);
+      await expect(within(group).getAllByRole('radio').filter((r) => r.tabIndex === 0)).toEqual([radio(name)]);
+    };
+    await step('Tab — в выбранный сегмент, не в первый', async () => {
+      await userEvent.tab();
+      await current('Образы');
+    });
+    await step('Стрелки по кругу', async () => {
+      await userEvent.keyboard('{ArrowRight}');
+      await current('Вишлист');
+      await userEvent.keyboard('{ArrowRight}');
+      await current('Вещи');
+      await userEvent.keyboard('{ArrowLeft}');
+      await current('Вишлист');
+      await userEvent.keyboard('{ArrowUp}');
+      await current('Образы');
+      await userEvent.keyboard('{ArrowDown}');
+      await current('Вишлист');
+    });
+    await step('Home и End', async () => {
+      await userEvent.keyboard('{Home}');
+      await current('Вещи');
+      await userEvent.keyboard('{End}');
+      await current('Вишлист');
+    });
+    await step('Tab уходит из группы, Shift+Tab возвращает в выбранный', async () => {
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name: 'После группы' })).toHaveFocus();
+      await userEvent.tab({ shift: true });
+      await current('Вишлист');
+    });
+  },
 };

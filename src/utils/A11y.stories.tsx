@@ -4,7 +4,7 @@ import { Column, Usage, UsageGrid } from '../docs/helpers';
 import { useControllableState } from './useControllableState';
 
 const meta = {
-  title: 'Utils/Примитивы',
+  title: 'Старт/Для разработчиков/Примитивы',
   tags: ['autodocs'],
   parameters: {
     controls: { disable: true },
