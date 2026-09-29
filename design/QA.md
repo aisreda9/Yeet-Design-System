@@ -10,6 +10,7 @@ npm run qa -- --no-docker                 # без Docker: всё, кроме с
 npm run qa -- --tap-min=40                # порог зоны нажатия для предупреждения (по умолчанию 44)
 npm run contrast                          # контраст токенов; --all — все пары, --brands=error — бренды как ошибка
 npm run flow-diff                         # экраны против флоу Figma: qa/out/flow-diff.md
+npm run test-storybook                    # play-тесты: каждая история — тест в headless Chromium (vitest)
 node scripts/qa/coverage.mjs              # покрытие: кадры Figma ↔ истории ↔ якоря, пути story реестра: qa/out/coverage.md
 node scripts/qa/boxes.mjs <экран> [селектор] # координаты блоков экрана для ручной сверки
 node scripts/qa/shots-pages.mjs s320        # все экраны на 320 (s320, a360, s375, i393, m430) → qa/out/pages-s320
@@ -31,6 +32,32 @@ node scripts/qa/sheet.mjs qa/out/pages-s320 qa/out/s320.png   # сводный �
 
 - Пробелы покрытия — **предупреждение** в CI (волна 2 доливает экраны); `--strict` — ошибка.
 - **Ошибка** всегда: путь `story` строки `src/docs/registry.ts` не существует в Storybook (заголовок `Atoms/Button` или `Atoms/Button/<история>`), слаг `figma-flows.json` без истории, тег `figma:` на несуществующий кадр.
+
+### Play-тесты: поведение с клавиатуры (`npm run test-storybook`)
+
+Скриншоты и axe видят состояние, но не поведение. Поведение проверяют `play`-функции историй, как в Radix и Spectrum:
+`@storybook/addon-vitest` превращает каждую историю в тест vitest в headless Chromium (`vitest.config.ts`), `play` — тело теста.
+Падает `expect`, исключение в `play` или рендер — тест красный, в CI красный job **«Play-тесты историй»** (`qa.yml`).
+Истории без `play` — дымовые тесты: рендер без ошибки. В Storybook тот же тест — панель «Interactions» и кнопка запуска тестов в сайдбаре.
+
+**Правило: у каждого интерактивного компонента — история «Клавиатура» с `play`**, которая проходит его только с клавиатуры:
+
+- порядок Tab, куда попадает фокус и куда уходит (у групп — roving tabindex: Tab в выбранный пункт, Tab из группы — наружу);
+- клавиши по [APG](https://www.w3.org/WAI/ARIA/apg/patterns/): Enter / пробел у кнопок и строк-выборов, стрелки и Home / End в радиогруппах, Escape у оверлеев;
+- состояние через роли и имена (`getByRole('radio', { name })`, `aria-checked`, `aria-pressed`, `aria-current`, `aria-busy`, `aria-describedby`), а не через классы;
+- края: первый и последний пункт, `min` / `max`, заблокированный повтор, фокус не теряется.
+
+Как писать стабильно:
+
+- `userEvent`, `expect`, `within`, `waitFor` — из `storybook/test`; шаги — `step('…')`, чтобы в отчёте было видно, где упало;
+- **никаких `sleep` / `setTimeout` в тесте** — только ожидание состояния: `await waitFor(() => expect(…))`, `findByRole`; для долгих анимаций — `waitFor(…, { timeout })`;
+- история для теста — отдельная (`Keyboard`, `name: 'Клавиатура'`) со своим состоянием (`useState`), чтобы `play` не менял витрины и их эталоны; её скриншот снимается в конце `play` и тоже идёт в `qa/baseline`;
+- нативное поведение браузера синтетический `keydown` не запускает (стрелки у `input type="range"`): воспроизводить его тем же API (`stepUp` + событие `input`) и писать об этом в комментарии.
+
+Покрыто: Field, FormField, ChipGroup, SegmentControl, RadioList, RangeSlider, Button (`loading`), BottomNav / TabBar, Sheet / Dialog, OutfitPager, ItemSlots, CropFrame, Motion.
+
+Запуск локально: `npm run test-storybook` (браузер Playwright: `npx playwright install chromium`, или свой — `CHROME_PATH=…`);
+один файл — `npx vitest run --project=storybook src/molecules/Field.stories.tsx`.
 
 ### Визуальная регрессия: эталоны в git, скриншоты в закреплённом образе
 
