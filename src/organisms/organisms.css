@@ -150,7 +150,7 @@
 .y-sheet--panel > .y-sheet__title + .y-text--secondary { margin-top: calc(var(--space-8) * -1); }
 .y-screen__content > .y-sheet--panel:last-child { flex: 1 0 auto; } /* панель внизу экрана тянется до низа */
 
-/* Overlay: затемнение проявляется (fade), шторка выезжает снизу на пружине quick; уход — быстрее (exit).
+/* Overlay: затемнение проявляется (fade), шторка выезжает снизу на пружине без перелёта (--motion-sheet); уход — быстрее (exit).
    Всё на transition + @starting-style, а не на keyframes: появление, уход и смахивание прерываются
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
