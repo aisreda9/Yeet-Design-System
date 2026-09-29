@@ -1,4 +1,4 @@
-import './molecules.css';
+import '../styles.css';
 
 export * from './inputs';
 export * from './selection';
