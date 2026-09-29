@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Процессы/iOS и Android" />
+<Meta title="Старт/Процессы/iOS и Android" />
 
 # iOS и Android
 
@@ -13,7 +13,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 tokens/tokens.json          ← правим только здесь (или синхронизируем из Figma «Yeet DS 2.0»)
         │  npm run tokens
         ├── src/tokens/tokens.generated.css     web / Storybook
-        ├── tokens/ios/YeetTokens.swift          SwiftUI
+        ├── tokens/ios/YeetTokens.swift          SwiftUI (только токены)
+        ├── native/ios                           SwiftUI-компоненты: Swift Package YeetDesignSystem
         └── tokens/android/YeetTokens.kt         Jetpack Compose
 ```
 
@@ -22,7 +23,11 @@ tokens/tokens.json          ← правим только здесь (или с�
 
 ## iOS · SwiftUI
 
-Скопируйте `YeetTokens.swift` в проект, добавьте шрифты Roboto Slab и Inter в `Info.plist`.
+Компоненты — Swift Package `YeetDesignSystem` в `native/ios` (iOS 16+): `YeetButton(variant: .primary, size: .l)`, `YeetSheet`,
+`YeetHeader(type: .large(...))` и т. д., подключение через SPM по URL репозитория, шрифты внутри пакета.
+Таблица соответствий React ↔ Swift — `native/ios/README.md`.
+
+Только токены: скопируйте `YeetTokens.swift` в проект и добавьте шрифты Roboto Slab и Inter в приложение.
 
 ```swift
 Text("Гардероб")
@@ -43,7 +48,7 @@ stamp.scaleEffect(isDone ? 0.53 : 1)
 
 ```kotlin
 val colors = if (isSystemInDarkTheme()) YeetDarkColors else YeetLightColors
-val type = YeetTypography(display = FontFamily(Font(R.font.roboto_slab)), text = FontFamily(Font(R.font.inter)))
+val type = YeetTypography.fromResources(R.font.roboto_slab_variable, R.font.inter_variable)
 
 Text("Гардероб", style = type.h1, color = colors.textPrimary)
 
@@ -59,10 +64,42 @@ val scale by animateFloatAsState(if (done) 0.53f else 1f, animationSpec = YeetMo
 ## Правила для нативных компонентов
 
 1. **Имена свойств — как в Figma и в Storybook.** `ChatBubble(from: .user)`, `WeatherCard(temperature:description:icon:)`,
-   `Button(variant: .primary, size: .l)`. Таблица соответствий — «Процессы / Figma ↔ код».
+   `Button(variant: .primary, size: .l)`. Таблица соответствий — «Старт / Процессы / Figma ↔ код».
 2. **Слоты — через content-замыкания.** Sheet, Dialog, InputGroup, ListGroup, Carousel принимают `@ViewBuilder content`
    (SwiftUI) или `content: @Composable () -> Unit` (Compose).
 3. **Цвета — только семантические** (`YeetColor.bgSubtle`), никогда примитивы или hex.
 4. **Размеры экрана.** Макеты — iPhone 393×852, поля 20. На Android те же значения в dp.
 5. **Системные элементы** (статус-бар, клавиатура, «хоум»-индикатор) — нативные, в дизайн-системе только для макетов.
 6. **Уменьшение движения.** iOS «Reduce Motion» и Android «Remove animations» — переходы мгновенные.
+7. **Тап-зона — минимум 44 pt (iOS) / 48 dp (Android).** Визуально кнопка может быть 40, недостающее — невидимый hit-slop,
+   раскладка не меняется (см. ниже). `YeetButton` / `YeetIconButton` в `native/ios` уже делают это сами.
+
+## Тап-зона
+
+```swift
+// Иконка-кнопка 40 × 40, нажимается в 44 × 44
+Button(action: close) {
+  Image(systemName: "xmark").frame(width: 40, height: 40)
+}
+.yeetHitArea(height: 40)   // = .contentShape(Rectangle().inset(by: -2)): вид и раскладка не меняются
+
+// Когда место позволяет — рамка вместо выхода за края
+Button(action: close) {
+  Image(systemName: "xmark")
+    .frame(minWidth: 44, minHeight: 44)
+    .contentShape(Rectangle())
+}
+```
+
+```kotlin
+// Видимая кнопка 40 dp, зона нажатия 48 dp
+Box(
+  Modifier
+    .minimumInteractiveComponentSize()   // Material 3: добирает до 48 dp, видимый размер не меняется
+    .size(40.dp)
+    .clip(CircleShape)
+    .clickable(onClick = onClose),
+)
+```
+
+Зоны соседних кнопок не должны перекрываться: если 44 / 48 не помещаются — раздвинуть кнопки, а не уменьшать зону.

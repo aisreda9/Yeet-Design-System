@@ -1,13 +1,13 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { ComponentRegistry } from './blocks';
+import { ComponentRegistry, StatusLegend } from './blocks';
 
-<Meta title="Процессы/Figma ↔ код" />
+<Meta title="Старт/Процессы/Figma ↔ код" />
 
 # Figma ↔ код
 
 **Figma:** файл YeetStyle 2.0 → страница **Design System 2.0 (Claude)**, коллекция переменных **Yeet DS 2.0** (Light / Dark).
 Секции: 00 Обзор · 01 Foundations · 02 Actions · 03 Inputs · 04 Selection · 05 Navigation & scroll · 06 Overlays ·
-07 Content · 08 States · 09 System · 10 Screen patterns. Слева компонент, справа — «В флоу».
+07 Content · 08 States · 09 System · 10 Screen patterns · 11 Motion. Слева компонент, справа — «В флоу».
 
 ## Переменные Figma → токены кода
 
@@ -24,14 +24,21 @@ import { ComponentRegistry } from './blocks';
 | `ui-colors/on-accent` | `--color-text-on-accent` |
 | `ui-colors/black-10%` | `--color-border-subtle` |
 | `ui-colors/overlay` | `--color-bg-overlay` |
+| `ui-colors/divider` | `--color-divider` |
+| `ui-colors/pattern-dot` | `--color-pattern-dot` |
+| `ui-colors/blue-text` / `red-text` | `--color-text-accent` / `--color-text-danger` |
 | `item-colors/*` | `--yeet-item-*` |
 | `spaces/*` | `--space-*` |
-| эффект `shadow/floating` | `--shadow-floating` |
+| эффект `shadow/floating` (цвет — `ui-colors/shadow`, 12 % / 50 %) | `--shadow-floating` |
 
 ## Реестр компонентов
 
 Каждый компонент есть и в Figma, и в коде, на одном уровне атомарной системы. Таблица строится из `src/docs/registry.ts`:
 новый компонент добавляется туда одной строкой и появляется здесь и на «Атомарной карте».
+
+**Статус** — зрелость компонента по факту (ADR 0007): тот же бейдж стоит рядом с компонентом в сайдбаре.
+
+<StatusLegend />
 
 <ComponentRegistry />
 
@@ -62,8 +69,22 @@ import { ComponentRegistry } from './blocks';
 
 **Слоты.** Там, где содержимое меняется от экрана к экрану, в Figma слот, а в коде `children`: input-group, list-group, segment-control, chip-group, sheet, dialog, carousel, outfit-collage. Внутрь слота кладутся инстансы компонентов — их свойства настраиваются прямо в панели справа, без detach.
 
+## Расхождения в Figma
+
+Исправлено на странице Design System 2.0 (Claude) и в коллекции «Yeet DS 2.0» (оригинал не тронут): пустая тёмная тема,
+опечатки (`ui-colors/balck`, `…-inner-sate`, «Поиска по странам», подпись свотча Red), мусорные переменные, путаница `chevron-up` / `chevron-up-down`,
+«сырые» фреймы в организмах, хардкод `#F1F4FF` у чипсов, радио из спрятанной иконки, шевроны из стороннего кита, токен `on-accent` для текста на синем и красном.
+
+Открыто:
+- 4 фона коллажей с точечным паттерном («Photo & Image Areas», карточки) привязаны к `light-grey` исходной коллекции — PATTERN-заливку нельзя перепривязать через API, только вручную.
+- Скругление последней карточки в сетке Гардероба — 32 вместо 20 (экран флоу).
+- Экраны флоу New app design собраны из «сырых» фреймов на исходной коллекции — переводятся на компоненты 2.0 по одному.
+- Тексты с родом в проде («Забыла пароль?», «Увидела в соцсетях…») — заменить по «Тексты и тон».
+- Code Connect — нужен тариф Figma Organization / Enterprise (сейчас Pro); токенов прозрачности и состояний pressed / disabled / loading у кнопок пока нет.
+
 ## Как вносить изменения
-1. Изменение в Figma (компонент или переменная) → запись в Changelog на странице.
-2. Токены — в `tokens/tokens.json`, затем `npm run tokens` (обновит CSS, Swift, Kotlin). Компоненты — в коде + story «В флоу».
-3. Обновить `DESIGN.md`.
-4. Storybook публикуется на GitHub Pages автоматически после пуша.
+Полный порядок и чек-лист PR — `CONTRIBUTING.md` в репозитории.
+1. Изменение в Figma (компонент или переменная, под замком в issue «Координация») → запись в Changelog на странице.
+2. Токены — в `tokens/tokens.json`, затем `npm run tokens` (CSS, Swift, Kotlin) и `npm run docs-tokens`. Компоненты — в коде + story «В флоу».
+3. Строка в `src/docs/registry.ts` со статусом; решение, меняющее правило, — ADR в `design/adr/`.
+4. Storybook публикуется на GitHub Pages автоматически после мержа.

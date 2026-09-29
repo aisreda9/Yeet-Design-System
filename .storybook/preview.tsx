@@ -1,7 +1,7 @@
 import type { Decorator, Preview } from '@storybook/react-vite';
-import '../src/tokens/tokens.css';
+import '../src/styles.css';
 import './preview.css';
-import tokens from '../tokens/tokens.json';
+import { tokens } from '../src/tokens/model';
 
 // Пункты тулбара «Бренд» строятся из tokens.json → brand: новая палитра появится здесь сама
 const brandItems = [
@@ -73,20 +73,23 @@ const preview: Preview = {
     layout: 'centered',
     controls: { expanded: true, sort: 'requiredFirst' },
     backgrounds: { disable: true },
+    a11y: { test: 'todo' }, // addon-a11y: нарушения видны в панели, но не валят тесты
     options: {
       storySort: {
         order: [
           'Старт',
-          ['О проекте', 'Введение', 'Принципы', 'Атомарная система', 'Как пользоваться'],
+          [
+            'Быстрый старт', 'О проекте', 'Введение', 'Принципы', 'Атомарная система', 'Как пользоваться',
+            'Прототип', 'Процессы', ['Figma ↔ код', 'iOS и Android', 'Ресурсы'], 'Для разработчиков', ['Обзор', 'Примитивы'],
+          ],
           'Foundations',
-          ['Токены и семантика', 'Типографика', 'Отступы и радиусы', 'Иконки', 'Скролл и края экрана', 'Резиновая вёрстка', 'Анимации', 'Тексты и тон'],
+          ['Токены и семантика', 'Бренд-палитры', 'Типографика', 'Отступы и радиусы', 'Иконки', 'Скролл и края экрана', 'Резиновая вёрстка', 'Анимации', 'Тексты и тон'],
           'Atoms',
           'Molecules',
           'Organisms',
           'Templates',
+          ['Screen', 'DetailsScreen', 'Prose'],
           'Pages',
-          'Процессы',
-          ['Figma ↔ код', 'iOS и Android'],
         ],
       },
     },

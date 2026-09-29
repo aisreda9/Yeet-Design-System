@@ -1,0 +1,41 @@
+# Обновления зависимостей раз в неделю, сгруппированно — чтобы не заваливать команду мелкими PR.
+# PR от Dependabot проходят обычный CI (QA Storybook); мержит координатор (TEAM.md §6).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: [dependencies, zone:infra]
+    ignore:
+      # typescript-eslint держит typescript <6.1 — мажор TS только вместе с его поддержкой (#59)
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # eslint-plugin-jsx-a11y поддерживает eslint до 9
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+      - dependency-name: '@eslint/js'
+        update-types: [version-update:semver-major]
+    groups:
+      storybook:
+        patterns: ['storybook', '@storybook/*']
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+      build:
+        patterns: ['vite', '@vitejs/*', 'typescript']
+      lint:
+        patterns: ['eslint', '@eslint/*', 'eslint-plugin-*', 'typescript-eslint', 'globals', 'stylelint', 'stylelint-*', 'prettier', 'lefthook', 'lint-staged']
+      qa:
+        patterns: ['playwright-core', 'axe-core', 'pixelmatch', 'pngjs', '@types/pixelmatch', '@types/pngjs']
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies, zone:infra]
+    groups:
+      actions:
+        patterns: ['*']

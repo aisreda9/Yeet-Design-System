@@ -1,0 +1,78 @@
+name: Release
+
+# Релиз по тегу v<семвер> (ставит человек, порядок — README «Релизы»):
+#   1. GitHub Release: заметки из CHANGELOG.md + дифф значений токенов с прошлым тегом;
+#   2. Android AAR → GitHub Packages (design.yeet:yeet-design-system:<версия>);
+#   iOS отдельной публикации не требует: SPM берёт Package.swift из корня по тому же тегу.
+# workflow_dispatch — сухой прогон: заметки в Summary и publishToMavenLocal, ничего не публикуется.
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # создать GitHub Release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # теги и история для диффа токенов
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Тег совпадает с версией в package.json
+        id: v
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Тег $GITHUB_REF_NAME, а в package.json $version. Сначала npm run release:version и PR, потом тег."
+            exit 1
+          fi
+      - name: Заметки релиза
+        run: |
+          node scripts/release-notes.mjs "v${{ steps.v.outputs.version }}" > notes.md
+          cat notes.md >> "$GITHUB_STEP_SUMMARY"
+      - name: GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: notes
+    permissions:
+      contents: read
+      packages: write # GitHub Packages
+    defaults:
+      run:
+        working-directory: native/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: AAR → GitHub Packages
+        if: github.ref_type == 'tag'
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./gradlew :yeet-design-system:publishReleasePublicationToGitHubPackagesRepository --stacktrace
+      - name: Сухой прогон (Maven Local)
+        if: github.ref_type != 'tag'
+        run: ./gradlew :yeet-design-system:publishToMavenLocal --stacktrace

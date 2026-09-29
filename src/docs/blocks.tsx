@@ -2,10 +2,11 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Icon } from '../atoms';
 import { icons, type IconName } from '../icons/icons';
 import { itemColors, radii, semanticColors, spaces, textStyles } from '../tokens/tokens';
-import tokenSource from '../../tokens/tokens.json';
-import { registry, type Level } from './registry';
-import { motions } from '../motion/motion';
-import '../tokens/tokens.css';
+import { tokens as tokenSource } from '../tokens/model';
+import { registry, type Level, type Status } from './registry';
+import { statusMeta } from './status';
+import { mechanics, motions } from '../motion/motion';
+import '../styles.css';
 
 const mono: CSSProperties = { font: '400 12px/16px ui-monospace, SFMono-Regular, Menlo, monospace' };
 const cap: CSSProperties = { font: '400 12px/16px var(--font-text)', color: '#6E6E6E' };
@@ -140,6 +141,20 @@ export function IconGallery() {
   );
 }
 
+/** «Ресурсы»: каждая иконка — ссылка на SVG из .downloads (npm run assets). */
+export function ResourceIcons() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 12 }}>
+      {(Object.keys(icons) as IconName[]).map((n) => (
+        <a key={n} href={`./downloads/icons/ui/${n}.svg`} download style={{ display: 'grid', justifyItems: 'center', gap: 8, padding: '16px 4px', background: 'var(--color-bg-subtle)', borderRadius: 16, color: 'var(--color-text-primary)', textDecoration: 'none' }}>
+          <Icon name={n} />
+          <span style={{ ...mono, color: 'var(--color-text-secondary)' }}>{n}.svg</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
 const byLevel = (l: Level) => registry.filter((e) => e.level === l).map((e) => e.code);
 
 const levels: { level: string; what: string; rule: string; items: string[] }[] = [
@@ -151,15 +166,47 @@ const levels: { level: string; what: string; rule: string; items: string[] }[] =
   { level: 'Pages', what: 'Экраны флоу с реальными данными', rule: 'Шаблон + содержимое', items: ['Splash', 'Onboarding', 'Auth', 'Сегодня', 'Гардероб', 'Поиск', 'Стилист', 'Поездки', 'Профиль', 'Настройки', '…'] },
 ];
 
+const figmaNode = (id: string) => `https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=${id.replace(':', '-')}`;
+
+/** Бейдж зрелости компонента — тот же, что в сайдбаре Storybook. */
+export function StatusBadge({ status }: { status: Status }) {
+  const m = statusMeta[status];
+  return <span title={m.rule} style={{ font: '500 11px/16px var(--font-text)', padding: '1px 8px', borderRadius: 8, color: m.color, background: m.bg, whiteSpace: 'nowrap' }}>{m.label}</span>;
+}
+
+/** Легенда статусов с числом компонентов в каждом. */
+export function StatusLegend() {
+  return (
+    <DocTable
+      head={['Статус', 'Компонентов', 'Что значит']}
+      rows={(Object.keys(statusMeta) as Status[]).map((s) => [
+        <StatusBadge status={s} />,
+        <Muted>{registry.filter((e) => e.status === s).length}</Muted>,
+        <span>{statusMeta[s].rule}</span>,
+      ])}
+    />
+  );
+}
+
 /** Таблица соответствия Figma ↔ код из `registry.ts`. */
 export function ComponentRegistry() {
   return (
     <DocTable
-      head={['Уровень', 'Код', 'Figma', 'Секция Figma', 'Storybook']}
+      head={['Уровень', 'Код', 'Статус', 'Figma', 'Секция Figma', 'Storybook']}
       rows={registry.map((e) => [
         <Muted>{e.level}</Muted>,
         <Code>{`<${e.code}>`}</Code>,
-        <span style={mono}>{e.figma ?? '—'}{e.note && <div style={cap}>{e.note}</div>}</span>,
+        <span>
+          <StatusBadge status={e.status} />
+          {e.statusWhy && <div style={cap}>{e.statusWhy}</div>}
+        </span>,
+        <span style={mono}>
+          {e.figma ?? '—'}
+          {e.figmaId ? (
+            <> · <a href={figmaNode(e.figmaId)} target="_blank" rel="noreferrer">{e.figmaId}</a></>
+          ) : e.figmaWhy && <div style={cap}>нет компонента: {e.figmaWhy}</div>}
+          {e.note && <div style={cap}>{e.note}</div>}
+        </span>,
         <Muted>{e.section}</Muted>,
         <Muted>{e.story}</Muted>,
       ])}
@@ -215,6 +262,24 @@ export function MotionTable() {
         m.what,
         <Muted>{m.where}</Muted>,
         <Muted>{m.figma}</Muted>,
+      ])}
+    />
+  );
+}
+
+/** Механики экранов: токен, длительность, хаптика, поведение при «Уменьшении движения» (motion.ts → mechanics). */
+export function MechanicsTable() {
+  return (
+    <DocTable
+      head={['Механика', 'Где сейчас', 'Что движется', 'Токен / пружина', 'Длительность', 'Хаптика', 'Меньше движения']}
+      rows={mechanics.map((m) => [
+        <span style={{ fontWeight: 500 }}>{m.name}<div style={cap}>{m.group} · {m.where}</div></span>,
+        <span>{m.on}{m.hook && <div style={cap}><Code>{m.hook}</Code></div>}</span>,
+        m.what,
+        <Code>{m.token}</Code>,
+        <Muted>{m.duration}</Muted>,
+        m.haptic === '—' ? <Muted>—</Muted> : <span>{m.haptic}</span>,
+        <Muted>{m.reduced}</Muted>,
       ])}
     />
   );

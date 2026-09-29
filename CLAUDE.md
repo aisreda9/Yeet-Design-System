@@ -1,25 +1,30 @@
 # Yeet Design System — правила для Claude
 
-Дизайн-система приложения YeetStyle. Полная спецификация — `DESIGN.md`, процесс QA — `design/QA.md`, структура — `README.md`.
+Структура и запуск — `README.md`, спецификация — `DESIGN.md`, QA — `design/QA.md`.
 
-## Инварианты
-- Источник правды — Figma `1LAkot5WySMWhwiiFJqJ0e`, страница **Design System 2.0 (Claude)** `942:5666`, коллекция **«Yeet DS 2.0»**. Оригинальные страницы и коллекция «Yeet Design System» — только чтение.
-- Значения токенов — только в `tokens/tokens.json` → `npm run tokens`. Сгенерированные файлы руками не правятся.
-- Слои `tokens → atoms → molecules → organisms → templates → pages`; импорт только вниз и через `index.tsx` слоя. В компонентах — только семантические и компонентные токены, без hex и `--yeet-*`.
-- Анимации — только переходы `--motion-*` и `--gesture-*`; ease-out для движения за пальцем, пружина — ответ системы, bouncy — только штамп.
-- Тексты — на «ты», без родовых окончаний (`DESIGN.md` §8).
-- Любой компонент: Figma + код + story (Playground, варианты, «В флоу») + `src/docs/registry.ts` + `design/figma-specs.json` + Light/Dark.
+## Ты не один
 
-## Правила Figma → код
-Токены, компоненты, иконки, ассеты, стили, движение (изинги, пружины, жесты, хаптика), процесс и лучшие практики:
+В репозитории параллельно работают другие сессии Claude и боты. Полный протокол — **`TEAM.md`**, прочитай его перед первой правкой. Коротко:
 
-@design/FIGMA-RULES.md
+1. В начале сессии хук показывает `npm run team` — активные ветки, их зоны и пересечения с тобой. Если твоя задача попадает в зону, где уже кто-то работает, не начинай её: договорись в issue/PR или возьми другую.
+2. Одна задача = один GitHub issue. Отметься в нём (`🔒 Беру. Роль, ветка, зоны`) до начала работы.
+3. После первого коммита сразу push и **draft PR** в `main` — иначе другие тебя не видят.
+4. Не выходи за свои зоны (`.github/team.json`). Горячие файлы — точечными добавлениями; сгенерированные файлы токенов не правь руками, а запускай `npm run tokens`.
+5. Писать в Figma — только держа замок в issue «Координация». Читать можно всегда.
+6. Перед пушем: `git merge origin/main`, `npm run typecheck`, `npm run build-storybook`.
+7. В конце — раздел «Передача» в PR: что сделано, что нет, что дальше. Всё, что должен знать следующий агент, пишется в GitHub, не в чат.
 
-## Figma MCP
-Подключается из `.mcp.json` (сервер `Figma`, `https://mcp.figma.com/mcp`). Первый раз: `/mcp` → `Figma` → вход в браузере. В облачных сессиях — коннектор Figma на claude.ai/customize/connectors.
+## Figma и агенты дизайн-системы
+
+- Правила Figma → код и запись в Figma — **`design/FIGMA-RULES.md`** (страницы DS 2.0 / Flow 2.0, переменные «Yeet DS 2.0», правило шторки, классы находок).
+- Figma MCP — `.mcp.json` (сервер `Figma`; первый раз `/mcp` → вход). В облачной сессии — коннектор Figma.
+- Задача крупнее одной правки — `/ds-team <задача>` (`.claude/skills/ds-team/SKILL.md`), агенты — `.claude/agents/ds-*.md`. Работают внутри протокола `TEAM.md`, в твоей ветке и зонах.
 
 ## Проверки
-`npm run typecheck` · `npm run contrast` · `npm run build-storybook && npm run qa` · `npm run flow-diff`
 
-## Команда
-Задачи крупнее одной правки — через `/ds-team <задача>` (`.claude/skills/ds-team/SKILL.md`), агенты в `.claude/agents/ds-*.md`.
+```bash
+npm run typecheck
+npm run build-storybook && npm run qa && npm run flow-diff
+npm run contrast
+npm run team        # кто над чем работает
+```

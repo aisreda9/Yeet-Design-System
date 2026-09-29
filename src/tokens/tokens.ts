@@ -1,5 +1,5 @@
-/** Метаданные токенов для документации. Значения — из tokens/tokens.json (единый источник для web, iOS, Android). */
-import tokens from '../../tokens/tokens.json';
+/** Метаданные токенов для документации. Значения — из tokens/tokens.json через model.js (единый источник для web, iOS, Android). */
+import { tokens } from './model';
 
 export type ItemColor = keyof typeof tokens.item;
 
@@ -21,7 +21,7 @@ export const semanticColors: { group: string; tokens: SemanticToken[] }[] = Obje
   tokens: Object.entries(entries).map(([k, v]) => ({ token: `--color-${k}`, role: v.role, light: show(v.light, 'light'), dark: show(v.dark, 'dark'), figma: v.figma })),
 }));
 
-export const itemColors = Object.entries(tokens.item).map(([id, v]) => [id as ItemColor, v.name, v.value] as const);
+export const itemColors = Object.entries(tokens.item).map(([id, v]) => [id as ItemColor, v.name, show(v.value, 'light')] as const);
 
 export const spaces = tokens.space;
 
@@ -34,3 +34,13 @@ export const textStyles = Object.entries(tokens.typography).map(([k, s]) => [
   `${fontName[s.font as keyof typeof fontName]} ${s.weight} · ${s.size}/${s.lineHeight}${s.letterSpacing ? ` · ${s.letterSpacing}` : ''}`,
   s.use,
 ] as const);
+
+/** Цвета аккаунтов (tokens.avatar.palette): фон аватара, буква — `--yeet-on-item-*`, контраст ≥ 4.5 : 1. */
+export const avatarPalette = tokens.avatar.palette as ItemColor[];
+
+/** Стабильный цвет аккаунта по id: один и тот же id — всегда один цвет. */
+export function avatarColor(id: string): ItemColor {
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return avatarPalette[h % avatarPalette.length];
+}

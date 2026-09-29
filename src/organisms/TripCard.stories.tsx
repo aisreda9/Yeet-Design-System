@@ -13,7 +13,7 @@ const meta: Meta<Args> = {
     label: { if: { arg: 'type', eq: 'add' } },
   },
   decorators: [(Story) => <div style={{ width: 173 }}><Story /></div>],
-  parameters: { docs: { description: { component: 'Карточка поездки 173×210: город H3, счётчики Caption grey (склоняются), вещи снизу. Type=Add — «Собрать новый чемодан». Figma: `trip-card` · Type, City, Meta, Label.' } } },
+  parameters: { docs: { description: { component: 'Карточка поездки 173×220: город H3, счётчики Body grey (склоняются), вещи снизу — поле 141×120 в 16 от боков и 20 от низа. Type=Add — «Собрать новый чемодан». Figma: `trip-card` · Type, City, Meta, Label.' } } },
   render: ({ type, city, items, outfits, label }) => type === 'add' ? <TripCard add label={label} /> : <TripCard city={city} items={items} outfits={outfits} art={[{ kind: 'accessories', x: 60, y: 30, size: 40 }, { kind: 'bottom', x: 28, y: 62, size: 72, color: 'green' }, { kind: 'top', x: 74, y: 62, size: 64, color: 'green' }]} />,
 };
 export default meta;

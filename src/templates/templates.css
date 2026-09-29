@@ -2,11 +2,14 @@
 
 .y-screen {
   position: relative; display: flex; flex-direction: column; overflow: hidden;
-  width: var(--screen-width); height: var(--screen-height); border-radius: 44px;
+  width: var(--screen-width); height: var(--screen-height); border-radius: 56px; /* угол экрана iPhone: низ шторки 48 = 56 − 8 */
   background: var(--color-bg-canvas); color: var(--color-text-primary);
   box-shadow: 0 0 0 10px #111, 0 30px 80px rgb(0 0 0 / 0.25);
   font-family: var(--font-text);
 }
+/* Фон экрана: сплэш на цвете бренда, фото на весь экран. Текст и статус-бар белые */
+.y-screen--accent { background: var(--color-accent); color: var(--color-text-on-accent); }
+.y-screen--photo { background: center / cover var(--screen-photo); color: var(--color-text-on-photo); }
 .y-screen__content {
   flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   /* Figma (флоу): контент начинается на 20 ниже шапки, блоки идут с шагом 20 */
@@ -17,6 +20,8 @@
 /* Контент скроллится, а не сжимается: иначе segment-control и кнопки сплющиваются по высоте */
 .y-screen__content > * { flex-shrink: 0; }
 .y-screen__content--center { justify-content: center; }
+/* Контент прижат к низу: кнопка поверх фото в 20 от края экрана (Search / Photo / Crop) */
+.y-screen__content--end { justify-content: flex-end; padding-bottom: var(--space-20); }
 .y-screen__content--flush { padding-left: 0; padding-right: 0; }
 .y-screen__floating { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 4; display: flex; justify-content: center; }
 
@@ -29,6 +34,7 @@
 /* Layout primitives */
 .y-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8) 7px; }
 .y-row { display: flex; }
+.y-stack { display: flex; flex-direction: column; }
 
 /* Липкая полоса фильтров (Sticky): прижимается под шапку; content padding-top 8 → top −8 */
 .y-sticky {
@@ -49,17 +55,61 @@
 /* Раздел экрана или панели (флоу): заголовок H3 и контент через 16, до раздела 24 */
 .y-section { display: flex; flex-direction: column; gap: var(--space-16); }
 * + .y-section { margin-top: var(--space-4); }
-/* Подвал Настроек (Figma: логотип 40 серым, ссылки и версия Caption, «Удалить аккаунт») */
-.y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
-.y-settings-footer .y-caption { margin: 0; }
-.y-settings-footer .y-button { margin-top: var(--space-20); }
-/* Юридическая подпись внизу экрана входа: 3 строки по центру, ссылки подчёркнуты */
-.y-legal { margin: auto 0 -4px; text-align: center; } /* флоу: 20 от низа экрана */
-.y-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; }
 /* Панель последним блоком на flush-экране доходит до низа экрана */
 .y-screen__content--flush:has(> .y-sheet--panel:last-child) { padding-bottom: 0; }
 .y-screen__content:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
-/* Заметка: текст на подложке (описание вещи во флоу Item Details) — 20 со всех сторон, радиус 20 */
-.y-note { padding: var(--space-20); border-radius: var(--radius-lg); background: var(--color-bg-subtle); }
+
+/* ─── DetailsScreen: панель наезжает на фото, фото → миниатюра 48 в шапке ───
+ * Figma «new things» 354:17405 → 354:17449. Состояние — Screen[data-collapsed] (24 pt скролла, обратно ≤ 8).
+ * Фото лежит слоем вне скролла: в покое под панелью (z 0, панель позже в дереве), при сворачивании — над шапкой (z 4).
+ */
+.y-details__media {
+  position: absolute; z-index: 0; left: var(--screen-gutter); right: var(--screen-gutter);
+  top: calc(var(--status-bar-height) + var(--space-8) + 48px + var(--space-20)); /* под шапкой (статус-бар + ряд 48) + 20 = y138 */
+  transform-origin: 0 0;
+  /* обратно фото опускается под панель, только когда долетело */
+  transition: transform var(--motion-collapse), opacity var(--motion-fade), z-index 0s linear var(--motion-300);
+}
+.y-details__media > * { transition: border-radius var(--motion-collapse); }
+.y-details[data-collapsed] .y-details__media {
+  z-index: 4; pointer-events: none;
+  /* в центр ряда шапки: y70 = статус-бар + 8 */
+  transform: translate(var(--details-dx, 0px), calc((48px + var(--space-20)) * -1)) scale(var(--details-scale, 0.136));
+  transition: transform var(--motion-collapse), opacity var(--motion-fade);
+}
+/* скругление миниатюры — как у карточки 48 (radius-md), а не уменьшенные 32 фото */
+.y-details[data-collapsed] .y-details__media > * { border-radius: calc(var(--radius-md) / var(--details-scale, 0.136)); }
+/* своя миниатюра (thumb) проявляется в шапке, фото на подлёте гаснет */
+.y-details--thumb[data-collapsed] .y-details__media { opacity: 0; }
+/* пилюля «Новая вещь» уступает место миниатюре */
+.y-details .y-header__center > :not(.y-header__on-scroll) { transition: opacity var(--motion-fade); }
+.y-details[data-collapsed] .y-header__center > :not(.y-header__on-scroll) { opacity: 0; }
+.y-details .y-header__center:has(> .y-header__on-scroll) > :not(.y-header__on-scroll) { position: absolute; }
+/* Место фото в потоке: схлопывается. Остаток 25 = порог 24 + 1: прокрутка на порог ставит панель ровно на y138 */
+.y-details__spacer {
+  display: grid; grid-template-rows: 1fr; margin: 0 var(--screen-gutter); overflow: hidden;
+  transition: grid-template-rows var(--motion-collapse), margin var(--motion-collapse);
+}
+.y-details__spacer > span { aspect-ratio: 1; min-height: 0; }
+.y-details[data-collapsed] .y-details__spacer { grid-template-rows: 0fr; margin-bottom: calc(25px - var(--space-20)); }
+/* Панель не короче экрана и уходит под нижнюю панель до низа экрана (Figma: панель y138 → 852):
+   свёрнутое состояние держится, даже если в панели мало полей */
+.y-details .y-sheet--panel { min-height: calc(100% + 120px); }
+/* В миниатюре кнопок нет: «×» фото не нажимается и не показывается */
+.y-details[data-collapsed] .y-details__media button { visibility: hidden; }
+/* Штамп «Надеть»: поверх контента, x225 y676 (справа 20, снизу 28), со скроллом не едет */
+.y-details__stamp { position: absolute; z-index: 4; right: var(--screen-gutter); bottom: 28px; }
+
+/* ─── Prose: документ из текста (Legal 513:6603, 513:6707) ───
+ * H1 → дата 12, разделы через 24, внутри раздела через 12; списки с маркером, пункты через 8. Почта — чёрным с подчёркиванием.
+ */
+.y-prose { display: flex; flex-direction: column; gap: var(--space-24); }
+.y-prose__head, .y-prose__section { display: flex; flex-direction: column; gap: var(--space-12); }
+.y-prose p, .y-prose ul { margin: 0; }
+.y-prose ul { padding-left: 21px; display: flex; flex-direction: column; gap: var(--space-8); }
+.y-prose a { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 4px 0; margin: -4px 0; } /* зона нажатия ≥ 24 без сдвига строки */
+/* Длинные слова заголовка на узком экране (320: «конфиденциальности») переносятся по слогам */
+.y-prose h1, .y-prose h2 { hyphens: auto; overflow-wrap: break-word; }
+.y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }

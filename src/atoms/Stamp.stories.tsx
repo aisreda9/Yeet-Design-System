@@ -7,10 +7,11 @@ const meta = {
   title: 'Atoms/Stamp',
   component: Stamp,
   tags: ['autodocs'],
-  args: { label: 'Надеть', tone: 'primary', done: false, icon: 'thumb-down' },
+  args: { label: 'Надеть', variant: 'primary', done: false, doneSize: 'M', icon: 'thumb-down' },
   argTypes: {
-    tone: { control: 'inline-radio', options: ['primary', 'secondary'] },
-    icon: { control: 'select', options: ['thumb-down', 'cross', 'plus'], if: { arg: 'tone', eq: 'secondary' } },
+    variant: { control: 'inline-radio', options: ['primary', 'secondary'] },
+    doneSize: { control: 'inline-radio', options: ['M', 'S'] },
+    icon: { control: 'select', options: ['thumb-down', 'cross', 'plus'], if: { arg: 'variant', eq: 'secondary' } },
   },
   parameters: {
     docs: {
@@ -37,9 +38,21 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={200}>
       <Usage screen="Outfits / Everyday" note="главное действие"><Stamp label="Надеть" /></Usage>
-      <Usage screen="Outfits / Everyday" note="после нажатия — отменить"><Stamp label="Надеть" done /></Usage>
+      <Usage screen="Outfits / Everyday" note="после нажатия — отменить, 78"><Stamp label="Надеть" done /></Usage>
+      <Usage screen="Outfit Details" note="после нажатия — отменить, 56"><Stamp label="Надеть" done doneSize="S" /></Usage>
       <Usage screen="Stylist / С чем носить" note="сохранить образ"><Stamp label="Сохранить" /></Usage>
-      <Usage screen="Stylist / С чем носить" note="не нравится, secondary S"><Stamp label="Не нравится" tone="secondary" /></Usage>
+      <Usage screen="Stylist / С чем носить" note="не нравится, secondary 64"><Stamp label="Не нравится" variant="secondary" /></Usage>
+    </UsageGrid>
+  ),
+};
+
+export const DoneSizes: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Выполнено: M 78 · S 56',
+  render: () => (
+    <UsageGrid min={200}>
+      <Usage screen="doneSize M" note="главная, 252:286"><Stamp label="Надеть" done /></Usage>
+      <Usage screen="doneSize S" note="детали образа, 440:3008"><Stamp label="Надеть" done doneSize="S" /></Usage>
     </UsageGrid>
   ),
 };

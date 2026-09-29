@@ -12,6 +12,7 @@ export function useSlidingPill<T extends HTMLElement>(index: number) {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let frame = 0;
     const measure = () => {
       const item = el.querySelectorAll<HTMLElement>(':scope > [data-pill-item]')[index];
       if (!item) return setStyle({ opacity: 0 });
@@ -21,12 +22,12 @@ export function useSlidingPill<T extends HTMLElement>(index: number) {
         transform: `translate(${item.offsetLeft}px, ${item.offsetTop}px)`,
         transition: ready.current ? undefined : 'none',
       });
-      if (!ready.current) requestAnimationFrame(() => (ready.current = true));
+      if (!ready.current && !frame) frame = requestAnimationFrame(() => (ready.current = true));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); cancelAnimationFrame(frame); };
   }, [index]);
   return [ref, style] as const;
 }

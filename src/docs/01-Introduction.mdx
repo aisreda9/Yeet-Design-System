@@ -1,6 +1,6 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { Stat, Stats, levelCounts } from './blocks';
-import * as Pages from '../pages/Pages.stories';
+import * as Pages from '../pages/Wardrobe.stories';
 
 <Meta title="Старт/Введение" />
 
@@ -16,13 +16,13 @@ import * as Pages from '../pages/Pages.stories';
 |---|---|---|
 | **Figma** · страница «Design System 2.0 (Claude)» | Компоненты и все их варианты из флоу | Дизайн |
 | **Storybook** (вы здесь) | Живые компоненты, правила, примеры экранов | Продукт, разработка, дизайн |
-| **DESIGN.md** в репозитории | Полная текстовая спецификация | Разработка, ревью |
+| **DESIGN.md** в репозитории | Указатель: что где лежит, ID страниц Figma, таблицы токенов (генерируются) | Разработка, ревью |
 
 <Stats>
   <Stat value="3" label="слоя токенов: примитивы → семантика → компоненты" />
   <Stat value="2" label="темы: светлая и тёмная из одних компонентов" />
   <Stat value={levelCounts()} label="атомов · молекул · организмов" />
-  <Stat value="28" label="экранов флоу собраны из компонентов" />
+  <Stat value={Object.keys(Pages).filter((k) => k !== 'default' && k !== '__namedExportsOrder').length} label="экранов флоу собраны из компонентов" />
 </Stats>
 
 ## Что это даёт
@@ -36,8 +36,8 @@ import * as Pages from '../pages/Pages.stories';
 
 ## Как читать Storybook
 
-1. **Старт** — принципы и устройство системы.
+1. **Старт** — быстрый старт для разработчиков, принципы и устройство системы.
 2. **Foundations** — токены, типографика, отступы, иконки, правила скролла и текстов.
-3. **Atoms → Molecules → Organisms → Templates → Pages** — компоненты по уровням. У каждого: интерактивная песочница,
+3. **Atoms → Molecules → Organisms → Templates → Pages** — компоненты по уровням; **Прототип** — те же экраны в одном кликабельном приложении. У каждого: интерактивная песочница,
    все варианты и раздел **«В флоу»** — где именно в приложении он используется.
 4. Переключатель **темы** — в верхней панели.

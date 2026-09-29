@@ -6,7 +6,6 @@
 :root {
   --yeet-blue-500: #0100f4;
   --yeet-blue-400: #4b4bff;
-  --yeet-blue-300: #5b5bff;
   --yeet-blue-200: #8a8aff;
   --yeet-red-600: #cc291b;
   --yeet-red-500: #ff4230;
@@ -22,20 +21,31 @@
   --yeet-graphite-900: #1a1a1e;
   --yeet-graphite-950: #0f0f11;
   --yeet-item-black: #1a1a2e;
-  --yeet-item-grey: #777777;
+  --yeet-on-item-black: #ffffff; /* буква / иконка на этом цвете */
+  --yeet-item-grey: var(--yeet-neutral-500);
+  --yeet-on-item-grey: #000000; /* буква / иконка на этом цвете */
   --yeet-item-white: #ffffff;
+  --yeet-on-item-white: #000000; /* буква / иконка на этом цвете */
   --yeet-item-purple: #6a00ff;
+  --yeet-on-item-purple: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-pink: #d900ff;
+  --yeet-on-item-pink: #000000; /* буква / иконка на этом цвете */
   --yeet-item-green: #00d08b;
+  --yeet-on-item-green: #000000; /* буква / иконка на этом цвете */
   --yeet-item-blue: #0100f4;
+  --yeet-on-item-blue: #ffffff; /* буква / иконка на этом цвете */
   --yeet-item-yellow: #ffd000;
+  --yeet-on-item-yellow: #000000; /* буква / иконка на этом цвете */
   --yeet-item-orange: #ff8800;
-  --yeet-item-red: #ff4230;
+  --yeet-on-item-orange: #000000; /* буква / иконка на этом цвете */
+  --yeet-item-red: var(--yeet-red-500);
+  --yeet-on-item-red: #000000; /* буква / иконка на этом цвете */
   --yeet-item-beige: #ffe1c7;
+  --yeet-on-item-beige: #000000; /* буква / иконка на этом цвете */
   --yeet-item-brown: #c26547;
+  --yeet-on-item-brown: #000000; /* буква / иконка на этом цвете */
 
   --space-0: 0px;
-  --space-1: 1px;
   --space-2: 2px;
   --space-4: 4px;
   --space-8: 8px;
@@ -49,8 +59,6 @@
   --space-48: 48px;
   --space-52: 52px;
   --space-56: 56px;
-  --space-64: 64px;
-  --space-72: 72px;
   --radius-xs: 4px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -58,6 +66,7 @@
   --radius-xl: 32px;
   --radius-bar: 48px;
   --radius-full: 999px;
+  --radius-overlay: 48px;
 
   --font-display: 'Roboto Slab', Georgia, serif;
   --font-text: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
@@ -129,16 +138,18 @@
   --color-text-inverse: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
+  --color-text-on-photo: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-600); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
-  --color-accent-soft: rgb(1 0 244 / 0.1); /* ui-colors/blue-10% */
+  --color-accent-soft: #f1f4ff; /* ui-colors/blue-10% */
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 66 48 / 0.1); /* ui-colors/red-10% */
   --color-border-subtle: rgb(0 0 0 / 0.1); /* ui-colors/black-10% */
-  --color-divider: rgb(0 0 0 / 0.05); /* divider (black @5%) */
-  --color-pattern-dot: rgb(0 0 0 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(0 0 0 / 0.05); /* ui-colors/divider */
+  --color-pattern-dot: rgb(0 0 0 / 0.23); /* ui-colors/pattern-dot */
+  --color-handle: rgb(0 0 0 / 0.17); /* ui-colors/handle */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.12);
 }
 
@@ -154,7 +165,8 @@
   --color-text-inverse: var(--yeet-graphite-950); /* ui-colors/white */
   --color-text-on-accent: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-inverse-secondary: #5b6470; /* ui-colors/inverse-secondary */
-  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/white */
+  --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
+  --color-text-on-photo: var(--yeet-neutral-0); /* ui-colors/white */
   --color-text-accent: var(--yeet-blue-200); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-400); /* ui-colors/red-text */
   --color-accent: var(--yeet-blue-400); /* ui-colors/blue */
@@ -162,8 +174,9 @@
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 107 92 / 0.18); /* ui-colors/red-10% */
   --color-border-subtle: rgb(245 245 247 / 0.12); /* ui-colors/black-10% */
-  --color-divider: rgb(245 245 247 / 0.08); /* divider (black @5%) */
-  --color-pattern-dot: rgb(245 245 247 / 0.23); /* pattern (black @23%) */
+  --color-divider: rgb(245 245 247 / 0.08); /* ui-colors/divider */
+  --color-pattern-dot: rgb(245 245 247 / 0.23); /* ui-colors/pattern-dot */
+  --color-handle: rgb(245 245 247 / 0.14); /* ui-colors/handle */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.5);
 }
 
@@ -368,12 +381,59 @@
   --card-radius: var(--radius-lg);
   --sheet-bg: var(--color-bg-elevated);
   --sheet-radius: var(--radius-xl);
+  --sheet-radius-bottom: var(--radius-bar);
   --tab-bar-bg: var(--color-bg-elevated);
   --input-bg: var(--color-bg-subtle);
+  --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8)); /* Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top */
+  --sheet-handle: var(--color-handle); /* Хэндл шторки, 48 × 4 (D8) */
+  --sheet-title-gap: var(--space-16); /* Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
 }
 
-.y-h1 { font: 380 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }
-.y-h2 { font: 400 24px/28px var(--font-display); letter-spacing: -0.4px; margin: 0; }
-.y-h3 { font: 400 19px/24px var(--font-display); letter-spacing: -0.3px; margin: 0; }
-.y-body { font: 460 14px/20px var(--font-text); letter-spacing: 0px; margin: 0; }
-.y-caption { font: 400 12px/16px var(--font-text); letter-spacing: 0px; margin: 0; }
+.y-h1 { font: var(--font-weight-h1) 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }
+.y-h2 { font: var(--font-weight-h2) 24px/28px var(--font-display); letter-spacing: -0.4px; margin: 0; }
+.y-h3 { font: var(--font-weight-h3) 19px/24px var(--font-display); letter-spacing: -0.3px; margin: 0; }
+.y-body { font: var(--font-weight-body) 14px/20px var(--font-text); letter-spacing: 0px; margin: 0; }
+.y-caption { font: var(--font-weight-caption) 12px/16px var(--font-text); letter-spacing: 0px; margin: 0; }
+
+/* Токены 2.0: прозрачность, слои, размеры контролов, фокус, толщина линий, составная типографика, брейкпоинты */
+:root {
+  --opacity-disabled: 0.4; /* Недоступная кнопка, иконка, стрелка пейджера */
+  --opacity-pressed: 0.64; /* Нажатая строка списка */
+  --layer-base: 0; /* Подложка: медиа под сворачивающейся шапкой */
+  --layer-raised: 1; /* Над соседями: вкладка таб-бара, подпись коллажа, текущий образ */
+  --layer-float: 2; /* Поверх контента: погода и штамп на «Сегодня», подсказка кропа, перетаскиваемая вещь */
+  --layer-bar: 3; /* Шапка, таб-бар, нижняя панель, стрелки пейджера */
+  --layer-sticky: 4; /* Плавающие и прилипающие элементы экрана, штамп в деталях */
+  --layer-overlay: 5; /* Затемнение и модальные sheet / dialog */
+  --size-control-s: 40px; /* S: чипсы, компактные кнопки, свёрнутая шапка */
+  --size-control-m: 48px; /* M: поле ввода в панели, заголовок-чипс, сегмент M */
+  --size-control-l: 52px; /* L: snackbar, чат, строка списка без группы */
+  --size-control-xl: 56px; /* XL: главная кнопка, поле, таб-бар, строка в группе */
+  --focus-ring-width: 2px; /* Толщина outline */
+  --focus-ring-offset: 2px; /* Отступ снаружи: кнопки, чипсы, ссылки */
+  --focus-ring-offset-inset: -2px; /* Кольцо внутри: элемент у края экрана или внутри карточки */
+  --border-width-thin: 1px; /* Разделители, обводка свотча, волосяная рамка кропа */
+  --border-width-icon: 1.3px; /* Линия иконок ui-icons (24 × 24) и кольцо аватара в таб-баре */
+  --border-width-medium: 1.5px; /* Кольцо фокуса поля ввода, выделение вещи на холсте */
+  --border-width-thick: 2px; /* Уголки кропа, кольцо стопки аватаров, цель перетаскивания */
+  --breakpoint-container-compact: 300px; /* Контейнер таб-бара (CSS @container): уже — на экране 320 с кнопкой «+» вкладки идут без зазора */
+  --breakpoint-compact: 320px; /* Самый узкий экран (iPhone SE) */
+  --breakpoint-regular: var(--screen-width); /* Базовый экран макетов (iPhone 15/16) */
+  --breakpoint-large: 430px; /* Широкий экран (Pro Max) */
+  --typography-h1: var(--font-weight-h1) 32px/36px var(--font-display);
+  --typography-h1-letter-spacing: -1px;
+  --typography-h2: var(--font-weight-h2) 24px/28px var(--font-display);
+  --typography-h2-letter-spacing: -0.4px;
+  --typography-h3: var(--font-weight-h3) 19px/24px var(--font-display);
+  --typography-h3-letter-spacing: -0.3px;
+  --typography-body: var(--font-weight-body) 14px/20px var(--font-text);
+  --typography-body-letter-spacing: 0px;
+  --typography-caption: var(--font-weight-caption) 12px/16px var(--font-text);
+  --typography-caption-letter-spacing: 0px;
+}
+
+:root,
+[data-theme],
+[data-brand] {
+  --focus-ring-color: var(--color-text-accent); /* Цвет кольца */
+}

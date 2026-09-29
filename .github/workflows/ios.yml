@@ -1,0 +1,62 @@
+name: iOS package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'native/ios/**'
+      - 'Package.swift'
+      - 'tokens/**'
+      - 'src/icons/**'
+      - 'src/atoms/icon.tsx'
+      - 'scripts/build-tokens.mjs'
+      - 'scripts/tokens/**'
+      - 'package-lock.json'
+      - 'scripts/build-ios.mjs'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - 'native/ios/**'
+      - 'Package.swift'
+      - 'tokens/**'
+      - 'src/icons/**'
+      - 'src/atoms/icon.tsx'
+      - 'scripts/build-tokens.mjs'
+      - 'scripts/tokens/**'
+      - 'package-lock.json'
+      - 'scripts/build-ios.mjs'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Новый пуш в PR отменяет устаревший прогон; прогоны main доигрывают до конца
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # Генератор токенов — Style Dictionary (devDependency)
+      - run: npm ci
+      - name: Сгенерированные файлы актуальны (npm run tokens)
+        run: |
+          node scripts/build-tokens.mjs
+          git status --porcelain -- native/ios tokens src/tokens
+          test -z "$(git status --porcelain -- native/ios tokens src/tokens)" || { echo '::error::Run `npm run tokens` and commit the result'; exit 1; }
+      - name: Xcode
+        run: xcodebuild -version && swift --version
+      - name: Build native/ios (iOS Simulator)
+        working-directory: native/ios
+        run: xcodebuild build -scheme YeetDesignSystem -destination 'generic/platform=iOS Simulator' -quiet
+      - name: Build root manifest (SPM by repository URL)
+        run: xcodebuild build -scheme YeetDesignSystem -destination 'generic/platform=iOS Simulator' -quiet
