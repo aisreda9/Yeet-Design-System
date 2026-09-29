@@ -8,7 +8,7 @@ const meta = {
   tags: ['autodocs'],
   args: { title: 'Упс, не нашли', description: 'Измени запрос или попробуй поискать что-то другое', action: { label: 'Сбросить поиск' } },
   decorators: [unlessBare(withWidth(353))],
-  parameters: { docs: { description: { component: 'Пустое состояние: H1 + Body grey через 16, опционально кнопка L через 32 — Tertiary («Сбросить фильтры») или Primary («Добавить вещь», «Показать еще»). Figma: `empty-state` · Title, Description, Action.' } } },
+  parameters: { docs: { description: { component: 'Пустое состояние: H1 + Body grey через 16, опционально кнопка L через 32 — по умолчанию Primary, как в Figma («Добавить вещь», «Сбросить поиск»); вторичное действие — `tertiary`. Figma: `empty-state` · Title, Description, Action.' } } },
 } satisfies Meta<typeof EmptyState>;
 export default meta;
 type Story = StoryObj<typeof meta>;

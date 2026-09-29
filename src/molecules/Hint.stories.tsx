@@ -8,14 +8,14 @@ const meta = {
   tags: ['autodocs'],
   args: { children: 'Перемещай и масштабируй вещи', icon: 'fingers-pinch', tone: 'default' },
   argTypes: { icon: { control: 'select', options: ['fingers-pinch', 'horizontal-drag', 'info'] }, tone: { control: 'inline-radio', options: ['default', 'onPhoto'] }, children: { control: 'text', name: 'label' } },
-  parameters: { docs: { description: { component: 'Плавающая подсказка: иконка 16 + Body 14. **default** — пилюля 28 elevated, радиус 32, тень; **onPhoto** — без подложки, белый текст и иконка поверх фото (`--color-text-on-photo`). Figma: `hint` · Tone (Default / On Photo), Label, Icon.' } } },
+  parameters: { docs: { description: { component: 'Плавающая подсказка: иконка + Body 14. **default** — пилюля 28 elevated, радиус 32, тень, иконка 16, gap 6; **onPhoto** — без подложки, иконка 24, gap 8, белый текст и иконка поверх фото (`--color-text-on-photo`). Figma: `hint` · Tone (Default / On Photo), Label, Icon.' } } },
 } satisfies Meta<typeof Hint>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-/** Подсказка поверх фото: белым, без пилюли. */
+/** Подсказка поверх фото: белым, без пилюли, иконка 24 через 8. */
 export const OnPhoto: Story = {
   name: 'On Photo',
   args: { tone: 'onPhoto', icon: 'fingers-pinch', children: 'Выдели вещь на фото' },

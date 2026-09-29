@@ -208,6 +208,8 @@ export type ListItemProps = Omit<ComponentPropsWithRef<'button'>, 'type' | 'chil
   /** @deprecated Используйте `variant`: `type` у кнопки — атрибут HTML (`button` / `submit`). */
   type?: ListItemVariant;
   label: string;
+  /** Вторая строка под label — Caption серым (Figma: list-item · Show Description, Description). */
+  description?: ReactNode;
   icon?: IconName;
   /** expandable: раскрыта ли строка */
   expanded?: boolean;
@@ -219,15 +221,22 @@ export type ListItemProps = Omit<ComponentPropsWithRef<'button'>, 'type' | 'chil
 };
 
 /**
- * Строка списка в sheet, высота 24, gap 12.
+ * Строка списка в sheet, высота 24, gap 12. С `description` — вторая строка Caption серым через 2, строка растёт по высоте.
  * **action** — действие с вещью (создать образ, редактировать, удалить), **expandable** — категории одежды,
  * **radio** — одиночный выбор (год рождения, пол; страна — с флагом, валюта — с кодом серым справа).
  * Группу radio-строк собирает `RadioList` (radiogroup, стрелки, uncontrolled). `ref`, `className` и атрибуты пробрасываются.
  */
-export function ListItem({ variant, type, label, icon, expanded, checked, trailing, onClick, className, ref, ...rest }: ListItemProps) {
+export function ListItem({ variant, type, label, description, icon, expanded, checked, trailing, onClick, className, ref, ...rest }: ListItemProps) {
   const kind = variant ?? type ?? 'action';
   const end = typeof trailing === 'string' ? <span className="y-list-item__trailing">{trailing}</span> : trailing;
-  const text = <span className="y-list-item__label">{label}</span>;
+  const text = description ? (
+    <span className="y-list-item__text">
+      <span className="y-list-item__label">{label}</span>
+      <span className="y-list-item__description y-caption">{description}</span>
+    </span>
+  ) : (
+    <span className="y-list-item__label">{label}</span>
+  );
   // Строка без действия (например, с кнопкой «Выйти» в trailing) — не кнопка: вложенный интерактив ломает скринридеры
   if (kind === 'action' && !onClick)
     return (
@@ -350,7 +359,7 @@ const rub = (v: number) => `${v.toLocaleString('ru-RU')} ₽`;
 
 /**
  * Двойной ползунок диапазона с гистограммой. Ручки — Primary 24 с иконкой `horizontal-drag`,
- * трек выбранного диапазона — `--color-accent`. Под ним — границы диапазона.
+ * трек выбранного диапазона — чёрная линия `--color-text-primary` (не accent). Под ним — границы диапазона.
  * **Контексты:** Search / Results / Sheet / Price Filter.
  */
 export function RangeSlider({ min, max, value, onChange, step = 100, histogram, format = rub, label, className, style, ...rest }: RangeSliderProps) {

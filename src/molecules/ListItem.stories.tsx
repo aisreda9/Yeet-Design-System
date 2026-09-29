@@ -8,10 +8,10 @@ const meta = {
   title: 'Molecules/ListItem',
   component: ListItem,
   tags: ['autodocs'],
-  args: { variant: 'action', label: 'Создать образ', icon: 'ai', expanded: false, checked: false },
-  argTypes: { variant: { control: 'inline-radio', options: ['action', 'expandable', 'radio'] }, icon: { control: 'select', options: [undefined, 'ai', 'pen', 'archive', 'trash', 'top', 'bottom', 'shoe'] } },
+  args: { variant: 'action', label: 'Создать образ', description: '', icon: 'ai', expanded: false, checked: false },
+  argTypes: { variant: { control: 'inline-radio', options: ['action', 'expandable', 'radio'] }, description: { control: 'text' }, icon: { control: 'select', options: [undefined, 'ai', 'pen', 'archive', 'trash', 'top', 'bottom', 'shoe'] } },
   decorators: [unlessBare(withWidth(353))],
-  parameters: { docs: { description: { component: 'Строка внутри sheet (высота 24, gap 12). action — действие, expandable — категория, radio — одиночный выбор; справа — флаг (`Flag`) или текст серым (валюта «₽ · RUB»). `List` — колонка строк с gap 20. Radio-строки группой — `RadioList` (radiogroup, стрелки, uncontrolled). `variant` заменил `type` (старое имя работает, помечено `@deprecated`). Figma: `list-item` · Type, State, Label, Icon, Trailing.' } } },
+  parameters: { docs: { description: { component: 'Строка внутри sheet (высота 24, gap 12). action — действие, expandable — категория, radio — одиночный выбор; справа — флаг (`Flag`) или текст серым (валюта «₽ · RUB»). `description` — вторая строка Caption серым через 2 (Figma: Show Description), строка растёт по высоте. `List` — колонка строк с gap 20. Radio-строки группой — `RadioList` (radiogroup, стрелки, uncontrolled). `variant` заменил `type` (старое имя работает, помечено `@deprecated`). Figma: `list-item` · Type, State, Label, Show Description, Icon, Trailing.' } } },
 } satisfies Meta<typeof ListItem>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -21,6 +21,20 @@ export const Playground: Story = {
     const [, update] = useArgs();
     return <ListItem {...args} onClick={() => (args.variant === 'radio' ? update({ checked: !args.checked }) : args.variant === 'expandable' ? update({ expanded: !args.expanded }) : undefined)} />;
   },
+};
+
+/** Вторая строка под label: Caption серым (Figma: list-item · Show Description). */
+export const WithDescription: Story = {
+  name: 'С описанием',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <List>
+      <ListItem icon="ai" label="Создать образ" description="Подберём вещи под погоду и повод" />
+      <ListItem variant="expandable" icon="top" label="Верх" description="12 вещей" />
+      <ListItem variant="radio" label="Российский рубль" description="Цены в приложении — в рублях" checked trailing="₽ · RUB" />
+      <ListItem variant="radio" label="Доллар США" description="Цены в приложении — в долларах" trailing="$ · USD" />
+    </List>
+  ),
 };
 
 export const InFlow: Story = {
