@@ -1,4 +1,4 @@
-import type { CSSProperties, ElementType, HTMLAttributes, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { ItemColor } from '../tokens/tokens';
 import { cx } from '../utils/cx';
 import { Icon } from './icon';
@@ -57,18 +57,3 @@ export function ScrollEdge({ position, size = 24, offset = 0 }: { position: 'top
   return <span aria-hidden className={cx('y-scroll-edge', `y-scroll-edge--${position}`)} style={style} />;
 }
 
-/* ─── Text ──────────────────────────────────────────────────────────── */
-
-export type TextProps = HTMLAttributes<HTMLElement> & {
-  variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption';
-  tone?: 'primary' | 'secondary' | 'accent' | 'danger';
-  as?: ElementType;
-};
-
-const defaultTag = { h1: 'h1', h2: 'h2', h3: 'h3', body: 'p', caption: 'span' } as const;
-
-/** Текст в одном из 5 стилей. Заголовки — Roboto Slab, остальное — Inter. */
-export function Text({ variant = 'body', tone = 'primary', as, className, ...rest }: TextProps) {
-  const Tag = (as ?? defaultTag[variant]) as ElementType;
-  return <Tag className={cx(`y-${variant}`, `y-text--${tone}`, className)} {...rest} />;
-}
