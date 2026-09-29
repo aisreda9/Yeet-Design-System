@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse guard for mcp__Figma__use_figma.
+# PreToolUse guard for use_figma (local mcp__Figma__ server or a cloud Figma connector).
 # Routine scripts run without a prompt (allowed in settings.json);
 # this hook escalates to "ask" when a script looks destructive or
 # writes to the original (non-Claude) pages of the YeetStyle file.

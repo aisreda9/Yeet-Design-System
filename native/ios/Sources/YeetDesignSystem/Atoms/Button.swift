@@ -76,6 +76,8 @@ public enum YeetControlSize: String, CaseIterable, Identifiable {
 /// Контексты во флоу: главный CTA онбординга и входа (Primary XL), пара действий в sheet (Tertiary + Primary L),
 /// фильтры-дропдауны (Tertiary / Soft S + `chevronUpDown`), «Пропустить» (Ghost M).
 /// Выключение — стандартный `.disabled(true)`: прозрачность 0.4.
+/// **Загрузка:** `isLoading` — «Войти» пока идёт запрос, «Сохранить» вещь, «Удалить аккаунт»: вместо содержимого спиннер,
+/// ширина кнопки не меняется, повторное нажатие не срабатывает, но кнопка остаётся доступной VoiceOver (значение — `loadingLabel`).
 public struct YeetButton<Label: View>: View {
     private let variant: YeetButtonStyle
     private let size: YeetControlSize
@@ -83,6 +85,8 @@ public struct YeetButton<Label: View>: View {
     private let rightIcon: YeetIconName?
     private let fullWidth: Bool
     private let floating: Bool
+    private let isLoading: Bool
+    private let loadingLabel: String
     private let action: () -> Void
     private let label: Label
 
@@ -93,6 +97,8 @@ public struct YeetButton<Label: View>: View {
         rightIcon: YeetIconName? = nil,
         fullWidth: Bool = false,
         floating: Bool = false,
+        isLoading: Bool = false,
+        loadingLabel: String = "Загрузка",
         action: @escaping () -> Void,
         @ViewBuilder label: () -> Label
     ) {
@@ -102,12 +108,16 @@ public struct YeetButton<Label: View>: View {
         self.rightIcon = rightIcon
         self.fullWidth = fullWidth
         self.floating = floating
+        self.isLoading = isLoading
+        self.loadingLabel = loadingLabel
         self.action = action
         self.label = label()
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button {
+            if !isLoading { action() }
+        } label: {
             HStack(spacing: size.gap) {
                 if let leftIcon {
                     YeetIcon(name: leftIcon)
@@ -119,6 +129,10 @@ public struct YeetButton<Label: View>: View {
                     YeetIcon(name: rightIcon)
                 }
             }
+            .opacity(isLoading ? 0 : 1)
+            .overlay {
+                if isLoading { YeetSpinner(size: size.iconSize) }
+            }
             .padding(.horizontal, size.padding)
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .frame(minHeight: size.height)
@@ -127,8 +141,9 @@ public struct YeetButton<Label: View>: View {
             .yeetFloating(floating)
             .contentShape(Capsule())
         }
-        .buttonStyle(YeetPressStyle())
+        .buttonStyle(YeetPressStyle(scale: isLoading ? 1 : YeetGesture.pressScale))
         .yeetHitArea(height: size.height)
+        .modifier(YeetBusy(isLoading: isLoading, label: loadingLabel))
     }
 }
 
@@ -142,10 +157,50 @@ public extension YeetButton where Label == Text {
         rightIcon: YeetIconName? = nil,
         fullWidth: Bool = false,
         floating: Bool = false,
+        isLoading: Bool = false,
+        loadingLabel: String = "Загрузка",
         action: @escaping () -> Void
     ) {
-        self.init(variant: variant, size: size, leftIcon: leftIcon, rightIcon: rightIcon, fullWidth: fullWidth, floating: floating, action: action) {
+        self.init(variant: variant, size: size, leftIcon: leftIcon, rightIcon: rightIcon, fullWidth: fullWidth, floating: floating, isLoading: isLoading, loadingLabel: loadingLabel, action: action) {
             Text(title)
+        }
+    }
+}
+
+// MARK: - Загрузка
+
+/// Спиннер `spin`: оборот за 1,2 с; при «Уменьшении движения» — пульсация прозрачности 1,6 с вместо вращения.
+struct YeetSpinner: View {
+    let size: CGFloat
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var spinning = false
+
+    var body: some View {
+        YeetIcon(name: .spin, size: size)
+            .rotationEffect(.degrees(!reduceMotion && spinning ? 360 : 0))
+            .opacity(reduceMotion && spinning ? 0.4 : 1)
+            .animation(
+                reduceMotion
+                    ? .easeInOut(duration: 1.6).repeatForever(autoreverses: true)
+                    : .linear(duration: 1.2).repeatForever(autoreverses: false),
+                value: spinning
+            )
+            .onAppear { spinning = true }
+            .accessibilityHidden(true)
+    }
+}
+
+/// Кнопка в загрузке: VoiceOver читает «Загрузка» значением, повторное нажатие не срабатывает (React: `aria-busy`).
+private struct YeetBusy: ViewModifier {
+    let isLoading: Bool
+    let label: String
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isLoading {
+            content.accessibilityValue(Text(label))
+        } else {
+            content
         }
     }
 }
@@ -163,6 +218,8 @@ public struct YeetIconButton: View {
     private let size: YeetControlSize
     private let floating: Bool
     private let decorative: Bool
+    private let isLoading: Bool
+    private let loadingLabel: String
     private let action: () -> Void
     // Внутренние подстройки размеров (чипс «+» 36, кнопки карточки аккаунта с иконкой 24)
     var side: CGFloat?
@@ -171,6 +228,7 @@ public struct YeetIconButton: View {
     /// - Parameters:
     ///   - label: обязательное описание действия для VoiceOver: «Назад», «Ещё», «Добавить».
     ///   - decorative: только вид кнопки внутри другой кнопки — без собственного действия, скрыта от VoiceOver.
+    ///   - isLoading: «Отправить» в чате, пока сообщение уходит: спиннер вместо иконки, повторное нажатие не срабатывает.
     public init(
         icon: YeetIconName,
         label: String,
@@ -178,6 +236,8 @@ public struct YeetIconButton: View {
         size: YeetControlSize = .m,
         floating: Bool = false,
         decorative: Bool = false,
+        isLoading: Bool = false,
+        loadingLabel: String = "Загрузка",
         action: @escaping () -> Void = {}
     ) {
         self.icon = icon
@@ -186,6 +246,8 @@ public struct YeetIconButton: View {
         self.size = size
         self.floating = floating
         self.decorative = decorative
+        self.isLoading = isLoading
+        self.loadingLabel = loadingLabel
         self.action = action
     }
 
@@ -199,7 +261,11 @@ public struct YeetIconButton: View {
 
     public var body: some View {
         let diameter = side ?? size.height
-        let face = YeetIcon(name: icon, size: iconSize ?? size.iconSize)
+        let glyph = iconSize ?? size.iconSize
+        let face = ZStack {
+            YeetIcon(name: icon, size: glyph).opacity(isLoading ? 0 : 1)
+            if isLoading { YeetSpinner(size: glyph) }
+        }
             .frame(width: diameter, height: diameter)
             .foregroundStyle(variant.foreground)
             .background(Circle().fill(variant.background))
@@ -208,36 +274,48 @@ public struct YeetIconButton: View {
         if decorative {
             face.accessibilityHidden(true)
         } else {
-            Button(action: action) { face }
-                .buttonStyle(YeetPressStyle())
+            Button {
+                if !isLoading { action() }
+            } label: { face }
+                .buttonStyle(YeetPressStyle(scale: isLoading ? 1 : YeetGesture.pressScale))
                 .yeetHitArea(height: diameter)
                 .accessibilityLabel(Text(label))
+                .modifier(YeetBusy(isLoading: isLoading, label: loadingLabel))
         }
     }
 }
 
 #if DEBUG
-#Preview("Button") {
-    ScrollView {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(YeetButtonStyle.allCases) { style in
-                HStack(spacing: 8) {
-                    YeetButton(style.rawValue.capitalized, variant: style, size: .l) {}
-                    YeetIconButton(icon: .plus, label: "Добавить", variant: style, size: .l)
+private struct ButtonPreview: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(YeetButtonStyle.allCases) { style in
+                    HStack(spacing: 8) {
+                        YeetButton(style.rawValue.capitalized, variant: style, size: .l) {}
+                        YeetIconButton(icon: .plus, label: "Добавить", variant: style, size: .l)
+                    }
                 }
-            }
-            ForEach(YeetControlSize.allCases) { size in
-                HStack(spacing: 8) {
-                    YeetButton("Размер \(size.rawValue)", variant: .tertiary, size: size, rightIcon: .chevronUpDown) {}
-                    YeetIconButton(icon: .more, label: "Ещё", size: size)
+                ForEach(YeetControlSize.allCases) { size in
+                    HStack(spacing: 8) {
+                        YeetButton("Размер \(size.rawValue)", variant: .tertiary, size: size, rightIcon: .chevronUpDown) {}
+                        YeetIconButton(icon: .more, label: "Ещё", size: size)
+                    }
                 }
+                YeetButton("Войти", variant: .primary, size: .xl, leftIcon: .apple, fullWidth: true) {}
+                YeetButton("Недоступно", variant: .primary) {}.disabled(true)
+                HStack(spacing: 8) {
+                    YeetButton("Войти", variant: .primary, size: .xl, isLoading: true) {}
+                    YeetIconButton(icon: .arrowUp, label: "Отправить", variant: .primary, isLoading: true)
+                }
+                YeetIconButton(icon: .plus, label: "Добавить", variant: .primary, size: .xl, floating: true)
             }
-            YeetButton("Войти", variant: .primary, size: .xl, leftIcon: .apple, fullWidth: true) {}
-            YeetButton("Недоступно", variant: .primary) {}.disabled(true)
-            YeetIconButton(icon: .plus, label: "Добавить", variant: .primary, size: .xl, floating: true)
+            .padding(20)
         }
-        .padding(20)
+        .background(YeetColor.bgCanvas)
     }
-    .background(YeetColor.bgCanvas)
 }
+
+#Preview("Button · Light") { ButtonPreview().preferredColorScheme(.light) }
+#Preview("Button · Dark") { ButtonPreview().preferredColorScheme(.dark) }
 #endif

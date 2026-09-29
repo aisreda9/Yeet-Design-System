@@ -66,6 +66,7 @@
   --radius-xl: 32px;
   --radius-bar: 48px;
   --radius-full: 999px;
+  --radius-overlay: 48px;
 
   --font-display: 'Roboto Slab', Georgia, serif;
   --font-text: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
@@ -148,6 +149,7 @@
   --color-border-subtle: rgb(0 0 0 / 0.1); /* ui-colors/black-10% */
   --color-divider: rgb(0 0 0 / 0.05); /* ui-colors/divider */
   --color-pattern-dot: rgb(0 0 0 / 0.23); /* ui-colors/pattern-dot */
+  --color-handle: rgb(0 0 0 / 0.17); /* ui-colors/handle */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.12);
 }
 
@@ -174,6 +176,7 @@
   --color-border-subtle: rgb(245 245 247 / 0.12); /* ui-colors/black-10% */
   --color-divider: rgb(245 245 247 / 0.08); /* ui-colors/divider */
   --color-pattern-dot: rgb(245 245 247 / 0.23); /* ui-colors/pattern-dot */
+  --color-handle: rgb(245 245 247 / 0.14); /* ui-colors/handle */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.5);
 }
 
@@ -381,6 +384,9 @@
   --sheet-radius-bottom: var(--radius-bar);
   --tab-bar-bg: var(--color-bg-elevated);
   --input-bg: var(--color-bg-subtle);
+  --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8)); /* Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top */
+  --sheet-handle: var(--color-handle); /* Хэндл шторки, 48 × 4 (D8) */
+  --sheet-title-gap: var(--space-16); /* Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
 }
 
 .y-h1 { font: var(--font-weight-h1) 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }

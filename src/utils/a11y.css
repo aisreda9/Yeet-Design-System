@@ -14,7 +14,7 @@
  * Новый интерактивный элемент получает его классом `y-focus-ring`; компоненты с особой формой кольца
  * (штамп, строка поля, трек слайдера) переопределяют его у себя.
  */
-:is(.y-focus-ring, .y-button, .y-icon-button, .y-link, .y-input-bar__photo, .y-chip__toggle, .y-chip__remove):focus-visible {
+:is(.y-focus-ring, .y-button, .y-icon-button, .y-link, .y-input-bar__photo, .y-chip__toggle, .y-chip__remove, button.y-list-item):focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
