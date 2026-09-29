@@ -1,5 +1,5 @@
-/** Метаданные токенов для документации. Значения — из tokens/tokens.json (единый источник для web, iOS, Android). */
-import tokens from '../../tokens/tokens.json';
+/** Метаданные токенов для документации. Значения — из tokens/tokens.json через model.js (единый источник для web, iOS, Android). */
+import { tokens } from './model';
 
 export type ItemColor = keyof typeof tokens.item;
 

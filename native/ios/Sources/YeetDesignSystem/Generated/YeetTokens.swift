@@ -449,3 +449,74 @@ public extension View {
         shadow(color: YeetShadow.floatingColor, radius: YeetShadow.floatingRadius, x: YeetShadow.floatingX, y: YeetShadow.floatingY)
     }
 }
+
+/// Прозрачность состояний элемента целиком (не цвета: прозрачные цвета — в color.*).
+public enum YeetOpacity {
+    /// Недоступная кнопка, иконка, стрелка пейджера
+    public static let disabled: Double = 0.4
+    /// Нажатая строка списка
+    public static let pressed: Double = 0.64
+}
+
+/// Слои (z-index) внутри экрана: чем выше, тем ближе к пользователю. Web — z-index, iOS — .zIndex, Android — Modifier.zIndex.
+public enum YeetLayer {
+    /// Подложка: медиа под сворачивающейся шапкой
+    public static let base: Double = 0
+    /// Над соседями: вкладка таб-бара, подпись коллажа, текущий образ
+    public static let raised: Double = 1
+    /// Поверх контента: погода и штамп на «Сегодня», подсказка кропа, перетаскиваемая вещь
+    public static let float: Double = 2
+    /// Шапка, таб-бар, нижняя панель, стрелки пейджера
+    public static let bar: Double = 3
+    /// Плавающие и прилипающие элементы экрана, штамп в деталях
+    public static let sticky: Double = 4
+    /// Затемнение и модальные sheet / dialog
+    public static let overlay: Double = 5
+}
+
+public enum YeetSize {
+    /// S: чипсы, компактные кнопки, свёрнутая шапка
+    public static let controlS: CGFloat = 40
+    /// M: поле ввода в панели, заголовок-чипс, сегмент M
+    public static let controlM: CGFloat = 48
+    /// L: snackbar, чат, строка списка без группы
+    public static let controlL: CGFloat = 52
+    /// XL: главная кнопка, поле, таб-бар, строка в группе
+    public static let controlXl: CGFloat = 56
+}
+
+/// Кольцо фокуса клавиатуры (:focus-visible). Цвет — text-accent: держит ≥ 3 : 1 во всех брендах, accent в светлых брендах падает до 1.4 : 1.
+public enum YeetFocusRing {
+    /// Цвет кольца
+    public static let color: Color = YeetColor.textAccent
+    /// Толщина outline
+    public static let width: CGFloat = 2
+    /// Отступ снаружи: кнопки, чипсы, ссылки
+    public static let offset: CGFloat = 2
+    /// Кольцо внутри: элемент у края экрана или внутри карточки
+    public static let offsetInset: CGFloat = -2
+}
+
+/// Толщина линий: обводки, разделители, кольца.
+public enum YeetBorderWidth {
+    /// Разделители, обводка свотча, волосяная рамка кропа
+    public static let thin: CGFloat = 1
+    /// Линия иконок ui-icons (24 × 24) и кольцо аватара в таб-баре
+    public static let icon: CGFloat = 1.3
+    /// Кольцо фокуса поля ввода, выделение вещи на холсте
+    public static let medium: CGFloat = 1.5
+    /// Уголки кропа, кольцо стопки аватаров, цель перетаскивания
+    public static let thick: CGFloat = 2
+}
+
+/// Ширины, под которые проверяется вёрстка. CSS-переменные нельзя подставить в @media / @container — значения для сверки и JS (matchMedia).
+public enum YeetBreakpoint {
+    /// Контейнер таб-бара (CSS @container): уже — на экране 320 с кнопкой «+» вкладки идут без зазора
+    public static let containerCompact: CGFloat = 300
+    /// Самый узкий экран (iPhone SE)
+    public static let compact: CGFloat = 320
+    /// Базовый экран макетов (iPhone 15/16)
+    public static let regular: CGFloat = 393
+    /// Широкий экран (Pro Max)
+    public static let large: CGFloat = 430
+}

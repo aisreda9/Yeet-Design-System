@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { Button } from '.';
 import { Matrix, Usage, UsageGrid } from '../docs/helpers';
 
@@ -12,6 +13,8 @@ const meta = {
     size: { control: 'inline-radio', options: ['S', 'M', 'L', 'XL'] },
     leftIcon: { control: 'select', options: [undefined, 'plus', 'apple', 'heart', 'camera'] },
     rightIcon: { control: 'select', options: [undefined, 'chevron-up-down', 'cross', 'external-link'] },
+    loading: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
   parameters: {
     docs: {
@@ -28,7 +31,13 @@ const meta = {
 | **soft** | Выбранная опция / чипс | «Сначала дешевле ⌄» |
 | **destructive** | Удаление и необратимые действия — всегда | «Удалить», «Очистить» |
 
-Размеры: **S 40** (чипсы, фильтры) · **M 48** (шапка, пустые состояния) · **L 52** (пары в sheet и диалогах) · **XL 56** (главный CTA).`,
+Размеры: **S 40** (чипсы, фильтры) · **M 48** (шапка, пустые состояния) · **L 52** (пары в sheet и диалогах) · **XL 56** (главный CTA).
+
+**Состояния:** нажатие — сжатие \`--gesture-press-scale\`; \`disabled\` — прозрачность 0.4, из фокуса выпадает;
+\`loading\` — спиннер цветом текста вместо содержимого (ширина та же), \`aria-busy\`, повторные нажатия и отправка формы гасятся,
+кнопка остаётся в фокусе и озвучивается «…, Загрузка» (\`loadingLabel\`).
+
+**API:** \`ref\`, \`className\` и любые атрибуты \`<button>\` пробрасываются; тип пропсов — \`ButtonProps\`.`,
       },
     },
   },
@@ -74,4 +83,56 @@ export const InFlow: Story = {
       <Usage screen="Dialog · Delete Account" note="деструктивное — всегда красное"><div style={{ display: 'flex', gap: 8, width: '100%' }}><Button variant="destructive" fullWidth>Удалить</Button><Button fullWidth>Отменить</Button></div></Usage>
     </UsageGrid>
   ),
+};
+
+/** Нажатие показано статично (то же сжатие, что даёт `:active`). В живой истории «Загрузка по нажатию» — полный цикл. */
+export const States: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Состояния',
+  render: () => (
+    <Matrix
+      rows={['primary', 'secondary', 'tertiary', 'soft', 'destructive']}
+      cols={['обычная', 'нажата', 'disabled', 'loading']}
+      render={(v, st) => (
+        <Button
+          variant={v as never}
+          size="L"
+          disabled={st === 'disabled'}
+          loading={st === 'loading'}
+          style={st === 'нажата' ? { transform: 'scale(var(--gesture-press-scale))' } : undefined}
+        >
+          Сохранить
+        </Button>
+      )}
+    />
+  ),
+};
+
+function LoadingDemo() {
+  const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(0);
+  return (
+    <div style={{ display: 'grid', gap: 12, width: 313 }}>
+      <Button
+        size="XL"
+        fullWidth
+        loading={loading}
+        loadingLabel="Входим"
+        onClick={() => { setCount((n) => n + 1); setLoading(true); window.setTimeout(() => setLoading(false), 1500); }}
+      >
+        Войти
+      </Button>
+      <span className="y-caption y-text--secondary">Запросов отправлено: {count}</span>
+    </div>
+  );
+}
+
+/**
+ * Сценарий проверки: нажать «Войти» — спиннер 1,5 с, счётчик +1. Нажать ещё несколько раз, пока крутится, —
+ * счётчик не растёт (повтор заблокирован), фокус остаётся на кнопке, скринридер слышит «Войти Входим, занято».
+ */
+export const LoadingOnPress: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Загрузка по нажатию',
+  render: () => <LoadingDemo />,
 };

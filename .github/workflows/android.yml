@@ -3,9 +3,9 @@ name: Android (Compose)
 on:
   push:
     branches: [main]
-    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/tokens/**', 'package-lock.json', 'scripts/android.mjs', '.github/workflows/android.yml']
   pull_request:
-    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/tokens/**', 'package-lock.json', 'scripts/android.mjs', '.github/workflows/android.yml']
   workflow_dispatch:
 
 permissions:
@@ -28,6 +28,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: npm
+      # Генератор токенов — Style Dictionary (devDependency)
+      - run: npm ci
+        working-directory: .
       - name: Сгенерированные токены, иконки и шрифты совпадают с источниками (npm run tokens)
         working-directory: .
         run: |

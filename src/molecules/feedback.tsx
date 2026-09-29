@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { cx } from '../utils/cx';
@@ -37,9 +37,11 @@ export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M' }: { 
   const [closing, setClosing] = useState(false);
   const leaving = useContext(LeavingContext) || closing;
   const [paused, setPaused] = useState(false);
+  const exit = useRef(0);
   const leave = useCallback((then?: () => void) => {
     setClosing(true);
-    window.setTimeout(() => { then?.(); onClose?.(); }, motionMs('--motion-exit'));
+    if (exit.current) return; // двойное нажатие не вызывает onUndo / onClose дважды; после размонтирования таймер доигрывает — «Отменить» не теряется
+    exit.current = window.setTimeout(() => { then?.(); onClose?.(); }, motionMs('--motion-exit'));
   }, [onClose]);
   useEffect(() => {
     if (!autoHide || !onClose || paused || leaving) return;
