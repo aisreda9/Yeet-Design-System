@@ -360,12 +360,14 @@ public struct YeetSpring {
     public static let quick = YeetSpring(mass: 1, stiffness: 300, damping: 20, duration: 0.744)
     /// Figma Bouncy
     public static let bouncy = YeetSpring(mass: 1, stiffness: 600, damping: 15, duration: 0.958)
+    /// Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
+    public static let critical = YeetSpring(mass: 1, stiffness: 300, damping: 34.641, duration: 0.54)
 }
 
 public enum YeetMotion {
     /// Нажатие кнопки, scale 0.97
     public static let press = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
-    /// Затухание краёв, тосты
+    /// Затухание краёв при скролле, затемнение под шторкой, подписи и тени
     public static let fade = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Фото сворачивается в шапку при скролле
     public static let collapse = Animation.timingCurve(0, 0, 0.58, 1, duration: 0.3)
@@ -389,6 +391,8 @@ public enum YeetMotion {
     public static let appear = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Исчезновение: быстрее появления, чтобы не мешать
     public static let exit = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
+    /// Шторка: появление и возврат после смахивания, без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
+    public static let sheet = YeetSpring.critical.animation
 }
 
 /// Параметры жестов и микро-анимаций (Storybook → Foundations/Анимации → Микро-анимации).
@@ -417,6 +421,8 @@ public enum YeetGesture {
     public static let rubberBand: CGFloat = 0.55
     /// Время показа snackbar без действия (с действием — 6000)
     public static let snackbar: TimeInterval = 4
+    /// Время показа snackbar с действием
+    public static let snackbarAction: TimeInterval = 6
 }
 
 /// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.
