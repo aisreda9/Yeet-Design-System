@@ -78,7 +78,7 @@ npm run docs-tokens              # обновить блоки <!-- gen:… --> 
 npm run docs-tokens -- --check   # только сверить: код выхода 1, если DESIGN.md отстал от tokens.json
 ```
 
-Как подключить в приложения — Storybook → «Процессы / iOS и Android».
+Как подключить в приложения — Storybook → «Старт / Процессы / iOS и Android».
 
 ## iOS: библиотека компонентов (SwiftUI)
 
