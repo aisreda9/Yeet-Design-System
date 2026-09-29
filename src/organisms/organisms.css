@@ -324,10 +324,11 @@
 /* штамп у правого нижнего угла коллажа на любой ширине: коллаж квадратный (100cqw), над ним превью 96 + отступы 3 + 20; штамп заходит на 73 выше низа коллажа */
 .y-today__stamp { position: absolute; right: 20px; top: calc(119px + 100cqw - 73px); z-index: 2; }
 
-/* Создание образа · выбор вещей: разделы с H2, карусель по центру, соседние карточки выглядывают, разделители во всю ширину */
+/* Создание образа · выбор вещей: разделы с H2, карусель по центру, соседние карточки выглядывают, разделители с полями 20 */
 .y-slots { display: flex; flex-direction: column; gap: var(--space-20); padding-top: var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating); flex: 1 0 auto; overflow: hidden; }
 .y-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter); }
-.y-slot + .y-slot { border-top: 1px solid var(--color-divider); padding-top: var(--space-20); }
+.y-slot + .y-slot { position: relative; padding-top: var(--space-20); }
+.y-slot + .y-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* как atom divider: линия с полями 20, не во всю ширину */
 .y-slot__row { display: flex; justify-content: center; align-items: center; gap: var(--space-8); }
 .y-slot__row > * { flex: none; width: calc((100% - 7px) / 2); } /* ширина колонки сетки: 173 при 393 */
 .y-slot__add { aspect-ratio: 173 / 172; display: grid; place-items: center; }
@@ -399,13 +400,14 @@
 .y-stylist-face { display: block; object-fit: contain; user-select: none; }
 
 /* ─── ItemSlots (#27) ─── */
-/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель во всю ширину; заголовок H2 → 16 → ряд карточек 173 × 172 */
+/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель с полями 20; заголовок H2 → 16 → ряд карточек 173 × 172 */
 .y-item-slots {
   display: flex; flex-direction: column; padding-top: var(--space-20);
   background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
 }
 .y-item-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter) var(--space-20); }
-.y-item-slot + .y-item-slot { border-top: 1px solid var(--color-divider); padding-top: var(--space-20); }
+.y-item-slot + .y-item-slot { position: relative; padding-top: var(--space-20); }
+.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: 1px; background: var(--color-border-subtle); } /* Flow 2.0: instance divider 353 при 393 — поля 20, цвет как у atom */
 /* ряд выходит на поля экрана; поля ряда (50 % секции + 20 − 86.5 = 110 при 393) дают первой и последней вещи встать по центру */
 .y-item-slot__row {
   --slot-card: 173px;
