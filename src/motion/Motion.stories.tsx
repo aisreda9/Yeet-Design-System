@@ -271,6 +271,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * Протяжка мышью (pointerId 1 — мышь всегда «активна», setPointerCapture не бросает) с отпусканием после паузы.
+ * Скорость считается по `e.timeStamp` (время создания события), поэтому жест без паузы не отдаёт поток таймерам.
  * 84 px за 6 шагов по ~10 мс ≈ 1,4 px/мс — быстрее порога броска 0,5 px/мс, но короче порога дистанции (30 % ≈ 106).
  */
 async function drag(el: Element, dx: number, dy: number, pause: number) {
@@ -278,9 +279,12 @@ async function drag(el: Element, dx: number, dy: number, pause: number) {
   const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
   const fire = (type: string, k: number) =>
     el.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x0 + dx * k, clientY: y0 + dy * k }));
+  // Шаги — синхронно с ожиданием по часам, а не setTimeout: под нагрузкой (параллельный прогон в CI) таймер
+  // растягивается дальше окна скорости 80 мс, и бросок без паузы превращается в «палец стоял» — флейк теста, не баг.
+  const spin = (ms: number) => { const end = performance.now() + ms; while (performance.now() < end); };
   fire('pointerdown', 0);
-  for (let i = 1; i <= 6; i++) { await wait(10); fire('pointermove', i / 6); }
-  await wait(pause);
+  for (let i = 1; i <= 6; i++) { spin(10); fire('pointermove', i / 6); }
+  if (pause) await wait(pause);
   fire('pointerup', 1);
 }
 

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
 import { RadioList } from '.';
-import { Flag } from '../atoms';
+import { Button, Flag } from '../atoms';
 import { unlessBare, Usage, UsageGrid, withWidth } from '../docs/helpers';
 
 const years = ['1991', '1992', '1993', '1994'].map((y) => ({ value: y, label: y }));
@@ -69,4 +70,53 @@ export const InFlow: Story = {
       </Usage>
     </UsageGrid>
   ),
+};
+
+/** Клавиатура (APG Radio Group): Tab попадает в выбранную строку, ↑↓ по кругу, Home / End. */
+export const Keyboard: Story = {
+  name: 'Клавиатура',
+  tags: ['bare'],
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div style={{ display: 'grid', gap: 20, width: 353 }}>
+      <RadioList label="Год рождения" defaultValue="1992" options={years} />
+      <Button variant="tertiary" size="S">После списка</Button>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('radiogroup', { name: 'Год рождения' });
+    const radio = (name: string) => within(group).getByRole('radio', { name });
+    const current = async (name: string) => {
+      await expect(radio(name)).toHaveAttribute('aria-checked', 'true');
+      await expect(radio(name)).toHaveFocus();
+      await expect(within(group).getAllByRole('radio', { checked: true })).toHaveLength(1);
+      await expect(within(group).getAllByRole('radio').filter((r) => r.tabIndex === 0)).toEqual([radio(name)]);
+    };
+    await step('Tab — в выбранную строку', async () => {
+      await userEvent.tab();
+      await current('1992');
+    });
+    await step('↑↓ по кругу, Home и End', async () => {
+      await userEvent.keyboard('{ArrowDown}');
+      await current('1993');
+      await userEvent.keyboard('{ArrowUp}');
+      await userEvent.keyboard('{ArrowUp}');
+      await current('1991');
+      await userEvent.keyboard('{ArrowUp}');
+      await current('1994');
+      await userEvent.keyboard('{ArrowDown}');
+      await current('1991');
+      await userEvent.keyboard('{End}');
+      await current('1994');
+      await userEvent.keyboard('{Home}');
+      await current('1991');
+    });
+    await step('Tab уходит из группы, Shift+Tab возвращает', async () => {
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name: 'После списка' })).toHaveFocus();
+      await userEvent.tab({ shift: true });
+      await current('1991');
+    });
+  },
 };
