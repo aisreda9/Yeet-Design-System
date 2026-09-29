@@ -112,8 +112,12 @@
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 .y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--color-bg-subtle); }
-.y-sheet__footer { display: flex; gap: 7px; }
-.y-sheet__footer > .y-button { flex: 1; }
+/* Кнопки футера — равные половины через 7; не влезает подпись — обе на всю ширину, одна под другой, безопасная снизу (C11, D7).
+   Ширина по подписи, но не шире футера: длиннее строки — многоточие. Поля 16 вместо 20 — только запас до переноса:
+   короткая подпись по центру выглядит так же, а «Сохранить и выйти» при 393 остаётся в половине 165, как в Figma. */
+.y-sheet__footer { display: flex; flex-wrap: wrap; gap: 7px; }
+.y-sheet__footer > .y-button { flex: 1 1 calc(50% - 3.5px); min-width: fit-content; padding-inline: var(--space-16); }
+.y-sheet__footer-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; }
 .y-sheet__head > .y-icon-button { margin: -8px -8px -8px auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--space-12); }
@@ -125,9 +129,19 @@
 .y-sheet--modal > .y-sheet__head { margin-top: var(--space-12); } /* без хэндла заголовок на 20 от верха */
 .y-sheet--no-handle { padding-top: var(--space-20); } /* Show Handle=false: контент на 20 от верха */
 .y-sheet--no-handle > .y-sheet__head { margin-top: 0; }
-/* Высокая модальная шторка не выше экрана: контент прокручивается внутри (Item Filter) */
-.y-overlay > .y-sheet--modal { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
-.y-overlay > .y-sheet--modal::-webkit-scrollbar { display: none; }
+/* Высота и прокрутка (SHEETS-AUDIT C1–C3, D2): хэндл, заголовок и футер закреплены, прокручивается только тело.
+   Ничего, кроме тела, не сжимается. Тело выходит в края шторки (поля — паддингом), чтобы лента чипсов упиралась в край,
+   и на 4 вверх и вниз — чтобы не резать кольцо фокуса. */
+.y-sheet > *, .y-sheet__body > * { flex-shrink: 0; }
+.y-sheet__body {
+  display: flex; flex-direction: column; gap: inherit; flex-shrink: 1; min-height: 0;
+  margin: calc(var(--space-4) * -1) calc(var(--screen-gutter) * -1); padding: var(--space-4) var(--screen-gutter);
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+}
+.y-sheet__body::-webkit-scrollbar { display: none; }
+/* заголовок → 12 → контент: как прежде, −4 у первого блока контента (тело само стоит на 16) */
+.y-sheet--modal > :is(.y-sheet__title, .y-sheet__head) + .y-sheet__body > :first-child { margin-top: calc(var(--space-4) * -1); }
+.y-overlay > .y-sheet--modal { max-height: 100%; }
 /* Панель деталей (Item / Outfit Details): заголовок H2 → контент 16, → подпись (сезон, цена) 12 */
 .y-sheet--panel { box-shadow: var(--shadow-floating); }
 .y-sheet--panel > .y-sheet__title + * { margin-top: calc(var(--space-4) * -1); }
@@ -139,13 +153,19 @@
    и продолжаются из текущего положения. Затемнение — отдельный слой ::before, чтобы гаснуть вместе с жестом. */
 .y-overlay {
   position: absolute; inset: 0; z-index: 5; --y-dim: 1;
-  display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--space-8) var(--space-8);
+  /* верх высокой шторки — под статус-баром + 8 (D2). TODO(tokens): перенести в токен --sheet-top-gap */
+  --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8));
+  display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
 }
 .y-overlay::before {
   content: ''; position: absolute; inset: 0; background: var(--color-bg-overlay);
   opacity: var(--y-dim); transition: opacity var(--motion-fade);
 }
-.y-overlay .y-sheet { transition: transform var(--motion-nav); touch-action: pan-x; /* вертикаль — жест шторки, горизонталь — ленты чипсов */ }
+/* Жест шторки — с хэндла, шапки и футера (touch-action: none). Тело прокручивает браузер (pan-y); из самого верха тела
+   палец вниз забирает жест шторки (touchmove в OverlayLayer). Лента чипсов — горизонталь своя, вертикаль — телу / шторке (C1, C4). */
+.y-overlay .y-sheet { transition: transform var(--motion-nav); touch-action: none; }
+.y-overlay .y-sheet__body { touch-action: pan-y; }
+.y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
   .y-overlay::before { opacity: 0; }
   .y-overlay .y-sheet { transform: translateY(calc(100% + var(--space-8))); } /* плавающая шторка уходит за край целиком, с отступом 8 */

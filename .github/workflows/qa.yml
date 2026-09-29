@@ -19,14 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm ci
       # До build-storybook: он сам перегенерирует токены и скроет ручную правку
       - name: Сгенерированные токены совпадают с tokens/tokens.json (npm run tokens)
         run: |
+          node --test scripts/tokens/dtcg.test.mjs
           node scripts/build-tokens.mjs
           if [ -n "$(git status --porcelain -- src/tokens tokens native)" ]; then
             git status --porcelain -- src/tokens tokens native
@@ -34,7 +36,6 @@ jobs:
             echo '::error::Сгенерированные файлы не совпадают с генератором. Правь tokens/tokens.json или scripts/build-tokens.mjs, затем `npm run tokens` и закоммить результат.'
             exit 1
           fi
-      - run: npm ci
       - run: npm run typecheck
       - id: build
         run: npm run build-storybook
@@ -43,7 +44,7 @@ jobs:
         run: echo "version=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Кэш браузеров Playwright
         id: pw-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
@@ -66,7 +67,7 @@ jobs:
       - if: always()
         run: cat qa/out/report.md qa/out/flow-diff.md qa/out/coverage.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: qa-report
           path: qa/out

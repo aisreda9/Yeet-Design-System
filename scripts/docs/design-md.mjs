@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const t = JSON.parse(readFileSync(join(root, 'tokens/tokens.json'), 'utf8'));
+const { tokens: t } = await import('../../src/tokens/model.js'); // tokens/tokens.json (DTCG) → удобная форма
 const designPath = join(root, 'DESIGN.md');
 const check = process.argv.includes('--check');
 

@@ -10,8 +10,10 @@ const meta = {
   argTypes: {
     variant: { control: 'inline-radio', options: ['primary', 'secondary', 'tertiary', 'inverse', 'ghost', 'soft', 'destructive'] },
     size: { control: 'inline-radio', options: ['S', 'M', 'L', 'XL'] },
+    loading: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
-  parameters: { docs: { description: { component: 'Круглая кнопка-иконка. Та же шкала и те же семантические стили, что у `Button`. `label` обязателен — это подпись для скринридера и тултип.' } } },
+  parameters: { docs: { description: { component: 'Круглая кнопка-иконка. Та же шкала и те же семантические стили, что у `Button`. `label` обязателен — это подпись для скринридера и тултип. Состояния те же, что у `Button`: нажатие, `disabled`, `loading` (спиннер вместо иконки, `aria-busy`, повтор заблокирован). `ref`, `className` и атрибуты `<button>` пробрасываются.' } } },
 } satisfies Meta<typeof IconButton>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -46,5 +48,26 @@ export const InFlow: Story = {
       <Usage screen="Photo area" note="удалить фото"><IconButton icon="cross" label="Удалить фото" variant="ghost" size="S" /></Usage>
       <Usage screen="Outfit Creation" note="перемешать"><IconButton icon="arrows-shuffle" label="Перемешать" /></Usage>
     </UsageGrid>
+  ),
+};
+
+export const States: Story = {
+  parameters: { controls: { disable: true } },
+  name: 'Состояния',
+  render: () => (
+    <Matrix
+      rows={['primary', 'tertiary', 'secondary']}
+      cols={['обычная', 'нажата', 'disabled', 'loading']}
+      render={(v, st) => (
+        <IconButton
+          icon="arrow-up"
+          label="Отправить"
+          variant={v as never}
+          disabled={st === 'disabled'}
+          loading={st === 'loading'}
+          style={st === 'нажата' ? { transform: 'scale(var(--gesture-press-scale))' } : undefined}
+        />
+      )}
+    />
   ),
 };

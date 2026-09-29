@@ -1,4 +1,4 @@
-import tokens from '../../tokens/tokens.json';
+import { tokens } from '../tokens/model';
 
 /**
  * Числа жестов из tokens.json → motion.gesture (тот же источник, что `--gesture-*` в CSS и YeetGesture в нативе).
@@ -30,9 +30,15 @@ export function rubberBand(offset: number, size: number, c = gesture.rubberBand)
   return sign * (1 - 1 / ((x * c) / size + 1)) * size;
 }
 
+/** Окно скорости броска, мс: учитываются точки не старше этого, и палец, стоявший дольше, бросок не даёт. */
+const VELOCITY_WINDOW = 80;
+
 /**
  * Скорость пальца по последним ~80 мс, px/мс. Средняя по всему жесту врёт: палец мог долго стоять,
  * а потом резко бросить — бросок должен засчитаться.
+ * И наоборот: протянул, подержал палец и отпустил — броска нет. Поэтому в `up` точку отпускания добавляют
+ * (`add` перед `get`), а `get(now)` отдаёт 0, если с последней точки прошло больше окна:
+ * `pointermove` на неподвижном пальце не приходит, и без этой проверки скорость «замерзает» на последнем рывке.
  */
 export function velocityTracker() {
   let samples: { t: number; x: number; y: number }[] = [];
@@ -40,11 +46,13 @@ export function velocityTracker() {
     reset() { samples = []; },
     add(x: number, y: number, t: number) {
       samples.push({ t, x, y });
-      while (samples.length > 2 && t - samples[0].t > 80) samples.shift();
+      while (samples.length > 2 && t - samples[0].t > VELOCITY_WINDOW) samples.shift();
     },
-    get() {
+    /** `now` — время отпускания в той же шкале, что `e.timeStamp` (по умолчанию `performance.now()`). */
+    get(now = typeof performance === 'undefined' ? undefined : performance.now()) {
       if (samples.length < 2) return { x: 0, y: 0 };
       const a = samples[0], b = samples[samples.length - 1], dt = Math.max(1, b.t - a.t);
+      if (now !== undefined && now - b.t > VELOCITY_WINDOW) return { x: 0, y: 0 }; // палец стоял — это не бросок
       return { x: (b.x - a.x) / dt, y: (b.y - a.y) / dt };
     },
   };

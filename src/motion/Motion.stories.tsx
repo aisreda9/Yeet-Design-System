@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState, type CSSProperties } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
 import { Carousel, ChipGroup, List, ListGroup, ListItem } from '../molecules';
 import { BottomNav, ItemCard, OutfitCollage, Overlay, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
@@ -263,3 +264,69 @@ export const Feedback: Story = { name: 'Snackbar, подсказка, загру
 export const CanvasGesture: Story = { name: 'Холст: подъём, бросок, щипок', render: () => <CanvasDemo /> };
 export const ProfileAccounts: Story = { name: 'Профиль: аккаунты и период', render: () => <ProfileDemo /> };
 export const PushPop: Story = { name: 'Переход между экранами', render: () => <PageStackDemo /> };
+
+/* ─── Бросок после паузы (C10): протянул, подержал, отпустил — не бросок ─── */
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Протяжка мышью (pointerId 1 — мышь всегда «активна», setPointerCapture не бросает) с отпусканием после паузы.
+ * 84 px за 6 шагов по ~10 мс ≈ 1,4 px/мс — быстрее порога броска 0,5 px/мс, но короче порога дистанции (30 % ≈ 106).
+ */
+async function drag(el: Element, dx: number, dy: number, pause: number) {
+  const r = el.getBoundingClientRect();
+  const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
+  const fire = (type: string, k: number) =>
+    el.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x0 + dx * k, clientY: y0 + dy * k }));
+  fire('pointerdown', 0);
+  for (let i = 1; i <= 6; i++) { await wait(10); fire('pointermove', i / 6); }
+  await wait(pause);
+  fire('pointerup', 1);
+}
+
+/** Регрессия C10 для шторки: протяжка ниже порога + пауза 1 с → шторка остаётся; без паузы тот же жест — бросок. */
+export const SheetFlickAfterPause: Story = {
+  name: 'Шторка: пауза перед отпусканием — не бросок',
+  parameters: { docs: { description: { story: 'Протяжка на 84 px (порог — 30 % высоты) быстрым движением. Отпустил сразу — бросок, шторка закрывается. Подержал палец 1 с и отпустил — шторка возвращается: скорость броска считается с точкой отпускания, а стоявший палец даёт 0.' } } },
+  render: () => <SheetDemo />,
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const open = async () => {
+      await userEvent.click(canvas.getByRole('button', { name: 'Шторка' }));
+      await waitFor(() => expect(canvas.getByRole('dialog', { name: 'Сезон' })).toBeVisible());
+      await wait(400); // появление доиграло
+    };
+    await step('Без паузы — бросок закрывает', async () => {
+      await open();
+      await drag(canvas.getByText('Сезон'), 0, 84, 0);
+      await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Сезон' })).toBeNull());
+    });
+    await step('Пауза 1 с — шторка остаётся', async () => {
+      await open();
+      await drag(canvas.getByText('Сезон'), 0, 84, 1000);
+      await wait(400);
+      await expect(canvas.getByRole('dialog', { name: 'Сезон' })).toBeInTheDocument();
+    });
+  },
+};
+
+/** Регрессия C10 для пейджера (`useSwipePager`): то же на ленте поводов. */
+export const PagerFlickAfterPause: Story = {
+  name: 'Пейджер: пауза перед отпусканием — не бросок',
+  parameters: { docs: { description: { story: 'Свайп на 84 px (порог — 30 % от 353). Без паузы — бросок, следующий повод. С паузой 1 с — лента возвращается на место.' } } },
+  render: () => <PagerDemo />,
+  play: async ({ canvasElement, step }) => {
+    const pager = canvasElement.querySelector('.y-pager')!, track = canvasElement.querySelector<HTMLElement>('.y-pager__track')!;
+    const at = (i: number) => expect(track.style.transform).toBe(`translateX(${-i * 373}px)`);
+    await step('Без паузы — бросок листает', async () => {
+      await at(1);
+      await drag(pager, -84, 0, 0);
+      await waitFor(() => at(2));
+    });
+    await step('Пауза 1 с — остаётся на месте', async () => {
+      await drag(pager, 84, 0, 1000);
+      await wait(100);
+      await at(2);
+    });
+  },
+};

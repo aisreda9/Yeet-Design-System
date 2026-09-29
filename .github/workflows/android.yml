@@ -3,9 +3,9 @@ name: Android (Compose)
 on:
   push:
     branches: [main]
-    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/tokens/**', 'package-lock.json', 'scripts/android.mjs', '.github/workflows/android.yml']
   pull_request:
-    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/android.mjs', '.github/workflows/android.yml']
+    paths: ['native/android/**', 'tokens/**', 'src/icons/**', 'scripts/build-tokens.mjs', 'scripts/tokens/**', 'package-lock.json', 'scripts/android.mjs', '.github/workflows/android.yml']
   workflow_dispatch:
 
 permissions:
@@ -24,25 +24,29 @@ jobs:
       run:
         working-directory: native/android
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
+          cache: npm
+      # Генератор токенов — Style Dictionary (devDependency)
+      - run: npm ci
+        working-directory: .
       - name: Сгенерированные токены, иконки и шрифты совпадают с источниками (npm run tokens)
         working-directory: .
         run: |
           node scripts/build-tokens.mjs
           git diff --exit-code -- tokens native/android src/tokens
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
       - name: Библиотека + sample (debug)
         run: ./gradlew :yeet-design-system:assembleDebug :sample:assembleDebug --stacktrace
       - name: Android Lint (библиотека)
         run: ./gradlew :yeet-design-system:lintDebug
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: yeet-sample-debug
           path: native/android/sample/build/outputs/apk/debug/*.apk
