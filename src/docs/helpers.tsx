@@ -20,9 +20,12 @@ export function Usage({ screen, note, children, width }: { screen: string; note?
   );
 }
 
-/** Сетка карточек «В флоу». */
+/**
+ * Сетка карточек «В флоу». В истории — `min(1100px, 90vw)` (100 % там схлопнул бы сетку до контента),
+ * в Docs холст задаёт `--usage-grid-width: 100%` (`.storybook/preview.css`), иначе сетка шире блока и режется.
+ */
 export function UsageGrid({ children, min = 220 }: { children: ReactNode; min?: number }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`, gap: '32px 28px', width: '100%', maxWidth: 1100 }}>{children}</div>;
+  return <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`, gap: '32px 28px', width: 'var(--usage-grid-width, min(1100px, 90vw))', maxWidth: 1100 }}>{children}</div>;
 }
 
 /** Таблица вариантов: строки × колонки. */
