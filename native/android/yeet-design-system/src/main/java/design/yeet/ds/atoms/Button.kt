@@ -1,7 +1,13 @@
 package design.yeet.ds.atoms
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,9 +24,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -35,6 +44,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -95,7 +105,10 @@ fun ButtonStyle.content(c: YeetColorScheme): Color = when (this) {
 /**
  * Общая поверхность нажимаемых элементов: фон по стилю, сжатие при нажатии (press 0.97, 150 мс),
  * смена цвета (select), disabled 40 %, фокус-обводка accent, без ripple.
- * Зона нажатия у элементов меньше 48 dp расширяется Compose автоматически (minimumTouchTargetSize) без изменения раскладки.
+ * Семантика нажатия: `toggled` — переключатель (`toggleable`: чипс, в вебе `aria-pressed`), `selected` + роль `Tab` / `RadioButton` —
+ * выбор в группе (`selectable`: сегмент), иначе — `clickable` (+ `selected` в семантике, если задан).
+ * Элементы меньше 48 dp получают зону нажатия 48 модификатором [minimumInteractiveComponentSize] на месте вызова
+ * (см. [IconButtonImpl], чипсы): рисуются прежнего размера, в раскладке занимают не меньше 48 — как компоненты Material 3.
  */
 @Composable
 internal fun ControlSurface(
@@ -113,6 +126,8 @@ internal fun ControlSurface(
     onClickLabel: String? = null,
     contentAlignment: Alignment = Alignment.Center,
     disabledAlpha: Float = 0.4f,
+    toggled: Boolean? = null,
+    stateDescription: String? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
@@ -124,12 +139,32 @@ internal fun ControlSurface(
     val fg by animateColorAsState(contentColor, motion.select(), label = "content")
     val accent = YeetTheme.colors.accent
 
+    val inGroup = selected != null && (role == Role.Tab || role == Role.RadioButton)
     val a11y = Modifier.semantics {
-        if (selected != null) this.selected = selected
+        // selectable / toggleable сами пишут состояние в семантику
+        if (selected != null && !inGroup && toggled == null) this.selected = selected
         if (contentDescription != null) this.contentDescription = contentDescription
+        if (stateDescription != null) this.stateDescription = stateDescription
     }
-    val click = if (onClick != null) {
-        Modifier.clickable(
+    val click = when {
+        onClick == null -> Modifier
+        toggled != null -> Modifier.toggleable(
+            value = toggled,
+            interactionSource = interaction,
+            indication = null,
+            enabled = enabled,
+            role = role,
+            onValueChange = { onClick() },
+        )
+        inGroup -> Modifier.selectable(
+            selected = selected == true,
+            interactionSource = interaction,
+            indication = null,
+            enabled = enabled,
+            role = role,
+            onClick = onClick,
+        )
+        else -> Modifier.clickable(
             interactionSource = interaction,
             indication = null,
             enabled = enabled,
@@ -137,8 +172,6 @@ internal fun ControlSurface(
             role = role,
             onClick = onClick,
         )
-    } else {
-        Modifier
     }
     Box(
         modifier
@@ -165,7 +198,13 @@ internal fun ControlSurface(
  * **Контексты во флоу:** главный CTA онбординга и входа (Primary XL), пара действий в sheet (Tertiary + Primary L),
  * фильтры-дропдауны (Tertiary / Soft S + `ChevronUpDown`), теги (Tertiary S + `Cross`), «Пропустить» (Ghost M).
  *
- * React: `<Button variant size leftIcon rightIcon fullWidth floating>text</Button>`.
+ * **Загрузка:** `loading` — «Войти», пока идёт запрос, «Сохранить» вещь, «Удалить аккаунт».
+ *
+ * React: `<Button variant size leftIcon rightIcon fullWidth floating loading loadingLabel>text</Button>`.
+ *
+ * @param loading действие выполняется: вместо содержимого — спиннер, ширина кнопки та же (макет не прыгает),
+ * повторные нажатия не проходят, нажатие не сжимает; кнопка остаётся в фокусе и озвучивается с состоянием [loadingLabel].
+ * @param loadingLabel что озвучить во время загрузки (web: `aria-busy` + скрытый текст). По умолчанию «Загрузка».
  */
 @Composable
 fun Button(
@@ -179,13 +218,27 @@ fun Button(
     fullWidth: Boolean = false,
     floating: Boolean = false,
     enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingLabel: String = DefaultLoadingLabel,
 ) {
-    Button(onClick, modifier, variant, size, leftIcon, rightIcon, fullWidth, floating, enabled) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        variant = variant,
+        size = size,
+        leftIcon = leftIcon,
+        rightIcon = rightIcon,
+        fullWidth = fullWidth,
+        floating = floating,
+        enabled = enabled,
+        loading = loading,
+        loadingLabel = loadingLabel,
+    ) {
         Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
-/** Кнопка с произвольным содержимым (children в React): точка цвета + текст и т. п. */
+/** Кнопка с произвольным содержимым (children в React): точка цвета + текст и т. п. `loading` — как у текстовой [Button]. */
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -197,20 +250,62 @@ fun Button(
     fullWidth: Boolean = false,
     floating: Boolean = false,
     enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingLabel: String = DefaultLoadingLabel,
     content: @Composable RowScope.() -> Unit,
 ) {
     val c = YeetTheme.colors
     ControlSurface(
-        onClick = onClick,
+        // во время загрузки нажатие гасится, но кнопка остаётся в фокусе и в дереве TalkBack
+        onClick = { if (!loading) onClick() },
         modifier = modifier.then(if (fullWidth) Modifier.fillMaxWidth() else Modifier),
         shape = RoundedCornerShape(YeetTheme.radius.xl),
         background = variant.background(c),
         contentColor = variant.content(c),
         enabled = enabled,
         floating = floating,
+        pressScale = if (loading) 1f else YeetGesture.pressScale,
+        stateDescription = if (loading) loadingLabel else null,
     ) {
-        ButtonRow(size = size, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon, content = content)
+        // содержимое прозрачное, но меряется: ширина кнопки не меняется (web: color: transparent)
+        Box(Modifier.graphicsLayer { alpha = if (loading) 0f else 1f }) {
+            ButtonRow(size = size, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon, content = content)
+        }
+        if (loading) ButtonSpinner(if (size == ControlSize.S) 20.dp else 24.dp)
     }
+}
+
+/** Что озвучивается у кнопки во время `loading` (web: `loadingLabel ?? 'Загрузка'`). */
+const val DefaultLoadingLabel = "Загрузка"
+
+/**
+ * Спиннер загрузки кнопки: `Spin` цветом содержимого, оборот 1.2 с;
+ * при «уменьшить движение» не крутится, а мерцает (прозрачность 1 → 0.4, 1.6 с — web: `y-pulse`).
+ */
+@Composable
+internal fun ButtonSpinner(size: Dp) {
+    val reduced = YeetTheme.motion.reduced
+    val transition = rememberInfiniteTransition(label = "buttonSpinner")
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = if (reduced) 0f else 360f,
+        animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing), RepeatMode.Restart),
+        label = "spinnerRotation",
+    )
+    val pulse by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = if (reduced) 0.4f else 1f,
+        animationSpec = infiniteRepeatable(tween(1600), RepeatMode.Reverse),
+        label = "spinnerPulse",
+    )
+    Icon(
+        IconName.Spin,
+        modifier = Modifier.graphicsLayer {
+            rotationZ = rotation
+            alpha = pulse
+        },
+        size = size,
+    )
 }
 
 @Composable
@@ -251,6 +346,9 @@ internal fun ButtonRow(
  *
  * @param label обязательное описание действия для TalkBack: «Назад», «Ещё», «Добавить».
  * @param decorative только вид кнопки внутри другой кнопки (карточка «+», зона фото): без нажатия и без озвучки.
+ * @param loading вместо иконки — спиннер («Отправить», пока сообщение уходит); нажатия гасятся, озвучивается [loadingLabel].
+ *
+ * Кнопка меньше 48 dp (S 40) занимает в раскладке 48 ([minimumInteractiveComponentSize]), круг рисуется прежнего размера.
  */
 @Composable
 fun IconButton(
@@ -263,8 +361,21 @@ fun IconButton(
     floating: Boolean = false,
     decorative: Boolean = false,
     enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingLabel: String = DefaultLoadingLabel,
 ) {
-    IconButtonImpl(icon, label, if (decorative) null else onClick, modifier, variant, size, floating, enabled)
+    IconButtonImpl(
+        icon = icon,
+        label = label,
+        onClick = if (decorative) null else onClick,
+        modifier = modifier,
+        variant = variant,
+        size = size,
+        floating = floating,
+        enabled = enabled,
+        loading = loading,
+        loadingLabel = loadingLabel,
+    )
 }
 
 @Composable
@@ -283,11 +394,17 @@ internal fun IconButtonImpl(
     role: Role = Role.Button,
     selected: Boolean? = null,
     disabledAlpha: Float = 0.4f,
+    loading: Boolean = false,
+    loadingLabel: String = DefaultLoadingLabel,
 ) {
     val c = YeetTheme.colors
+    // зона нажатия 48 у кнопок меньше 48 (S 40, «+» чипсов 36, «Отправить» 44); декоративной (без нажатия) не нужна
+    val touchTarget = if (onClick != null && diameter < MinTouchTarget) Modifier.minimumInteractiveComponentSize() else Modifier
+    val click: (() -> Unit)? = onClick?.let { action -> { if (!loading) action() } }
     ControlSurface(
-        onClick = onClick,
+        onClick = click,
         modifier = modifier
+            .then(touchTarget)
             .sizeIn(minWidth = diameter, minHeight = diameter)
             .size(diameter),
         shape = CircleShape,
@@ -300,10 +417,15 @@ internal fun IconButtonImpl(
         disabledAlpha = disabledAlpha,
         // decorative (onClick == null): без описания — вид кнопки внутри другой кнопки не озвучивается отдельно
         contentDescription = if (onClick == null) null else label,
+        pressScale = if (loading) 1f else YeetGesture.pressScale,
+        stateDescription = if (loading && onClick != null) loadingLabel else null,
     ) {
-        Icon(icon, size = iconSize)
+        if (loading) ButtonSpinner(iconSize) else Icon(icon, size = iconSize)
     }
 }
+
+/** Минимальная зона нажатия (Material 3 на Android — 48 dp). */
+internal val MinTouchTarget = 48.dp
 
 @YeetPreviews
 @Composable
@@ -318,6 +440,11 @@ private fun ButtonPreview() = YeetPreviewSurface {
     Button("Войти", onClick = {}, size = ControlSize.XL, fullWidth = true)
     Button("Сезон", onClick = {}, variant = ButtonStyle.Tertiary, size = ControlSize.S, rightIcon = IconName.ChevronUpDown)
     Button("Неактивна", onClick = {}, enabled = false)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Button("Войти", onClick = {}, loading = true)
+        Button("Сохранить", onClick = {}, variant = ButtonStyle.Tertiary, size = ControlSize.S, loading = true)
+        IconButton(IconName.ArrowUp, label = "Отправить", onClick = {}, variant = ButtonStyle.Primary, loading = true)
+    }
     Box(Modifier.padding(8.dp)) {
         IconButton(IconName.Plus, label = "Добавить", onClick = {}, variant = ButtonStyle.Primary, size = ControlSize.XL, floating = true)
     }

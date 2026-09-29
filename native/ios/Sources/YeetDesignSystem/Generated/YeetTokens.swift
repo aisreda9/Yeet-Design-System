@@ -82,6 +82,8 @@ public enum YeetColor {
     public static let divider = dynamic(UIColor(hex: 0x000000, alpha: 0.05), UIColor(hex: 0xF5F5F7, alpha: 0.08))
     /// Точки фона коллажа и холста (2 px, шаг 10) · Figma ui-colors/pattern-dot
     public static let patternDot = dynamic(UIColor(hex: 0x000000, alpha: 0.23), UIColor(hex: 0xF5F5F7, alpha: 0.23))
+    /// Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) · Figma ui-colors/handle
+    public static let handle = dynamic(UIColor(hex: 0x000000, alpha: 0.17), UIColor(hex: 0xF5F5F7, alpha: 0.14))
 }
 
 /// Цвет вещи — атрибут одежды, не интерфейс.
@@ -173,6 +175,12 @@ public enum YeetComponent {
     public static let sheetRadiusBottom: CGFloat = YeetRadius.bar
     public static let tabBarBg: Color = YeetColor.bgElevated
     public static let inputBg: Color = YeetColor.bgSubtle
+    /// Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top
+    public static let sheetTopGap: CGFloat = YeetSpace.s8
+    /// Хэндл шторки, 48 × 4 (D8)
+    public static let sheetHandle: Color = YeetColor.handle
+    /// Заголовок → контент и заголовок → описание (решение владельца 29.09, #58)
+    public static let sheetTitleGap: CGFloat = YeetSpace.s16
 }
 
 public enum YeetSpace {
@@ -208,6 +216,8 @@ public enum YeetRadius {
     public static let bar: CGFloat = 48
     /// Аватар, радио
     public static let full: CGFloat = 999
+    /// Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58)
+    public static let overlay: CGFloat = 48
 }
 
 /// Макет: iPhone 393 × 852, поля 20.
