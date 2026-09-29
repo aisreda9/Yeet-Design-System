@@ -1,4 +1,4 @@
-import tokens from '../../tokens/tokens.json';
+import { tokens } from '../tokens/model';
 
 /**
  * Числа жестов из tokens.json → motion.gesture (тот же источник, что `--gesture-*` в CSS и YeetGesture в нативе).
