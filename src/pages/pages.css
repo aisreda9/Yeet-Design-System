@@ -10,22 +10,22 @@
 .y-legal { margin: auto 0 -4px; text-align: center; }
 
 /* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
-.y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; }
+.y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; } /* stylelint-disable-line unit-disallowed-list -- подъём над таб-баром из Figma */
 /* Пустые Архив, Корзина, поиск по гардеробу (шапка 118, низа нет): блок по центру экрана (y426), а не области под шапкой */
-.y-empty-bar { flex: 1; display: grid; place-items: center; padding-bottom: calc(118px - var(--space-24) + var(--space-20)); }
+.y-empty-bar { flex: 1; display: grid; place-items: center; padding-bottom: calc(118px - var(--space-24) + var(--space-20)); } /* stylelint-disable-line unit-disallowed-list -- подъём над панелью из Figma */
 
 /* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
 .y-item-looks { gap: var(--space-20); }
 
 /* Search / Text / No Results Filtered: блок ниже центра — текст на y460 */
-.y-search-empty { margin-top: 66px; }
+.y-search-empty { margin-top: 66px; } /* stylelint-disable-line unit-disallowed-list -- положение пустого поиска из Figma */
 
 /* Search / Discover: блоки через 32 — фото → поле 32, подзаголовок шапки → фото 28 */
 .y-discover-photos { margin-top: var(--space-8); }
 .y-discover-query { margin-top: var(--space-12); }
 
 /* Stylist / Home: сообщения прижаты к низу панели, над полем ввода */
-.y-chat-spacer { flex: 1; min-height: 180px; }
+.y-chat-spacer { flex: 1; min-height: 180px; } /* stylelint-disable-line unit-disallowed-list -- место под аватар стилиста из Figma */
 
 /* Settings / Main: подвал (513:4818) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
 .y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
@@ -40,7 +40,7 @@
 .y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */
 
 /* «С чем носить» (463:1534): поводы на 101 ниже ленты — под штампами «Сохранить» и «Не нравится», которые выходят за коллаж */
-.y-occasions { margin-top: 81px; }
+.y-occasions { margin-top: 81px; } /* stylelint-disable-line unit-disallowed-list -- положение поводов из Figma */
 
 /* Search / Photo / Crop: рамка обрезки на всё фото под контентом; жесты доходят до рамки, кнопки остаются нажимаемыми */
 .y-crop-screen .y-crop-layer { position: absolute; inset: 0; }
