@@ -10,6 +10,8 @@ const config: StorybookConfig = {
     },
     // Панель «Accessibility» для авторов историй; гейт — axe в npm run qa, а не аддон
     '@storybook/addon-a11y',
+    // Истории как тесты в headless Chromium: npm run test-storybook (vitest.config.ts), CI — job «Play-тесты»
+    '@storybook/addon-vitest',
   ],
   framework: { name: '@storybook/react-vite', options: {} },
   // Шрифты Google Fonts (Inter, Roboto Slab) раздаются из репозитория — без внешнего CDN.
