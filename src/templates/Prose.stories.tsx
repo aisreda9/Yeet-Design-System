@@ -6,6 +6,7 @@ import { Prose, Screen } from '.';
 const meta = {
   title: 'Templates/Prose',
   component: Prose,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     controls: { disable: true },

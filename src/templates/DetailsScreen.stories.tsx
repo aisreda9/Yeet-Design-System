@@ -6,6 +6,7 @@ import { DetailsScreen } from '.';
 const meta = {
   title: 'Templates/DetailsScreen',
   component: DetailsScreen,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     controls: { disable: true },
