@@ -4,6 +4,7 @@ import { Avatar, Icon } from '../atoms';
 import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, StatRow, StatTile, UsageMeter } from '../molecules';
 import { AccountsSheet, BottomNav, Header, ItemCard, OutfitCollage, Overlay, Sheet } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
+import { demoAvatar } from '../docs/helpers';
 import { motionMs } from '../utils/gesture';
 import { sima, tina } from './data';
 import './pages.css';
@@ -94,11 +95,11 @@ export const AccountsMulti: Story = { name: 'Profile / Accounts / Sheet / List',
 export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Single', render: () => <ProfileScreen accounts={[sima]} open="accounts" /> };
 export const PeriodSheet: Story = { name: 'Profile / Analytics / Sheet / Period', render: () => <ProfileScreen accounts={[sima, tina]} open="period" /> };
 
-export const ProfileEdit: Story = {
-  name: 'Profile / Edit / No Avatar',
-  render: () => (
+/** Редактирование профиля (Figma `Profile / Edit`): без фото — камера в круге, с фото — снимок. */
+function ProfileEditScreen({ photo }: { photo?: string }) {
+  return (
     <Screen header={<Header type="bar" title="Редактирование профиля" />}>
-      <Row justify="center"><Avatar size="L" /></Row>
+      <Row justify="center"><Avatar size="L" src={photo} /></Row>
       {/* флоу: поля ввода без подписей — имя введено, почта подсказкой */}
       <InputGroup>
         <Field label="Имя" input={{ defaultValue: 'Сима' }} />
@@ -110,5 +111,8 @@ export const ProfileEdit: Story = {
         <Field label="Год рождения" value="1991" trailingIcon="chevron-up-down" />
       </InputGroup>
     </Screen>
-  ),
-};
+  );
+}
+
+export const ProfileEdit: Story = { name: 'Profile / Edit / No Avatar', render: () => <ProfileEditScreen /> };
+export const ProfileEditAvatar: Story = { name: 'Profile / Edit / Avatar Added', render: () => <ProfileEditScreen photo={demoAvatar} /> };

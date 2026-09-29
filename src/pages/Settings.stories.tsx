@@ -3,8 +3,9 @@ import { Button, Flag, Icon, Logo } from '../atoms';
 import { demoAvatar } from '../docs/helpers';
 import { AccountCard, Field, InputBar, InputGroup, List, ListGroup, ListItem, StatRow, StatTile } from '../molecules';
 import { Dialog, Header, Overlay, Sheet } from '../organisms';
-import { Screen } from '../templates';
+import { Prose, Screen } from '../templates';
 import { sima } from './data';
+import { privacy, terms } from './legal';
 import './pages.css';
 
 /* Раздел: настройки и удаление аккаунта. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -94,4 +95,14 @@ export const CurrencySheet: Story = {
       <AccountCard account={{ ...sima, photo: demoAvatar }} kind="settings" />
     </Screen>
   ),
+};
+
+export const LegalPrivacy: Story = {
+  name: 'Legal / Privacy Policy / May 2026',
+  render: () => <Screen header={<Header type="bar" />}><Prose {...privacy} /></Screen>,
+};
+
+export const LegalTerms: Story = {
+  name: 'Legal / Terms of Use / May 2026',
+  render: () => <Screen header={<Header type="bar" />}><Prose {...terms} /></Screen>,
 };
