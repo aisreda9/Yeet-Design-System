@@ -8,6 +8,8 @@ const config: StorybookConfig = {
       name: '@storybook/addon-docs',
       options: { mdxPluginOptions: { mdxCompileOptions: { remarkPlugins: [remarkGfm] } } },
     },
+    // Панель «Accessibility» для авторов историй; гейт — axe в npm run qa, а не аддон
+    '@storybook/addon-a11y',
   ],
   framework: { name: '@storybook/react-vite', options: {} },
   // Шрифты Google Fonts (Inter, Roboto Slab) раздаются из репозитория — без внешнего CDN.

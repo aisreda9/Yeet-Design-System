@@ -24,7 +24,7 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
     <div className="y-sheet__footer">
       {actions.map((a, i) => (
         <Button key={a.label} variant={a.variant ?? (i === 0 ? 'tertiary' : 'primary')} size="L" fullWidth={actions.length === 1} onClick={a.onClick} data-autofocus={(focusLast && i === actions.length - 1) || undefined}>
-          {a.label}
+          <span className="y-sheet__footer-label">{a.label}</span>
         </Button>
       ))}
     </div>
@@ -69,6 +69,7 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
   const modal = type === 'modal';
   const heading = type === 'panel' ? 'y-h2' : 'y-h3';
   const h2 = title && <h2 id={titleId} className={cx(heading, 'y-sheet__title')}>{title}</h2>;
+  const desc = description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>;
   return (
     <section
       className={cx('y-sheet', `y-sheet--${type}`, !handle && 'y-sheet--no-handle', className)}
@@ -88,8 +89,20 @@ export function Sheet({ title, description, type = 'modal', footer, onClose, lab
       ) : (
         h2
       )}
-      {description && <p id={descId} className="y-body y-text--secondary y-sheet__description">{description}</p>}
-      {children}
+      {modal ? (
+        (description || children) && (
+          // шапка и футер закреплены, прокручивается только тело (SHEETS-AUDIT C1–C3, D2)
+          <div className="y-sheet__body">
+            {desc}
+            {children}
+          </div>
+        )
+      ) : (
+        <>
+          {desc}
+          {children}
+        </>
+      )}
       {footer && <Footer actions={footer} />}
     </section>
   );
@@ -132,11 +145,13 @@ export function Dialog({ tone = 'default', title, description, cancel, confirm, 
       onKeyDown={onEscape(onCancel ?? layer?.dismiss)}
     >
       <span className="y-sheet__handle" aria-hidden />
-      <div className="y-dialog__text">
-        <h2 id={`${id}-title`} className="y-h3">{title}</h2>
-        {description && <p id={`${id}-text`} className="y-body y-text--secondary">{description}</p>}
+      <div className="y-sheet__body">
+        <div className="y-dialog__text">
+          <h2 id={`${id}-title`} className="y-h3">{title}</h2>
+          {description && <p id={`${id}-text`} className="y-body y-text--secondary">{description}</p>}
+        </div>
+        {children}
       </div>
-      {children}
       <Footer
         focusLast // безопасное действие всегда справа
         actions={
@@ -205,7 +220,8 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
   const leavingFromScreen = useContext(LeavingContext);
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const drag = useRef<{ id: number; x0: number; y0: number; h: number; offset: number; active: boolean; crossed: boolean } | null>(null);
+  /** `body` — жест начат в теле прокрутки: шторку тянет только палец вниз, вверх — прокрутка тела. */
+  const drag = useRef<{ id: number; x0: number; y0: number; h: number; offset: number; active: boolean; crossed: boolean; body: boolean } | null>(null);
   const speed = useRef(velocityTracker());
   const dragged = useRef(false);
   const leaving = closing || leavingFromScreen || !!leavingProp;
@@ -253,6 +269,22 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     };
   }, [leaving]);
 
+  // Тело прокрутки — touch-action: pan-y, браузер сам ведёт прокрутку. Когда тело в самом верху и палец идёт вниз,
+  // жест забирает шторка: отменённый touchmove не даёт браузеру начать прокрутку (и pointercancel) — pointermove идут дальше.
+  // React вешает touchmove пассивно, поэтому слушатель — свой, { passive: false }.
+  useEffect(() => {
+    const o = ref.current;
+    if (!o) return;
+    const touchmove = (e: TouchEvent) => {
+      const d = drag.current, p = e.touches[0];
+      if (!d || !p || !e.cancelable || e.touches.length > 1) return;
+      const dx = p.clientX - d.x0, dy = p.clientY - d.y0;
+      if (d.active || (dy > 0 && dy >= Math.abs(dx))) e.preventDefault();
+    };
+    o.addEventListener('touchmove', touchmove, { passive: false });
+    return () => o.removeEventListener('touchmove', touchmove);
+  }, []);
+
   const keys = (e: KeyboardEvent<HTMLDivElement>) => {
     const o = ref.current;
     if (!o || leaving) return;
@@ -288,9 +320,10 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     const s = sheet(), t = e.target as Element;
     if (!closable || leaving || !s || !s.contains(t) || (e.pointerType === 'mouse' && e.button !== 0)) return;
     if (t.closest('input, textarea, select, [role=slider]')) return; // поле и ползунок — свои жесты
-    // внутренний скролл, прокрученный вниз, сначала докручивается к началу
-    for (let a: Element | null = t; a && a !== s; a = a.parentElement) if (a.scrollTop > 0) return;
-    drag.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, h: s.offsetHeight, offset: 0, active: false, crossed: false };
+    // прокрученное тело (и любой скролл внутри него) сначала докручивается к началу — включая саму шторку (C2)
+    for (let a: Element | null = t; a; a = a === s ? null : a.parentElement) if (a.scrollTop > 0) return;
+    const body = !!t.closest('.y-sheet__body');
+    drag.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, h: s.offsetHeight, offset: 0, active: false, crossed: false, body };
     speed.current.reset();
     speed.current.add(e.clientX, e.clientY, e.timeStamp);
   };
@@ -302,9 +335,10 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     if (!d.active) {
       if (Math.hypot(dx, dy) < gesture.slop) return;
       if (Math.abs(dx) > Math.abs(dy)) { drag.current = null; return; } // горизонтальный жест — лента чипсов, не шторка
+      if (d.body && dy < 0) { drag.current = null; return; } // из тела вверх — прокрутка тела, не шторка
       d.active = true;
       d.y0 += Math.sign(dy) * gesture.slop; // без скачка на величину slop
-      sheet()?.setPointerCapture(e.pointerId);
+      try { sheet()?.setPointerCapture(e.pointerId); } catch { /* синтетический указатель (play-тест) — захват не нужен */ }
       setDragging(true);
     }
     const y = e.clientY - d.y0;

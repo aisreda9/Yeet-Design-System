@@ -22,3 +22,6 @@ export const Playground: Story = {
 };
 
 export const NoHistogram: Story = { name: 'Без гистограммы', args: { histogram: undefined }, render: Playground.render };
+
+/** min = max (в выдаче одна цена) и гистограмма из одной корзины: ручки у левого края, без NaN %. */
+export const SinglePrice: Story = { name: 'min = max', args: { min: 5000, max: 5000, value: [5000, 5000], histogram: [4] }, render: Playground.render };

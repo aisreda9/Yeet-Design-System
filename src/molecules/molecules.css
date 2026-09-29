@@ -64,7 +64,6 @@ span.y-field__trailing { cursor: inherit; }
 }
 .y-input-bar__photo--l { width: 52px; height: 52px; }
 .y-input-bar__photo:active { transform: scale(var(--gesture-press-scale)); }
-.y-input-bar__photo:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .y-input-bar__photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .y-input-bar--l .y-input-bar__field { height: 52px; padding-left: var(--space-16); }
 .y-input-bar--chat .y-input-bar__field { height: 52px; padding: 0 var(--space-4) 0 var(--space-20); background: var(--color-bg-elevated); box-shadow: var(--shadow-floating); }
@@ -102,8 +101,6 @@ span.y-field__trailing { cursor: inherit; }
 .y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
 .y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */
 .y-chip__remove > .y-icon { width: 20px; height: 20px; }
-.y-chip__toggle:focus-visible,
-.y-chip__remove:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 /* Chip · State=Editing: поле по ширине текста внутри капсулы S, плейсхолдер серым, каретка акцентом */
 .y-chip--editing { padding: 0 var(--space-16); cursor: text; }
 .y-chip--editing:active { transform: none; }
@@ -277,3 +274,13 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 .y-avatar-stack__people::after { left: min(0px, calc(100% - 44px)); right: 0; }
 .y-avatar-stack__people + .y-icon-button::after { left: 0; right: min(0px, calc(100% - 44px)); }
 .y-segment > :is(.y-button, .y-icon-button)::after { left: max(-2px, min(0px, calc((100% - 44px) / 2))); right: max(-2px, min(0px, calc((100% - 44px) / 2))); }
+
+/* ─── FormField: лейбл, описание и ошибка вокруг поля; текст на отступе 20, как значение в Field ─── */
+.y-form-field { display: flex; flex-direction: column; gap: var(--space-8); }
+.y-form-field__label,
+.y-form-field__description,
+.y-form-field__error { margin: 0; padding: 0 var(--space-20); }
+.y-form-field__label { color: var(--color-text-secondary); }
+.y-form-field__description { color: var(--color-text-secondary); }
+.y-form-field__error { color: var(--color-text-danger); }
+.y-form-field__error:empty { margin-top: calc(-1 * var(--space-8)); } /* пустой live-регион остаётся в дереве доступности, но не добавляет отступ */
