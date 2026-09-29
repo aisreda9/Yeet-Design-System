@@ -131,6 +131,7 @@ public struct YeetAvatarStack: View {
                 }
             }
             .buttonStyle(YeetPressStyle())
+            .yeetHitArea(height: 40)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Аккаунты: \(accounts.map(\.name).joined(separator: ", "))"))
             .accessibilityAddTraits(.isButton)

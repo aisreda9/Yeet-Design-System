@@ -1,0 +1,114 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
+import { Avatar, Icon } from '../atoms';
+import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, StatRow, StatTile, UsageMeter } from '../molecules';
+import { AccountsSheet, BottomNav, Header, ItemCard, OutfitCollage, Overlay, Sheet } from '../organisms';
+import { Row, Screen, Stack } from '../templates';
+import { motionMs } from '../utils/gesture';
+import { sima, tina } from './data';
+import './pages.css';
+
+/* Раздел: профиль — аналитика гардероба, аккаунты, редактирование. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
+const meta = {
+  title: 'Pages/Экраны флоу',
+  parameters: {
+    layout: 'centered', controls: { disable: true }, options: { showPanel: false },
+    docs: { description: { component: 'Экраны флоу, собранные **только** из компонентов системы. Названия — как в Figma (`Раздел / Экран / Состояние`).' } },
+  },
+} satisfies Meta;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+type ProfileOverlay = 'accounts' | 'period' | undefined;
+
+/** Цена образа или вещи в плашке коллажа: сумма H2, под ней подпись. */
+const price = (sum: string, caption: string) => (
+  <><Stack gap={0}><span className="y-h2">{sum}</span><span className="y-caption y-text--secondary">{caption}</span></Stack><Icon name="chevron-right" /></>
+);
+
+/** Профиль (Figma: Profile / Overview / Analytics): аккаунты и период над панелью со статистикой. */
+function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?: ProfileOverlay }) {
+  const [open, setOpen] = useState<ProfileOverlay>(initial);
+  const [period, setPeriod] = useState('За всё время');
+  const overlay =
+    open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
+    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
+  return (
+    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
+      <div className="y-gutter y-profile-bar">
+        <Row gap={0} align="center" justify="space-between">
+          <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
+          <ChipGroup wrap chips={[{ label: period, dropdown: true }]} onToggle={() => setOpen('period')} />
+        </Row>
+      </div>
+      <Sheet type="panel" className="y-profile-panel">
+        <div className="y-stack-8 y-profile-summary">
+          <UsageMeter percent={11} />
+          <StatRow>
+            <StatTile label="Вещи" value={43} />
+            <StatTile label="Образы" value={12} />
+            <StatTile label="Вишлист" value={4} />
+          </StatRow>
+        </div>
+        <Carousel title="Чаще всего надевалось" itemWidth={173}>
+          <ItemCard kind="top" color="green" label="30 раз" />
+          <ItemCard kind="top" color="brown" label="12 раз" />
+          <ItemCard kind="bottom" color="black" label="9 раз" />
+        </Carousel>
+        <BarChart bars={[{ label: 'Верхняя одежда', icon: 'outerwear', value: 5 }, { label: 'Верх', icon: 'top', value: 50 }, { label: 'Обувь', icon: 'shoe', value: 10 }, { label: 'Аксессуары', icon: 'accessories', value: 30 }, { label: 'Низ', icon: 'bottom', value: 5 }]} />
+        <section className="y-section">
+          <h2 className="y-h3">Самый дорогой образ</h2>
+          <OutfitCollage
+            label="Ужин"
+            items={[{ kind: 'bottom', x: 28, y: 44, size: 130, color: 'black' }, { kind: 'top', x: 64, y: 30, color: 'brown' }, { kind: 'container', x: 78, y: 56, size: 56, color: 'black' }]}
+            footer={price('120 640 ₽', '4 вещи')}
+          />
+        </section>
+        {/* порядок как во флоу: цвета → давно не надевалось → сезоны → лучшая инвестиция → другие цифры */}
+        <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Черный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
+        <Carousel title="Давно не надевалось" itemWidth={173}>
+          <ItemCard kind="top" color="black" label="20 дней" />
+          <ItemCard kind="top" color="white" label="1 день" />
+          <ItemCard kind="shoe" color="brown" label="1 день" />
+        </Carousel>
+        <BarChart bars={[{ label: 'Весна', icon: 'flower', value: 20 }, { label: 'Лето', icon: 'sun', value: 70 }, { label: 'Осень', icon: 'leaf', value: 8 }, { label: 'Зима', icon: 'snowflake', value: 1 }]} />
+        <section className="y-section">
+          <h2 className="y-h3">Лучшая инвестиция</h2>
+          <OutfitCollage plain label="Аксессуары" items={[{ kind: 'container', x: 50, y: 42, size: 180, color: 'black' }]} footer={price('32 640 ₽', '5 образов')} />
+        </section>
+        <section className="y-section">
+          <h2 className="y-h3">Другие цифры</h2>
+          <StatRow>
+            <StatTile label="Стоимость гардероба" value="23 600 ₽" />
+            <StatTile label="Средняя стоимость одной вещи" value="1 480 ₽" />
+          </StatRow>
+        </section>
+      </Sheet>
+    </Screen>
+  );
+}
+
+export const ProfileAnalytics: Story = { name: 'Profile / Overview / Analytics', render: () => <ProfileScreen accounts={[sima, tina]} /> };
+export const ProfileSingle: Story = { name: 'Profile / Overview / Single Account', render: () => <ProfileScreen accounts={[sima]} /> };
+export const AccountsMulti: Story = { name: 'Profile / Accounts / Sheet / List', render: () => <ProfileScreen accounts={[sima, tina]} open="accounts" /> };
+export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Single', render: () => <ProfileScreen accounts={[sima]} open="accounts" /> };
+export const PeriodSheet: Story = { name: 'Profile / Analytics / Sheet / Period', render: () => <ProfileScreen accounts={[sima, tina]} open="period" /> };
+
+export const ProfileEdit: Story = {
+  name: 'Profile / Edit / No Avatar',
+  render: () => (
+    <Screen header={<Header type="bar" title="Редактирование профиля" />}>
+      <Row justify="center"><Avatar size="L" /></Row>
+      {/* флоу: поля ввода без подписей — имя введено, почта подсказкой */}
+      <InputGroup>
+        <Field label="Имя" input={{ defaultValue: 'Сима' }} />
+        <Field label="sima@space.com" input={{ type: 'email' }} />
+      </InputGroup>
+      <InputGroup>
+        <Field label="Пол" value="Женский" trailingIcon="chevron-up-down" />
+        <Field label="Стиль" value="Кэжуал" trailingIcon="chevron-up-down" />
+        <Field label="Год рождения" value="1991" trailingIcon="chevron-up-down" />
+      </InputGroup>
+    </Screen>
+  ),
+};
