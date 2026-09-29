@@ -6,7 +6,8 @@ plugins {
 }
 
 group = "design.yeet"
-version = "0.3.0"
+// Версия одна на всю систему — из корневого package.json (её поднимает `npm run version`, см. README «Релизы»)
+version = (groovy.json.JsonSlurper().parse(rootDir.resolve("../../package.json")) as Map<*, *>)["version"] as String
 
 android {
     namespace = "design.yeet.ds"
@@ -49,8 +50,19 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 }
 
-// ./gradlew :yeet-design-system:publishToMavenLocal → design.yeet:yeet-design-system:0.3.0
+// ./gradlew :yeet-design-system:publishToMavenLocal → design.yeet:yeet-design-system:<версия>
+// ./gradlew :yeet-design-system:publishReleasePublicationToGitHubPackagesRepository — только из release.yml по тегу
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/indiekola/Yeet-Design-System")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
     publications {
         register<MavenPublication>("release") {
             groupId = "design.yeet"

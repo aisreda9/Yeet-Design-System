@@ -14,6 +14,7 @@ Closes #
 - [ ] База влита в ветку (`git merge origin/main`)
 - [ ] `npm run typecheck`
 - [ ] `npm run build-storybook` (+ `npm run qa` / `npm run flow-diff`, если менялись компоненты или экраны)
+- [ ] `npx changeset`, если меняется то, что получают приложения (токены, компоненты, API) — см. README «Релизы»
 - [ ] Figma: не писал / писал под замком в issue «Координация» и снял его
 
 ## Передача

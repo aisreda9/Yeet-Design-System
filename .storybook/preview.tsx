@@ -73,6 +73,7 @@ const preview: Preview = {
     layout: 'centered',
     controls: { expanded: true, sort: 'requiredFirst' },
     backgrounds: { disable: true },
+    a11y: { test: 'todo' }, // addon-a11y: нарушения видны в панели, но не валят тесты
     options: {
       storySort: {
         order: [
