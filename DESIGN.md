@@ -1,7 +1,7 @@
 # Yeet Design System
 
 Указатель по дизайн-системе приложения **YeetStyle (yeet)** — умного гардероба: что где лежит, ID страниц Figma и сводные таблицы токенов.
-Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->61<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
+Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->86<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
 здесь она не дублируется. Storybook публикуется на GitHub Pages (`.github/workflows/storybook.yml`); локально — `npm ci && npm run storybook`.
 
 > Таблицы токенов ниже **генерируются** из `tokens/tokens.json` (`npm run docs-tokens`, проверка — `npm run docs-tokens -- --check`): блоки между `<!-- gen:… -->` руками не правятся.
@@ -81,6 +81,7 @@
 | `ui-colors/black-10%` | `--color-border-subtle` | `#000000` @ 10% | `#F5F5F7` @ 12% | Обводки свотчей, гистограмма, фон неактивных точек |
 | `ui-colors/divider` | `--color-divider` | `#000000` @ 5% | `#F5F5F7` @ 8% | Разделители строк в input-group и list-group |
 | `ui-colors/pattern-dot` | `--color-pattern-dot` | `#000000` @ 23% | `#F5F5F7` @ 23% | Точки фона коллажа и холста (2 px, шаг 10) |
+| `ui-colors/handle` | `--color-handle` | `#000000` @ 17% | `#F5F5F7` @ 14% | Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) |
 <!-- /gen:colors -->
 
 <!-- gen:contrast -->
@@ -146,6 +147,7 @@
 | `--radius-xl` | 32 | Кнопки-капсулы, верх sheet, подсказка стилиста |
 | `--radius-bar` | 48 | Tab-bar, низ плавающего sheet (концентрично углу экрана) |
 | `--radius-full` | 999 | Аватар, радио |
+| `--radius-overlay` | 48 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) |
 
 Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`, `--sheet-radius-bottom` → `bar`.
 <!-- /gen:radius -->
