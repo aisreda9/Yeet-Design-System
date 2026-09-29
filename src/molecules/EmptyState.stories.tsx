@@ -24,7 +24,7 @@ export const InFlow: Story = {
       <Usage screen="Wardrobe / Items / Empty"><EmptyState title="Гардероб пуст" description="Добавь первую вещь, чтобы начать создавать образы" /></Usage>
       <Usage screen="Archive / Empty"><EmptyState title="Архив пуст" description="Архивировав вещь, она будет храниться здесь в течение указанного времени" /></Usage>
       <Usage screen="Outfits / Recommendations / Empty" note="главное действие"><EmptyState title="Полный шкаф, а надеть нечего?" description="Добавь больше вещей, чтобы ИИ смог тебе подбирать образы под погоду и повод" action={{ label: 'Добавить вещь', variant: 'primary' }} /></Usage>
-      <Usage screen="Search / No Results" note="с действием"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск' }} /></Usage>
+      <Usage screen="Search / No Results" note="вторичное действие (tertiary), как в эталоне"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск', variant: 'tertiary' }} /></Usage>
     </UsageGrid>
   ),
 };
