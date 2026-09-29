@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -92,6 +93,7 @@ fun Snackbar(
     val shift = with(LocalDensity.current) { 16.dp.toPx() }
     val appear = remember { Animatable(0f) }
     LaunchedEffect(Unit) { appear.animateTo(1f, motion.appear()) }
+    val hasActions = onUndo != null || onClose != null
     Row(
         modifier
             .fillMaxWidth()
@@ -101,24 +103,34 @@ fun Snackbar(
             }
             .heightIn(min = 52.dp)
             .background(c.bgInverse, RoundedCornerShape(YeetTheme.radius.sm))
-            .padding(horizontal = 20.dp)
+            // иконки-кнопки занимают 48 при иконке 24: справа поле меньше на выступ зоны (12) — иконка на 20 от края, как в макете
+            .padding(start = 20.dp, end = if (hasActions) 20.dp - SnackbarActionInset else 20.dp)
             .semantics { liveRegion = LiveRegionMode.Polite },
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(if (hasActions) 12.dp - SnackbarActionInset else 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CompositionLocalProvider(LocalContentColor provides c.textInverse) {
             Text(text, modifier = Modifier.weight(1f).padding(vertical = 12.dp))
-            if (onUndo != null) SnackbarAction(IconName.Undo, "Отменить", onUndo)
-            if (onClose != null) SnackbarAction(IconName.Cross, "Закрыть", onClose)
+            if (hasActions) {
+                // зоны 48 соседних кнопок заходят друг на друга на 12, чтобы между иконками осталось 12 из макета
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp - SnackbarActionInset * 2), verticalAlignment = Alignment.CenterVertically) {
+                    if (onUndo != null) SnackbarAction(IconName.Undo, "Отменить", onUndo)
+                    if (onClose != null) SnackbarAction(IconName.Cross, "Закрыть", onClose)
+                }
+            }
         }
     }
 }
 
+/** На сколько зона нажатия 48 выступает за иконку 24 с каждой стороны. */
+private val SnackbarActionInset = 12.dp
+
 @Composable
 private fun SnackbarAction(icon: IconName, label: String, onClick: () -> Unit) {
-    // Иконка 24; зона нажатия расширяется до 48 автоматически (minimumTouchTargetSize)
+    // иконка 24, зона нажатия и фокуса TalkBack — 48 (Material 3: minimumInteractiveComponentSize)
     Box(
         Modifier
+            .minimumInteractiveComponentSize()
             .size(24.dp)
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label },
