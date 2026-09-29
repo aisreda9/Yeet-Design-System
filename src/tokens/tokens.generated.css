@@ -385,7 +385,6 @@
   --card-radius: var(--radius-lg);
   --sheet-bg: var(--color-bg-elevated);
   --sheet-radius: var(--radius-xl);
-  --sheet-radius-bottom: var(--radius-bar);
   --tab-bar-bg: var(--color-bg-elevated);
   --input-bg: var(--color-bg-subtle);
   --sheet-top-gap: calc(var(--status-bar-height) + var(--space-8)); /* Верх высокой шторки: 8 под статус-баром (D2). Web — статус-бар + 8, натив — 8 от safe area top */
