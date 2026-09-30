@@ -156,7 +156,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
   OnboardingName: [btn('Далее', 'FirstItemPrompt')],
   FirstOutfit: [btn('Пропустить', (n) => n.root('Today')), btn('Сохранить образ и завершить', async (n) => { await n.root('Today'); n.toast('Образ сохранён'); })],
-  FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), { sel: '.y-photo-tile', go: ok('NewItem') }],
+  FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), btn('Добавить', ok('NewItem'))],
   PasswordRecovery: [btn('Отправить код', (n) => n.overlay('PasswordRecoverySent'))],
   PasswordRecoverySent: [btn('Ок!', closeThen((n) => n.back()))],
 
