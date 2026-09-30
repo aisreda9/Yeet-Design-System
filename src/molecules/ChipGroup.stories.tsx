@@ -57,7 +57,7 @@ export const InFlow: Story = {
 };
 
 /**
- * Лента без `wrap` в шторке (Figma: Outfit Creation / Item Filter / Sheet, `414:1842`): первый чипс на полях шторки, как заголовок,
+ * Лента без `wrap` в шторке (Figma: Outfit Creation / Item Filter / Sheet, `1371:42294`): первый чипс на полях шторки, как заголовок,
  * а лента уходит под край шторки, не экрана, — последний чипс обрезан краем шторки и прокручивается.
  */
 export const InSheet: Story = {

@@ -105,7 +105,7 @@ export const OnboardingName: Story = {
   ),
 };
 
-/** Первый образ из добавленных вещей: вещи можно двигать и масштабировать (Figma `203:1559`). */
+/** Первый образ из добавленных вещей: вещи можно двигать и масштабировать (Figma `1371:37145`). */
 function FirstOutfitScreen() {
   const [items, setItems] = useState<CanvasItem[]>([
     { id: 'skirt', kind: 'bottom', color: 'black', x: 30, y: 56, size: 150 },

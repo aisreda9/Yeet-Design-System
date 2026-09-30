@@ -22,7 +22,7 @@ export type DetailsScreenProps = {
   onBack?: () => void;
   /** Закреплённый низ: `BottomBar`. */
   bottom?: ReactNode;
-  /** Штамп «Надеть»: закреплён поверх контента справа внизу и не едет со скроллом (Figma `349:8637`, `349:10430`). */
+  /** Штамп «Надеть»: закреплён поверх контента справа внизу и не едет со скроллом (Figma `1371:41156`, `1371:41329`). */
   stamp?: ReactNode;
   overlay?: ReactNode;
   scrollRef?: RefObject<HTMLElement | null>;
@@ -31,7 +31,7 @@ export type DetailsScreenProps = {
 };
 
 /**
- * Детали вещи и образа (Figma: Wardrobe / Item Details `349:9258 → 349:9976`, Outfit Details `349:8637 → 349:10430`,
+ * Детали вещи и образа (Figma: Wardrobe / Item Details `1371:41024 → 1371:41076`, Outfit Details `1371:41156 → 1371:41329`,
  * Animations «new things» `354:17405 → 354:17449`).
  *
  * В покое: фото 353 на y138, под ним панель с хэндлом на y511. После 24 pt скролла (`Screen` → `data-collapsed`):

@@ -55,7 +55,7 @@ function Footer({ actions, focusLast }: { actions: FooterAction[]; focusLast?: b
 
 export type SheetProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'children'> & {
   title?: string;
-  /** Абзац-пояснение под заголовком: Body серым, 16 под заголовком и 20 до контента (Settings / Currency `513:6256`). */
+  /** Абзац-пояснение под заголовком: Body серым, 16 под заголовком и 20 до контента (Settings / Currency `1371:43380`). */
   description?: ReactNode;
   /**
    * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 48 на все углы (`--radius-overlay`, концентрично углу экрана).

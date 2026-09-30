@@ -7,7 +7,7 @@ import { setRef } from './refs';
 /** Рамка в долях контейнера 0…1: левый верхний угол, ширина, высота. */
 export type CropRect = { x: number; y: number; w: number; h: number };
 
-/** Рамка из флоу Search / Photo / Crop `261:1590`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
+/** Рамка из флоу Search / Photo / Crop `1371:38089`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
 export const cropDefault: CropRect = { x: 20 / 393, y: 315 / 852, w: 353 / 393, h: 226 / 852 };
 
 export type CropFrameProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onChange' | 'defaultValue'> & {

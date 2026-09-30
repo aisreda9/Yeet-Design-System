@@ -51,7 +51,7 @@ const currencies: [string, string, string][] = [['ru', 'Российский р�
 
 export const Description: Story = {
   name: 'С описанием',
-  parameters: { controls: { disable: true }, docs: { description: { story: 'Settings / Currency `513:6256`: пояснение под заголовком — Body серым, 12 от заголовка и 20 до списка; шторка ссылается на него через `aria-describedby`.' } } },
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Settings / Currency `1371:43380`: пояснение под заголовком — Body серым, 12 от заголовка и 20 до списка; шторка ссылается на него через `aria-describedby`.' } } },
   render: () => (
     <Sheet title="Валюта" description="Цены пересчитываются по курсу ЦБ на 10 августа 2026 и помечаются как примерные. Сохранённая цена не меняется.">
       <List>{currencies.map(([code, label, trailing], k) => <ListItem key={code} type="radio" label={label} checked={k === 0} trailing={trailing} />)}</List>
@@ -72,15 +72,15 @@ const actions = {
 export const Actions: Story = {
   name: 'Действия',
   tags: ['bare'],
-  parameters: { controls: { disable: true }, docs: { description: { story: 'Шторка действий — это `Sheet` с заголовком (имя вещи или повода) и `List` из `ListItem` action с иконкой 24; необратимое действие — последним. Отдельного компонента ActionSheet нет. Кадры: вещь `551:3746`, `555:4123`; вишлист `305:1528`; архив `337:2567`; корзина `555:4098`; повод `305:1472`, `456:1053`, `349:8618`; «Добавить в вишлист» `455:1007`.' } } },
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Шторка действий — это `Sheet` с заголовком (имя вещи или повода) и `List` из `ListItem` action с иконкой 24; необратимое действие — последним. Отдельного компонента ActionSheet нет. Кадры: вещь `1371:37501`, `1371:43508`; вишлист `1371:40512`; архив `1371:37535`; корзина `1371:37565`; повод `1371:40430`, `1371:40451`, `1371:41135`; «Добавить в вишлист» `1371:40549`.' } } },
   render: () => (
     <UsageGrid min={393}>
-      <Usage screen="Wardrobe / Item / Actions" note="551:3746 · 555:4123">{onOverlay(() => <Sheet title="Название вещи">{actions.item}</Sheet>)}</Usage>
-      <Usage screen="Wishlist / Item / Actions" note="305:1528">{onOverlay(() => <Sheet title="Название вещи">{actions.wishlist}</Sheet>)}</Usage>
-      <Usage screen="Archive / Item / Actions" note="337:2567">{onOverlay(() => <Sheet title="Название вещи">{actions.archive}</Sheet>)}</Usage>
-      <Usage screen="Trash / Item / Actions" note="555:4098">{onOverlay(() => <Sheet title="Название вещи">{actions.trash}</Sheet>)}</Usage>
-      <Usage screen="Occasion / Actions" note="305:1472 · 456:1053 (в 349:8618 — «Удалить»)">{onOverlay(() => <Sheet title="Повод образа">{actions.occasion}</Sheet>)}</Usage>
-      <Usage screen="Wishlist / Add" note="455:1007">{onOverlay(() => <Sheet title="Добавить в вишлист">{actions.add}</Sheet>)}</Usage>
+      <Usage screen="Wardrobe / Item / Actions" note="1371:37501 · 1371:43508">{onOverlay(() => <Sheet title="Название вещи">{actions.item}</Sheet>)}</Usage>
+      <Usage screen="Wishlist / Item / Actions" note="1371:40512">{onOverlay(() => <Sheet title="Название вещи">{actions.wishlist}</Sheet>)}</Usage>
+      <Usage screen="Archive / Item / Actions" note="1371:37535">{onOverlay(() => <Sheet title="Название вещи">{actions.archive}</Sheet>)}</Usage>
+      <Usage screen="Trash / Item / Actions" note="1371:37565">{onOverlay(() => <Sheet title="Название вещи">{actions.trash}</Sheet>)}</Usage>
+      <Usage screen="Occasion / Actions" note="1371:40430 · 1371:40451 (в 1371:41135 — «Удалить»)">{onOverlay(() => <Sheet title="Повод образа">{actions.occasion}</Sheet>)}</Usage>
+      <Usage screen="Wishlist / Add" note="1371:40549">{onOverlay(() => <Sheet title="Добавить в вишлист">{actions.add}</Sheet>)}</Usage>
     </UsageGrid>
   ),
 };

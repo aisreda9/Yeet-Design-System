@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useReducedMotion } from './useReducedMotion';
 
 /**
- * Геометрия морфа для экранов (393 × 852), по кадру «Wardrobe / Outfit Details / Scrolled» `349:10430`:
+ * Геометрия морфа для экранов (393 × 852), по кадру «Wardrobe / Outfit Details / Scrolled» `1371:41329`:
  * миниатюра 48 × 48 в (173, 70) — по центру строки кнопок шапки 48; панель деталей под шапкой — y 138 (70 + 48 + 20).
  * Развёрнутое фото 353 стоит на том же отступе под шапкой (как в Figma Animations «new things» `354:17405`), панель — под фото + 20.
  * Кадр Animations `354:17449` — черновик с миниатюрой 52 и кнопками 52; на экранах DS 2.0 — 48 (`349:10424`, `503:1392`).
@@ -16,7 +16,7 @@ export const photoCollapse = {
   to: { x: 173, y: 70 },
   panelFrom: 138 + 353 + 20,
   panelTo: 138,
-  figma: '349:10430 (экран, Scrolled) · Animations 354:17405 → 354:17449',
+  figma: '1371:41329 (экран, Scrolled) · Animations 354:17405 → 354:17449',
 } as const;
 
 export type PhotoCollapseOptions = {

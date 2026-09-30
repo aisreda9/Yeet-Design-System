@@ -9,7 +9,7 @@ const meta = {
   args: { from: 'stylist', children: 'Привет! Я твой ИИ стилист. Спрашивай про образы, сочетания и что надеть сегодня' },
   argTypes: { from: { control: 'inline-radio', options: ['stylist', 'user'] }, avatar: { control: 'boolean' }, children: { control: 'text', name: 'text' } },
   decorators: [(Story) => <div style={{ width: 353, display: 'flex', flexDirection: 'column' }}><Story /></div>],
-  parameters: { docs: { description: { component: 'Сообщение в чате: паддинг 16/20, макс. 265, радиус 20 с «хвостом» 8. From=Stylist — light-grey слева, From=User — blue справа. `avatar` — аватар 64 слева, по низу, через 4: `true` — аватар стилиста по умолчанию (`StylistAvatar`, флоу `413:846`, `699:2858`), или свой узел. Figma: `chat-bubble` · From, Text.' } } },
+  parameters: { docs: { description: { component: 'Сообщение в чате: паддинг 16/20, макс. 265, радиус 20 с «хвостом» 8. From=Stylist — light-grey слева, From=User — blue справа. `avatar` — аватар 64 слева, по низу, через 4: `true` — аватар стилиста по умолчанию (`StylistAvatar`, флоу `1371:38928`, `1371:39070`), или свой узел. Figma: `chat-bubble` · From, Text.' } } },
 } satisfies Meta<typeof ChatBubble>;
 export default meta;
 export const Playground: StoryObj<typeof meta> = {};
@@ -31,7 +31,7 @@ export const InFlow: StoryObj<typeof meta> = {
   tags: ['bare'],
   render: () => (
     <UsageGrid min={353}>
-      <Usage screen="Stylist / Assistant / Greeting" note="413:846 · 699:2858" width={353}>
+      <Usage screen="Stylist / Assistant / Greeting" note="1371:38928 · 1371:39070" width={353}>
         <div style={{ display: 'grid', gap: 8 }}>
           <ChatBubble avatar>Привет! Я твой ИИ стилист. Спрашивай про образы, сочетания и что надеть сегодня</ChatBubble>
           <ChatBubble from="user">Что надеть на свидание?</ChatBubble>

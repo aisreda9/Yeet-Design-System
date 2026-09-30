@@ -49,7 +49,7 @@ const meta: Meta<Args> = {
     docs: {
       description: {
         component:
-          'Выбор вещей в образ (Outfit Creation / Item Selection `414:1459`, пустой `414:1541`). `ItemSlots` — панель: фон elevated, радиус 32 сверху, тень, секции через разделитель с полями 20. ' +
+          'Выбор вещей в образ (Outfit Creation / Item Selection `1371:41906`, пустой `1371:41989`). `ItemSlots` — панель: фон elevated, радиус 32 сверху, тень, секции через разделитель с полями 20. ' +
           '`ItemSlot` — секция: H2 → 16 → ряд карточек 173 × 172 через 8. Выбранная вещь стоит по центру экрана, соседние обрезаны краем, в конце — карточка «+» (кнопка L 52 в 22 от её края). Пустая секция — только «+» по центру. ' +
           'Ряд листается свайпом со снапом по центру, выбор — по карточке в центре после остановки (`onIndexChange`, хаптика select); с клавиатуры — Tab на ряд и ← / →.',
       },
@@ -68,7 +68,7 @@ export const Variants: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <UsageGrid min={393}>
-      <Usage screen="Все секции пустые" note="414:1541" width={393}><Slots top={0} bottom={0} shoe={0} /></Usage>
+      <Usage screen="Все секции пустые" note="1371:41989" width={393}><Slots top={0} bottom={0} shoe={0} /></Usage>
       <Usage screen="Одна вещь" note="по центру, «+» справа" width={393}><ItemSlots><ItemSlot title="Верх" onAdd={() => {}}><ItemCard kind="top" color="green" onRemove={() => {}} /></ItemSlot></ItemSlots></Usage>
       <Usage screen="Несколько вещей" note="выбрана вторая: первая обрезана слева" width={393}><ItemSlots><ItemSlot title="Обувь" index={1} onAdd={() => {}}><ItemCard kind="shoe" color="beige" onRemove={() => {}} /><ItemCard kind="shoe" color="brown" onRemove={() => {}} /></ItemSlot></ItemSlots></Usage>
       <Usage screen="Без «+»" note="onAdd не передан" width={393}><ItemSlots><ItemSlot title="Низ" index={1}><ItemCard kind="bottom" color="black" /><ItemCard kind="bottom" color="blue" /><ItemCard kind="bottom" color="green" /></ItemSlot></ItemSlots></Usage>
@@ -79,9 +79,9 @@ export const Variants: Story = {
 export const InFlow: Story = {
   name: 'В флоу',
   tags: ['bare'],
-  parameters: { controls: { disable: true }, docs: { description: { story: 'Outfit Creation / Item Selection / Ready to Continue `414:1459`. Экран `src/pages` переводит на компонент задача screens (#30).' } } },
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Outfit Creation / Item Selection / Ready to Continue `1371:41906`. Экран `src/pages` переводит на компонент задача screens (#30).' } } },
   render: () => (
-    <Usage screen="Outfit Creation / Item Selection / Ready to Continue" note="414:1459">
+    <Usage screen="Outfit Creation / Item Selection / Ready to Continue" note="1371:41906">
       <Screen header={<Header variant="bar" titleChip="Выбор вещей" onBack={() => {}} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={<div style={{ padding: '20px var(--screen-gutter)', background: 'var(--color-bg-elevated)' }}><Button size="L" fullWidth>Далее</Button></div>} flush>
         <Slots top={1} bottom={0} shoe={2} />
       </Screen>

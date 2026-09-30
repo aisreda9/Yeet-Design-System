@@ -27,7 +27,7 @@
 /* Stylist / Home: сообщения прижаты к низу панели, над полем ввода */
 .y-chat-spacer { flex: 1; min-height: 180px; } /* stylelint-disable-line unit-disallowed-list -- место под аватар стилиста из Figma */
 
-/* Settings / Main: подвал (513:4818) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
+/* Settings / Main: подвал (1371:39113) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
 .y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
 .y-settings-footer .y-caption { margin: 0; }
 .y-settings-footer .y-button { margin-top: var(--space-20); }
@@ -39,7 +39,7 @@
 .y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
 .y-profile-panel > .y-profile-summary { margin-bottom: calc(var(--space-8) * -1); } /* сводка → лента 24 */
 
-/* «С чем носить» (463:1534): поводы на 101 ниже ленты — под штампами «Сохранить» и «Не нравится», которые выходят за коллаж */
+/* «С чем носить» (1371:42779): поводы на 101 ниже ленты — под штампами «Сохранить» и «Не нравится», которые выходят за коллаж */
 .y-occasions { margin-top: 81px; } /* stylelint-disable-line unit-disallowed-list -- положение поводов из Figma */
 
 /* Search / Photo / Crop: рамка обрезки на всё фото под контентом; жесты доходят до рамки, кнопки остаются нажимаемыми */

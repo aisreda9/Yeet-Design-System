@@ -96,7 +96,7 @@ export const Toast: Story = {
 
 const outfit: CollageItem[] = [{ kind: 'accessories', x: 32, y: 20, size: 64 }, { kind: 'top', x: 68, y: 34, size: 120, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 150, color: 'green' }, { kind: 'shoe', x: 72, y: 74, size: 80, color: 'brown' }];
 
-/** Детали образа (Figma `349:8637 → 349:10430`): в шапке при скролле — мини-коллаж, штамп «Надеть» закреплён поверх. */
+/** Детали образа (Figma `1371:41156 → 1371:41329`): в шапке при скролле — мини-коллаж, штамп «Надеть» закреплён поверх. */
 function OutfitDetailsScreen({ scrolled }: { scrolled?: boolean }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
   return (
@@ -123,7 +123,7 @@ const bagLooks: CollageItem[][] = [
   [{ kind: 'bottom', x: 30, y: 58, size: 150, color: 'green' }, { kind: 'top', x: 66, y: 34, size: 110, color: 'white' }, { kind: 'container', x: 76, y: 74, size: 64, color: 'black' }],
 ];
 
-/** Детали вещи из гардероба (Figma `349:9258 → 349:9976`): статистика, теги, образы с вещью. */
+/** Детали вещи из гардероба (Figma `1371:41024 → 1371:41076`): статистика, теги, образы с вещью. */
 function WardrobeItemScreen({ scrolled }: { scrolled?: boolean }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
   return (
@@ -160,7 +160,7 @@ export const Wishlist: Story = {
   ),
 };
 
-/** Детали вещи из вишлиста (Figma `503:1150 → 503:1311`): описание, образы, BottomBar закреплён. */
+/** Детали вещи из вишлиста (Figma `1371:43300 → 1371:43256`): описание, образы, BottomBar закреплён. */
 function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
   return (
@@ -362,7 +362,7 @@ export const WishlistOutfitDetails: Story = {
   ),
 };
 
-/** Новая вещь в вишлисте (Figma `503:987 → 503:1070`): бренд и ссылка на магазин, комментарий. */
+/** Новая вещь в вишлисте (Figma `1371:42992 → 1371:43197`): бренд и ссылка на магазин, комментарий. */
 function WishlistNewItemScreen({ filled }: { filled?: boolean }) {
   const ref = useScrolled(filled ? SCROLLED : 0);
   const text = (label: string, value: string) => <Field label={label} input={filled ? { defaultValue: value } : {}} />;
