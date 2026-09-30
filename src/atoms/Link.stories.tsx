@@ -9,7 +9,7 @@ const meta = {
   tags: ['autodocs'],
   args: { href: '#', children: 'политикой конфиденциальности' },
   argTypes: { children: { control: 'text' }, external: { control: 'boolean' } },
-  render: (args) => <p className="y-caption y-text--secondary">Продолжая, вы соглашаетесь с <Link {...args} /></p>,
+  render: (args) => <p className="y-caption y-text--secondary">Продолжая, ты соглашаешься с <Link {...args} /></p>,
   parameters: {
     docs: {
       description: {
@@ -51,7 +51,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={300}>
       <Usage screen="Auth / Sign In" note="юридическая подпись, Caption серым">
-        <p className="y-caption y-text--secondary" style={{ textAlign: 'center' }}>Продолжая, вы соглашаетесь <br />с <Link href="#privacy">политикой конфиденциальности</Link> <br />и <Link href="#terms">условиями использования</Link></p>
+        <p className="y-caption y-text--secondary" style={{ textAlign: 'center' }}>Продолжая, ты соглашаешься <br />с <Link href="#privacy">политикой конфиденциальности</Link> <br />и <Link href="#terms">условиями использования</Link></p>
       </Usage>
       <Usage screen="Settings / Legal" note="e-mail, Body"><p className="y-body">По вопросам данных: <Link href="mailto:privacy@yeet.app">privacy@yeet.app</Link></p></Usage>
     </UsageGrid>
