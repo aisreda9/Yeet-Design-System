@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { Snackbar } from '../../molecules';
 import { cx } from '../../utils/cx';
@@ -26,7 +26,7 @@ if (import.meta.env?.DEV) {
  */
 
 type Layer = { key: number; id: ScreenId; overlay: boolean };
-type ToastState = { key: number; text: string; undo?: boolean; offset: number };
+type ToastState = { key: number; text: string; undo?: (nav: Nav) => void | Promise<void>; offset: number };
 
 const INTERACTIVE = 'button, a[href], input, textarea, select, [role=slider], [role=switch], [role=checkbox]';
 /** Контролы внутри карточек и экранов, у которых своё действие: тап по ним не ведёт по флоу. */
@@ -50,6 +50,17 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const suppress = useRef(false);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [hotspots, setHotspots] = useState(false);
+  /** Вещь, по которой нажали последней: экран и номер карточки. Её убирает `take()`. */
+  const picked = useRef<{ screen: ScreenId; index: number } | null>(null);
+  /** Убранные из списков вещи: экран → номера карточек. Новый слой экрана начинает с полного списка, кроме возврата по «Отменить». */
+  const removed = useRef(new Map<ScreenId, Set<number>>());
+  const keep = useRef<ScreenId | null>(null);
+  const hideRemoved = () => {
+    for (const l of layersRef.current) {
+      const gone = removed.current.get(l.id);
+      els.current.get(l.key)?.querySelectorAll<HTMLElement>('.y-item-card').forEach((c, i) => { c.style.display = gone?.has(i) ? 'none' : ''; });
+    }
+  };
 
   const commit = useCallback((next: Layer[]) => {
     layersRef.current = next;
@@ -62,7 +73,11 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const play = (e: Element | undefined | null, keyframes: Keyframe[], ms: number, easing: string, fill: FillMode = 'none') =>
     e ? e.animate(keyframes, { duration: ms, easing, fill }).finished.catch(() => undefined) : Promise.resolve();
   const focusTop = () => requestAnimationFrame(() => el(top())?.querySelector<HTMLElement>('.y-screen__content')?.focus({ preventScroll: true }));
-  const make = (id: ScreenId): Layer => ({ key: ++seq.current, id, overlay: screens[id].overlay });
+  const make = (id: ScreenId): Layer => {
+    if (keep.current === id) keep.current = null;
+    else removed.current.delete(id);
+    return { key: ++seq.current, id, overlay: screens[id].overlay };
+  };
   const screenCount = () => layersRef.current.filter((l) => !l.overlay).length;
 
   const nav = useMemo<Nav>(() => {
@@ -143,6 +158,25 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         const offset = t?.querySelector('.y-bottom-nav, .y-dock') ? 132 : t?.querySelector('.y-bottom-bar') ? 100 : 36;
         setToast({ key: ++seq.current, text, undo: opts?.undo, offset });
       },
+      take() {
+        const p = picked.current;
+        picked.current = null;
+        if (!p || !layersRef.current.some((l) => l.id === p.screen)) return () => undefined;
+        const set = removed.current.get(p.screen) ?? new Set<number>();
+        removed.current.set(p.screen, set.add(p.index));
+        hideRemoved();
+        return () => {
+          set.delete(p.index);
+          removed.current.set(p.screen, set);
+          // экран уже сменился пустым состоянием — следующий слой этого экрана откроется с тем же списком
+          if (!layersRef.current.some((l) => l.id === p.screen)) keep.current = p.screen;
+          hideRemoved();
+        };
+      },
+      left() {
+        const t = [...layersRef.current].reverse().find((l) => !l.overlay);
+        return [...(el(t)?.querySelectorAll<HTMLElement>('.y-item-card') ?? [])].filter((c) => c.style.display !== 'none').length;
+      },
       below() {
         const l = layersRef.current;
         return l[l.length - 1]?.overlay ? l[l.length - 2]?.id : undefined;
@@ -163,6 +197,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     if (busy.current) return;
     busy.current = true;
     frame.current?.setAttribute('data-busy', ''); // play-тесты ждут конца перехода
+    const card = target.closest<HTMLElement>('.y-item-card'), host = card?.closest<HTMLElement>('[data-proto-layer]');
+    if (card && host?.dataset.screen) picked.current = { screen: host.dataset.screen, index: [...host.querySelectorAll('.y-item-card')].indexOf(card) };
     try {
       if (typeof go === 'string') await (screens[go].overlay ? nav.overlay(go) : nav.push(go));
       else await go(nav, target, ev);
@@ -339,6 +375,9 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     void run(hit.route.go, hit.target);
   };
 
+  /* Убранные вещи остаются скрытыми, пока слой их экрана в стеке */
+  useLayoutEffect(() => hideRemoved(), [layers]);
+
   /* Сплэш и загрузка уходят сами */
   const topLayer = layers[layers.length - 1];
   useEffect(() => {
@@ -427,7 +466,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         })}
         {toast && (
           <div key={toast.key} className="y-proto__toast" style={{ bottom: toast.offset }}>
-            <Snackbar autoHide onClose={() => setToast((t) => (t?.key === toast.key ? null : t))} onUndo={toast.undo ? () => undefined : undefined}>{toast.text}</Snackbar>
+            <Snackbar autoHide onClose={() => setToast((t) => (t?.key === toast.key ? null : t))} onUndo={toast.undo ? () => void run((n) => toast.undo!(n), frame.current!) : undefined}>{toast.text}</Snackbar>
           </div>
         )}
       </div>
@@ -456,6 +495,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
             <li>Таб-бар, «Назад», карточки, кнопки и чипсы ведут по флоу</li>
             <li>Свайп от левого края — назад, шторку смахни вниз или нажми на затемнение</li>
             <li>Долгое нажатие на вещь в гардеробе — действия, на пустой холст образа — очистить</li>
+            <li>Вещь в корзине — действия; удаление окончательное, когда тост закрылся, до этого — «Отменить»</li>
           </ul>
         </aside>
       )}

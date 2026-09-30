@@ -16,8 +16,12 @@ export type Nav = {
   close(): Promise<void>;
   /** Уйти из цепочки экранов (создание образа) одним «назад» — к экрану, откуда в неё вошли. */
   leave(ids: ScreenId[]): Promise<void>;
-  /** Snackbar над низом экрана. */
-  toast(text: string, opts?: { undo?: boolean }): void;
+  /** Snackbar над низом экрана. `undo` — кнопка «Отменить»: вызывается только ею, не по таймеру и не «×». */
+  toast(text: string, opts?: { undo?: (nav: Nav) => void | Promise<void> }): void;
+  /** Убрать из списка вещь, по которой нажали последней (карточка скрывается сразу). Результат — вернуть её на место. */
+  take(): () => void;
+  /** Сколько карточек вещей видно на верхнем экране. */
+  left(): number;
   /** Экран под верхним слоем: откуда открыли шторку. */
   below(): ScreenId | undefined;
   /** Экраны в стеке снизу вверх: откуда пришли в общую цепочку (онбординг или гардероб). */
@@ -104,6 +108,24 @@ const lastSkip: Route = {
   go: (n, el) => { if (el.closest('.y-outfit-pager')?.querySelector('[aria-label="Следующий образ"][aria-disabled=true]')) return n.swap('OutfitOfTheDayEmpty'); },
 };
 
+/**
+ * Вещь уходит из списка сразу, тост с «Отменить» (#184). Удаление окончательное, когда тост закрылся сам или «×»;
+ * «Отменить» до этого возвращает вещь на место, а опустевший список (`empty`) — обратно в список с вещью.
+ * Из деталей вещи сначала «назад» к списку, откуда её открыли.
+ */
+const removeItem = (text: string, empty?: ScreenId): Go => closeThen(async (n, from) => {
+  if (from === 'WardrobeItemDetails') await n.back();
+  const list = n.stack().at(-1);
+  const restore = n.take();
+  if (empty && !n.left()) await n.swap(empty);
+  n.toast(text, {
+    undo: async (u) => {
+      restore();
+      if (empty && list && u.stack().at(-1) === empty) await u.swap(list);
+    },
+  });
+});
+
 /* ─── Создание образа: диалоги и фильтр вещей (#54) ──────────────────── */
 const CREATION: ScreenId[] = ['OutfitItems', 'Canvas', 'CanvasDefault', 'CanvasHint', 'OutfitCriteria'];
 /** «Назад» с выбранными вещами — сначала диалог несохранённых изменений. */
@@ -160,11 +182,12 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ItemActions: [
     { sel: '.y-list-item', text: 'Создать образ', go: closeThen((n) => n.push('OutfitItems')) },
     { sel: '.y-list-item', text: 'Редактировать', go: closeThen(comingSoon) },
-    { sel: '.y-list-item', text: 'Архивировать', go: closeThen((n) => n.toast('Вещь перемещена в архив', { undo: true })) },
-    { sel: '.y-list-item', text: 'Удалить', go: closeThen((n) => n.toast('Вещь перемещена в корзину', { undo: true })) },
+    { sel: '.y-list-item', text: 'Архивировать', go: removeItem('Вещь перемещена в архив', 'WardrobeEmpty') },
+    { sel: '.y-list-item', text: 'Удалить', go: removeItem('Вещь перемещена в корзину', 'WardrobeEmpty') },
   ],
   WardrobeItemDetails: [btn('Ещё', (n) => n.overlay('ItemActions')), openOutfit],
-  OutfitDetails: [openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: true }) }],
+  // штамп в истории без состояния: «Отменить» возвращать нечего
+  OutfitDetails: [openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
 
   /* Вишлист */
   Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', go: ok('ItemDetails') }, { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
@@ -184,7 +207,11 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
 
   /* Архив и корзина */
   Archive: [openItem],
-  TrashPopulated: [btn('Очистить корзину', (n) => n.overlay('ClearTrash'))],
+  TrashPopulated: [btn('Очистить корзину', (n) => n.overlay('ClearTrash')), { sel: '.y-item-card', go: (n) => n.overlay('TrashItemActions') }],
+  TrashItemActions: [
+    { sel: '.y-list-item', text: 'Вернуть в гардероб', go: removeItem('Вещь возвращена в гардероб', 'TrashEmpty') },
+    { sel: '.y-list-item', text: 'Удалить навсегда', go: removeItem('Вещь удалена навсегда', 'TrashEmpty') },
+  ],
   ClearTrash: [btn('Отменить', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('TrashEmpty'); n.toast('Корзина очищена'); }))],
 
   /* Поиск по гардеробу */

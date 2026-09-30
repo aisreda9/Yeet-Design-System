@@ -357,6 +357,19 @@ export const TrashPopulated: Story = {
   ),
 };
 
+/** Действия вещи в корзине (Figma `555:4098`, #122): «Удалить навсегда» — тост `555:4116` с «Отменить» (#184). */
+export const TrashItemActions: Story = {
+  name: 'Trash / Item / Sheet / Actions',
+  render: () => (
+    <Screen
+      header={<Header type="bar" title="Корзина вещей" actions={[{ icon: 'trash', label: 'Очистить корзину' }]} />}
+      overlay={<Overlay><Sheet title="Название вещи"><List><ListItem icon="undo" label="Вернуть в гардероб" /><ListItem icon="trash" label="Удалить навсегда" /></List></Sheet></Overlay>}
+    >
+      <Grid><ItemCard kind="top" color="white" /><ItemCard kind="top" color="black" /></Grid>
+    </Screen>
+  ),
+};
+
 export const WishlistOutfitDetails: Story = {
   name: 'Wishlist / Outfit Details / Default',
   render: () => (
