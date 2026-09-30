@@ -152,8 +152,19 @@
   left: min(0px, calc((100% - 44px) / 2)); right: min(0px, calc((100% - 44px) / 2));
   /* stylelint-enable unit-disallowed-list */
 }
-/* Соседи без зазора не делят зону: вкладки таб-бара на 320 (gap 0) растут только по вертикали — ширина ячейки и есть её зона */
-@container (max-width: 300px) { .y-tab-bar__tab::after { left: 0; right: 0; } }
+/* Вкладки таб-бара на 320 с «+» (gap 0, ячейка ≈ 42): зоны 44 сдвигаются лесенкой влево — k-я с конца вкладка забирает k × (44 − ширина, до целого px вверх)
+   у соседа слева (он ниже по порядку DOM, его ::after перекрыт), первая выходит за край таб-бара, последняя — в свой отступ справа.
+   Вид не меняется, пересечений зон нет. */
+/* stylelint-disable unit-disallowed-list -- 44 — минимум зоны нажатия (HIG), 0px нужен в min() с длиной; токенов нет */
+@container (max-width: 300px) {
+  .y-tab-bar__tab::after { left: 0; right: 0; }
+  .y-tab-bar__tab:nth-last-of-type(2)::after { left: min(0px, round(down, 100% - 44px, 1px)); }
+  .y-tab-bar__tab:nth-last-of-type(3)::after { left: calc(2 * min(0px, round(down, 100% - 44px, 1px))); }
+  .y-tab-bar__tab:nth-last-of-type(4)::after { left: calc(3 * min(0px, round(down, 100% - 44px, 1px))); }
+  .y-tab-bar__tab:nth-last-of-type(5)::after { left: calc(4 * min(0px, round(down, 100% - 44px, 1px))); }
+  .y-tab-bar__tab:last-of-type::after { right: min(0px, round(down, 100% - 44px, 1px)); }
+}
+/* stylelint-enable unit-disallowed-list */
 
 /* Link — инлайн-ссылка в тексте (юридическая подпись входа, диалог удаления, e-mail в Legal): цвет текста вокруг, подчёркивание, видимый фокус */
 /* stylelint-disable unit-disallowed-list -- толщина и отступ подчёркивания ссылки, скругление фокуса: токенов нет */
