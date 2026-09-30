@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button, Divider, Link, Logo } from '../atoms';
-import { Field, InputGroup, PhotoTile } from '../molecules';
+import { Field, InputGroup } from '../molecules';
 import { BottomBar, type CanvasItem, Dialog, Header, OutfitCanvas, Overlay } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
 import './pages.css';
@@ -20,8 +20,9 @@ type Story = StoryObj<typeof meta>;
 export const Splash: Story = {
   name: 'App / Splash',
   render: () => (
+    // Логотип L (знак 130×60) по центру всего экрана, а не области под статус-баром (1173:18160)
     <Screen background="accent" center>
-      <Row justify="center"><Logo height={56} /></Row>
+      <Row justify="center"><Logo size="L" className="y-splash" /></Row>
     </Screen>
   ),
 };
@@ -42,11 +43,12 @@ export const OnboardingWelcome: Story = {
 export const FirstItemPrompt: Story = {
   name: 'Onboarding / First Item Prompt',
   render: () => (
-    <Screen header={<Header type="back" title="Добавь первую вещь" subtitle="Сфотографируй вещь — фон удалим сами" textAction={{ label: 'Пропустить' }} />}>
-      <Row gap={7}>
-        <PhotoTile source="gallery" />
-        <PhotoTile source="camera" />
-      </Row>
+    // Пустой холст ждёт первую вещь; «Добавить» открывает выбор фото. Перенос заголовка — неразрывными пробелами «вещь в гардероб»
+    <Screen
+      header={<Header type="back" title={'Добавь первую вещь\u00a0в\u00a0гардероб'} subtitle={<>Сфотографируй на ровной поверхности,<br />а мы вырежем фон, определим цвет и категорию</>} textAction={{ label: 'Пропустить' }} />}
+      bottom={<BottomBar label="Добавить" />}
+    >
+      <OutfitCanvas items={[]} aria-label="Холст первой вещи" />
     </Screen>
   ),
 };
@@ -70,16 +72,20 @@ export const SignIn: Story = {
   ),
 };
 
-const recoveryHeader = <Header type="back" title="Восстановление пароля" subtitle="Введи почту, на которую зарегистрирован аккаунт, — пришлём код для сброса пароля" />;
+const recoveryHeader = <Header type="back" title="Забыли пароль?" subtitle={<>Пришлём код на почту, указанную при<br />регистрации</>} />;
 
 export const PasswordRecovery: Story = {
   name: 'Auth / Password Recovery',
   render: () => (
+    // Во флоу поле пустое и в фокусе (открыта клавиатура). Кнопка во флоу подписана «Войти» — опечатка макета: действие — отправить код
     <Screen header={recoveryHeader}>
-      <InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /></InputGroup>
+      <InputGroup><Field label="E-mail" input={{ type: 'email', autoComplete: 'email' }} /></InputGroup>
       <Button size="L" fullWidth>Отправить код</Button>
     </Screen>
   ),
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLInputElement>('input[type="email"]')?.focus();
+  },
 };
 
 export const PasswordRecoverySent: Story = {
