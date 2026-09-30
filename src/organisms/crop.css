@@ -1,6 +1,6 @@
 /* CropFrame — стили компонента (TEAM.md §7.4: вынесены из organisms.css). Слой назначает src/styles.css. */
 /* ─── CropFrame (#27) ─── */
-/* Search / Photo / Crop 261:1590: рамка 353 × 226, радиус 20; снаружи — затемнение overlay, по углам — белые уголки 2 px */
+/* crop-frame 1356:29832, экран 1176:19019: рамка 353 × 227, радиус 20; снаружи — затемнение overlay, по углам — белые уголки 2 px */
 .y-crop {
   position: relative;
   overflow: hidden;
@@ -100,14 +100,14 @@
   border-bottom-right-radius: var(--radius-lg);
 }
 /* stylelint-enable unit-disallowed-list */
-/* подсказка в 20 над кнопкой L внизу экрана: 20 + 52 + 20 */
+/* подсказка в 24 над кнопкой L внизу экрана (crop-frame 1356:29832): 20 + 52 + 24 */
 .y-crop__hint {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: var(--crop-hint-bottom, 92px);
+  bottom: var(--crop-hint-bottom, calc(var(--space-20) + var(--size-control-l) + var(--space-24)));
   z-index: var(--layer-float);
   display: flex;
   justify-content: center;
   pointer-events: none;
-} /* stylelint-disable-line unit-disallowed-list -- подсказка: 20 + кнопка 52 + 20 */
+}
