@@ -95,7 +95,7 @@
 /* Scroll edge — fades content under fixed chrome; works in both themes (mask over canvas colour) */
 .y-scroll-edge {
   position: absolute; left: 0; right: 0; pointer-events: none;
-  background: var(--color-bg-canvas);
+  background: var(--screen-edge-bg, var(--color-bg-canvas)); /* над панелью экран задаёт bg-elevated (templates) */
 }
 .y-scroll-edge--top    { -webkit-mask-image: linear-gradient(to bottom, black, transparent); mask-image: linear-gradient(to bottom, black, transparent); }
 .y-scroll-edge--bottom { -webkit-mask-image: linear-gradient(to top, black, transparent);    mask-image: linear-gradient(to top, black, transparent); }
