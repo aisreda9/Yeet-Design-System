@@ -29,6 +29,7 @@ src/
                overlays.tsx  Sheet, Dialog, Overlay
                cards.tsx     ItemCard, ProductCard, OutfitCollage, CollageLayer, PhotoArea, WeatherCard, ChatBubble
                stylist.tsx   OutfitThumbnail, StylistPromptCard, TripCard
+               crop.tsx      CropFrame — рамка обрезки фото 353 × 227 (стили — crop.css)
   templates/   Screen — каркас экрана со скроллом под навигацией; Grid, Row — раскладка
   pages/       экраны флоу, собранные только из компонентов (stories)
   motion/      метаданные анимаций и интерактивные демо
