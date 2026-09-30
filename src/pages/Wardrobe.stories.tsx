@@ -434,13 +434,13 @@ export const SeasonFilterSheet: Story = {
 export const TagsFilterSheet: Story = {
   name: 'Wardrobe / Items / Sheet / Tags Filter',
   tags: ['figma:1371-37801', 'figma:1371-37775'],
-  render: () => <FilterSheetScreen title="Теги" chips={['Тег #1', 'Тег #2', 'Тег #3', 'Тег #4', 'Тег #5', 'Тег #6']} />,
+  render: () => <FilterSheetScreen title="Теги" chips={Array.from({ length: 10 }, (_, k) => `Тег #${k + 1}`)} />,
 };
 
 export const OccasionFilterSheet: Story = {
   name: 'Wardrobe / Outfits / Sheet / Occasion Filter',
   tags: ['figma:1371-37867', 'figma:1371-37843', 'figma:1371-37891'],
-  render: () => <FilterSheetScreen title="Повод" chips={['На каждый день', 'Прогулка', 'Ужин', 'Работа', 'Свидание', 'Вечеринка', 'Путешествие']} />,
+  render: () => <FilterSheetScreen title="Повод" chips={['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Кастомный']} />,
 };
 
 /** Шторка действий: заголовок — имя вещи или повода, необратимое действие последним (Organisms/Sheet → «Действия»). */

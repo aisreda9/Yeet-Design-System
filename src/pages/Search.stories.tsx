@@ -90,7 +90,7 @@ export const SortingSheet: Story = {
   render: () => (
     <Screen
       header={<Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка', selected: true }, { label: 'Цена' }]} />}
-      overlay={<Overlay><Sheet title="Сортировка"><ChipGroup wrap chips={['Сначала дешевле', 'Сначала дороже', 'По популярности', 'Новинки'].map((label, k) => ({ label, selected: k === 0 }))} /></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Сортировка"><ChipGroup wrap chips={['По релевантности', 'Сначала дешевле', 'Сначала дороже', 'Со скидкой'].map((label, k) => ({ label, selected: k === 0 }))} /></Sheet></Overlay>}
     >
       {resultsBackdrop}
     </Screen>
