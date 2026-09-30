@@ -321,5 +321,7 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 
 /* Иконки внутри компонентов — в конце файла: эти селекторы специфичнее прочих `… .y-icon` (no-descending-specificity) */
 .y-input-bar__field > .y-icon:first-child { color: var(--color-text-secondary); } /* InputBar: иконка слева серым */
-.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 20px; height: 20px; } /* ChipGroup · trailing */ /* stylelint-disable-line unit-disallowed-list -- иконка 20, токена размера иконки нет */
+/* ChipGroup · Trailing=Dropdown: ⇕ рисуется в боксе 24, как в Field (#202, DS 0.2 1174:19818: стрелки 8 × 5 через 2) — в боксе 20 глиф был на ~1 px мельче Figma (#203).
+   Поля −2 по бокам оставляют место 20: ширина чипса и отступ справа 12 не меняются, центр глифа — там же. */
+.y-chip-group .y-chip--trailing > .y-icon:last-child { width: 24px; height: 24px; margin: 0 calc(-1 * var(--space-2)); } /* stylelint-disable-line unit-disallowed-list -- иконка 24, токена размера иконки нет */
 .y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; } /* ListGroup: иконки справа 20 */ /* stylelint-disable-line unit-disallowed-list -- иконка 20 */
