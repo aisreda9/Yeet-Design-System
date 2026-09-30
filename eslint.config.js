@@ -49,7 +49,7 @@ export default tseslint.config(
       'jsx-a11y/anchor-is-valid': 'warn', // pages/Onboarding.stories
       'jsx-a11y/interactive-supports-focus': 'warn', // molecules/selection
       'jsx-a11y/no-noninteractive-element-interactions': 'warn', // organisms/crop, overlays, pager
-      'jsx-a11y/no-noninteractive-tabindex': 'warn', // organisms/crop, templates/index
+      'jsx-a11y/no-noninteractive-tabindex': 'warn', // organisms/crop, templates/index, molecules/data (Carousel)
       'jsx-a11y/no-static-element-interactions': 'warn', // organisms/overlays
       'jsx-a11y/click-events-have-key-events': 'warn', // organisms/pager
     },

@@ -150,7 +150,7 @@ export const OnboardingChain: Story = {
     await back(root);
     await at(root, 'FirstItemPrompt');
 
-    await tap(root, q(root, '.y-photo-tile'));
+    await tap(root, topLayer(root).getByRole('button', { name: 'Добавить' }));
     await at(root, 'NewItem');
     await at(root, 'NewItemPhotoV2', 5000);
     await tap(root, submit(root));

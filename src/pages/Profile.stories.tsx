@@ -68,7 +68,7 @@ function ProfileScreen({ accounts, open: initial, scrollTo = 0 }: { accounts: Ac
           />
         </section>
         {/* порядок как во флоу: цвета → давно не надевалось → сезоны → лучшая инвестиция → другие цифры */}
-        <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Чёрный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
+        <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Чёрный', color: 'black', value: 62 }, { label: 'Оранжевый', color: 'orange', value: 25 }]} />
         <Carousel title="Давно не надевалось" itemWidth={173}>
           <ItemCard kind="top" color="black" label="20 дней" />
           <ItemCard kind="top" color="white" label="1 день" />
@@ -77,15 +77,14 @@ function ProfileScreen({ accounts, open: initial, scrollTo = 0 }: { accounts: Ac
         <BarChart bars={[{ label: 'Весна', icon: 'flower', value: 20 }, { label: 'Лето', icon: 'sun', value: 70 }, { label: 'Осень', icon: 'leaf', value: 8 }, { label: 'Зима', icon: 'snowflake', value: 1 }]} />
         <section className="y-section">
           <h2 className="y-h3">Лучшая инвестиция</h2>
-          <OutfitCollage plain label="Аксессуары" items={[{ kind: 'container', x: 50, y: 42, size: 180, color: 'black' }]} footer={price('32 640 ₽', '5 образов')} />
+          <OutfitCollage label="Аксессуары" items={[{ kind: 'container', x: 50, y: 42, size: 180, color: 'black' }]} footer={price('32 640 ₽', '5 образов')} />
         </section>
-        <section className="y-section">
-          <h2 className="y-h3">Другие цифры</h2>
-          <StatRow>
-            <StatTile label="Стоимость гардероба" value="23 600 ₽" />
-            <StatTile label="Средняя стоимость одной вещи" value="1 480 ₽" />
-          </StatRow>
-        </section>
+        {/* флоу: высокие карточки 171 лентой, третья выглядывает справа */}
+        <Carousel title="Другие цифры" itemWidth={171} className="y-profile-figures">
+          <StatTile label="Стоимость гардероба" value="23 600 ₽" />
+          <StatTile label="Средняя стоимость одной вещи" value="1 480 ₽" />
+          <StatTile label="Средняя стоимость образа" value="5 900 ₽" />
+        </Carousel>
       </Sheet>
     </Screen>
   );

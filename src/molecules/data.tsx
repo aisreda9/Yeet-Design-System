@@ -51,7 +51,9 @@ export function Carousel({ title, itemWidth = 173, children, className, style, .
   return (
     <section className={cx('y-carousel', className)} style={{ ['--carousel-item' as string]: `${itemWidth}px`, ...style }} {...rest}>
       {title && <h2 className="y-h3">{title}</h2>}
-      <div className="y-carousel__track">{children}</div>
+      {/* Лента прокручивается горизонтально: фокус с клавиатуры нужен, даже если карточки внутри не интерактивны (axe scrollable-region-focusable) */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- прокручиваемая область */}
+      <div className="y-carousel__track" tabIndex={0} aria-label={title} role="group">{children}</div>
     </section>
   );
 }
