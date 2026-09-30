@@ -62,11 +62,11 @@
 | `ui-colors/white` | `--color-bg-canvas` | `#FFFFFF` | `#0F0F11` | Фон экрана |
 | `ui-colors/elevated` | `--color-bg-elevated` | `#FFFFFF` | `#1A1A1E` | Поднятые поверхности: tab-bar, sheet, dialog, hint |
 | `ui-colors/light-grey` | `--color-bg-subtle` | `#F7F7F7` | `#26262B` | Карточки, поля, tertiary-кнопки |
-| `ui-colors/black` | `--color-bg-inverse` | `#000000` | `#F5F5F7` | Snackbar, Secondary-кнопка, погода |
+| `ui-colors/bg-inverse` | `--color-bg-inverse` | `#000000` | `#F5F5F7` | Snackbar, Secondary-кнопка, погода |
 | `ui-colors/overlay` | `--color-bg-overlay` | `#000000` @ 40% | `#000000` @ 60% | Затемнение под модальным sheet |
 | `ui-colors/black` | `--color-text-primary` | `#000000` | `#F5F5F7` | Основной текст и иконки |
 | `ui-colors/grey` | `--color-text-secondary` | `#6E6E6E` | `#8E8E93` | Вторичный текст, лейблы, подписи |
-| `ui-colors/white` | `--color-text-inverse` | `#FFFFFF` | `#0F0F11` | Текст на inverse-поверхности |
+| `ui-colors/text-inverse` | `--color-text-inverse` | `#FFFFFF` | `#0F0F11` | Текст на inverse-поверхности |
 | `ui-colors/on-accent` | `--color-text-on-accent` | `#FFFFFF` | `#FFFFFF` | Текст и иконки на accent / danger |
 | `ui-colors/inverse-secondary` | `--color-text-inverse-secondary` | `#A7B3BF` | `#5B6470` | Вторичный текст на inverse-поверхности: подпись в карточке погоды |
 | `ui-colors/on-accent` | `--color-text-on-danger` | `#FFFFFF` | `#FFFFFF` | Текст на danger (бейдж скидки) — белый в любом бренде |

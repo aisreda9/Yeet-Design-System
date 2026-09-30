@@ -238,7 +238,7 @@ export const OutfitsEmpty: Story = {
   ),
 };
 
-const noFilterResults = <EmptyState title="Упс, не нашли" description={<>Измени фильтры или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить фильтры' }} />;
+const noFilterResults = <EmptyState title="Упс, не нашли" description={<>Измени фильтры или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить фильтры', variant: 'tertiary' }} />;
 
 export const ItemsNoFilterResults: Story = {
   name: 'Wardrobe / Items / No Filter Results',
@@ -292,7 +292,7 @@ export const ItemSearchEmpty: Story = {
   name: 'Wardrobe / Item Search / No Results',
   render: () => (
     <Screen header={<Header type="search" query="asdasdasd" />}>
-      <div className="y-empty-bar"><EmptyState title="Упс, не нашли" description={<>Измени запрос или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить поиск' }} /></div>
+      <div className="y-empty-bar"><EmptyState title="Упс, не нашли" description={<>Измени запрос или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить поиск', variant: 'tertiary' }} /></div>
     </Screen>
   ),
 };

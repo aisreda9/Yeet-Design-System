@@ -10,15 +10,16 @@ import photoGallery from '../icons/art/photo-gallery.png';
 /* ─── Hint ──────────────────────────────────────────────────────────── */
 
 /**
- * Подсказка поверх холста или фото, Body 14 с иконкой 16.
- * `default` — пилюля `elevated` с тенью; `onPhoto` — без подложки, белый текст и иконка поверх фото (Figma: hint · On Photo, флоу Search / Photo / Crop).
+ * Подсказка поверх холста или фото, Body 14.
+ * `default` — пилюля `elevated` с тенью, иконка 16, gap 6; `onPhoto` — без подложки, иконка 24, gap 8, белый текст и иконка
+ * поверх фото `--color-text-on-photo` (Figma: hint · On Photo `1183:20594`, флоу Search / Photo / Crop).
  */
 export type HintProps = ComponentPropsWithRef<'span'> & { icon?: IconName; /** Окраска относительно фона. */ tone?: 'default' | 'onPhoto' };
 
 export function Hint({ icon = 'fingers-pinch', tone = 'default', children, className, ...rest }: HintProps) {
   return (
     <span className={cx('y-hint', tone === 'onPhoto' && 'y-hint--on-photo', className)} role="note" {...rest}>
-      <Icon name={icon} size={16} />
+      <Icon name={icon} size={tone === 'onPhoto' ? 24 : 16} />
       {children}
     </span>
   );
@@ -33,7 +34,7 @@ export function Hint({ icon = 'fingers-pinch', tone = 'default', children, class
  * (`--motion-exit`, 150 мс). С `autoHide` закрывается сам через `--gesture-snackbar` 4 с, с «Отменить» — 6 с;
  * пока на тосте курсор или фокус, таймер стоит (успеть прочитать и нажать — WCAG 2.2.1).
  * «Отменить» и «×» сначала доигрывают уход, потом вызывают `onClose`.
- * `size`: **M** — 52, паддинг 20 (тост над таб-баром); **S** — 48, паддинг 16 (подсказка на холсте образа, 313 при отступах 20).
+ * `size`: **M** — 52, паддинг 20, gap 12 (тост над таб-баром); **S** — 48, паддинг 16, gap 20 (подсказка на холсте образа, 313 при отступах 20).
  */
 export type SnackbarProps = ComponentPropsWithRef<'div'> & {
   onClose?: () => void;
@@ -90,7 +91,7 @@ export function Snackbar({ children, onClose, onUndo, autoHide, size = 'M', clas
 export type EmptyStateProps = Omit<ComponentPropsWithRef<'div'>, 'title' | 'children'> & {
   title: string;
   description: ReactNode;
-  /** Кнопка L через 32: «Добавить вещь» (primary), «Сбросить фильтры» (tertiary, по умолчанию). */
+  /** Кнопка L через 32 (Figma: empty-state · Action — Primary L): «Добавить вещь» (primary, по умолчанию), вторичное действие — `tertiary`. */
   action?: { label: string; variant?: 'primary' | 'tertiary'; onClick?: () => void };
 };
 
@@ -100,7 +101,7 @@ export function EmptyState({ title, description, action, className, ...rest }: E
       <h2 className="y-h1 y-text--primary">{title}</h2>
       <p className="y-body y-text--secondary">{description}</p>
       {action && (
-        <Button variant={action.variant ?? 'tertiary'} size="L" onClick={action.onClick}>
+        <Button variant={action.variant ?? 'primary'} size="L" onClick={action.onClick}>
           {action.label}
         </Button>
       )}

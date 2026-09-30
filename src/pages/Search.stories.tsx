@@ -53,7 +53,7 @@ export const SearchEmpty: Story = {
   name: 'Search / Text / No Results Filtered',
   render: () => (
     <Screen header={<Header type="search" query="asdasd" filters={[{ label: 'Сначала дешевле', selected: true }, { label: 'до 60 000 ₽', selected: true }]} />} center>
-      <div className="y-search-empty"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск' }} /></div>
+      <div className="y-search-empty"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск', variant: 'tertiary' }} /></div>
     </Screen>
   ),
 };

@@ -134,6 +134,8 @@ span.y-field__trailing { cursor: inherit; }
 }
 div.y-list-item { cursor: default; }
 .y-list-item__label { flex: 1; }
+.y-list-item__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); } /* label + description (Figma: list-item · Show Description) */
+.y-list-item__description { color: var(--color-text-secondary); }
 .y-list-item__trailing { flex: none; color: var(--color-text-secondary); white-space: nowrap; } /* текстовый trailing: «₽ · RUB» */
 .y-radio {
   width: 24px; height: 24px; border-radius: var(--radius-full); flex: none; /* stylelint-disable-line unit-disallowed-list -- радио 24 из Figma */
@@ -171,7 +173,7 @@ div.y-list-item { cursor: default; }
   transition: translate var(--motion-appear), opacity var(--motion-appear);
 }
 @starting-style { .y-hint { translate: 0 var(--space-8); opacity: 0; } } /* появление: прозрачность + сдвиг 8 pt */
-.y-hint--on-photo { padding: 0; background: none; box-shadow: none; border-radius: 0; color: var(--color-text-on-photo); }
+.y-hint--on-photo { gap: var(--space-8); padding: 0; background: none; box-shadow: none; border-radius: 0; color: var(--color-text-on-photo); } /* Figma hint · On Photo: иконка 24, gap 8 */
 
 /* Snackbar: флоу — 52, радиус 12; появление снизу */
 .y-snackbar {
@@ -183,7 +185,8 @@ div.y-list-item { cursor: default; }
 @starting-style { .y-snackbar { translate: 0 var(--space-16); opacity: 0; } }
 /* уход быстрее появления и короче по пути: 8 pt вниз за 150 мс */
 .y-snackbar.is-leaving { translate: 0 var(--space-8); opacity: 0; pointer-events: none; transition: translate var(--motion-exit), opacity var(--motion-exit); }
-.y-snackbar--S { height: var(--size-control-m); padding: 0 var(--space-16); } /* подсказка на холсте: 313 × 48, паддинг 16, радиус 12 */
+.y-snackbar--S { height: var(--size-control-m); padding: 0 var(--space-16); gap: var(--space-20); } /* подсказка на холсте: 313 × 48, паддинг 16, радиус 12, gap 20 (эталон 0.1) */
+.y-snackbar > span { flex: 1; min-width: 0; } /* Figma: текст FILL — «Отменить» и «×» прижаты вправо */
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
 
 /* LoadingState */
