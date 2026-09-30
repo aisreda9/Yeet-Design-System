@@ -20,6 +20,8 @@ export type Nav = {
   toast(text: string, opts?: { undo?: boolean }): void;
   /** Экран под верхним слоем: откуда открыли шторку. */
   below(): ScreenId | undefined;
+  /** Экраны в стеке снизу вверх: откуда пришли в общую цепочку (онбординг или гардероб). */
+  stack(): ScreenId[];
   /** Прокрутить контент экрана к началу (повторное нажатие на активную вкладку). */
   scrollTop(): void;
 };
@@ -76,14 +78,31 @@ const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): 
     .filter(([l]) => l !== self)
     .map(([l, id]) => ({ sel: '.y-segment [role=radio]', text: l, go: (n: Nav) => n.swap(id) }));
 
-/** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. */
+/** Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ. */
+const today: Route[] = [{ sel: '.y-outfit-thumb', go: ok('OutfitDetails') }, openOutfit];
+
+/** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. Чипсы на фокусе — не кнопки. */
 const noResults = /^Белое платье/;
 const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
-  { sel: '.y-chip-group button', text: noResults, go: empty },
-  { sel: '.y-chip-group button', go: results },
+  { sel: '.y-chip-group > .y-button', text: noResults, go: empty },
+  { sel: '.y-chip-group > .y-button', go: results },
 ];
 
 const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет в макетах');
+const howItWorks: Route = btn('Как это работает', comingSoon);
+/** Кнопка «Добавить» внизу формы новой вещи (не «+» у тегов). */
+const addItem = (go: Go): Route => ({ sel: '.y-button--full', text: 'Добавить', go });
+/** Вещь добавлена: в онбординге — к первому образу, иначе в гардероб с подтверждением. */
+const addedItem: Go = async (n) => {
+  if (n.stack().includes('FirstItemPrompt')) { await n.push('FirstOutfit'); n.toast('Первая вещь добавлена'); return; }
+  await n.root('Wardrobe');
+  n.toast('Вещь добавлена в гардероб');
+};
+/** «Не нравится» на последнем образе стопки: образы закончились. Штамп листает сам, пока есть следующий. */
+const lastSkip: Route = {
+  sel: '.y-stamp', text: 'Не нравится', native: true,
+  go: (n, el) => { if (el.closest('.y-outfit-pager')?.querySelector('[aria-label="Следующий образ"][aria-disabled=true]')) return n.swap('OutfitOfTheDayEmpty'); },
+};
 
 /* ─── Создание образа: диалоги и фильтр вещей (#54) ──────────────────── */
 const CREATION: ScreenId[] = ['OutfitItems', 'Canvas', 'CanvasDefault', 'CanvasHint', 'OutfitCriteria'];
@@ -112,28 +131,28 @@ export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'Shuffle
 export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Запуск и онбординг */
   OnboardingWelcome: [btn('Начать бесплатно', 'SignIn')],
-  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'FirstItemPrompt'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'FirstItemPrompt')],
-  FirstItemPrompt: [btn('Пропустить', (n) => n.root('Today')), { sel: '.y-photo-tile', go: ok('NewItem') }],
+  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
+  OnboardingName: [btn('Далее', 'FirstItemPrompt')],
+  FirstOutfit: [btn('Пропустить', (n) => n.root('Today')), btn('Сохранить образ и завершить', async (n) => { await n.root('Today'); n.toast('Образ сохранён'); })],
+  FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), { sel: '.y-photo-tile', go: ok('NewItem') }],
   PasswordRecovery: [btn('Отправить код', (n) => n.overlay('PasswordRecoverySent'))],
   PasswordRecoverySent: [btn('Ок!', closeThen((n) => n.back()))],
 
   /* Главная */
-  Today: [
-    { sel: '.y-outfit-thumb', go: ok('OutfitDetails') },
-    openOutfit,
-    { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: true }) },
-  ],
-  RecommendationsEmpty: [btn('Добавить вещь', 'NewItem')],
+  Today: today,
+  TodayRain: today,
+  TodayWorn: today,
+  RecommendationsEmpty: [btn('Добавить вещь', 'NewItemNoPhotoV2')],
 
   /* Гардероб */
   Wardrobe: [...topSeg('items'), ...gridSearch, filters, { sel: '.y-item-card', on: 'long', go: (n) => n.overlay('ItemActions') }, openItem,
-    { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
-  WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
-  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, filters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
+    { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
+  WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
+  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, filters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   OutfitsPopulated: [...topSeg('outfits'), filters, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsEmpty: [...topSeg('outfits'), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsNoFilterResults: [...topSeg('outfits'), filters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
-  Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItem') }],
+  Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   FilterSheet: [
     btn('Применить', closeThen((n, b) => { if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); })),
     btn('Сбросить', closeThen((n, b) => { if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); })),
@@ -174,7 +193,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ItemSearchEmpty: [btn('Сбросить поиск', (n) => n.swap('ItemSearchFocused')), { sel: '.y-input-bar__field', go: (n) => n.swap('ItemSearchFocused') }],
 
   /* Поиск в сторах */
-  SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchResults') }],
+  SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchFocused') }],
+  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty'), btn('Поиск по фото', 'PhotoCrop')],
   SearchResults: [
     { sel: '.y-chip-group button', text: 'Цена', go: (n) => n.overlay('PriceFilter') },
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
@@ -187,6 +207,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   StylistHome: [
     { sel: '.y-prompt-card', text: /^Конструктор/, go: ok('OutfitItems') },
     { sel: '.y-prompt-card', text: /^Для поездок/, go: ok('Trips') },
+    { sel: '.y-prompt-card', text: /^Удиви меня/, go: ok('OutfitOfTheDay') },
+    { sel: '.y-prompt-card', text: /^С чем носить/, go: ok('WhatToWear') },
     { sel: '.y-prompt-card', go: comingSoon },
     { sel: '.y-dock .y-input-bar__field', go: ok('Stylist') },
     { sel: '.y-dock .y-input-bar__send', go: ok('Stylist') },
@@ -194,9 +216,13 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   Trips: [
     { sel: '.y-trip-card--add', go: (n) => n.toast('Создание поездки пока без макета') },
     { sel: '.y-trip-card', go: ok('TripDetails') },
-    btn('Как это работает', comingSoon),
+    howItWorks,
   ],
-  TripDetails: [openOutfit],
+  TripDetails: [{ sel: '.y-segment [role=radio]', text: /^Вещи/, go: (n) => n.swap('TripItems') }, openOutfit],
+  TripItems: [{ sel: '.y-segment [role=radio]', text: /^Образы/, go: (n) => n.swap('TripDetails') }, openItem],
+  OutfitOfTheDay: [lastSkip, howItWorks],
+  OutfitOfTheDayEmpty: [btn('Показать еще', (n) => n.swap('OutfitOfTheDay')), howItWorks],
+  WhatToWear: [openItem, howItWorks],
 
   /* Создание образа */
   OutfitItems: [btn('Далее', 'Canvas'), ...steps('Гардероб'), shuffleAsk, exitAsk],
@@ -217,6 +243,14 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     btn('Очистить', closeThen((n) => n.toast('Фильтр сброшен'))),
   ],
   OutfitCriteria: [btn('Создать образ', async (n) => { await n.root('OutfitsPopulated'); n.toast('Образ создан'); }), ...steps('Описание')],
+
+  /* Новая вещь: без фото → загрузка (сама) → фото добавлено → «Добавить» */
+  NewItemNoPhotoV1: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItemLoadingV1') }],
+  NewItemNoPhotoV2: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItem') }],
+  NewItemPhotoV1: [addItem(addedItem)],
+  NewItemPhotoV2: [addItem(addedItem)],
+  NewItemCompletedV1: [addItem(addedItem)],
+  NewItemCompletedV2: [addItem(addedItem)],
 
   /* Профиль и настройки */
   ProfileAnalytics: [openItem, openOutfit, btn('Настройки', 'Settings', { native: true }), btn('Редактировать профиль', 'ProfileEdit', { native: true }), { sel: '.y-overlay button', text: 'Добавить аккаунт', go: 'SignIn', native: true }],
@@ -267,7 +301,8 @@ export const globalRoutes: Route[] = [
 /** Экран, который сам уходит дальше: сплэш и загрузка фото. */
 export const auto: Partial<Record<ScreenId, { after: number; go: Go }>> = {
   Splash: { after: 1600, go: (n) => n.swap('OnboardingWelcome') },
-  NewItem: { after: 2600, go: async (n) => { await n.swap('WardrobeItemDetails'); n.toast('Вещь добавлена в гардероб'); } },
+  NewItem: { after: 2600, go: (n) => n.swap('NewItemPhotoV2') },
+  NewItemLoadingV1: { after: 2600, go: (n) => n.swap('NewItemPhotoV1') },
 };
 
 /** Первый экран по умолчанию и экран, куда «Назад» ведёт с единственного экрана в стеке. */

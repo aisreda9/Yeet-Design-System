@@ -30,7 +30,7 @@ type ToastState = { key: number; text: string; undo?: boolean; offset: number };
 
 const INTERACTIVE = 'button, a[href], input, textarea, select, [role=slider], [role=switch], [role=checkbox]';
 /** Контролы внутри карточек и экранов, у которых своё действие: тап по ним не ведёт по флоу. */
-const NATIVE = 'input, textarea, select, [role=slider], [role=switch], [role=checkbox], .y-product-card__like, .y-item-card__remove, .y-photo-area__close, .y-photo-area__add, .y-chip__remove, .y-snackbar button, .y-stamp, .y-input-bar__clear';
+const NATIVE = 'input:not([readonly]), textarea:not([readonly]), select, [role=slider], [role=switch], [role=checkbox], .y-product-card__like, .y-item-card__remove, .y-photo-area__close, .y-photo-area__add, .y-chip__remove, .y-snackbar button, .y-stamp, .y-input-bar__clear';
 const cssVar = (name: string, fallback: string) => (typeof document === 'undefined' ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
 const anims = (el?: Element | null) => el?.getAnimations?.() ?? [];
 
@@ -146,6 +146,9 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
       below() {
         const l = layersRef.current;
         return l[l.length - 1]?.overlay ? l[l.length - 2]?.id : undefined;
+      },
+      stack() {
+        return layersRef.current.map((l) => l.id);
       },
       scrollTop() {
         el(top())?.querySelector('.y-screen__content')?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -362,6 +365,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               if (!n.hasAttribute('data-proto-link')) n.setAttribute('data-proto-link', r.on === 'long' ? 'long' : '');
               if (!n.matches(INTERACTIVE) && !n.hasAttribute('tabindex')) {
                 n.tabIndex = 0;
+                // карточка со своими контролами (лайк, «Выйти», поле) — с клавиатуры по Enter, но не кнопка: кнопка в кнопке — nested-interactive
+                if (n.querySelector(INTERACTIVE)) return;
                 n.setAttribute('role', 'button');
                 n.removeAttribute('aria-hidden'); // декоративный аватар становится кнопкой «Изменить фото»
                 if (!n.hasAttribute('aria-label')) n.setAttribute('aria-label', r.name ?? (label(n) || 'Открыть'));
@@ -411,6 +416,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               ref={(node) => { if (node) els.current.set(l.key, node); else els.current.delete(l.key); }}
               className={cx('y-proto__layer', l.overlay && 'y-proto__layer--overlay')}
               data-proto-layer={l.key}
+              data-screen={l.id}
               data-buried={!visible || undefined}
               inert={l.key === belowOverlay || !visible}
             >
