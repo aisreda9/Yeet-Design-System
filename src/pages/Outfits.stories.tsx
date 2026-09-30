@@ -39,7 +39,7 @@ function TodayScreen({ weather, worn: initialWorn = false }: { weather?: 'rain';
         index={index}
         onIndexChange={setIndex}
         weather={rain
-          ? <WeatherCard temperature="20°" weather="pcloudy-day" description="Облачно, ветер 14 км/ч" alert="Через 1 час дождь, захвати зонт" tilt />
+          ? <WeatherCard temperature="20°" weather="sunny" description="Облачно, ветер 14 км/ч" alert="Через 1 час дождь, захвати зонт" tilt />
           : <WeatherCard temperature="20°" description="Солнечно, ветер 14 км/ч" tilt />}
         stamp={<Stamp label="Надеть" done={worn} onClick={() => setWorn((w) => !w)} />}
       />

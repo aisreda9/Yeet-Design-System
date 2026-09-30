@@ -616,12 +616,12 @@
       }
     },
     {
-      "figma": "input · иконка справа 20",
+      "figma": "input-value · раскрывашка ⇕ 24 (DS 0.2 new-item 1174:19818)",
       "story": "molecules-field-inputgroup--playground",
       "selector": ".y-field__trailing .y-icon",
       "expect": {
-        "width": 20,
-        "height": 20
+        "width": 24,
+        "height": 24
       }
     },
     {

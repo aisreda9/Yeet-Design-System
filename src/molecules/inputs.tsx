@@ -13,7 +13,7 @@ export type FieldProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onClic
   value?: string;
   /** Свотч цвета вещи перед значением. */
   colorDot?: ItemColor;
-  /** Иконка справа 20: `chevron-up-down` — выбор, `eye` / `eye-off` — пароль, `external-link` — ссылка. */
+  /** Иконка справа: `chevron-up-down` — выбор (24, как в строках-селекторах DS 0.2), `eye` / `eye-off` — пароль, `external-link` — ссылка (20). */
   trailingIcon?: IconName;
   onTrailingClick?: () => void;
   /** Имя кнопки-иконки для скринридера («Открыть ссылку»). Без `onTrailingClick` иконка декоративная и не озвучивается. */
@@ -38,6 +38,8 @@ export type FieldProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onClic
  */
 export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, trailingLabel, input, multiline, error, onClick, className, onKeyDown: onKeyDownProp, ...rest }: FieldProps) {
   const [shown, setShown] = useState(false);
+  // Раскрывашка ⇕ в строке-селекторе — 24 (DS 0.2 new-item 1174:19818: стрелки 8 × 5 через 2, правый край — на поле 20); остальные иконки — 20
+  const trailingSize = trailingIcon === 'chevron-up-down' ? 24 : 20;
   if (multiline)
     return (
       <div className={cx('y-field', 'y-field--multiline', error && 'y-field--error', className)} {...rest}>
@@ -72,12 +74,12 @@ export function Field({ label, value, colorDot, trailingIcon, onTrailingClick, t
           <Icon name={shown ? 'eye-off' : 'eye'} size={20} />
         </button>
       ) : trailingIcon && onTrailingClick ? (
-        <button type="button" className="y-field__trailing" aria-label={trailingLabel ?? label} onClick={(e) => { e.stopPropagation(); onTrailingClick(); }}>
-          <Icon name={trailingIcon} size={20} />
+        <button type="button" className={cx('y-field__trailing', trailingSize === 24 && 'y-field__trailing--24')} aria-label={trailingLabel ?? label} onClick={(e) => { e.stopPropagation(); onTrailingClick(); }}>
+          <Icon name={trailingIcon} size={trailingSize} />
         </button>
       ) : trailingIcon ? (
         <span className="y-field__trailing" aria-hidden>
-          <Icon name={trailingIcon} size={20} />
+          <Icon name={trailingIcon} size={trailingSize} />
         </span>
       ) : null}
     </div>

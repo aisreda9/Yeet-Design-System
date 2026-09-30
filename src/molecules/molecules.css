@@ -10,7 +10,7 @@
 .y-input-group--L .y-field { min-height: var(--size-control-l); }
 .y-field__label { color: var(--color-text-secondary); flex: none; }
 .y-field__main { flex: 1; display: flex; align-items: center; gap: var(--space-12); min-width: 0; }
-.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); min-width: 0; } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 20 */
+.y-field__value { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-12); min-width: 0; } /* флоу: точка 16 → 12 → значение → 12 → раскрывашка 24 */
 .y-field__value-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } /* длинное значение — «…» */
 .y-field__input {
   flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 0;
@@ -21,6 +21,7 @@
 .y-field--error .y-field__value { color: var(--color-text-danger); }
 .y-field__trailing { display: inline-flex; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
 button.y-field__trailing { flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -12px; } /* зона нажатия 44, отрицательные поля сохраняют вид 20 */ /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG), токена нет */
+button.y-field__trailing--24 { margin: -10px; } /* иконка 24: зона 44, вид 24 */ /* stylelint-disable-line unit-disallowed-list -- зона нажатия 44 (HIG), токена нет */
 span.y-field__trailing { cursor: inherit; }
 .y-field + .y-field::before {
   content: ''; position: absolute; top: 0; left: var(--space-16); right: var(--space-16); height: var(--border-width-thin); background: var(--color-divider);
