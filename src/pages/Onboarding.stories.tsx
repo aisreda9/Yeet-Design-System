@@ -49,7 +49,7 @@ export const FirstItemPrompt: Story = {
       header={<Header type="back" title={'Добавь первую вещь\u00a0в\u00a0гардероб'} subtitle={<>Сфотографируй на ровной поверхности,<br />а мы вырежем фон, определим цвет и категорию</>} textAction={{ label: 'Пропустить' }} />}
       bottom={<BottomBar label="Добавить" />}
     >
-      <OutfitCanvas items={[]} aria-label="Холст первой вещи" />
+      <OutfitCanvas items={[]} aria-label="Холст первой вещи" className="y-first-item-canvas" />
     </Screen>
   ),
 };

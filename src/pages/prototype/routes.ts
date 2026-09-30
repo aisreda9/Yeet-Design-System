@@ -68,8 +68,20 @@ const subSeg: Route[] = [
   { sel: '.y-segment--S [role=radio]', text: 'Вещи', go: (n, el) => { if (!active(el)) return n.swap('Wishlist'); } },
   { sel: '.y-segment--S [role=radio]', text: 'Образы', go: (n, el) => { if (!active(el)) return n.swap('WishlistOutfits'); } },
 ];
-/** Фильтры гардероба: любой чипс открывает шторку. */
-const filters: Route = { sel: '.y-chip-group button', go: (n) => n.overlay('FilterSheet') };
+/** Фильтры гардероба: у каждого чипса своя шторка (Figma: Items «Категория» / «Сезон» / «Теги», Outfits «Повод» / «Сезон» / «Теги», #210). */
+const chipSheet = (text: RegExp, id: ScreenId): Route => ({ sel: '.y-chip-group button', text, go: (n) => n.overlay(id) });
+const itemFilters: Route[] = [chipSheet(/^Категория/, 'FilterSheet'), chipSheet(/^Сезон/, 'SeasonFilterSheet'), chipSheet(/^Теги/, 'TagsFilterSheet')];
+// первый чипс образов — повод: «Повод» или выбранный («На каждый день»)
+const outfitFilters: Route[] = [chipSheet(/^Сезон/, 'SeasonFilterSheet'), chipSheet(/^Теги/, 'TagsFilterSheet'), { sel: '.y-chip-group button', go: (n) => n.overlay('OccasionFilterSheet') }];
+/** Выбор в шторке-фильтре без кнопок применяется сразу: «Все» сбрасывает фильтр, остальное — фильтрует. */
+const applyFilter = closeThen((n, b) => { if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); });
+const resetFilter = closeThen((n, b) => { if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); });
+/** Чипсы шторки-фильтра — статичные (без `onToggle`): тело чипса, в том числе у «Кастомный ×». */
+const filterChip = ':is(.y-chip--static, .y-chip__toggle)';
+const quickFilter: Route[] = [
+  { sel: filterChip, text: 'Все', go: resetFilter },
+  { sel: filterChip, go: applyFilter },
+];
 const gridSearch: Route[] = [
   { sel: 'button', text: 'Поиск', go: ok('ItemSearchFocused') },
   { sel: 'button', text: 'Архив', go: ok('Archive') },
@@ -96,6 +108,11 @@ const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет 
 const howItWorks: Route = btn('Как это работает', comingSoon);
 /** Кнопка «Добавить» внизу формы новой вещи (не «+» у тегов). */
 const addItem = (go: Go): Route => ({ sel: '.y-button--full', text: 'Добавить', go });
+/** Вещь из вишлиста перемещена в гардероб: тост с «Отменить» (↶), как у остальных перемещений (Figma `1371:37590`). */
+const movedToWardrobe = async (n: Nav) => {
+  await n.root('Wardrobe');
+  n.toast('Вещь перемещена в гардероб', { undo: async (u) => { await u.root('Wishlist'); await u.push('ItemDetails'); } });
+};
 /** Вещь добавлена: в онбординге — к первому образу, иначе в гардероб с подтверждением. */
 const addedItem: Go = async (n) => {
   if (n.stack().includes('FirstItemPrompt')) { await n.push('FirstOutfit'); n.toast('Первая вещь добавлена'); return; }
@@ -167,18 +184,18 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   RecommendationsEmpty: [btn('Добавить вещь', 'NewItemNoPhotoV2')],
 
   /* Гардероб */
-  Wardrobe: [...topSeg('items'), ...gridSearch, filters, { sel: '.y-item-card', on: 'long', go: (n) => n.overlay('ItemActions') }, openItem,
+  Wardrobe: [...topSeg('items'), ...gridSearch, ...itemFilters, { sel: '.y-item-card', on: 'long', go: (n) => n.overlay('ItemActions') }, openItem,
     { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
-  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, filters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
-  OutfitsPopulated: [...topSeg('outfits'), filters, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
+  ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, ...itemFilters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
+  OutfitsPopulated: [...topSeg('outfits'), ...outfitFilters, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsEmpty: [...topSeg('outfits'), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
-  OutfitsNoFilterResults: [...topSeg('outfits'), filters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
+  OutfitsNoFilterResults: [...topSeg('outfits'), ...outfitFilters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
-  FilterSheet: [
-    btn('Применить', closeThen((n, b) => { if (b === 'Wardrobe') return n.swap('ItemsNoFilterResults'); if (b === 'OutfitsPopulated') return n.swap('OutfitsNoFilterResults'); })),
-    btn('Сбросить', closeThen((n, b) => { if (b === 'ItemsNoFilterResults') return n.swap('Wardrobe'); if (b === 'OutfitsNoFilterResults') return n.swap('OutfitsPopulated'); })),
-  ],
+  FilterSheet: [btn('Применить', applyFilter), btn('Сбросить', resetFilter)],
+  SeasonFilterSheet: quickFilter,
+  TagsFilterSheet: quickFilter,
+  OccasionFilterSheet: [btn('Добавить', closeThen(comingSoon)), ...quickFilter],
   ItemActions: [
     { sel: '.y-list-item', text: 'Создать образ', go: closeThen((n) => n.push('OutfitItems')) },
     { sel: '.y-list-item', text: 'Редактировать', go: closeThen(comingSoon) },
@@ -187,16 +204,29 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
   WardrobeItemDetails: [btn('Ещё', (n) => n.overlay('ItemActions')), openOutfit],
   // штамп в истории без состояния: «Отменить» возвращать нечего
-  OutfitDetails: [openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
+  OutfitDetails: [btn('Ещё', (n) => n.overlay('OutfitActions')), openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
+  OutfitActions: [
+    { sel: '.y-list-item', text: 'Редактировать', go: closeThen((n) => n.push('OutfitItems')) },
+    // образ в истории без состояния: «Отменить» открывает его снова
+    { sel: '.y-list-item', text: 'Удалить', go: closeThen(async (n) => { await n.back(); n.toast('Образ удалён', { undo: (u) => u.push('OutfitDetails') }); }) },
+  ],
 
   /* Вишлист */
   Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', go: ok('ItemDetails') }, { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
   WishlistOutfits: [...topSeg('wishlist'), ...subSeg, { sel: '.y-collage', name: 'Открыть образ', go: ok('WishlistOutfitDetails') }, { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
   WishlistEmpty: [...topSeg('wishlist'), { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
   ItemDetails: [
-    btn('Переместить в гардероб', async (n) => { await n.root('Wardrobe'); n.toast('Вещь перемещена в гардероб'); }),
+    btn('Ещё', (n) => n.overlay('WishlistItemActions')),
+    btn('Переместить в гардероб', movedToWardrobe),
     btn('Открыть в магазине', (n) => n.toast('Откроется магазин в браузере')),
     openOutfit,
+  ],
+  WishlistItemActions: [
+    { sel: '.y-list-item', text: 'Перейти по ссылке', go: closeThen((n) => n.toast('Откроется магазин в браузере')) },
+    { sel: '.y-list-item', text: 'Создать образ', go: closeThen((n) => n.push('OutfitItems')) },
+    { sel: '.y-list-item', text: 'Переместить в гардероб', go: closeThen(movedToWardrobe) },
+    { sel: '.y-list-item', text: 'Редактировать', go: closeThen(comingSoon) },
+    { sel: '.y-list-item', text: 'Удалить', go: closeThen(async (n) => { await n.root('Wishlist'); n.toast('Вещь удалена из вишлиста', { undo: (u) => u.push('ItemDetails') }); }) },
   ],
   WishlistOutfitDetails: [
     btn('Переместить в гардероб', async (n) => { await n.root('OutfitsPopulated'); n.toast('Образ перемещён в гардероб'); }),
@@ -206,8 +236,17 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   WishlistNewItemCompleted: [btn('Добавить', async (n) => { await n.root('Wishlist'); n.toast('Вещь добавлена в вишлист'); })],
 
   /* Архив и корзина */
-  Archive: [openItem],
-  TrashPopulated: [btn('Очистить корзину', (n) => n.overlay('ClearTrash')), { sel: '.y-item-card', go: (n) => n.overlay('TrashItemActions') }],
+  // действия с вещью — долгим нажатием, как в Figma (MOUSE_DOWN 0,4 с); тап — запасной путь (клавиатура, скринридер), #210
+  Archive: [{ sel: '.y-item-card', on: 'long', go: (n) => n.overlay('ArchiveItemActions') }, { sel: '.y-item-card', go: (n) => n.overlay('ArchiveItemActions') }],
+  ArchiveItemActions: [
+    { sel: '.y-list-item', text: 'Вернуть в гардероб', go: removeItem('Вещь возвращена в гардероб', 'ArchiveEmpty') },
+    { sel: '.y-list-item', text: 'Удалить', go: removeItem('Вещь перемещена в корзину', 'ArchiveEmpty') },
+  ],
+  TrashPopulated: [
+    btn('Очистить корзину', (n) => n.overlay('ClearTrash')),
+    { sel: '.y-item-card', on: 'long', go: (n) => n.overlay('TrashItemActions') },
+    { sel: '.y-item-card', go: (n) => n.overlay('TrashItemActions') },
+  ],
   TrashItemActions: [
     { sel: '.y-list-item', text: 'Вернуть в гардероб', go: removeItem('Вещь возвращена в гардероб', 'TrashEmpty') },
     { sel: '.y-list-item', text: 'Удалить навсегда', go: removeItem('Вещь удалена навсегда', 'TrashEmpty') },
@@ -224,8 +263,12 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   SearchFocused: [...suggestions('SearchResults', 'SearchEmpty'), btn('Поиск по фото', 'PhotoCrop')],
   SearchResults: [
     { sel: '.y-chip-group button', text: 'Цена', go: (n) => n.overlay('PriceFilter') },
+    { sel: '.y-chip-group button', text: 'Сортировка', go: (n) => n.overlay('SortingSheet') },
+    // сердечко переключается само (native); тост — только когда вещь добавляется, не убирается
+    { sel: '.y-product-card__like', native: true, go: (n, el) => { if (el.getAttribute('aria-pressed') !== 'true') n.toast('Вещь перемещена в вишлист', { undo: () => undefined }); } },
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
   ],
+  SortingSheet: [{ sel: '.y-chip--static', go: closeThen((n) => n.toast('Сортировка изменена')) }],
   SearchEmpty: [btn('Сбросить поиск', (n) => n.back())],
   PhotoCrop: [btn('Найти похожее', 'PhotoResults')],
   PhotoResults: [{ sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') }],

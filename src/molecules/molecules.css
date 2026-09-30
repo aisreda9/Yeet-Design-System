@@ -15,6 +15,7 @@
 .y-field__input {
   flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 0;
   font: inherit; color: var(--color-text-primary); caret-color: var(--color-accent);
+  text-overflow: ellipsis; /* длинное значение без фокуса — «…», как ссылка в Wishlist / New Item / Completed (1173:18555, #210) */
 }
 .y-field__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .y-field--error .y-field__input,
@@ -139,6 +140,11 @@ button.y-chip__toggle::after { content: ''; position: absolute; top: calc(-1 * v
 }
 .y-chip__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .y-chip--editing:focus-within { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }
+/* Editing · Trailing=Remove (1413:30294): капсула без полей, как у removable, — поле слева 16, до крестика 8 */
+.y-chip--editing.y-chip--removable > .y-chip__input { padding: 0 var(--space-8) 0 var(--space-16); }
+/* Зона нажатия поля — ::after капсулы-label (44), как у чипса-поля без иконки; «×» поверх него, иначе ::after забирал бы нажатие */
+.y-chip-group > .y-chip--editing.y-chip--removable::after { content: ''; }
+.y-chip--editing > .y-chip__remove { z-index: var(--layer-raised); }
 
 /* ListItem & List */
 .y-list { display: flex; flex-direction: column; gap: var(--space-20); }
@@ -324,4 +330,5 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 /* ChipGroup · Trailing=Dropdown: ⇕ рисуется в боксе 24, как в Field (#202, DS 0.2 1174:19818: стрелки 8 × 5 через 2) — в боксе 20 глиф был на ~1 px мельче Figma (#203).
    Поля −2 по бокам оставляют место 20: ширина чипса и отступ справа 12 не меняются, центр глифа — там же. */
 .y-chip-group .y-chip--trailing > .y-icon:last-child { width: 24px; height: 24px; margin: 0 calc(-1 * var(--space-2)); } /* stylelint-disable-line unit-disallowed-list -- иконка 24, токена размера иконки нет */
+.y-chip-group .y-chip--editing > .y-icon:last-child { color: var(--color-text-secondary); } /* Editing · Trailing=Dropdown (1182:20334): ⌄ серым, как плейсхолдер */
 .y-list-group .y-list-item > .y-icon:last-child { width: 20px; height: 20px; } /* ListGroup: иконки справа 20 */ /* stylelint-disable-line unit-disallowed-list -- иконка 20 */

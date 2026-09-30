@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type ComponentProps, type ReactNode, useState } from 'react';
 import { IconButton, Stamp } from '../atoms';
-import { ChipGroup, EmptyState, Field, InputGroup, List, ListItem, Note, SegmentControl, Snackbar, StatRow, StatTile } from '../molecules';
+import { type Chip, ChipGroup, EmptyState, Field, InputGroup, List, ListItem, Note, SegmentControl, Snackbar, StatRow, StatTile } from '../molecules';
 import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Row, Screen, Sticky } from '../templates';
 import { grid, shoes } from './data';
@@ -326,7 +326,7 @@ export const WishlistEmpty: Story = {
   render: () => (
     <Screen header={wardrobeHeader} bottom={wardrobeNav}>
       <SegmentControl value="wishlist" segments={tabs} />
-      <div className="y-wardrobe-empty">
+      <div className="y-wardrobe-empty y-wardrobe-empty--wishlist">
         <EmptyState title="Вишлист пуст" description={<>Сохраняй вещи из поиска<br />нажимая на сердечко</>} />
       </div>
     </Screen>
@@ -337,7 +337,7 @@ export const ArchiveEmpty: Story = {
   name: 'Archive / Items / Empty',
   render: () => (
     <Screen header={<Header type="bar" titleChip="Архив вещей" />}>
-      <div className="y-empty-bar"><EmptyState title="Архив пуст" description="Вещь из архива можно вернуть в гардероб" /></div>
+      <div className="y-empty-bar y-empty-bar--storage"><EmptyState title="Архив пуст" description="Вещь из архива можно вернуть в гардероб" /></div>
     </Screen>
   ),
 };
@@ -346,7 +346,7 @@ export const TrashEmpty: Story = {
   name: 'Trash / Items / Empty',
   render: () => (
     <Screen header={<Header type="bar" title="Корзина вещей" />}>
-      <div className="y-empty-bar"><EmptyState title="Корзина пуста" description="Если ты удалишь вещь, она будет храниться здесь 30 дней" /></div>
+      <div className="y-empty-bar y-empty-bar--storage"><EmptyState title="Корзина пуста" description="Если ты удалишь вещь, она будет храниться здесь 30 дней" /></div>
     </Screen>
   ),
 };
@@ -416,10 +416,10 @@ export const WishlistNewItemCompleted: Story = { name: 'Wishlist / New Item / Co
 
 const itemsBackdrop = <Grid>{grid.map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>;
 
-/** Шторка-фильтр над гардеробом: заголовок → 16 → чипсы, без кнопок — выбор применяется сразу. */
-function FilterSheetScreen({ title, chips }: { title: string; chips: string[] }) {
+/** Шторка-фильтр над гардеробом: заголовок → 16 → чипсы, без кнопок — выбор применяется сразу. `add` — синий «+» перед чипсами (свой повод). */
+function FilterSheetScreen({ title, chips, add }: { title: string; chips: (string | Chip)[]; add?: boolean }) {
   return (
-    <Screen header={wardrobeHeader} overlay={<Overlay><Sheet title={title}><ChipGroup wrap chips={chips.map((label, k) => ({ label, selected: k === 0 }))} /></Sheet></Overlay>}>
+    <Screen header={wardrobeHeader} overlay={<Overlay><Sheet title={title}><ChipGroup wrap onAdd={add ? () => {} : undefined} chips={chips.map((c, k) => ({ ...(typeof c === 'string' ? { label: c } : c), selected: k === 0 }))} /></Sheet></Overlay>}>
       {itemsBackdrop}
     </Screen>
   );
@@ -440,7 +440,7 @@ export const TagsFilterSheet: Story = {
 export const OccasionFilterSheet: Story = {
   name: 'Wardrobe / Outfits / Sheet / Occasion Filter',
   tags: ['figma:1371-37867', 'figma:1371-37843', 'figma:1371-37891'],
-  render: () => <FilterSheetScreen title="Повод" chips={['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Кастомный']} />,
+  render: () => <FilterSheetScreen title="Повод" add chips={['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка', { label: 'Кастомный', removable: true }]} />,
 };
 
 /** Шторка действий: заголовок — имя вещи или повода, необратимое действие последним (Organisms/Sheet → «Действия»). */
@@ -494,7 +494,7 @@ export const ToastMovedToTrash: Story = {
 export const ToastMovedToWardrobe: Story = {
   name: 'Wishlist / Item / Toast / Moved to Wardrobe',
   tags: ['figma:1371-37590'],
-  render: () => <ToastScreen text="Вещь перемещена в гардероб" />,
+  render: () => <ToastScreen text="Вещь перемещена в гардероб" undo />,
 };
 
 export const ToastDeletedPermanently: Story = {
