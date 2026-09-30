@@ -22,7 +22,7 @@ node scripts/qa/sheet.mjs qa/out/pages-s320 qa/out/s320.png   # сводный �
 
 ### Покрытие экранов (`scripts/qa/coverage.mjs`)
 
-«flow-diff зелёный» не значит «экран есть». Скрипт берёт все кадры New app design из `design/figma-frames.json` (снимок `get_metadata 70:12`: node-id, имя, размер; обновляется вручную, как `figma-flows.json`) и ищет для каждого историю `Pages/*` в собранном `index.json`:
+«flow-diff зелёный» не значит «экран есть». Скрипт берёт все кадры New app design из `design/figma-frames.json` (снимок `get_metadata 551:2286`, кадры-оригиналы `1371:*`: node-id, имя, размер; обновляется вручную, как `figma-flows.json`) и ищет для каждого историю `Pages/*` в собранном `index.json`:
 
 - **якоря** — кадр есть в `design/figma-flows.json`, история `pages-экраны-флоу--<слаг>` существует (связь по node-id);
 - **тег** — у истории `tags: ['figma:349-9258']` (node-id через `-` или `:`), когда имя не совпадает или кадров с таким именем несколько;

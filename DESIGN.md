@@ -15,7 +15,7 @@
 | Что | Узел | Назначение |
 |---|---|---|
 | **Design System 0.2** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Единая страница: компоненты на коллекции «Yeet DS 2.0» (Light / Dark) и экраны флоу из них (секция Pages, только светлая тема, `1168:12824`) — **источник правды для кода** |
-| Screens Design 0.1 | [`1306:22698`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1306-22698) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида, якоря `npm run flow-diff` |
+| New App (Raw) | [`551:2286`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=551-2286) | Оригиналы, только чтение: исходные макеты дизайнера (~140 экранов и состояний, кадры `1371:*`) — эталон вида, якоря `npm run flow-diff`; старые компоненты DS 0.1 |
 | Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*`. Читается по id, но `get_metadata` без `nodeId` её не перечисляет — открывать по ссылке |
 
 Правило: **компонент DS — закон, экран — пример использования.** Порядок правки — `CONTRIBUTING.md`. Оригинальные страницы YeetStyle 2.0 не трогаем; писать в Figma — под замком (`TEAM.md` §5).
