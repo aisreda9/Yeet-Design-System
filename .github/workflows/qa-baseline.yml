@@ -7,9 +7,9 @@ name: QA baseline
 # из scripts/qa/lib.mjs (docker run, репозиторий смонтирован в /work, браузер — из образа). Поэтому эталоны
 # побайтно совпадают с тем, что сравнивает CI. Браузеры на хост не ставим: скриншоты снимаются только внутри образа.
 #
-# ВАЖНО: push токеном GITHUB_TOKEN не запускает другие workflow (защита GitHub от рекурсии). После пересъёмки
-# QA Storybook на новом коммите сам не стартует: нужен следующий обычный коммит в ветку или ручной запуск
-# Actions → QA Storybook → Run workflow → та же ветка (у qa.yml есть workflow_dispatch). PAT и секреты не заводим нарочно.
+# ВАЖНО: push токеном GITHUB_TOKEN не запускает другие workflow (защита GitHub от рекурсии). Поэтому после коммита
+# эталонов workflow сам запускает QA Storybook на ветке через workflow_dispatch — это исключение из защиты
+# (#147 п. 2). PAT и секреты не заводим нарочно.
 
 on:
   workflow_dispatch:
@@ -26,6 +26,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # запуск QA Storybook (workflow_dispatch) после коммита эталонов
 
 concurrency:
   # Два прогона на одну ветку писали бы друг другу поверх — второй ждёт первого
@@ -110,7 +111,7 @@ jobs:
                 printf '%s\n' "$files" | sed 's/^/- `/; s/$/`/'
                 echo
               done
-              echo '> Push токеном GITHUB_TOKEN не запускает CI. Перезапустите **QA Storybook** вручную на этой ветке или дождитесь следующего коммита.'
+              echo '> QA Storybook на новом коммите запущен автоматически (workflow_dispatch).'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           [ -z "$changes" ] && exit 0
@@ -121,6 +122,12 @@ jobs:
             echo "::error::Push отклонён: ветка $BRANCH ушла вперёд во время пересъёмки. Запустите workflow ещё раз."
             exit 1
           fi
+          echo "pushed=true" >> "$GITHUB_ENV"
+      - name: Запуск QA Storybook на ветке
+        if: env.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run qa.yml --ref "$BRANCH"
       - if: always()
         run: cat qa/out/report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
       - if: always()

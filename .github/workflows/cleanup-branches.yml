@@ -1,0 +1,50 @@
+name: Cleanup merged branches
+
+# Удаляет ветки claude/*, в которых не осталось своих изменений вне main
+# (git log --cherry-pick: все не-merge коммиты уже в main по содержимому) и у которых нет открытого PR.
+# Запуск вручную. По умолчанию dry_run — только список, без удаления.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Только показать список (true) или удалить (false)'
+        required: true
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Find and delete merged branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          open=$(gh pr list --state open --limit 200 --json headRefName -q '.[].headRefName')
+          deleted=0; kept=0
+          echo "## Ветки claude/* (dry_run=$DRY_RUN)" >> "$GITHUB_STEP_SUMMARY"
+          for ref in $(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/claude/); do
+            b="$ref"
+            if printf '%s\n' "$open" | grep -qx "$b"; then
+              echo "- оставлена (открытый PR): \`$b\`" >> "$GITHUB_STEP_SUMMARY"; kept=$((kept+1)); continue
+            fi
+            own=$(git log --no-merges --cherry-pick --right-only --format=%h "origin/main...origin/$b" | wc -l)
+            if [ "$own" -ne 0 ]; then
+              echo "- оставлена ($own своих коммитов вне main): \`$b\`" >> "$GITHUB_STEP_SUMMARY"; kept=$((kept+1)); continue
+            fi
+            echo "- удалить: \`$b\`" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$DRY_RUN" = "false" ]; then git push origin --delete "$b"; fi
+            deleted=$((deleted+1))
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Итого: к удалению $deleted, оставлено $kept" >> "$GITHUB_STEP_SUMMARY"
