@@ -1,6 +1,6 @@
 ---
-name: ds-docs-keeper
 model: claude-opus-5-5
+name: ds-docs-keeper
 description: Хранитель документации (зона docs). Синхронизирует MDX-страницы Storybook (src/docs), DESIGN.md-указатель и README с фактическим состоянием кода и Figma, готовит ADR. Используй в конце задачи, которая изменила компоненты, токены или процесс.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
