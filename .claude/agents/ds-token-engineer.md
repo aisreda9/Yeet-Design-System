@@ -1,5 +1,6 @@
 ---
 name: ds-token-engineer
+model: claude-opus-5-5
 description: Инженер токенов (роль «Токены и платформы», зона tokens). Владеет tokens/tokens.json в формате DTCG, сборкой Style Dictionary, тёмной темой, контрастом и выгрузкой в iOS/Android. Используй для любых изменений значений цветов, отступов, радиусов, типографики, теней и движения.
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---

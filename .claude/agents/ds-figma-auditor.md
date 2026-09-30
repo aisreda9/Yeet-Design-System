@@ -1,5 +1,6 @@
 ---
 name: ds-figma-auditor
+model: claude-opus-5-5
 description: Аудитор расхождений Figma ↔ код. Только читает Figma (DS 2.0, Flow 2.0, оригиналы) и репозиторий, ничего не меняет. Используй перед правкой компонента или токена, для сверки с макетом и для разбора жалобы на вид.
 disallowedTools: Edit, Write, NotebookEdit, mcp__Figma__use_figma
 ---
