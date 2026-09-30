@@ -54,7 +54,7 @@
 .y-screen[data-collapsed] .y-header__on-scroll { opacity: 1; transform: none; }
 
 /* ─── Нижняя навигация ─── */
-.y-bottom-nav, .y-bottom-bar { position: relative; z-index: var(--layer-bar); background: var(--color-bg-canvas); display: flex; align-items: center; gap: 7px; padding: 0 var(--screen-gutter) var(--space-20); } /* stylelint-disable-line unit-disallowed-list -- зазор 7 между таб-баром и «+» из Figma */
+.y-bottom-nav, .y-bottom-bar { position: relative; z-index: var(--layer-bar); background: var(--screen-edge-bg, var(--color-bg-canvas)); display: flex; align-items: center; gap: 7px; padding: 0 var(--screen-gutter) var(--space-20); } /* stylelint-disable-line unit-disallowed-list -- зазор 7 между таб-баром и «+» из Figma */
 .y-bottom-nav { container-type: inline-size; }
 /* FAB: таб-бар сжимается, «+» выезжает справа (--motion-nav) */
 .y-bottom-nav__fab {

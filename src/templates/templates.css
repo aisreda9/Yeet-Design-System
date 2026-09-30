@@ -28,7 +28,7 @@
 
 /* Большой заголовок в скролле (#170): закреплён только статус-бар с белым затуханием под ним, шапка уезжает с контентом.
    Затухание — над контентом (z bar), но под липкими фильтрами (z sticky): прилипшие фильтры закрывают его своим фоном */
-.y-screen__top { position: relative; z-index: var(--layer-bar); flex-shrink: 0; }
+.y-screen__top { position: relative; z-index: var(--layer-bar); flex-shrink: 0; background: var(--screen-edge-bg, transparent); transition: background-color var(--motion-fade); }
 .y-screen__content--header { padding-top: 0; }
 .y-screen__content--header > .y-header { z-index: auto; margin: 0 calc(var(--screen-gutter) * -1); }
 .y-screen__content--header.y-screen__content--flush > .y-header { margin: 0; }
@@ -39,6 +39,10 @@
 .y-screen:not([data-edge-top]) .y-screen__top .y-scroll-edge,
 .y-screen:not([data-edge-bottom]) .y-bottom-nav .y-scroll-edge,
 .y-screen:not([data-edge-bottom]) .y-bottom-bar .y-scroll-edge { opacity: 0; }
+/* Панель под краем (#181): подложка статус-бара / таб-бара и затухание — цвета панели (bg-elevated), без полосы canvas */
+.y-screen[data-panel-top] .y-screen__top,
+.y-screen[data-panel-bottom] .y-bottom-nav,
+.y-screen[data-panel-bottom] .y-bottom-bar { --screen-edge-bg: var(--color-bg-elevated); }
 /* шапка в скролле: статус-бар и затухание — у экрана (.y-screen__top), а не в шапке */
 .y-screen .y-screen__content--header > .y-header > .y-status-bar,
 .y-screen .y-screen__content--header > .y-header > .y-scroll-edge { display: none; }
