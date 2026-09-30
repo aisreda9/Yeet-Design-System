@@ -35,7 +35,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
     open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За полгода', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
-    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
+    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" avatarSrc={demoAvatar} />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
       <div className="y-gutter y-profile-bar">
         <Row gap={0} align="center" justify="space-between">
           <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
