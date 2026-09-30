@@ -19,7 +19,10 @@ type HeaderFields = {
   search: { query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string; /** Кнопка «Поиск по фото» справа; `false` — поиск по своим вещам (Wardrobe / Item Search). */ photoSearch?: boolean; /** Поле в состоянии фокуса (InputBar `focused`). */ focused?: boolean };
 };
 
-/** Вид шапки: `large` — корневые вкладки, `bar` — экраны с «назад» и пилюлей, `back` — вход и онбординг, `search` — поиск. */
+/**
+ * Вид шапки: `large` — корневые вкладки, `bar` — экраны с «назад» и пилюлей, `back` — вход и онбординг, `search` — поиск.
+ * `back` в `Screen`: ряд «назад» закреплён, большой заголовок уезжает с контентом, в ряду проявляется компактный (#203).
+ */
 export type HeaderVariant = keyof HeaderFields;
 
 type HeaderOf<V extends HeaderVariant> = HeaderFields[V] &
@@ -76,9 +79,10 @@ export function Header(allProps: HeaderProps) {
         )}
         {props.variant === 'back' && (
           <>
-            <div className="y-header__row">
+            <div className="y-header__row y-header__row--back">
               <IconButton icon="chevron-left" label="Назад" onClick={props.onBack} />
-              <span className="y-header__pill" aria-hidden>{props.title}</span>
+              {/* компактный заголовок: проявляется, когда большой уехал под ряд (Screen → data-collapsed) */}
+              <span className="y-header__compact-title" aria-hidden>{props.title}</span>
               {props.textAction && (
                 <Button variant="tertiary" size="M" className="y-header__text-action" onClick={props.textAction.onClick}>
                   {props.textAction.label}
