@@ -70,7 +70,7 @@ function StampDemo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
       <Stamp label="Надеть" done={done} onClick={() => setDone((v) => !v)} />
-      <Stamp label="Не нравится" tone="secondary" onClick={() => setSkips((s) => s + 1)} />
+      <Stamp label="Не нравится" variant="secondary" onClick={() => setSkips((s) => s + 1)} />
       <div className="y-motion-column" style={{ alignItems: 'flex-start' }}>
         <p className="y-caption y-text--secondary" style={{ maxWidth: 220 }}>Нажми на штамп: сжатие 0.94, затем пружина bouncy — звезда 148 → 78, −60°, чернеет, «отменить». Повторное нажатие отменяет. Нажатие на выполненный штамп не сбрасывает поворот.</p>
         <span className="y-caption y-text--secondary">«Не нравится»: {skips}</span>
@@ -210,7 +210,7 @@ function PressDemo() {
         <ListGroup><ListItem label="Корзина вещей" trailing={<Icon name="chevron-right" />} onClick={() => {}} /></ListGroup>
         <figcaption>строка — подсветка фона, без сжатия</figcaption>
       </figure>
-      <figure><Stamp label="Не нравится" tone="secondary" /><figcaption>штамп 0.94 · stamp</figcaption></figure>
+      <figure><Stamp label="Не нравится" variant="secondary" /><figcaption>штамп 0.94 · stamp</figcaption></figure>
       <figure style={{ width: 173 }}><ProductCard kind="outerwear" name="Пальто" price="12 990 ₽" liked={liked} onLike={() => setLiked((v) => !v)} /><figcaption>лайк — прыжок на пружине drop · toggle</figcaption></figure>
       <figure><HapticChip /><figcaption>хаптика последнего действия</figcaption></figure>
     </div>

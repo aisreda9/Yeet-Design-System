@@ -163,7 +163,7 @@ export const ExitDialog: Story = {
 
 export const ClearDialog: Story = {
   name: 'Outfit Creation / Clear / Dialog / Confirmation',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog tone="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog variant="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
 };
 
 export const ItemFilterSheet: Story = {

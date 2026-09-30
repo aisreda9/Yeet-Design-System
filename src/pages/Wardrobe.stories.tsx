@@ -209,7 +209,7 @@ export const Archive: Story = {
 export const ClearTrash: Story = {
   name: 'Trash / Items / Dialog / Clear',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
+    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog variant="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
       <Grid>{grid.slice(0, 4).map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
     </Screen>
   ),
