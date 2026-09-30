@@ -24,7 +24,6 @@
 /* large: с кнопкой справа строка 48 и заголовок по центру; без кнопки — заголовок на y70, как во флоу */
 .y-header__title-row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 36px; } /* stylelint-disable-line unit-disallowed-list -- строка большого заголовка — высота строки H1 36 */
 .y-header__title-row:has(> .y-icon-button) { min-height: var(--size-control-m); }
-.y-header__large-title { transition: opacity var(--motion-fade), transform var(--motion-lift); transform-origin: left center; }
 .y-header__subtitle { margin: var(--space-4) 0; } /* флоу: подзаголовок через 12 от заголовка */
 /* Главная: вторая строка заголовка — повод акцентом с раскрывашкой */
 .y-header__accent { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-8); margin-top: calc(var(--space-8) * -1); padding: 0; border: 0; background: none; color: var(--color-text-accent); cursor: pointer; text-align: left; }
@@ -32,7 +31,8 @@
 .y-header__back-text { display: flex; flex-direction: column; gap: var(--space-12); } /* back: подзаголовок Body серым через 12 */
 .y-header__text-action { padding: 0 var(--space-20); } /* «Пропустить»: Tertiary M, отступы 20 (Figma: header · Back, action) */
 
-/* Скролл: большой заголовок уходит в пилюлю по центру (Screen → data-collapsed) */
+/* Скролл шапки `back`: заголовок схлопывается, по центру ряда «назад» — пилюля (Screen → data-collapsed).
+   Большой заголовок (`large`) не сворачивается — уезжает с контентом (Screen, #170) */
 .y-header__pill {
   position: absolute; left: 50%; top: 50%; max-width: 60%; height: var(--size-control-s); padding: 0 var(--space-16);
   display: inline-flex; align-items: center; border-radius: var(--radius-xl); background: var(--color-bg-subtle);
@@ -48,12 +48,8 @@
   opacity: 0; transform: translateY(var(--space-12)) scale(0.6); transition: opacity var(--motion-fade), transform var(--motion-collapse);
 }
 .y-screen[data-collapsed] .y-header__pill { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.y-screen[data-collapsed] .y-header__large-title { opacity: 0; transform: translateY(-6px) scale(0.92); } /* stylelint-disable-line unit-disallowed-list -- сдвиг большого заголовка при сворачивании, токена нет */
-/* Уходящий заголовок гаснет быстрее, чем появляется новый (exit < appear): пилюля — при возврате к началу, большой — при скролле */
-.y-screen:not([data-collapsed]) .y-header__pill,
-.y-screen[data-collapsed] .y-header__large-title { transition: opacity var(--motion-exit), transform var(--motion-exit); }
-.y-screen[data-collapsed] .y-header__body > p,
-.y-screen[data-collapsed] .y-header__accent { display: none; }
+/* Уходящая пилюля гаснет быстрее, чем появляется (exit < appear) — при возврате к началу */
+.y-screen:not([data-collapsed]) .y-header__pill { transition: opacity var(--motion-exit), transform var(--motion-exit); }
 .y-screen[data-collapsed] .y-header__collapse { grid-template-rows: 0fr; opacity: 0; }
 .y-screen[data-collapsed] .y-header__on-scroll { opacity: 1; transform: none; }
 
@@ -463,5 +459,5 @@
 /* ─── В конце файла: эти селекторы специфичнее прочих `… > *` (no-descending-specificity) ─── */
 /* Нажатие вкладки: сжимается иконка (переход — у .y-tab-bar__tab > *) */
 .y-tab-bar__tab:active > * { transform: scale(var(--gesture-press-scale)); }
-/* Шапка: кнопки справа от свёрнутой пилюли — над ней */
-.y-header__large-title + .y-header__pill ~ * { position: relative; z-index: var(--layer-raised); }
+/* Шапка `back`: кнопки справа от свёрнутой пилюли — над ней */
+.y-header__row > .y-header__pill ~ * { position: relative; z-index: var(--layer-raised); }
