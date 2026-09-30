@@ -282,11 +282,16 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 
 /* Зона нажатия ≥ 44 (hit-slop — atoms.css). Лента чипсов — в .y-chip-group--scroll.
    Стопка аккаунтов: аватары и «+» внахлёст −8, поэтому зоны растут наружу — аватары влево, «+» вправо.
-   Сегмент: иконки стоят через 4 — вбок зона растёт не дальше половины зазора, соседние не перекрываются. */
+   Сегмент: иконки S (32) стоят через 4 — зоны 44 идут лесенкой влево: каждая забирает зазор справа, k-я с конца — ещё k × (44 − 32 − 4)
+   у соседа слева (он ниже по порядку DOM), первая выходит за левый край сегмента, последняя — за правый. Вид не меняется, зоны не пересекаются. */
 /* stylelint-disable unit-disallowed-list -- 44 — минимум зоны нажатия (HIG), 0px нужен в min() с длиной; токенов нет */
 .y-avatar-stack__people::after { left: min(0px, calc(100% - 44px)); right: 0; }
 .y-avatar-stack__people + .y-icon-button::after { left: 0; right: min(0px, calc(100% - 44px)); }
-.y-segment > :is(.y-button, .y-icon-button)::after { left: max(-2px, min(0px, calc((100% - 44px) / 2))); right: max(-2px, min(0px, calc((100% - 44px) / 2))); }
+.y-segment > :is(.y-button, .y-icon-button)::after { left: 0; right: max(calc(-1 * var(--space-4)), min(0px, calc(100% - 44px))); }
+.y-segment > :is(.y-button, .y-icon-button):nth-last-of-type(2)::after { left: min(0px, calc(100% + var(--space-4) - 44px)); }
+.y-segment > :is(.y-button, .y-icon-button):nth-last-of-type(3)::after { left: calc(2 * min(0px, calc(100% + var(--space-4) - 44px))); }
+.y-segment > :is(.y-button, .y-icon-button):nth-last-of-type(4)::after { left: calc(3 * min(0px, calc(100% + var(--space-4) - 44px))); }
+.y-segment > :is(.y-button, .y-icon-button):last-of-type::after { right: min(0px, calc(100% - 44px)); }
 /* stylelint-enable unit-disallowed-list */
 
 /* ─── FormField: лейбл, описание и ошибка вокруг поля; текст на отступе 20, как значение в Field ─── */
