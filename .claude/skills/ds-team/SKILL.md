@@ -27,7 +27,7 @@ description: Оркестрация агентов дизайн-системы Y
 | `ds-token-engineer`     | Токены и платформы · `tokens`                                   | `tokens/tokens.json` (DTCG) → `npm run tokens`, `DESIGN.md` gen-блоки |
 | `ds-component-engineer` | Компоненты / Экраны · `atoms` `molecules` `organisms` `screens` | `src/<уровень>/`, строки `registry.ts`                                |
 | `ds-motion-engineer`    | Компоненты · `motion`                                           | `src/motion/`; спецификация токенов — для token-engineer              |
-| `ds-figma-builder`      | Figma-синхронизация                                             | Figma DS 2.0 / Flow 2.0 под замком, `figmaId` в `registry.ts`         |
+| `ds-figma-builder`      | Figma-синхронизация                                             | Figma DS 0.2 (компоненты и Pages) под замком, `figmaId` в `registry.ts`         |
 | `ds-content-editor`     | тексты                                                          | тексты в зонах из брифа                                               |
 | `ds-critic`             | слепой критик вида (Gauntlet Loop)                              | ничего (вердикт)                                                      |
 | `ds-qa`                 | QA · `qa`                                                       | `design/figma-specs.json`, `qa/baseline`, журнал `design/QA.md`       |
@@ -57,7 +57,7 @@ description: Оркестрация агентов дизайн-системы Y
 | Сверка компонента с Figma          | auditor → component-engineer ∥ token-engineer → critic (если меняется вид) → qa → docs-keeper                                                                            | уровень, tokens?            |
 | Изменение токена / темы            | auditor (`get_variable_defs`) → token-engineer → qa → builder 🔒 (если меняется Figma) → docs-keeper                                                                     | tokens                      |
 | Шторка / диалог по единому правилу | auditor (FIGMA-RULES §7, `design/SHEETS-AUDIT.md`) → token-engineer (`--radius-overlay`, `--sheet-*`) → component-engineer (`organisms`) ∥ builder 🔒 → qa → docs-keeper | tokens, organisms, Figma    |
-| Экран флоу на компонентах 2.0      | auditor (узел флоу) → builder 🔒 (Flow 2.0) ∥ component-engineer (`screens`) ∥ content-editor → **critic** → qa (`flow-diff`) → docs-keeper                              | screens, Figma              |
+| Экран флоу на компонентах 2.0      | auditor (узел флоу) → builder 🔒 (Pages на DS 0.2) ∥ component-engineer (`screens`) ∥ content-editor → **critic** → qa (`flow-diff`) → docs-keeper                              | screens, Figma              |
 | Итерация QA                        | qa → auditor (подтвердить спеки) → component-engineer / token-engineer → qa → docs-keeper                                                                                | qa + по находкам            |
 | Анимация / жест                    | auditor (`get_motion_context`) → motion-engineer → token-engineer (новый переход) → component-engineer (если разметка) → qa → docs-keeper                                | motion, tokens?             |
 | Аудит текстов                      | content-editor → component-engineer (если истории) → qa (`flow-diff`)                                                                                                    | по файлам                   |
@@ -80,7 +80,7 @@ description: Оркестрация агентов дизайн-системы Y
 ## 5. Готово, когда
 
 - `npm run typecheck`, `npm run lint`, `npm run contrast`, `npm run qa`, `npm run flow-diff -- --strict` — 0 ошибок; play-функции доигрывают.
-- Компонент в Figma DS 2.0 и в коде, Light и Dark, 320–430; строка в `registry.ts` со статусом по факту; история с «В флоу»; эталоны в PR.
+- Компонент в Figma DS 0.2 и в коде, Light и Dark, 320–430; строка в `registry.ts` со статусом по факту; история с «В флоу»; эталоны в PR.
 - Шторки и диалоги — по FIGMA-RULES §7; движение — только `--motion-*` / `--gesture-*`, проверено с reduced motion.
 - Тексты по «Тексты и тон»; решения дизайна — вопросом в #6, принятые — ADR.
 - Draft PR с «Передачей», замок Figma снят; мерж — за координатором.

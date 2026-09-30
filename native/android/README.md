@@ -2,7 +2,7 @@
 
 Нативная библиотека компонентов Yeet DS для Android. Источник правды — `tokens/tokens.json`, `DESIGN.md`
 и React-компоненты в `src/atoms`, `src/molecules`, `src/organisms` (они повторяют Figma-библиотеку
-«Design System 2.0 (Claude)»). Имена совпадают 1 : 1: **свойство Figma = prop React = параметр Kotlin**.
+«Design System 0.2»). Имена совпадают 1 : 1: **свойство Figma = prop React = параметр Kotlin**.
 
 ```
 native/android/

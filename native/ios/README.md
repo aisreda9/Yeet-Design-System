@@ -1,7 +1,7 @@
 # YeetDesignSystem — iOS (SwiftUI)
 
 Нативная библиотека компонентов Yeet Design System: SwiftUI, iOS 16+, без сторонних зависимостей.
-Повторяет React-компоненты из `src/atoms`, `src/molecules`, `src/organisms` (они же — библиотека Figma «Design System 2.0 (Claude)»):
+Повторяет React-компоненты из `src/atoms`, `src/molecules`, `src/organisms` (они же — библиотека Figma «Design System 0.2»):
 **свойство Figma = prop React = параметр Swift**. Значения — только из токенов `tokens/tokens.json`.
 
 ```
