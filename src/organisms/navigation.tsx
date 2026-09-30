@@ -47,9 +47,8 @@ export function Header(allProps: HeaderProps) {
         {props.variant === 'large' && (
           <>
             <div className="y-header__title-row">
+              {/* большой заголовок не сворачивается: в Screen он уезжает вместе с контентом (#170) */}
               <h1 className="y-h1 y-header__large-title">{props.title}</h1>
-              {/* при скролле большой заголовок уходит в пилюлю по центру (Screen → data-collapsed) */}
-              <span className="y-header__pill" aria-hidden>{props.title}</span>
               {props.action && <IconButton icon={props.action.icon} label={props.action.label} onClick={props.action.onClick} />}
             </div>
             {props.accent && (

@@ -26,20 +26,31 @@
 .y-screen__content--flush { padding-left: 0; padding-right: 0; }
 .y-screen__floating { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: var(--layer-sticky); display: flex; justify-content: center; }
 
+/* Большой заголовок в скролле (#170): закреплён только статус-бар с белым затуханием под ним, шапка уезжает с контентом.
+   Затухание — над контентом (z bar), но под липкими фильтрами (z sticky): прилипшие фильтры закрывают его своим фоном */
+.y-screen__top { position: relative; z-index: var(--layer-bar); flex-shrink: 0; }
+.y-screen__content--header { padding-top: 0; }
+.y-screen__content--header > .y-header { z-index: auto; margin: 0 calc(var(--screen-gutter) * -1); }
+.y-screen__content--header.y-screen__content--flush > .y-header { margin: 0; }
+
 /* Scroll edges appear only when content is actually underneath */
 .y-screen .y-scroll-edge { transition: opacity var(--motion-fade); }
 .y-screen:not([data-edge-top]) .y-header .y-scroll-edge,
+.y-screen:not([data-edge-top]) .y-screen__top .y-scroll-edge,
 .y-screen:not([data-edge-bottom]) .y-bottom-nav .y-scroll-edge,
 .y-screen:not([data-edge-bottom]) .y-bottom-bar .y-scroll-edge { opacity: 0; }
+/* шапка в скролле: статус-бар и затухание — у экрана (.y-screen__top), а не в шапке */
+.y-screen .y-screen__content--header > .y-header > .y-status-bar,
+.y-screen .y-screen__content--header > .y-header > .y-scroll-edge { display: none; }
 
 /* Layout primitives */
 .y-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8) 7px; } /* stylelint-disable-line unit-disallowed-list -- колонки через 7 из Figma */
 .y-row { display: flex; }
 .y-stack { display: flex; flex-direction: column; }
 
-/* Липкая полоса фильтров (Sticky): прижимается под шапку; content padding-top 8 → top −8 */
+/* Липкая полоса фильтров (Sticky): прижимается под статус-бар (или под закреплённую шапку); фильтры — на 8 ниже (y70) */
 .y-sticky {
-  /* top −20: sticky отсчитывается от content-box, а у контента padding-top 20; z-index над затуханием шапки */
+  /* top −20: sticky отсчитывается от content-box, а у контента padding-top 20; z-index над затуханием статус-бара и шапки */
   position: sticky; top: calc(var(--space-20) * -1); z-index: var(--layer-sticky); flex-shrink: 0;
   margin: calc(var(--space-8) * -1) calc(var(--screen-gutter) * -1) 0; padding: var(--space-8) var(--screen-gutter) 0;
   background: var(--color-bg-canvas); display: flex; flex-direction: column; gap: var(--space-16);
@@ -48,7 +59,9 @@
   content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24px; pointer-events: none; /* stylelint-disable-line unit-disallowed-list -- затухание 24 */
   background: linear-gradient(var(--color-bg-canvas), transparent); opacity: 0; transition: opacity var(--motion-fade);
 }
-.y-screen[data-collapsed] .y-sticky::after { opacity: 1; }
+/* шапка в скролле: padding-top контента 0 — полоса прилипает к самому верху скролла, под статус-бар */
+.y-screen__content--header > .y-sticky { top: 0; }
+.y-screen[data-stuck] .y-sticky::after { opacity: 1; }
 .y-screen__content--flush .y-sticky { margin-left: 0; margin-right: 0; }
 
 /* Пара блоков, идущих вплотную (группы в Настройках): 8 вместо шага экрана 20 */
@@ -117,3 +130,11 @@
 /* Панель выбора вещей (ItemSlots) последним блоком на flush-экране — до низа экрана и под BottomBar, как шторка в Figma (1371:41906) */
 .y-screen__content--flush:has(> .y-item-slots:last-child) { padding-bottom: 0; }
 .y-screen__content--flush > .y-item-slots:last-child { flex: 1 0 auto; min-height: calc(100% + 120px); } /* stylelint-disable-line unit-disallowed-list -- запас под нижнюю панель, как у .y-details .y-sheet--panel */
+
+/* Шапка в скролле (#170), экран по центру / у низа: контент под шапкой, а не вместе с ней.
+   В конце файла: селекторы `… > *` специфичнее прочих (no-descending-specificity) */
+.y-screen__content--header.y-screen__content--center,
+.y-screen__content--header.y-screen__content--end { justify-content: flex-start; }
+.y-screen__content--header.y-screen__content--center > .y-header + *,
+.y-screen__content--header.y-screen__content--end > .y-header + * { margin-top: auto; }
+.y-screen__content--header.y-screen__content--center > :last-child { margin-bottom: auto; }
