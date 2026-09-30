@@ -153,7 +153,7 @@ export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'Shuffle
 export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Запуск и онбординг */
   OnboardingWelcome: [btn('Начать бесплатно', 'SignIn')],
-  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Забыли пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
+  SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Не помнишь пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
   OnboardingName: [btn('Далее', 'FirstItemPrompt')],
   FirstOutfit: [btn('Пропустить', (n) => n.root('Today')), btn('Сохранить образ и завершить', async (n) => { await n.root('Today'); n.toast('Образ сохранён'); })],
   FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), btn('Добавить', ok('NewItem'))],

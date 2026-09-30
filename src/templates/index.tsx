@@ -173,7 +173,7 @@ export function Row({ gap = 8, align, justify, children }: { gap?: number; align
 /**
  * Вертикальная группа с собственным шагом, когда шаг экрана 20 не подходит:
  * кнопка и ссылка под ней (8), заголовок и подзаголовок (12), цена и подпись (0).
- * `align="center"` — блоки по центру по своей ширине (ghost-кнопка «Забыли пароль?»).
+ * `align="center"` — блоки по центру по своей ширине (ghost-кнопка «Не помнишь пароль?»).
  */
 export function Stack({ gap = 8, align, className, children }: { gap?: number; align?: CSSProperties['alignItems']; className?: string; children: ReactNode }) {
   return <div className={cx('y-stack', className)} style={{ gap, alignItems: align }}>{children}</div>;
