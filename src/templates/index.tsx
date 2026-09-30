@@ -1,12 +1,21 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { StatusBar } from '../organisms';
+import { isValidElement, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { ScrollEdge } from '../atoms';
+import { Header, StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
 import { LeavingContext, usePresence } from '../utils/usePresence';
 import '../styles.css';
 
 export type ScreenProps = {
-  /** Закреплённая шапка (`Header`). Если нет — рисуется статус-бар. */
+  /**
+   * Шапка (`Header`). Если нет — рисуется статус-бар.
+   * Большой заголовок (`Header variant="large"`) уезжает вместе с контентом, остальные шапки закреплены — см. `pinHeader`.
+   */
   header?: ReactNode;
+  /**
+   * Закрепить шапку над скроллом. По умолчанию закреплены все шапки, кроме большого заголовка (`variant="large"`):
+   * он уезжает с контентом, а закреплён только статус-бар (#170). `DetailsScreen` закрепляет шапку явно.
+   */
+  pinHeader?: boolean;
   /** Закреплённый низ: `BottomNav` или `BottomBar`. */
   bottom?: ReactNode;
   /** Модальный слой (`Overlay` со `Sheet` / `Dialog`). */
@@ -38,28 +47,44 @@ export type ScreenProps = {
   children?: ReactNode;
 };
 
+/** Большой заголовок корневой вкладки: `<Header variant="large">` (или устаревшее `type="large"`). */
+function isLargeHeader(header: ReactNode) {
+  if (!isValidElement(header) || header.type !== Header) return false;
+  const { variant, type } = header.props as { variant?: string; type?: string };
+  return (variant ?? type) === 'large';
+}
+
 /**
  * Шаблон экрана iPhone 393×852.
  *
- * Правило скролла: шапка и низ **закреплены**, контент скроллится между ними и **уходит под них**.
+ * Правило скролла (#170): контент скроллится и **уходит под закреплённые края** — статус-бар сверху, `BottomNav` / `BottomBar` снизу.
+ * - Большой заголовок (`Header variant="large"`) не закреплён и не сворачивается: уезжает вместе с контентом.
+ * - Ряд фильтров в `<Sticky>` прилипает сразу под статус-бар (фильтры на y70); сегмент и остальное уезжают.
+ * - Шапки с «назад», поиском и детали (`bar`, `back`, `search`, `DetailsScreen`) закреплены, как раньше (`pinHeader`).
+ *
  * Полосы затухания появляются, только когда под краем действительно есть контент:
- * верхняя — после начала скролла, нижняя — пока список не докручен до конца.
+ * верхняя — после начала скролла (под статус-баром или под прилипшими фильтрами), нижняя — пока список не докручен до конца.
  */
-export function Screen({ header, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
+export function Screen({ header, pinHeader, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
   const own = useRef<HTMLElement>(null);
   const ref = scrollRef ?? own;
-  const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false });
+  // шапка в скролле: закреплён только статус-бар, заголовок уезжает с контентом
+  const scrolls = header != null && !(pinHeader ?? !isLargeHeader(header));
+  const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false, stuck: false });
   const frame = useRef(0);
   const update = useCallback(() => {
     const el = ref.current;
     if (!el) return;
+    // stuck — липкие фильтры прижаты к верху скролла: под ними проявляется затухание
+    const sticky = el.querySelector<HTMLElement>(':scope > .y-sticky');
+    const stuck = !!sticky && el.scrollTop > 1 && sticky.getBoundingClientRect().top - el.getBoundingClientRect().top < 1;
     setEdges((prev) => {
-      // collapsed — большой заголовок уехал: шапка показывает его пилюлей по центру, липкие фильтры прижаты к шапке.
+      // collapsed — для закреплённой шапки: фото деталей → миниатюра, заголовок `back` → пилюля (у шапки в скролле не выставляется).
       // Гистерезис 24 / 8: шапка при сворачивании меняет высоту, и без запаса заголовок дрожал бы на границе
       const collapsed = prev.collapsed ? el.scrollTop > 8 : el.scrollTop > 24;
-      const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed };
+      const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed, stuck };
       // тот же объект — React не перерисовывает экран на каждое событие скролла
-      return next.top === prev.top && next.bottom === prev.bottom && next.collapsed === prev.collapsed ? prev : next;
+      return next.top === prev.top && next.bottom === prev.bottom && next.collapsed === prev.collapsed && next.stuck === prev.stuck ? prev : next;
     });
   // ref.current читается в момент вызова; с [ref] React Compiler не сохраняет мемоизацию (preserve-manual-memoization)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,12 +110,18 @@ export function Screen({ header, bottom, overlay, floating, floatingOffset = 132
     <div
       className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`, className)}
       style={photo ? { ['--screen-photo' as string]: `url("${photo}")` } : undefined}
-      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={edges.collapsed || undefined}>
-      {header ?? <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />}
+      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={(!scrolls && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}>
+      {scrolls ? (
+        <div className="y-screen__top">
+          <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />
+          <ScrollEdge position="top" size={24} />
+        </div>
+      ) : header ?? <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />}
       {backdrop}
       {/* tabIndex у прокручиваемой области — прокрутка с клавиатуры (axe scrollable-region-focusable) */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-      <main ref={ref} onScroll={onScroll} tabIndex={0} className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush')}>
+      <main ref={ref} onScroll={onScroll} tabIndex={0} className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush', scrolls && 'y-screen__content--header')}>
+        {scrolls && header}
         {children}
       </main>
       {bottom}
@@ -107,8 +138,10 @@ export function Screen({ header, bottom, overlay, floating, floatingOffset = 132
 /* ─── Layout primitives ─────────────────────────────────────────────── */
 
 /**
- * Липкая полоса внутри скролла: фильтры и чипсы прижимаются под шапку и остаются на месте,
- * пока контент едет под ними. На фоне экрана, во всю ширину, с затуханием снизу, когда прижата.
+ * Липкая полоса внутри скролла — только ряд фильтров (поиск, архив, чипсы): прижимается под статус-бар
+ * (под закреплённую шапку, если она есть) и остаётся на месте, пока контент едет под ней.
+ * На фоне экрана, во всю ширину, с затуханием снизу, когда прижата (`Screen[data-stuck]`).
+ * Сегмент «Вещи / Образы / Вишлист» и вложенные переключатели не прилипают — уезжают с контентом (#170).
  */
 export function Sticky({ children }: { children: ReactNode }) {
   return <div className="y-sticky">{children}</div>;

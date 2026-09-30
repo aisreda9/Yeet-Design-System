@@ -58,15 +58,15 @@ export function SheetDemo() {
   );
 }
 
-/* ─── Шапка при скролле: большой заголовок → пилюля, липкие фильтры ─────── */
+/* ─── Скролл экрана: заголовок уезжает, фильтры прилипают под статус-бар (#170) ─────── */
 
 export function HeaderScrollDemo() {
   const [tab, setTab] = useState('items');
   const [chips, setChips] = useState(['Все']);
   return (
     <Screen header={<Header type="large" title="Гардероб" action={{ icon: 'search', label: 'Поиск' }} />} bottom={<BottomNav active="wardrobe" fab />}>
+      <SegmentControl value={tab} onChange={setTab} segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wish', label: 'Вишлист' }]} />
       <Sticky>
-        <SegmentControl value={tab} onChange={setTab} segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wish', label: 'Вишлист' }]} />
         <ChipGroup chips={['Все', 'Верх', 'Низ', 'Обувь', 'Сумки'].map((label) => ({ label, selected: chips.includes(label) }))} onToggle={(l) => setChips([l])} />
       </Sticky>
       <Grid>{[...items, ...items].map((it, k) => <ItemCard key={k} {...it} />)}</Grid>

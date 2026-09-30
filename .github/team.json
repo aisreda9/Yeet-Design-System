@@ -1,6 +1,6 @@
 {
   "base": "main",
-  "staleDays": 5,
+  "staleHours": 4,
   "limits": {
     "maxBranchesPerZone": 2,
     "limitedZones": ["atoms", "molecules", "organisms", "screens"],
