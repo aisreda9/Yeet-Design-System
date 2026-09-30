@@ -32,6 +32,7 @@ description: Оркестрация агентов дизайн-системы Y
 | `ds-critic`             | слепой критик вида (Gauntlet Loop)                              | ничего (вердикт)                                                      |
 | `ds-qa`                 | QA · `qa`                                                       | `design/figma-specs.json`, `qa/baseline`, журнал `design/QA.md`       |
 | `ds-docs-keeper`        | Документация · `docs`                                           | `src/docs/`, `DESIGN.md`, `README.md`, ADR                            |
+| `ds-planner`            | планировщик: нарезка на issues, приоритеты, контроль            | только issues и комментарии в GitHub                                  |
 
 ## 2. Процесс
 

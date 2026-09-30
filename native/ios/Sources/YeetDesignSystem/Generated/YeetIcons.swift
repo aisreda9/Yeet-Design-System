@@ -50,7 +50,6 @@ public enum YeetIconName: String, CaseIterable, Identifiable {
     case placeholder = "placeholder"
     case check = "check"
     case apple = "apple"
-    case arrowBack = "arrow-back"
     case thumbDown = "thumb-down"
     case undo = "undo"
     case eyeOff = "eye-off"
@@ -110,7 +109,6 @@ enum YeetIconPaths {
         case .placeholder: return placeholder
         case .check: return check
         case .apple: return apple
-        case .arrowBack: return arrowBack
         case .thumbDown: return thumbDown
         case .undo: return undo
         case .eyeOff: return eyeOff
@@ -949,21 +947,6 @@ enum YeetIconPaths {
             p.addCurve(to: pt(14.69, 4.6), control1: pt(12.81, 6.15), control2: pt(13.97, 5.48))
             p.closeSubpath()
         }, stroke: false, fill: true, lineCap: .butt, lineJoin: .miter, dash: []),
-    ]
-
-    private static let arrowBack: [YeetIconLayer] = [
-        YeetIconLayer(path: Path { p in
-            p.move(to: pt(6.3, 8))
-            p.addLine(to: pt(14.78, 8))
-            p.addCurve(to: pt(18.47, 9.46), control1: pt(16.17, 8), control2: pt(17.49, 8.53))
-            p.addCurve(to: pt(20, 13), control1: pt(19.45, 10.4), control2: pt(20, 11.67))
-            p.addCurve(to: pt(18.47, 16.54), control1: pt(20, 14.33), control2: pt(19.45, 15.6))
-            p.addCurve(to: pt(14.78, 18), control1: pt(17.49, 17.47), control2: pt(16.17, 18))
-            p.addLine(to: pt(5, 18))
-            p.move(to: pt(10, 4))
-            p.addLine(to: pt(6, 8))
-            p.addLine(to: pt(10, 12))
-        }, stroke: true, fill: false, lineCap: .square, lineJoin: .miter, dash: []),
     ]
 
     private static let thumbDown: [YeetIconLayer] = [
