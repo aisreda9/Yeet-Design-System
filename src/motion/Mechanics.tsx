@@ -170,7 +170,7 @@ export function PageStackDemo() {
   const [open, setOpen] = useState(false);
   const [drag, setDrag] = useState<number | null>(null);
   const g = useRef<{ x: number; w: number; crossed: boolean } | null>(null);
-  const width = useRef(393);
+  const [width, setWidth] = useState(393); // ширина экрана на момент жеста — в state, а не в ref: её читает рендер
   const speed = useRef(velocityTracker());
   const push = (on: boolean) => { setOpen(on); setDrag(null); };
 
@@ -188,7 +188,7 @@ export function PageStackDemo() {
     speed.current.add(e.clientX, e.clientY, e.timeStamp);
     const dx = e.clientX - g.current.x;
     setDrag(dx >= 0 ? dx : rubberBand(dx, g.current.w));
-    width.current = g.current.w;
+    setWidth(g.current.w);
     const crossed = dx > g.current.w * gesture.swipeDistance;
     if (crossed && !g.current.crossed) haptic('threshold');
     g.current.crossed = crossed;
@@ -201,7 +201,7 @@ export function PageStackDemo() {
     g.current = null;
     push(!back);
   };
-  const progress = drag === null ? (open ? 1 : 0) : 1 - Math.max(0, drag) / width.current;
+  const progress = drag === null ? (open ? 1 : 0) : 1 - Math.max(0, drag) / width;
   return (
     <div className="y-motion-phone y-stack" data-dragging={drag !== null || undefined} style={{ ['--stack' as string]: progress }}>
       <div className="y-stack__page y-stack__page--under" inert={open || undefined}>
