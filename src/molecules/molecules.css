@@ -117,7 +117,14 @@ span.y-field__trailing { cursor: inherit; }
 .y-chip__toggle:is(span) { cursor: default; }
 .y-chip--static:active { transform: none; }
 .y-chip__remove { position: relative; padding: 0 var(--space-12) 0 0; color: var(--color-text-secondary); }
-.y-chip__remove::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--space-8)); right: 0; } /* зона нажатия 40: забирает отступ 8 до крестика */
+/* Зона нажатия ≥ 44 у частей капсулы (hit-slop — atoms.css): у самой капсулы-span ::after выключен — он лежал поверх обеих кнопок и забирал нажатия.
+   Высота: обе кнопки −2 сверху и снизу (40 → 44; лента даёт запас 2, в переносе ряды через 4 — зоны встык).
+   «Удалить» (32): влево 8 — отступ до крестика у своего чипса (кнопка ниже по DOM, перекрывает его край), вправо 4 — зазор до соседнего чипса (gap ChipGroup),
+   итого 44. Сосед справа — чипс ≥ 44, его зона вбок не растёт, поэтому пересечений нет; чипс уже 44 (текст в 1 символ) залез бы в тот же зазор — берёт его «×». */
+.y-chip-group > .y-chip--removable::after { content: none; }
+button.y-chip__toggle { position: relative; }
+button.y-chip__toggle::after { content: ''; position: absolute; top: calc(-1 * var(--space-2)); bottom: calc(-1 * var(--space-2)); left: 0; right: 0; }
+.y-chip__remove::after { content: ''; position: absolute; top: calc(-1 * var(--space-2)); bottom: calc(-1 * var(--space-2)); left: calc(-1 * var(--space-8)); right: calc(-1 * var(--space-4)); }
 .y-chip__remove > .y-icon { width: 20px; height: 20px; } /* stylelint-disable-line unit-disallowed-list -- иконка 20 */
 /* Chip · State=Editing: поле по ширине текста внутри капсулы S, плейсхолдер серым, каретка акцентом */
 .y-chip--editing { padding: 0 var(--space-16); cursor: text; }
@@ -125,6 +132,9 @@ span.y-field__trailing { cursor: inherit; }
 .y-chip__input {
   width: auto; min-width: 1ch; field-sizing: content; padding: 0; border: 0; outline: 0; background: transparent;
   font: inherit; color: var(--color-text-primary); caret-color: var(--color-accent);
+  /* Зона нажатия — вся капсула-label с её ::after 44 (hit-slop — atoms.css): тап мимо текста фокусирует поле.
+     Само поле — над этим ::after, иначе тап по тексту не ставит каретку */
+  position: relative; z-index: var(--layer-raised);
 }
 .y-chip__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .y-chip--editing:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
