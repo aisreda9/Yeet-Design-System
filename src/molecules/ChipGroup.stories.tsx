@@ -99,7 +99,9 @@ export const InSheetWrap: Story = {
     const tops = [...new Set([...group.children].map((c) => Math.round((c as HTMLElement).getBoundingClientRect().top)))];
     await expect(tops.length).toBe(3);
     await expect(Math.round(chip.getBoundingClientRect().top)).toBe(tops[2]);
-    await expect(chip.scrollWidth).toBeLessThanOrEqual(chip.clientWidth);
+    // Текст чипса не сжат (#177). Меряется тело чипса, а не капсула: зона нажатия «×» (::after) выходит на 4 в зазор справа и входит в scrollWidth капсулы
+    const toggle = chip.querySelector('.y-chip__toggle') as HTMLElement;
+    await expect(toggle.scrollWidth).toBeLessThanOrEqual(toggle.clientWidth);
   },
 };
 
