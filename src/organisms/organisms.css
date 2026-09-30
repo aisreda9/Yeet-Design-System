@@ -109,7 +109,7 @@
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 .y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--sheet-handle); } /* ≈ 1,5:1 к фону шторки (D8) */ /* stylelint-disable-line unit-disallowed-list -- хэндл шторки 48 × 4 (D8) */
-.y-dock > .y-sheet__handle { margin-bottom: 14px; } /* stylelint-disable-line unit-disallowed-list -- хэндл → поле 14 в доке из Figma */
+.y-dock > .y-sheet__handle { margin-bottom: 22px; } /* stylelint-disable-line unit-disallowed-list -- хэндл → поле 30 (22 + gap 8) в доке, Figma 1173:18217 (#210: было 14 — док стоял на 8 ниже) */
 /* Кнопки футера — равные половины через 7; не влезает подпись — обе на всю ширину, одна под другой, безопасная снизу (C11, D7).
    Ширина по подписи, но не шире футера: длиннее строки — многоточие. Поля 16 вместо 20 — только запас до переноса:
    короткая подпись по центру выглядит так же, а «Сохранить и выйти» при 393 остаётся в половине 165, как в Figma. */
@@ -119,7 +119,7 @@
 .y-sheet__head { display: flex; align-items: center; justify-content: space-between; flex-direction: row; gap: var(--space-8); min-height: 24px; } /* stylelint-disable-line unit-disallowed-list -- строка заголовка не ниже иконки 24 */
 .y-sheet__head > .y-icon-button { margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--sheet-title-gap); } /* заголовок → 16 → описание (#58) */
-.y-dialog__more { display: contents; } /* обёртка только для aria-describedby: раскладка как у прямых детей тела */
+.y-dialog__more { display: flex; flex-direction: column; gap: var(--space-12); } /* блоки после описания — через 12 (Figma 1176:11793 «Аккаунт будет удалён», #210) */
 /* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
    все 4 угла --radius-overlay (48, концентрично углу экрана 56); хэндл → 16 → заголовок → --sheet-title-gap (16) → контент / описание (#58) */
 .y-sheet--modal { gap: var(--space-16); border-radius: var(--radius-overlay); }
@@ -169,6 +169,9 @@
 .y-overlay .y-sheet { transition: transform var(--sheet-spring); touch-action: none; }
 .y-overlay .y-sheet[role='alertdialog'] { transition: transform var(--motion-appear); } /* диалог — 240 мс standard, без пружины (C7) */
 .y-overlay .y-sheet__body { touch-action: pan-y; }
+/* Тело выходит на 4 вверх (кольцо фокуса), поэтому после заголовка его margin-top — тоже −4: правило `title + *` (Sheet & Dialog)
+   обнуляло его, и контент стоял на 20 под заголовком вместо 16 (#210: шторки на 4–8 выше Figma) */
+.y-sheet--modal > :is(.y-sheet__title, .y-sheet__head) + .y-sheet__body { margin-top: calc(var(--sheet-title-gap) - var(--space-16) - var(--space-4)); }
 .y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
   .y-overlay::before { opacity: 0; }
@@ -246,9 +249,9 @@
 @keyframes y-shimmer { to { translate: 100% 0; } }
 @media (prefers-reduced-motion: reduce) { .y-photo-area::before { animation: none; } }
 .y-photo-area__add { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); font: var(--typography-body); background: none; border: 0; color: inherit; cursor: pointer; }
-.y-photo-area__close { /* «×» 24 серым в 20 от угла: кнопка 44 с иконкой по центру → 10 от края */
+.y-photo-area__close { /* «×» 24 чёрным в 20 от угла: кнопка 44 с иконкой по центру → 10 от края (цвет — Figma photo-area в DS 0.2 1174:18042, 1173:18306, #210) */
   position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; padding: 0; border: 0; background: none; /* stylelint-disable-line unit-disallowed-list -- «×» 24 в 20 от угла: кнопка 44 → 10 от края */
-  display: grid; place-items: center; color: var(--color-text-secondary); cursor: pointer;
+  display: grid; place-items: center; color: var(--color-text-primary); cursor: pointer;
 }
 .y-photo-area__close:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset-inset); border-radius: var(--radius-full); }
 
@@ -267,7 +270,7 @@
 
 /* Чат: ответ пользователя — светлый акцент, хвост справа снизу */
 .y-bubble { max-width: 265px; padding: var(--space-16) var(--space-20); background: var(--card-bg); color: var(--color-text-primary); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8); } /* stylelint-disable-line unit-disallowed-list -- ширина пузыря 265 из Figma */
-.y-bubble--own { background: var(--color-accent-soft); border-radius: var(--radius-lg) var(--radius-lg) var(--space-8) var(--radius-lg); margin-left: auto; width: fit-content; }
+.y-bubble--own { background: var(--color-accent-soft); border-radius: var(--radius-lg) var(--radius-lg) var(--space-8) var(--radius-lg); margin-left: auto; margin-right: var(--space-12); width: fit-content; } /* свой пузырь на 32 от края экрана: поле 20 + 12 (Figma 1176:20046, #210) */
 .y-bubble-row { display: flex; align-items: flex-end; gap: var(--space-4); }
 .y-bubble-row__avatar { flex: none; width: 64px; height: 64px; display: grid; place-items: center; } /* stylelint-disable-line unit-disallowed-list -- аватар стилиста 64 из Figma */
 /* Аватар стилиста в чате (во флоу — 3D-персонаж 64; здесь заглушка) */
@@ -411,14 +414,14 @@
 .y-stylist-face { display: block; object-fit: contain; user-select: none; }
 
 /* ─── ItemSlots (#27) ─── */
-/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель с полями 20; заголовок H2 → 16 → ряд карточек 173 × 172 */
+/* Outfit Creation / Item Selection 414:1459: секции через 20 и разделитель во всю ширину; заголовок H2 → 16 → ряд карточек 173 × 172 */
 .y-item-slots {
   display: flex; flex-direction: column; padding-top: var(--space-20);
   background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
 }
 .y-item-slot { display: flex; flex-direction: column; gap: var(--space-16); padding: 0 var(--screen-gutter) var(--space-20); }
 .y-item-slot + .y-item-slot { position: relative; padding-top: var(--space-20); }
-.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: var(--screen-gutter); right: var(--screen-gutter); height: var(--border-width-thin); background: var(--color-border-subtle); } /* Flow 2.0: instance divider 353 при 393 — поля 20, цвет как у atom */
+.y-item-slot + .y-item-slot::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: var(--border-width-thin); background: var(--color-border-subtle); } /* DS 0.2 1173:22216: разделитель во всю ширину панели (#210), цвет как у atom */
 /* ряд выходит на поля экрана; поля ряда (50 % секции + 20 − 86.5 = 110 при 393) дают первой и последней вещи встать по центру */
 .y-item-slot__row {
   --slot-card: 173px; /* stylelint-disable-line unit-disallowed-list -- карточка 173 из Figma */

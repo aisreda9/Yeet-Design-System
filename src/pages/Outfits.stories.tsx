@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Stamp } from '../atoms';
-import { EmptyState, List, ListItem } from '../molecules';
+import { type Chip, ChipGroup, EmptyState } from '../molecules';
 import { BottomNav, Header, OutfitPager, Overlay, type PagerLook, Sheet, WeatherCard } from '../organisms';
 import { Screen } from '../templates';
 import './pages.css';
@@ -27,22 +27,44 @@ const todayLooks: PagerLook[] = [
 /**
  * Главная (Figma `1371:36589`): стопка образов со свайпом, погода поверх, штамп «Надеть».
  * `weather="rain"` — предупреждение о дожде (`1371:36745`); `worn` — образ надет, штамп сжат в «отменить» (`1371:36823`);
- * `occasions` — открыт выбор повода из акцента шапки (`1371:36667`).
+ * `occasions` — открыта шторка «Повод» из акцента шапки (DS 0.2 `1173:14091` / `1144:3546`, их кадры в New App (Raw) — `1371:43786` / `1371:43810`,
+ *   теги истории: coverage сверяет теги только с кадрами Raw): чипсы с «+», «Все» выбран, свой повод с ×, под ней дождливый день.
  */
-const occasionList = ['На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Спорт'];
+const occasionChips = ['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка'];
 function TodayScreen({ weather, worn: initialWorn = false, occasions = false }: { weather?: 'rain'; worn?: boolean; occasions?: boolean }) {
   const [occasionOpen, setOccasionOpen] = useState(occasions);
-  const [occasion, setOccasion] = useState(occasionList[0]);
+  // В шторке по умолчанию выбран «Все», а в шапке — повод дня
+  const [occasion, setOccasion] = useState('Все');
+  const [custom, setCustom] = useState<Chip[]>([{ label: 'Кастомный', removable: true }]);
   const [index, setIndex] = useState(1);
   const [worn, setWorn] = useState(initialWorn);
-  const rain = weather === 'rain' || initialWorn; // «Надето» в макете — в дождливый день
+  const rain = weather === 'rain' || initialWorn || occasions; // «Надето» и выбор повода в макете — в дождливый день
+  const pick = (o: string) => { setOccasion(o); setOccasionOpen(false); };
+  const addCustom = () => setCustom((cur) => (cur.some((c) => c.editing) ? cur : [...cur, { label: '', value: 'new', editing: true, removable: true, placeholder: 'Свой повод' }]));
+  const editCustom = (v: string) => setCustom((cur) => cur.map((c) => (c.editing ? { ...c, label: v } : c)));
+  const doneCustom = (v: string) => setCustom((cur) => cur.flatMap((c) => (c.editing ? (v.trim() ? [{ label: v.trim(), removable: true }] : []) : [c])));
+  const removeCustom = (v: string) => {
+    setCustom((cur) => cur.filter((c) => (c.value ?? c.label) !== v));
+    if (v === occasion) setOccasion('Все');
+  };
   return (
     <Screen
-      header={<Header type="large" title="Твои образы" accent={{ label: occasion.toLowerCase(), onClick: () => setOccasionOpen(true) }} />}
+      header={<Header type="large" title="Твои образы" accent={{ label: (occasion === 'Все' ? 'На каждый день' : occasion).toLowerCase(), onClick: () => setOccasionOpen(true) }} />}
       bottom={<BottomNav active="today" />}
       overlay={(
         <Overlay open={occasionOpen} onOpenChange={setOccasionOpen}>
-          <Sheet title="Повод"><List>{occasionList.map((o) => <ListItem key={o} type="radio" label={o} checked={o === occasion} onClick={() => { setOccasion(o); setOccasionOpen(false); }} />)}</List></Sheet>
+          <Sheet title="Повод">
+            <ChipGroup
+              wrap
+              aria-label="Повод"
+              chips={[...occasionChips.map((label) => ({ label, selected: label === occasion })), ...custom.map((c) => ({ ...c, selected: !c.editing && c.label === occasion }))]}
+              onToggle={pick}
+              onRemove={removeCustom}
+              onAdd={addCustom}
+              onEdit={editCustom}
+              onEditDone={doneCustom}
+            />
+          </Sheet>
         </Overlay>
       )}
     >
@@ -62,7 +84,7 @@ function TodayScreen({ weather, worn: initialWorn = false, occasions = false }: 
 export const Today: Story = { name: 'Outfits / Everyday / Sunny', render: () => <TodayScreen /> };
 export const TodayRain: Story = { name: 'Outfits / Everyday / Rain Alert', render: () => <TodayScreen weather="rain" /> };
 export const TodayWorn: Story = { name: 'Outfits / Everyday / Wear Action Active', render: () => <TodayScreen worn /> };
-export const TodayOccasions: Story = { name: 'Outfits / Everyday / Occasion Selector Open', tags: ['figma:1371-36667'], render: () => <TodayScreen occasions /> };
+export const TodayOccasions: Story = { name: 'Outfits / Everyday / Occasion Selector Open', tags: ['figma:1371-43786', 'figma:1371-43810'], render: () => <TodayScreen occasions /> };
 
 export const RecommendationsEmpty: Story = {
   name: 'Outfits / Recommendations / Empty Wardrobe',

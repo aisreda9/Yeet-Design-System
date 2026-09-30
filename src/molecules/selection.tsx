@@ -95,6 +95,7 @@ export type Chip = {
   /**
    * Chip · State=Editing: чипс превращается в поле ввода по ширине текста — свой повод или тег
    * (флоу Outfit Creation / Custom Occasion Name). `label` — введённый текст, `placeholder` — подсказка серым.
+   * В Figma вариант есть только с иконкой справа: `dropdown` — ⌄, `removable` — × (отменить ввод, `onRemove`); обе серые.
    */
   editing?: boolean;
   placeholder?: string;
@@ -148,9 +149,10 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
     <div tabIndex={!wrap && !hasFocusable ? 0 : undefined} className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center', className)} {...rest}>
       {onAdd && <IconButton icon="plus" label="Добавить" variant="primary" size="S" onClick={onAdd} />}
       {chips.map((c) => {
+        // Figma: Editing=true бывает только с иконкой справа — ⌄ (dropdown, `1182:20334`) или × (removable, `1413:30294`), обе серые
         if (c.editing)
           return (
-            <label key="editing" className="y-button y-button--S y-style--tertiary y-chip--editing">
+            <label key="editing" className={cx('y-button y-button--S y-style--tertiary y-chip--editing', (c.dropdown || c.removable) && 'y-chip--trailing', c.removable && 'y-chip--removable')}>
               <input
                 className="y-chip__input"
                 value={c.label}
@@ -162,6 +164,13 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
                 onBlur={(e) => onEditDone?.(e.currentTarget.value)}
                 readOnly={!onEdit}
               />
+              {c.removable ? (
+                <button type="button" className="y-chip__remove" aria-label={c.label ? `Удалить: ${c.label}` : 'Удалить'} onMouseDown={(e) => e.preventDefault()} onClick={() => onRemove?.(chipId(c))}>
+                  <Icon name="cross" />
+                </button>
+              ) : (
+                c.dropdown && <Icon name="chevron-up-down" />
+              )}
             </label>
           );
         const id = chipId(c);

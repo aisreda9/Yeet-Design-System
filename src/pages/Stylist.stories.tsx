@@ -28,10 +28,12 @@ const greeting = 'Привет! Я твой ИИ-стилист. Спрашив�
 /**
  * Чат со стилистом в белой панели с хэндлом, сообщения внизу над полем.
  * `reply` — ответ пользователя уже в ленте (Message Ready); `draft` — текст в поле (Greeting Entered); без них — пустое поле в фокусе.
+ * `back` — кнопка «Назад» (×) справа от заголовка.
  */
-function StylistChat({ reply, draft, focused }: { reply?: string; draft?: string; focused?: boolean }) {
+function StylistChat({ reply, draft, focused, back }: { reply?: string; draft?: string; focused?: boolean; back?: boolean }) {
+  // Message Ready открывается из каталога: без таб-бара выход — видимый «Назад» в строке заголовка (#210, в Figma 1176:20046 его нет — тупик)
   return (
-    <Screen header={<Header type="large" title="Стилист" />} flush>
+    <Screen header={<Header type="large" title="Стилист" action={back ? { icon: 'cross', label: 'Назад' } : undefined} />} flush>
       <Sheet type="panel" className="y-chat-panel">
         <div className="y-chat-spacer" />
         <ChatBubble avatar={<span className="y-stylist-avatar"><Icon name="ai" /></span>}>{greeting}</ChatBubble>
@@ -42,7 +44,7 @@ function StylistChat({ reply, draft, focused }: { reply?: string; draft?: string
   );
 }
 
-export const Stylist: Story = { name: 'Stylist / Home / Message Ready', render: () => <StylistChat reply="Привет" /> };
+export const Stylist: Story = { name: 'Stylist / Home / Message Ready', render: () => <StylistChat reply="Привет" back /> };
 export const StylistFocused: Story = { name: 'Stylist / Assistant / Input Focused', render: () => <StylistChat focused /> };
 export const StylistGreeting: Story = { name: 'Stylist / Home / Greeting Entered', render: () => <StylistChat draft="Привет" /> };
 

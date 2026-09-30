@@ -17,10 +17,18 @@
 /* «Упс, не нашли» под фильтрами — ниже центра: заголовок на y411 у вещей (1141:2212) и y403 у образов (1174:19706) */
 .y-wardrobe-empty--items-filtered { padding-bottom: 12px; } /* stylelint-disable-line unit-disallowed-list -- положение из Figma */
 .y-wardrobe-empty--outfits-filtered { padding-bottom: 28px; } /* stylelint-disable-line unit-disallowed-list -- положение из Figma */
+/* Wishlist / Items / Empty (1141:2566): блок не по центру, а ниже — заголовок на y545, описание в 146 над таб-баром (#210) */
+.y-wardrobe-empty--wishlist { place-items: end center; padding-bottom: 122px; } /* stylelint-disable-line unit-disallowed-list -- положение из Figma */
 /* Outfits / Recommendations / Empty (1173:19455): блок прижат к низу, кнопка в 100 над таб-баром */
 .y-recommendations-empty { margin-bottom: calc(var(--space-40) * 2); }
 /* Пустые Архив, Корзина, поиск по гардеробу (шапка 118, низа нет): блок по центру экрана (y426), а не области под шапкой */
 .y-empty-bar { flex: 1; display: grid; place-items: center; padding-bottom: calc(118px - var(--space-24) + var(--space-20)); } /* stylelint-disable-line unit-disallowed-list -- подъём над панелью из Figma */
+/* Архив и Корзина (1142:3181, 1142:3342): блок на 10 выше; описание не шире 313 — «…храниться / здесь 30 дней», как в Figma (#210) */
+.y-empty-bar--storage { padding-bottom: calc(118px - var(--space-24) + var(--space-40)); } /* stylelint-disable-line unit-disallowed-list -- подъём над панелью из Figma */
+.y-empty-bar--storage .y-empty > p { max-width: 313px; } /* stylelint-disable-line unit-disallowed-list -- ширина описания из Figma: «…храниться / здесь 30 дней» */
+
+/* Onboarding / First Item Prompt (1173:21880): пустой холст на y294 — на 8 ниже, чем под шапкой с подзаголовком по умолчанию (#210) */
+.y-first-item-canvas { margin-top: var(--space-8); }
 
 /* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
 .y-item-looks { gap: var(--space-20); }

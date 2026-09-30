@@ -289,3 +289,116 @@ export const TrashAutoHide: Story = {
     await expect(cards(root)).toHaveLength(1);
   },
 };
+
+/* ─── Play: фильтры, «Ещё», долгое нажатие, поиск (#210) ─────────────── */
+
+/** Фильтры: у каждого чипса гардероба и образов своя шторка; выбор в шторке без кнопок применяется сразу, «Сбросить» и «Все» — сброс. */
+export const FiltersChain: Story = {
+  name: 'Цепочка: фильтры',
+  args: { start: 'Wardrobe' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    const chip = (name: RegExp) => topLayer(root).getByRole('button', { name });
+    await at(root, 'Wardrobe');
+    await tap(root, chip(/^Теги/));
+    await sheet(c, 'Теги');
+    await userEvent.keyboard('{Escape}');
+    await idle(root);
+    await gone(c, 'dialog');
+
+    await tap(root, chip(/^Сезон/));
+    await tap(root, await within(await sheet(c, 'Сезон')).findByRole('button', { name: 'Весна' }));
+    await gone(c, 'dialog');
+    await at(root, 'ItemsNoFilterResults');
+    await tap(root, chip(/^Категория/));
+    await tap(root, within(await sheet(c, 'Категория')).getByRole('button', { name: 'Сбросить' }));
+    await gone(c, 'dialog');
+    await at(root, 'Wardrobe');
+
+    await tap(root, topLayer(root).getByRole('radio', { name: 'Образы' }));
+    await at(root, 'OutfitsPopulated');
+    await tap(root, chip(/^Повод/));
+    const occasion = await sheet(c, 'Повод');
+    await expect(within(occasion).getByRole('button', { name: 'Добавить' })).toBeVisible();
+    await expect(within(occasion).getByRole('button', { name: 'Удалить: Кастомный' })).toBeVisible();
+    await tap(root, await within(occasion).findByRole('button', { name: 'Офис' }));
+    await gone(c, 'dialog');
+    await at(root, 'OutfitsNoFilterResults');
+    await tap(root, chip(/^Сезон/));
+    await tap(root, await within(await sheet(c, 'Сезон')).findByRole('button', { name: 'Все' }));
+    await gone(c, 'dialog');
+    await at(root, 'OutfitsPopulated');
+  },
+};
+
+/** «Ещё» в деталях: вещь из вишлиста → шторка действий → в гардероб с «Отменить»; образ → шторка действий → удалить. */
+export const MoreChain: Story = {
+  name: 'Цепочка: «Ещё» в деталях',
+  args: { start: 'Wishlist' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await tap(root, q(root, '.y-product-card'));
+    await at(root, 'ItemDetails');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Ещё' }));
+    await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Переместить в гардероб' }));
+    await gone(c, 'dialog');
+    await at(root, 'Wardrobe');
+    await c.findByText('Вещь перемещена в гардероб');
+    await expect(within(toastEl(root)!).getByRole('button', { name: 'Отменить' })).toBeInTheDocument(); // ↶, не «×» (Figma 1371:37590)
+
+    await tap(root, topLayer(root).getByRole('radio', { name: 'Образы' }));
+    await at(root, 'OutfitsPopulated');
+    await tap(root, q(root, '.y-collage'));
+    await at(root, 'OutfitDetails');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Ещё' }));
+    await tap(root, await within(await sheet(c, 'Повод образа')).findByRole('button', { name: 'Удалить' }));
+    await gone(c, 'dialog');
+    await at(root, 'OutfitsPopulated');
+    await c.findByText('Образ удалён');
+  },
+};
+
+/** Архив: долгое нажатие (правая кнопка) на вещь → шторка действий → «Вернуть в гардероб» → вещь уходит, тост. */
+export const ArchiveLongPress: Story = {
+  name: 'Цепочка: действия в архиве',
+  args: { start: 'Archive' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'Archive');
+    const before = cards(root).length;
+    cards(root)[0].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    await idle(root);
+    await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Вернуть в гардероб' }));
+    await gone(c, 'dialog');
+    await c.findByText('Вещь возвращена в гардероб');
+    await expect(cards(root)).toHaveLength(before - 1);
+  },
+};
+
+/** Результаты поиска: «Сортировка» → шторка; сердечко → вещь в вишлисте, тост. */
+export const SearchSortAndLike: Story = {
+  name: 'Цепочка: сортировка и вишлист',
+  args: { start: 'SearchResults' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'SearchResults');
+    await tap(root, topLayer(root).getByRole('button', { name: /^Сортировка/ }));
+    await tap(root, await within(await sheet(c, 'Сортировка')).findByRole('button', { name: 'Сначала дешевле' }));
+    await gone(c, 'dialog');
+    await tap(root, topLayer(root).getAllByRole('button', { name: 'В вишлист' })[0]);
+    await c.findByText('Вещь перемещена в вишлист');
+  },
+};
+
+/** Стилист: из каталога в чат (Message Ready) и обратно видимым «Назад» — у чата нет таб-бара (#210). */
+export const StylistBack: Story = {
+  name: 'Цепочка: чат стилиста и «Назад»',
+  args: { start: 'StylistHome' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    await at(root, 'StylistHome');
+    await tap(root, q(root, '.y-dock .y-input-bar__field'));
+    await at(root, 'Stylist');
+    await back(root);
+    await at(root, 'StylistHome');
+  },
+};

@@ -63,7 +63,7 @@ export const DeleteAccount: Story = {
           <Dialog variant="danger" title="Аккаунт будет удалён" description={<>Сима, твой аккаунт <span className="y-text--primary"><Link href="mailto:sima@space.com">sima@space.com</Link></span> будет деактивирован.</>} cancel="Отменить" confirm="Удалить">
             <p className="y-body y-text--secondary">Ты потеряешь:</p>
             <StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow>
-            <p className="y-body y-text--secondary">В течение 14 дней аккаунт можно восстановить — просто войди с тем же паролем.</p>
+            <p className="y-body y-text--secondary">В течение 14 дней аккаунт можно восстановить — просто войди с тем же паролем</p>
             <p className="y-body y-text--secondary">После этого все данные будут удалены навсегда.</p>
           </Dialog>
         </Overlay>

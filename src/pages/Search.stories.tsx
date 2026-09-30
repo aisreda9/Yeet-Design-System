@@ -41,9 +41,9 @@ export const SearchResults: Story = {
   render: () => (
     <Screen header={<Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
       <Grid rowGap={16}>
-        {/* ряды 2–3 как во флоу: AF1 '07 и '07 LV8 по 10 400, левая в вишлисте */}
+        {/* как во флоу 1141:2876: скидка только у первой, в вишлисте — вторая и третья; ряд 3 — AF1 '07 и '07 LV8 по 10 400 */}
         {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8", "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8"].map((n, i) => (
-          <ProductCard key={i} kind="shoe" name={n} price={`${(i === 1 ? 14300 : 10400).toLocaleString('ru-RU')} ₽`} discount={i % 2 ? undefined : '-10%'} liked={i === 1 || i === 2 || i === 4} />
+          <ProductCard key={i} kind="shoe" name={n} price={`${(i === 1 ? 14300 : 10400).toLocaleString('ru-RU')} ₽`} discount={i === 0 ? '-10%' : undefined} liked={i === 1 || i === 2} />
         ))}
       </Grid>
     </Screen>
