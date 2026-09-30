@@ -7,8 +7,8 @@ import { setRef } from './refs';
 /** Рамка в долях контейнера 0…1: левый верхний угол, ширина, высота. */
 export type CropRect = { x: number; y: number; w: number; h: number };
 
-/** Рамка из флоу Search / Photo / Crop `1371:38089`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
-export const cropDefault: CropRect = { x: 20 / 393, y: 315 / 852, w: 353 / 393, h: 226 / 852 };
+/** Рамка как в Figma: crop-frame `1356:29832`, экран Search / Photo / Crop · DS `1176:19019` — 353 × 227 в 20 от краёв экрана 393 × 852, верх на 313. */
+export const cropDefault: CropRect = { x: 20 / 393, y: 313 / 852, w: 353 / 393, h: 227 / 852 };
 
 export type CropFrameProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'onChange' | 'defaultValue'> & {
   /** Фото под рамкой (cover). Вместо него можно передать `children`. */
@@ -20,7 +20,7 @@ export type CropFrameProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'on
   /** Начальная рамка, если `value` не задан. По умолчанию — как во флоу. */
   defaultValue?: CropRect;
   onChange?: (rect: CropRect) => void;
-  /** Подсказка `Hint onPhoto` внизу; `null` — без подсказки. */
+  /** Подсказка `Hint onPhoto` внизу, в 24 над кнопкой L; `null` — без подсказки. */
   hint?: ReactNode;
   /** Минимальная сторона рамки, px. */
   min?: number;
