@@ -91,6 +91,7 @@ span.y-field__trailing { cursor: inherit; }
 
 /* ChipGroup: чипс — Button S, боковой отступ 16; с иконкой справа 16 / 12 и иконка 20 */
 .y-chip-group { display: flex; gap: var(--space-4); align-items: center; }
+.y-chip-group > * { flex-shrink: 0; } /* #177: чипс не сжимается — в стеке (wrap) переносится на следующий ряд, в ленте ряд прокручивается */
 .y-chip-group--wrap { flex-wrap: wrap; }
 .y-chip-group--center { justify-content: center; }
 .y-chip-group--scroll {
@@ -123,7 +124,6 @@ span.y-field__trailing { cursor: inherit; }
 }
 .y-chip__input::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .y-chip--editing:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.y-chip-group > .y-icon-button.y-style--primary { width: 36px; height: 36px; align-self: center; } /* «+» перед тегами */ /* stylelint-disable-line unit-disallowed-list -- 36 из Figma, токена нет */
 
 /* ListItem & List */
 .y-list { display: flex; flex-direction: column; gap: var(--space-20); }
@@ -271,7 +271,6 @@ button.y-account:active { transform: scale(var(--gesture-press-scale-card)); }
 .y-account__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .y-account__text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .y-account__actions { display: flex; gap: var(--space-4); } /* флоу: кнопки 40 заканчиваются на паддинге 20 */
-.y-account__actions .y-icon { width: 24px; height: 24px; } /* stylelint-disable-line unit-disallowed-list -- иконка 24 */
 
 /* AvatarStack — аватары 40 внахлёст −8 с кольцом цвета фона 2, «+» Tertiary S */
 .y-avatar-stack { display: inline-flex; align-items: center; }

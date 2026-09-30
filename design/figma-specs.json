@@ -840,6 +840,51 @@
         "width": 64,
         "height": 64
       }
+    },
+    {
+      "figma": "icon-button · Size=S, Icon Size=24 (account-card · Kind=Current, #176)",
+      "story": "molecules-accountcard--playground",
+      "selector": ".y-account__actions .y-icon-button",
+      "expect": {
+        "width": 40,
+        "height": 40
+      }
+    },
+    {
+      "figma": "icon-button · Size=S, Icon Size=24 · иконка 24 (#176)",
+      "story": "molecules-accountcard--playground",
+      "selector": ".y-account__actions .y-icon-button .y-icon",
+      "expect": {
+        "width": 24,
+        "height": 24
+      }
+    },
+    {
+      "figma": "input-bar · Chat · «Отправить» 44",
+      "story": "molecules-inputbar--chat",
+      "selector": ".y-input-bar--chat .y-input-bar__send",
+      "expect": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "figma": "input-bar · Chat · «Отправить» 44, иконка 24",
+      "story": "molecules-inputbar--chat",
+      "selector": ".y-input-bar--chat .y-input-bar__send .y-icon",
+      "expect": {
+        "width": 24,
+        "height": 24
+      }
+    },
+    {
+      "figma": "chip-group · «+» 40 (icon-button Primary S, иконка 20)",
+      "story": "molecules-chipgroup--in-sheet-wrap",
+      "selector": ".y-chip-group > .y-icon-button",
+      "expect": {
+        "width": 40,
+        "height": 40
+      }
     }
   ]
 }

@@ -124,7 +124,7 @@ export type InputBarProps = Omit<ComponentPropsWithRef<'div'>, 'onChange' | 'def
   fieldIcon?: IconName;
   leading?: InputBarAction;
   trailing?: InputBarAction;
-  /** Чат со стилистом: кнопка отправки 44 внутри поля (primary, когда есть текст), поле 52 на подложке с тенью. */
+  /** Чат со стилистом: кнопка отправки 44 (иконка 24) внутри поля (primary, когда есть текст), поле 52 на подложке с тенью. */
   send?: { label: string; onClick?: () => void };
   /** L — 52 (поле поиска на экране), по умолчанию 48 (в шапке). */
   size?: 'M' | 'L';
@@ -144,7 +144,7 @@ export function InputBar({ placeholder, value, onChange, fieldIcon, leading, tra
         <input className="y-field__input" placeholder={placeholder} value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={!onChange} />
         {/* флоу Search / Text / Results: очистка «×» 20 серым, пока в поле есть текст */}
         {value && !send && <button type="button" className="y-input-bar__clear" aria-label="Очистить" onClick={() => onChange?.('')}><Icon name="cross" size={20} /></button>}
-        {send && <IconButton className="y-input-bar__send" icon="arrow-up" label={send.label} variant={value ? 'primary' : 'tertiary'} size="S" onClick={send.onClick} disabled={!value} />}
+        {send && <IconButton className="y-input-bar__send" icon="arrow-up" label={send.label} variant={value ? 'primary' : 'tertiary'} size="S" iconSize={24} onClick={send.onClick} disabled={!value} />}
       </label>
       {trailing && <SideButton action={trailing} size={size} />}
     </div>

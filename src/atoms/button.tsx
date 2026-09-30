@@ -79,6 +79,11 @@ export type IconButtonProps = Omit<ComponentPropsWithRef<'button'>, 'children'> 
   label: string;
   variant?: ButtonStyle;
   size?: ControlSize;
+  /**
+   * Размер иконки (Figma: icon-button · Icon Size). По умолчанию 20 у `S` и 24 у остальных.
+   * `size="S" iconSize={24}` — кнопка 40 с иконкой 24 (действия в карточке аккаунта); спиннер того же размера, зона нажатия ≥ 44 не меняется.
+   */
+  iconSize?: 20 | 24;
   floating?: boolean;
   /** Только вид кнопки внутри другой кнопки (карточка «+», зона фото): рендерится `<span aria-hidden>`, без вложенного интерактива. */
   decorative?: boolean;
@@ -90,9 +95,9 @@ export type IconButtonProps = Omit<ComponentPropsWithRef<'button'>, 'children'> 
  * **Контексты во флоу:** «Назад» и «Ещё» в шапке (Tertiary M), FAB «+» (Primary XL, floating),
  * «Отправить» в чате (Primary M, `loading` пока сообщение уходит), поделиться (Secondary XL), фильтры гардероба (Tertiary S).
  */
-export function IconButton({ icon, label, variant = 'tertiary', size = 'M', floating, decorative, loading, loadingLabel, className, onClick, ...rest }: IconButtonProps) {
+export function IconButton({ icon, label, variant = 'tertiary', size = 'M', iconSize: iconSizeProp, floating, decorative, loading, loadingLabel, className, onClick, ...rest }: IconButtonProps) {
   const cls = cx('y-icon-button', `y-icon-button--${size}`, `y-style--${variant}`, floating && 'y-icon-button--floating', loading && 'y-button--loading', className);
-  const iconSize = size === 'S' ? 20 : 24;
+  const iconSize = iconSizeProp ?? (size === 'S' ? 20 : 24);
   if (decorative)
     return (
       <span className={cls} aria-hidden>

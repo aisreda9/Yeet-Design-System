@@ -27,6 +27,12 @@ export const PhotoPreview: Story = {
   args: { value: '', trailing: { icon: 'search-by-image', label: 'Выбранное фото', image: demoPhoto } },
 };
 
+/** Чат со стилистом с текстом: «Отправить» Primary 44 внутри поля 52 (Figma: input-bar · Chat). */
+export const Chat: Story = {
+  name: 'Чат с текстом',
+  args: { placeholder: 'Спроси у стилиста', value: 'Что надеть на ужин?', fieldIcon: undefined, leading: undefined, trailing: undefined, send: { label: 'Отправить' } },
+};
+
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
   name: 'В флоу',
