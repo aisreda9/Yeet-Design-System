@@ -94,15 +94,16 @@ const clampPercent = (p: number) => (Number.isFinite(p) ? Math.min(100, Math.max
 export type UsageMeterProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { percent: number; label?: string };
 
 export function UsageMeter({ percent, label = 'гардероба используется', className, ...rest }: UsageMeterProps) {
-  const total = 120;
-  const on = Math.round((clampPercent(percent) / 100) * total);
+  const cols = 52;
+  const rows = 8;
+  const onCols = Math.ceil((clampPercent(percent) / 100) * cols);
   return (
     <div className={cx('y-usage-meter', className)} {...rest}>
       <span className="y-h1">{Number.isFinite(percent) ? percent : 0}%</span>
       <span className="y-caption y-text--secondary">{label}</span>
       <div className="y-usage-meter__dots" aria-hidden>
-        {Array.from({ length: total }, (_, i) => (
-          <span key={i} className={cx(i % 30 < Math.ceil(on / 4) && 'is-on')} />
+        {Array.from({ length: cols * rows }, (_, i) => (
+          <span key={i} className={cx(i % cols < onCols && 'is-on')} />
         ))}
       </div>
     </div>
