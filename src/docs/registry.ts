@@ -15,10 +15,10 @@ export type Status = 'alpha' | 'beta' | 'stable' | 'deprecated';
 
 export type Entry = {
   code: string;
-  /** Имя компонента на странице «Design System 2.0 (Claude)»; `null` — только в коде. */
+  /** Имя компонента на странице «Design System 0.2»; `null` — только в коде. */
   figma: string | null;
   /**
-   * node-id компонента (component set / symbol) на странице DS 2.0 `942:5666` — ссылка вида `?node-id=942-6953`.
+   * node-id компонента (component set / symbol) на странице DS 0.2 `942:5666` — ссылка вида `?node-id=942-6953`.
    * `null` — отдельного компонента в Figma нет, причина в `figmaWhy`. Не задано — ещё не сверено.
    */
   figmaId?: string | null;
@@ -111,6 +111,6 @@ export const registry: Entry[] = [
   { code: 'StylistAvatar', figma: 'аватар стилиста 64 (флоу Stylist)', figmaId: null, figmaWhy: 'иллюстрация в макетах 1371:38928 (слой 699:2534), 1371:39070; не компонент', level: 'Organisms', story: 'Organisms/ChatBubble', note: 'ChatBubble avatar={true}', status: 'alpha', statusWhy: 'нет компонента в Figma; на экраны придёт с #50–#54' },
 
   // Шаблоны после #46 (#29) — строка предложена в PR #64 автором #43
-  { code: 'DetailsScreen', figma: 'Item / Outfit Details (панель поверх фото, миниатюра 48 в шапке)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 1371:41024 → 1371:41076, 1371:41156 → 1371:41329; Animations «new things» 354:17405', level: 'Templates', story: 'Templates/DetailsScreen', status: 'beta', statusWhy: 'нет компонента в Figma; своя история — каркас со слотами, с данными — на экранах деталей и «Новая вещь»' },
-  { code: 'Prose', figma: 'Legal (текстовый документ: H1, разделы, карточка контактов)', figmaId: null, figmaWhy: 'компонента в DS 2.0 нет, только экраны: 1371:43055, 1371:43118', level: 'Templates', story: 'Templates/Prose', status: 'beta', statusWhy: 'нет компонента в Figma; своя история — каркас со слотами, с данными — Legal в Pages' },
+  { code: 'DetailsScreen', figma: 'Item / Outfit Details (панель поверх фото, миниатюра 48 в шапке)', figmaId: null, figmaWhy: 'компонента в DS 0.2 нет, только экраны: 1371:41024 → 1371:41076, 1371:41156 → 1371:41329; Animations «new things» 354:17405', level: 'Templates', story: 'Templates/DetailsScreen', status: 'beta', statusWhy: 'нет компонента в Figma; своя история — каркас со слотами, с данными — на экранах деталей и «Новая вещь»' },
+  { code: 'Prose', figma: 'Legal (текстовый документ: H1, разделы, карточка контактов)', figmaId: null, figmaWhy: 'компонента в DS 0.2 нет, только экраны: 1371:43055, 1371:43118', level: 'Templates', story: 'Templates/Prose', status: 'beta', statusWhy: 'нет компонента в Figma; своя история — каркас со слотами, с данными — Legal в Pages' },
 ];

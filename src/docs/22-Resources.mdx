@@ -16,7 +16,7 @@ import { ResourceIcons } from './blocks';
 |---|---|
 | Компоненты и экраны — **источник правды**, секции как в Storybook | [Design System 0.2](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) |
 | Экраны, собранные из компонентов (секция Pages) | [Pages · Экраны флоу](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1168-12824) |
-| Те же экраны в тёмной теме | [Claude · DS 2.0 — Dark](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1173-7887) |
+| Тёмные экраны (архив, с 29.09 не ведём) | [Archive · Screens Dark](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1173-7887) |
 | Исходные макеты дизайнера (эталон вида) | [New App (Raw)](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=551-2286) |
 | Анимации | [Animations](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) |
 
@@ -53,7 +53,7 @@ import { ResourceIcons } from './blocks';
 
 Компонент или экран считается готовым, когда выполнено всё:
 
-1. В Figma он собран из компонентов DS 2.0, цвета и тексты привязаны к переменным и стилям (без «сырых» hex).
+1. В Figma он собран из компонентов DS 0.2, цвета и тексты привязаны к переменным и стилям (без «сырых» hex).
 2. В Storybook есть история, свойства совпадают с Figma по имени и значениям; строка в реестре «Figma ↔ код».
 3. Расхождение с экраном-эталоном по положению текстов — **не больше 2 px** (`npm run flow-diff`, сверка в Figma).
 4. `npm run qa` — **0 ошибок** в светлой и тёмной теме на всех размерах экрана (320–430); спеки Figma в пределах 1 px.

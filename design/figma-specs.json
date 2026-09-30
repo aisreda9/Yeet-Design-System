@@ -1,5 +1,5 @@
 {
-  "$description": "Эталонные размеры компонентов из Figma (страница Design System 2.0 (Claude)). `npm run qa` сравнивает с ними вычисленные стили в Storybook. Допуск — 1px. Обновлять при изменении компонента в Figma.",
+  "$description": "Эталонные размеры компонентов из Figma (страница Design System 0.2). `npm run qa` сравнивает с ними вычисленные стили в Storybook. Допуск — 1px. Обновлять при изменении компонента в Figma.",
   "tolerance": 1,
   "specs": [
     {
