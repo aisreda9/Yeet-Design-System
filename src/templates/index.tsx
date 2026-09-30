@@ -8,12 +8,14 @@ import '../styles.css';
 export type ScreenProps = {
   /**
    * Шапка (`Header`). Если нет — рисуется статус-бар.
-   * Большой заголовок (`Header variant="large"`) уезжает вместе с контентом, остальные шапки закреплены — см. `pinHeader`.
+   * Большой заголовок (`Header variant="large"`) уезжает вместе с контентом; у `Header variant="back"` закреплён ряд «назад»,
+   * а заголовок уезжает; остальные шапки закреплены — см. `pinHeader`.
    */
   header?: ReactNode;
   /**
-   * Закрепить шапку над скроллом. По умолчанию закреплены все шапки, кроме большого заголовка (`variant="large"`):
-   * он уезжает с контентом, а закреплён только статус-бар (#170). `DetailsScreen` закрепляет шапку явно.
+   * Закрепить шапку над скроллом целиком. По умолчанию закреплены все шапки, кроме большого заголовка (`variant="large"`):
+   * он уезжает с контентом, а закреплён только статус-бар (#170), — и шапки `variant="back"`: у неё закреплён только ряд
+   * «назад», заголовок уезжает (#203). `DetailsScreen` закрепляет шапку явно.
    */
   pinHeader?: boolean;
   /** Закреплённый низ: `BottomNav` или `BottomBar`. */
@@ -47,11 +49,11 @@ export type ScreenProps = {
   children?: ReactNode;
 };
 
-/** Большой заголовок корневой вкладки: `<Header variant="large">` (или устаревшее `type="large"`). */
-function isLargeHeader(header: ReactNode) {
-  if (!isValidElement(header) || header.type !== Header) return false;
+/** Вид шапки: `<Header variant="large">` (или устаревшее `type="large"`); не `Header` — `undefined`. */
+function headerVariant(header: ReactNode) {
+  if (!isValidElement(header) || header.type !== Header) return undefined;
   const { variant, type } = header.props as { variant?: string; type?: string };
-  return (variant ?? type) === 'large';
+  return variant ?? type;
 }
 
 /**
@@ -60,7 +62,10 @@ function isLargeHeader(header: ReactNode) {
  * Правило скролла (#170): контент скроллится и **уходит под закреплённые края** — статус-бар сверху, `BottomNav` / `BottomBar` снизу.
  * - Большой заголовок (`Header variant="large"`) не закреплён и не сворачивается: уезжает вместе с контентом.
  * - Ряд фильтров в `<Sticky>` прилипает сразу под статус-бар (фильтры на y70); сегмент и остальное уезжают.
- * - Шапки с «назад», поиском и детали (`bar`, `back`, `search`, `DetailsScreen`) закреплены, как раньше (`pinHeader`).
+ * - Шапка `back` (#203, как large title в iOS и top app bar в M3): ряд «назад» закреплён под статус-баром, «назад» всегда под рукой;
+ *   большой заголовок и подзаголовок уезжают с контентом, а когда заголовок ушёл под ряд — в ряду проявляется компактный
+ *   (`data-collapsed`). Фильтры в `<Sticky>` прилипают под ряд.
+ * - Шапки `bar`, `search` и детали (`DetailsScreen`) закреплены целиком (`pinHeader`).
  *
  * Полосы затухания появляются, только когда под краем действительно есть контент:
  * верхняя — после начала скролла (под статус-баром или под прилипшими фильтрами), нижняя — пока список не докручен до конца.
@@ -69,25 +74,33 @@ function isLargeHeader(header: ReactNode) {
 export function Screen({ header, pinHeader, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
   const own = useRef<HTMLElement>(null);
   const ref = scrollRef ?? own;
+  const kind = headerVariant(header);
   // шапка в скролле: закреплён только статус-бар, заголовок уезжает с контентом
-  const scrolls = header != null && !(pinHeader ?? !isLargeHeader(header));
+  const scrolls = header != null && !(pinHeader ?? (kind !== 'large' && kind !== 'back'));
+  // у шапки `back` в скролле ряд «назад» прилипает под статус-бар (position: sticky), заголовок уезжает
+  const pinsBar = scrolls && kind === 'back';
   const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false, stuck: false, panelTop: false, panelBottom: false });
   const frame = useRef(0);
   const update = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    // stuck — липкие фильтры прижаты к верху скролла: под ними проявляется затухание
-    const sticky = el.querySelector<HTMLElement>(':scope > .y-sticky');
     const box = el.getBoundingClientRect();
-    const stuck = !!sticky && el.scrollTop > 1 && sticky.getBoundingClientRect().top - box.top < 1;
+    // закреплённый ряд шапки `back` внутри скролла: верхний край — под ним, а не у верха скролла (#203)
+    const bar = el.querySelector<HTMLElement>(':scope > .y-header .y-header__row');
+    const pin = bar ? bar.getBoundingClientRect().bottom - box.top : 0;
+    // stuck — липкие фильтры прижаты к верху скролла (или к ряду «назад»): под ними проявляется затухание
+    const sticky = el.querySelector<HTMLElement>(':scope > .y-sticky');
+    const stuck = !!sticky && el.scrollTop > 1 && sticky.getBoundingClientRect().top - box.top < pin + 1;
     // панель (Sheet type="panel", bg-elevated) под краем: подложка и затухание края берут её цвет, а не bg-canvas (#181)
     const panel = el.querySelector<HTMLElement>(':scope > .y-sheet--panel')?.getBoundingClientRect();
-    const panelTop = !!panel && el.scrollTop > 1 && panel.top - box.top < 1 && panel.bottom > box.top;
+    const panelTop = !!panel && el.scrollTop > 1 && panel.top - box.top < pin + 1 && panel.bottom > box.top + pin;
+    // большой заголовок `back` целиком ушёл под ряд → компактный заголовок в ряду. Высота шапки не меняется — без гистерезиса
+    const title = bar && el.querySelector<HTMLElement>(':scope > .y-header .y-header__back-title');
     const panelBottom = !!panel && panel.top < box.bottom && panel.bottom > box.bottom - 1;
     setEdges((prev) => {
-      // collapsed — для закреплённой шапки: фото деталей → миниатюра, заголовок `back` → пилюля (у шапки в скролле не выставляется).
+      // collapsed — для закреплённой шапки: фото деталей → миниатюра, заголовок `back` схлопнут → компактный.
       // Гистерезис 24 / 8: шапка при сворачивании меняет высоту, и без запаса заголовок дрожал бы на границе
-      const collapsed = prev.collapsed ? el.scrollTop > 8 : el.scrollTop > 24;
+      const collapsed = title ? title.getBoundingClientRect().bottom <= box.top + pin : prev.collapsed ? el.scrollTop > 8 : el.scrollTop > 24;
       const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed, stuck, panelTop, panelBottom };
       // тот же объект — React не перерисовывает экран на каждое событие скролла
       return (Object.keys(next) as (keyof typeof next)[]).every((k) => next[k] === prev[k]) ? prev : next;
@@ -116,7 +129,7 @@ export function Screen({ header, pinHeader, bottom, overlay, floating, floatingO
     <div
       className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`, className)}
       style={photo ? { ['--screen-photo' as string]: `url("${photo}")` } : undefined}
-      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={(!scrolls && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}
+      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={((!scrolls || pinsBar) && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}
       data-panel-top={edges.panelTop || undefined} data-panel-bottom={edges.panelBottom || undefined}>
       {scrolls ? (
         <div className="y-screen__top">
@@ -127,7 +140,7 @@ export function Screen({ header, pinHeader, bottom, overlay, floating, floatingO
       {backdrop}
       {/* tabIndex у прокручиваемой области — прокрутка с клавиатуры (axe scrollable-region-focusable) */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-      <main ref={ref} onScroll={onScroll} tabIndex={0} className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush', scrolls && 'y-screen__content--header')}>
+      <main ref={ref} onScroll={onScroll} tabIndex={0} className={cx('y-screen__content', center && 'y-screen__content--center', end && 'y-screen__content--end', flush && 'y-screen__content--flush', scrolls && 'y-screen__content--header', pinsBar && 'y-screen__content--bar')}>
         {scrolls && header}
         {children}
       </main>

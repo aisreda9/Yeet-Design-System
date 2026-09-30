@@ -9,7 +9,7 @@
 .y-status-bar__icons { grid-column: 3; justify-self: center; display: inline-flex; gap: 7px; align-items: center; padding-right: 10px; } /* stylelint-disable-line unit-disallowed-list -- зазор и сдвиг иконок статус-бара iOS */
 
 /* ─── Header — закреплённая шапка: сплошная подложка + полоса затухания снизу ─── */
-.y-header { position: relative; z-index: var(--layer-bar); background: var(--color-bg-canvas); color: var(--color-text-primary); }
+.y-header { position: relative; z-index: var(--layer-bar); background: var(--screen-edge-bg, var(--color-bg-canvas)); color: var(--color-text-primary); transition: background-color var(--motion-fade); } /* над панелью — её цвет (Screen → data-panel-top, #181) */
 .y-header__body { padding: var(--space-8) var(--screen-gutter) 0; display: flex; flex-direction: column; gap: var(--space-8); }
 .y-header__body:has(.y-header__back-title) { padding-bottom: var(--space-4); }
 .y-header__body:has(> .y-input-bar + .y-chip-group) { gap: var(--space-20); } /* поиск: фильтры на 20 ниже поля */
@@ -33,14 +33,17 @@
 .y-header__back-text { display: flex; flex-direction: column; gap: var(--space-12); } /* back: подзаголовок Body серым через 12 */
 .y-header__text-action { padding: 0 var(--space-20); } /* «Пропустить»: Tertiary M, отступы 20 (Figma: header · Back, action) */
 
-/* Скролл шапки `back`: заголовок схлопывается, по центру ряда «назад» — пилюля (Screen → data-collapsed).
+/* Шапка `back` (#203, iOS large title / M3 top app bar): в Screen ряд «назад» закреплён, большой заголовок уезжает с контентом;
+   когда он ушёл под ряд (Screen → data-collapsed), по центру ряда проявляется компактный — Body semibold, одна строка, «…».
+   Ряд — три колонки: «назад», заголовок, действие; заголовок сжимается, а не наезжает на «Пропустить» (320).
    Большой заголовок (`large`) не сворачивается — уезжает с контентом (Screen, #170) */
-.y-header__pill {
-  position: absolute; left: 50%; top: 50%; max-width: 60%; height: var(--size-control-s); padding: 0 var(--space-16);
-  display: inline-flex; align-items: center; border-radius: var(--radius-xl); background: var(--color-bg-subtle);
-  font: var(--typography-body); color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  opacity: 0; transform: translate(-50%, -50%) scale(0.8); pointer-events: none;
-  transition: opacity var(--motion-fade), transform var(--motion-lift);
+.y-header__row--back { display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr); }
+.y-header__row--back > .y-header__text-action { grid-column: 3; justify-self: end; }
+.y-header__compact-title {
+  --header-compact-weight: 600; /* TODO(tokens): body/semibold — у Body один вес (--font-weight-body) */
+  grid-column: 2; min-width: 0; font: var(--typography-body); font-weight: var(--header-compact-weight); letter-spacing: var(--typography-body-letter-spacing);
+  color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none;
+  opacity: 0; transition: opacity var(--motion-exit); /* уходит быстрее, чем появляется (exit < fade) */
 }
 .y-header__collapse { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--motion-collapse), opacity var(--motion-fade); }
 .y-header__collapse > * { overflow: hidden; min-height: 0; }
@@ -49,10 +52,9 @@
   width: var(--size-control-m); height: var(--size-control-m); border-radius: var(--radius-md); background: var(--card-bg); overflow: hidden; display: grid; place-items: center;
   opacity: 0; transform: translateY(var(--space-12)) scale(0.6); transition: opacity var(--motion-fade), transform var(--motion-collapse);
 }
-.y-screen[data-collapsed] .y-header__pill { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-/* Уходящая пилюля гаснет быстрее, чем появляется (exit < appear) — при возврате к началу */
-.y-screen:not([data-collapsed]) .y-header__pill { transition: opacity var(--motion-exit), transform var(--motion-exit); }
-.y-screen[data-collapsed] .y-header__collapse { grid-template-rows: 0fr; opacity: 0; }
+.y-screen[data-collapsed] .y-header__compact-title { opacity: 1; transition: opacity var(--motion-fade); }
+/* Закреплённая целиком шапка `back` (`pinHeader`): заголовок схлопывается по высоте. В скролле он просто уезжает */
+.y-screen[data-collapsed] > .y-header .y-header__collapse { grid-template-rows: 0fr; opacity: 0; }
 .y-screen[data-collapsed] .y-header__on-scroll { opacity: 1; transform: none; }
 
 /* ─── Нижняя навигация ─── */
@@ -434,5 +436,3 @@
 /* ─── В конце файла: эти селекторы специфичнее прочих `… > *` (no-descending-specificity) ─── */
 /* Нажатие вкладки: сжимается иконка (переход — у .y-tab-bar__tab > *) */
 .y-tab-bar__tab:active > * { transform: scale(var(--gesture-press-scale)); }
-/* Шапка `back`: кнопки справа от свёрнутой пилюли — над ней */
-.y-header__row > .y-header__pill ~ * { position: relative; z-index: var(--layer-raised); }
