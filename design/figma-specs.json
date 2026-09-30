@@ -558,7 +558,7 @@
       }
     },
     {
-      "figma": "stamp · Tone=Secondary (64, иконка 29 −15°)",
+      "figma": "stamp · Tone=Secondary (64, иконка 24 −15°)",
       "story": "atoms-stamp--in-flow",
       "selector": ".y-stamp--S",
       "expect": {
