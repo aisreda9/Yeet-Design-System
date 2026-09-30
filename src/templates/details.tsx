@@ -63,6 +63,8 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
   return (
     <Screen
       className={cx('y-details', thumb != null && 'y-details--thumb')}
+      /* отдельный шаблон: шапка закреплена, фото сворачивается в миниатюру по data-collapsed — правило #170 сюда не относится */
+      pinHeader
       header={<Header type="bar" titleChip={titleChip} actions={actions} onBack={onBack} centerOnScroll={thumb} />}
       backdrop={
         <>

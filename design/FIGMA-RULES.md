@@ -11,7 +11,7 @@
 - **Оригиналы** — только чтение: **New App (Raw)** `551:2286` — исходные экраны дизайнера (эталон вида и якоря `flow-diff`, кроме опечаток и неверно выставленных параметров и цветов; с 30.09 кадры `1371:*`, прежняя страница Screens Design 0.1 `1306:22698` удалена) и старые компоненты Design System 0.1, Animations `354:17404`, Archive `352:12171`, Prod (Claude-old) `0:1`, коллекция «Yeet Design System».
 - **Компонент DS — закон, экран — пример использования.** Нет варианта в DS 0.2 — сначала вариант в Figma (или `figmaId: null` + `figmaWhy` в реестре), а не локальная правка экрана.
 - Код из `get_design_context` — **референс, не результат**: React + Tailwind с абсолютными значениями. Здесь нет Tailwind — всё переводится в существующие компоненты, классы `y-*` и токены.
-- Читать Figma можно всем и всегда. **Писать — только держа замок** (§6).
+- Читать Figma можно всем и всегда. **Писать — только держа замок своей секции** (§6).
 
 ## 1. Figma MCP
 
@@ -55,12 +55,36 @@ Animations `354:17404` не видна в `get_metadata` без `nodeId` — о�
 
 - Слои `tokens → atoms → molecules → organisms → templates → pages`; импорт только вниз и через `index.tsx` слоя (`import { Button } from '../atoms'`).
 - Новый компонент — **в свой файл** (`src/molecules/account.tsx`), экспорт — одной строкой в `index.tsx` слоя (горячий файл, `TEAM.md` §4).
-- Пропсы = свойства компонента Figma по смыслу, значения вариантов — в нижнем регистре (`variant="primary"`, `size="L"`). Таблица — «Старт / Процессы / Figma ↔ код».
+- Пропсы = свойства компонента Figma по смыслу, значения вариантов — в нижнем регистре (`variant="primary"`; `size="L"` — исключение). Правила именования — словарь ниже, примеры — «Старт / Процессы / Figma ↔ код».
 - Слот в Figma = `children` в коде. Инстансы внутри узла — существующие компоненты, а не новые `div`.
 - Функциональные компоненты, именованный экспорт, `XxxProps`, JSDoc на русском; нативные атрибуты — `...rest`, классы — `cx`. Утилиты — `src/utils` (`cx`, `plural`, `useFitScale`, `useSlidingPill`, `usePresence`, `useControllableState`, `gesture`, `haptic`, `VisuallyHidden`), не копировать.
 - Реестр `src/docs/registry.ts`: `figmaId` (node-id на `942:5666`) или `null` + `figmaWhy`; `status` по факту ([ADR 0007](./adr/0007-component-status.md)).
 - Доступность: зона нажатия 44 pt / 48 dp невидимым расширением, вид не меняется ([ADR 0001](./adr/0001-tap-target-44-48.md)); подпись у `IconButton` (`label`); декоративное — `aria-hidden`; фокус — `:focus-visible`.
 - История: Playground, все варианты, **«В флоу»** с реальными текстами экранов; интерактивное (клавиатура, фокус, ввод) — **play-функция** (`Keyboard` у Sheet / Dialog). `npm run qa` ждёт, пока play доиграет, и ловит ошибку.
+
+### Словарь свойств Figma ↔ код
+
+Как свойство компонента Figma становится пропсом (решение владельца, #147). Примеры проверены по `src/**/*.tsx`; таблица «Старт / Процессы / Figma ↔ код» (`src/docs/20-Figma.mdx`) — витрина, при расхождении прав этот словарь и код.
+
+| Figma                                                                                        | Код                                                                     | Примеры                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Вариант из одного слова                                                                      | значение в нижнем регистре                                              | `button` · Style=Primary → `variant="primary"`; `account-card` · Kind=Settings → `kind="settings"`; `chat-bubble` · From=User → `from="user"`                                              |
+| Составное значение варианта (`On Photo`, `On Accent`)                                        | camelCase, без пробелов                                                 | `hint` · Tone=On Photo → `tone="onPhoto"`; `status-bar` · Tone=On Accent → `tone="onAccent"`                                                                                               |
+| `Style`, `Type` (вид компонента)                                                             | `variant` (`type` — атрибут HTML, старые `type` помечены `@deprecated`) | `sheet` · Type=Panel → `variant="panel"`; `header` · Type=Bar → `variant="bar"`; `list-item` · Type=Radio → `variant="radio"`                                                              |
+| `Tone` как **роль** (`Default` / `Destructive` / `Danger`, `Primary` / `Secondary` у штампа) | `variant`                                                               | `dialog` · Tone=Destructive → `<Dialog variant="destructive">`; `stamp` · Tone=Secondary → `<Stamp variant="secondary">` (`tone` у них — `@deprecated`)                                    |
+| `Tone` как **окраска относительно фона** (`Default` / `On Photo` / `On Accent`)              | `tone`                                                                  | `hint`, `status-bar`. У `yeet` (Logo) Tone наследуется через `currentColor`, пропа нет                                                                                                     |
+| `Size` S / M / L / XL                                                                        | `size` — те же заглавные буквы (исключение из нижнего регистра)         | `button`, `icon-button` → `size="L"` (`ControlSize`); `stat-tile` · Size=L → `size="L"`; `snackbar` · Size=S → `size="S"`                                                                  |
+| `Show *` (boolean) без своего текста                                                         | boolean-проп без `Show`                                                 | `sheet` / `dialog` · Show Handle → `handle`; `product-card` · Show Like → `showLike` (исключение: `liked` занят состоянием)                                                                |
+| `Show *` + текстовое свойство                                                                | наличие пропа с содержимым, отдельного boolean нет                      | `list-item` · Show Description + Description → `description`; `product-card` · Show Discount + Discount → `discount`; `chip` · Show Color Dot → `colorDot`                                 |
+| `Show *` у элемента с действием                                                              | обработчик: есть обработчик — есть элемент                              | `sheet` · Show Close → `onClose`                                                                                                                                                           |
+| `Trailing` / `Right` (что справа)                                                            | флаги или `trailing` / данные справа; `None` — проп не задан            | `chip` · Trailing=Dropdown / Remove / None → `dropdown` / `removable` / ничего; `list-item` · Trailing=Text → `trailing="₽ · RUB"`; `input-bar` · Right=Photo → `image`                    |
+| `State` интерактивный (`Focus`, `Hover`, `Pressed`, `Disabled`)                              | не проп: псевдоклассы и атрибуты                                        | Focus → `:focus-visible` / `:focus-within` (`input-bar`, `link`); Disabled → атрибут `disabled`; загрузка → `loading` + `aria-busy`                                                        |
+| `State` / `Selected` смысловой                                                               | проп состояния + aria                                                   | `chip` · Selected → `selected` + `aria-pressed`; `list-item` · Type=Radio → `checked` + `aria-checked`; `stamp` · State=Done → `done` + `aria-pressed`; `chip` · State=Editing → `editing` |
+| Слот (`Content`, `Rows`, `Inputs`, `Cards`)                                                  | `children` или массив данных                                            | `list-group` (Rows) → `<ListGroup>{…}</ListGroup>`; `bar-chart` → `bars={[…]}`                                                                                                             |
+
+Новое свойство в Figma — сначала строка по этим правилам, потом проп; не вписывается — вопрос владельцу в #6.
+
+TODO: скрипт сверки свойств Figma ↔ пропсов (`get_design_context` по `figmaId` из `registry.ts` против типов `XxxProps`) — отдельная задача.
 
 ## 4. Стили, иконки, ассеты
 
@@ -85,7 +109,11 @@ Animations `354:17404` не видна в `get_metadata` без `nodeId` — о�
 
 ## 6. Запись в Figma
 
-1. **Замок.** Комментарий в issue «Координация» (#6): `🔒 Figma: <ветка>, страница/секция, что меняю`. Кто-то держит замок — ждать или договориться. Закончил — `🔓 Figma свободна` в том же issue.
+1. **Замок — на секцию** (`TEAM.md` §5). Комментарий в issue «Координация» (#6): `🔒 Figma: <ветка>, <страница> → <секция>, что меняю` — секция DS 0.2 верхнего уровня (Старт · Foundations · Atoms · Molecules · Organisms · Templates · Pages) или вложенная (`Pages/Экраны флоу · Light`, `Анимации`), либо `<страница> → вся`. Закончил — `🔓 Figma: <страница> → <секция> свободна` в том же issue.
+   - Разные секции — можно писать одновременно; в секцию под чужим замком — ждать или договориться.
+   - **Весь файл** (`🔒 Figma: <ветка>, весь файл, что меняю`) — для переменных коллекции «Yeet DS 2.0» и для переноса, переименования, добавления и удаления секций. Берётся, когда других замков нет; пока держится, другие не пишут.
+   - Строка в Changelog секции «Старт» (п. 5) — не повод брать «Старт»: только добавить свою строку в конец, одним вызовом. Править или переставлять чужие строки — под замком «Старт».
+   - **Лимит частоты MCP:** с Figma одновременно работают не больше 2 сессий (писатели и читатели вместе), вызовы — по одному, без параллельных.
 2. **Куда.** Только Design System 0.2 `942:5666` (включая экраны в Pages) и коллекция «Yeet DS 2.0». Оригиналы (§0) — только чтение.
 3. **Хук.** `.claude/hooks/figma-guard.sh` спрашивает подтверждение на удаления и запись в оригиналы. Не обходить — перестроить скрипт.
 4. **Как.** Всё интерактивное — из компонентов; цвета — переменные «Yeet DS 2.0», не hex; без `detachInstance`, `flatten`, «сырых» фреймов. Компонент — в секции своего уровня (Atoms / Molecules / Organisms / Templates, как `level` в `registry.ts`), под подписью с путём истории Storybook, по алфавиту; только компонент со всеми вариантами, без «В флоу» — пример использования живёт на экранах Pages. Проверка в Light и Dark.

@@ -5,7 +5,7 @@ import { ChipGroup, EmptyState, Field, InputGroup, List, ListItem, Note, Segment
 import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Row, Screen, Sticky } from '../templates';
 import { grid, shoes } from './data';
-import { SCROLLED, useScrolled } from './scroll';
+import { SCROLLED, SCROLLED_LIST, useScrolled } from './scroll';
 import './pages.css';
 
 /* Раздел: гардероб — вещи, образы, вишлист, архив, корзина. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -21,25 +21,30 @@ type Story = StoryObj<typeof meta>;
 
 const tabs = [{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }, { value: 'wishlist', label: 'Вишлист' }];
 
-export const Wardrobe: Story = {
-  name: 'Wardrobe / Items / Populated',
-  render: () => {
-    const [tab, setTab] = useState('items');
-    return (
-      <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />}>
-        <SegmentControl value={tab} onChange={setTab} segments={tabs} />
-        <Sticky>
-          <Row gap={4}>
-            <IconButton icon="search" label="Поиск" size="S" />
-            <IconButton icon="archive" label="Архив" size="S" />
-            <ChipGroup chips={[{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }, { label: 'Теги', dropdown: true }]} />
-          </Row>
-        </Sticky>
-        <Grid>{[...grid, ...grid].map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
-      </Screen>
-    );
-  },
-};
+/**
+ * Гардероб: вещи. При скролле (#170) заголовок и сегмент уезжают, ряд фильтров прилипает под статус-бар (y70),
+ * под ним — затухание (Figma `1205:13362` Wardrobe / Items / Populated / Scrolled).
+ */
+function WardrobeItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
+  const [tab, setTab] = useState('items');
+  const ref = useScrolled(scrollTo);
+  return (
+    <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} scrollRef={ref}>
+      <SegmentControl value={tab} onChange={setTab} segments={tabs} />
+      <Sticky>
+        <Row gap={4}>
+          <IconButton icon="search" label="Поиск" size="S" />
+          <IconButton icon="archive" label="Архив" size="S" />
+          <ChipGroup chips={[{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }, { label: 'Теги', dropdown: true }]} />
+        </Row>
+      </Sticky>
+      <Grid>{[...grid, ...grid].map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
+    </Screen>
+  );
+}
+
+export const Wardrobe: Story = { name: 'Wardrobe / Items / Populated', render: () => <WardrobeItemsScreen /> };
+export const WardrobeScrolled: Story = { name: 'Wardrobe / Items / Populated / Scrolled', render: () => <WardrobeItemsScreen scrollTo={SCROLLED_LIST} /> };
 
 export const WardrobeEmpty: Story = {
   name: 'Wardrobe / Items / Empty',
@@ -145,20 +150,24 @@ function WardrobeItemScreen({ scrolled }: { scrolled?: boolean }) {
 export const WardrobeItemDetails: Story = { name: 'Wardrobe / Item Details', render: () => <WardrobeItemScreen /> };
 export const WardrobeItemDetailsScrolled: Story = { name: 'Wardrobe / Item Details / Scrolled', render: () => <WardrobeItemScreen scrolled /> };
 
-export const Wishlist: Story = {
-  name: 'Wishlist / Items / Populated',
-  render: () => (
-    <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />}>
+/** Вишлист: вещи. Фильтров нет — при скролле не прилипает ничего, кроме статус-бара (#170, Figma `1205:13506`). */
+function WishlistItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
+  const ref = useScrolled(scrollTo);
+  // прокрученное состояние — с длинным списком, иначе экрану некуда скроллиться
+  const list = scrollTo ? [...shoes, ...shoes, ...shoes] : shoes;
+  return (
+    <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} scrollRef={ref}>
       <SegmentControl value="wishlist" segments={tabs} />
-      <Sticky>
-        <SegmentControl size="S" fit value="items" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
-      </Sticky>
+      <SegmentControl size="S" fit value="items" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
       <Grid rowGap={24}>
-        {shoes.map((n, i) => <ProductCard key={i} kind="shoe" name={n} price={i ? '14 300 ₽' : '10 400 ₽'} showLike={false} />)}
+        {list.map((n, i) => <ProductCard key={i} kind="shoe" name={n} price={i % shoes.length ? '14 300 ₽' : '10 400 ₽'} showLike={false} />)}
       </Grid>
     </Screen>
-  ),
-};
+  );
+}
+
+export const Wishlist: Story = { name: 'Wishlist / Items / Populated', render: () => <WishlistItemsScreen /> };
+export const WishlistScrolled: Story = { name: 'Wishlist / Items / Scrolled', render: () => <WishlistItemsScreen scrollTo={SCROLLED_LIST} /> };
 
 /** Детали вещи из вишлиста (Figma `1371:43300 → 1371:43256`): описание, образы, BottomBar закреплён. */
 function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
@@ -302,9 +311,8 @@ export const WishlistOutfits: Story = {
   render: () => (
     <Screen header={wardrobeHeader} bottom={wardrobeNav}>
       <SegmentControl value="wishlist" segments={tabs} />
-      <Sticky>
-        <SegmentControl size="S" fit value="outfits" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
-      </Sticky>
+      {/* фильтров нет — ничего не прилипает, переключатель уезжает с контентом (#170, Figma 1205:13506) */}
+      <SegmentControl size="S" fit value="outfits" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
       <div className="y-stack-8">{looks.map((items, i) => <OutfitCollage key={i} items={items} />)}</div>
     </Screen>
   ),

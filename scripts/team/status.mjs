@@ -31,6 +31,8 @@ const mine = new Set([
 ]);
 
 const now = Date.now();
+// Порог «брошенной» ветки: без коммитов дольше staleHours (TEAM.md §3 п. 7). staleDays — старое поле, запасное.
+const staleHours = config.staleHours ?? (config.staleDays != null ? config.staleDays * 24 : 4);
 const branches = lines(git('for-each-ref', '--format=%(refname:short)|%(committerdate:unix)|%(subject)', 'refs/remotes/origin'))
   .map((l) => { const [ref, ts, ...s] = l.split('|'); return { ref, name: ref.replace(/^origin\//, ''), days: (now / 1000 - Number(ts)) / 86400, subject: s.join('|') }; })
   .filter((b) => b.ref !== base && b.ref !== 'origin/HEAD' && b.ref !== 'origin' && b.name !== current)
@@ -39,7 +41,7 @@ const branches = lines(git('for-each-ref', '--format=%(refname:short)|%(committe
   .map((b) => {
     const files = lines(git('diff', '--name-only', `${base}...${b.ref}`));
     const overlap = files.filter((f) => mine.has(f));
-    return { ...b, files, zones: zonesOf(files), overlap };
+    return { ...b, files, zones: zonesOf(files), overlap, stale: b.days * 24 > staleHours };
   })
   .sort((a, b) => a.days - b.days);
 
@@ -50,7 +52,7 @@ out.push(`Ты на ветке \`${current}\`, твои зоны: ${mine.size ? 
 
 if (!branches.length) out.push('Других активных веток нет.');
 for (const b of branches) {
-  const stale = b.days > config.staleDays ? ' · ⚠ заброшена?' : '';
+  const stale = b.stale ? ` · ⚠ брошена (нет коммитов > ${staleHours} ч, не в лимите зоны — можно вытеснить с пометкой в issue)` : '';
   out.push(`- \`${b.name}\` · ${age(b.days)} · зоны: ${b.zones.join(', ') || '—'} · «${b.subject}»${stale}`);
   if (b.overlap.length) out.push(`  ↳ пересечение с тобой: ${b.overlap.map((f) => `\`${f}\``).join(', ')}`);
   if (!brief) {
@@ -99,10 +101,11 @@ if (soft.length) out.push('', `Ещё ${soft.length} пар веток трог�
 // Лимиты из team.json: перегруженные зоны и слишком широкие ветки
 const limits = config.limits;
 if (limits) {
+  // Брошенные ветки лимит зоны не занимают (TEAM.md §7 п. 2), ширину ветки проверяем у всех
   const all = [...branches, ...(mine.size ? [{ name: `${current} (ты)`, zones: zonesOf([...mine]) }] : [])];
   const warns = [];
   for (const z of limits.limitedZones ?? []) {
-    const inZone = all.filter((b) => b.zones.includes(z));
+    const inZone = all.filter((b) => !b.stale && b.zones.includes(z));
     if (inZone.length > limits.maxBranchesPerZone)
       warns.push(`- зона \`${z}\`: ${inZone.length} веток при лимите ${limits.maxBranchesPerZone} (${inZone.map((b) => b.name).join(', ')}) — новую не начинай, встань в очередь в issue`);
   }
