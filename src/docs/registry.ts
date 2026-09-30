@@ -38,7 +38,7 @@ export const registry: Entry[] = [
   { code: 'Icon', figma: 'ui-icons/*', figmaId: '942:5714', level: 'Atoms', story: 'Atoms/Icon', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'Logo', figma: 'yeet', figmaId: '1180:20027', level: 'Atoms', story: 'Atoms/Logo', note: 'Size: L 136×88 / S 61×40; Tone: Default / On Dark / Muted — цвет наследуется (currentColor), пропа tone нет', status: 'stable' },
   { code: 'Button', figma: 'button', figmaId: '942:6953', level: 'Atoms', story: 'Atoms/Button', status: 'stable' },
-  { code: 'IconButton', figma: 'icon-button', figmaId: '942:7068', level: 'Atoms', story: 'Atoms/IconButton', status: 'stable' },
+  { code: 'IconButton', figma: 'icon-button', figmaId: '942:7068', level: 'Atoms', story: 'Atoms/IconButton', note: 'Icon Size ↔ iconSize (20 / 24; по умолчанию 20 у S, 24 у остальных)', status: 'stable' },
   { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp', status: 'stable' },
   { code: 'Badge', figma: 'badge', figmaId: '942:7125', level: 'Atoms', story: 'Atoms/Badge', status: 'stable' },
   { code: 'Avatar', figma: 'avatar', figmaId: '968:3666', level: 'Atoms', story: 'Atoms/Avatar', note: 'Content: Empty / Initial / Photo', status: 'stable' },
