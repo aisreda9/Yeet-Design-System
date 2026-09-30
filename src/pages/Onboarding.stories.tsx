@@ -65,7 +65,7 @@ export const SignIn: Story = {
       </Stack>
       <Divider label="или" />
       <Button variant="secondary" size="L" leftIcon="apple" fullWidth>Войти с Apple</Button>
-      <p className="y-caption y-text--secondary y-legal">Продолжая, вы соглашаетесь <br />с <Link href="#">политикой конфиденциальности</Link> <br />и <Link href="#">условиями использования</Link></p>
+      <p className="y-caption y-text--secondary y-legal">Продолжая, ты соглашаешься <br />с <Link href="#">политикой конфиденциальности</Link> <br />и <Link href="#">условиями использования</Link></p>
     </Screen>
   ),
 };

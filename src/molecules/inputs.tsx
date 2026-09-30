@@ -130,6 +130,8 @@ export type InputBarProps = Omit<ComponentPropsWithRef<'div'>, 'onChange' | 'def
   send?: { label: string; onClick?: () => void };
   /** L — 52 (поле поиска на экране), по умолчанию 48 (в шапке). */
   size?: 'M' | 'L';
+  /** Состояние фокуса без фокуса (экраны флоу «Query Focused»): обводка акцентом и каретка в начале пустого поля. */
+  focused?: boolean;
 };
 
 /**
@@ -137,12 +139,13 @@ export type InputBarProps = Omit<ComponentPropsWithRef<'div'>, 'onChange' | 'def
  * В фокусе поле обводится акцентом 1.5 (Figma: input-bar · State=Focus), каретка — акцентная.
  * **Контексты:** поиск («Назад» + поле + поиск по фото; после выбора фото справа — его превью 48), чат со стилистом (поле + «Отправить» Primary), поиск по гардеробу.
  */
-export function InputBar({ placeholder, value, onChange, fieldIcon, leading, trailing, send, size = 'M', className, ...rest }: InputBarProps) {
+export function InputBar({ placeholder, value, onChange, fieldIcon, leading, trailing, send, size = 'M', focused, className, ...rest }: InputBarProps) {
   return (
-    <div className={cx('y-input-bar', send && 'y-input-bar--chat', size === 'L' && 'y-input-bar--l', className)} {...rest}>
+    <div className={cx('y-input-bar', send && 'y-input-bar--chat', size === 'L' && 'y-input-bar--l', focused && 'is-focused', className)} {...rest}>
       {leading && <SideButton action={leading} size={size} />}
       <label className="y-input-bar__field">
         {fieldIcon && <Icon name={fieldIcon} />}
+        {focused && !value && <span className="y-input-bar__caret" aria-hidden />}
         <input className="y-field__input" placeholder={placeholder} value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={!onChange} />
         {/* флоу Search / Text / Results: очистка «×» 20 серым, пока в поле есть текст */}
         {value && !send && <button type="button" className="y-input-bar__clear" aria-label="Очистить" onClick={() => onChange?.('')}><Icon name="cross" size={20} /></button>}
