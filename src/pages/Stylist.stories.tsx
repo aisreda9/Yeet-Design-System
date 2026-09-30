@@ -107,7 +107,7 @@ export const TripDetails: Story = {
   ),
 };
 
-/** «Удиви меня»: образы закончились (Figma `798:1783`, дубль `798:2034`; в макете оба кадра названы «Default»). */
+/** «Удиви меня»: образы закончились (Figma `1371:42727`, дубль `1371:42753`; в макете оба кадра названы «Default»). */
 export const OutfitOfTheDayEmpty: Story = {
   name: 'Stylist / Outfit of the Day / No More Outfits',
   render: () => (
@@ -127,7 +127,7 @@ const stylistLooks: PagerLook[] = [
   { id: 'beige', name: 'бежевый жакет', items: [{ kind: 'outerwear', x: 36, y: 36, size: 120, color: 'beige' }, { kind: 'bottom', x: 68, y: 58, size: 110, color: 'blue' }, { kind: 'shoe', x: 34, y: 80, size: 64, color: 'white' }] },
 ];
 
-/** «Удиви меня» (Figma `798:1741`): стопка образов с превью 150, «Сохранить» и «Не нравится» — следующий образ. */
+/** «Удиви меня» (Figma `1371:42686`): стопка образов с превью 150, «Сохранить» и «Не нравится» — следующий образ. */
 function SurpriseScreen() {
   const [index, setIndex] = useState(1);
   const [saved, setSaved] = useState(false);
@@ -150,7 +150,7 @@ export const OutfitOfTheDay: Story = { name: 'Stylist / Outfit of the Day / Defa
 const occasions = ['Прогулка', 'Вечеринка', 'Офис', 'На каждый день', 'Свидание', 'Вечеринка ', 'Офис '];
 
 /**
- * «С чем носить» (Figma `463:1534`, в макете кадр назван «Stylist / Trips / List»): лента образов с одной вещью,
+ * «С чем носить» (Figma `1371:42779`, в макете кадр назван «Stylist / Trips / List»): лента образов с одной вещью,
  * под ней поводы — чипсы и свайп ведут один индекс, ниже вещи из образа.
  */
 function WhatToWearScreen() {

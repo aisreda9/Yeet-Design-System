@@ -71,14 +71,14 @@ private val CollapseAfter = 24.dp
 /** …и разворачивается, только когда скролл вернулся ниже 8 dp: шапка меняется, и без запаса морф дрожал бы на границе. */
 private val ExpandBelow = 8.dp
 
-/** Миниатюра в шапке — 48, как на экранах DS 2.0 (`349:10430`, web: `photoCollapse.thumb`). */
+/** Миниатюра в шапке — 48, как на экранах DS 2.0 (`1371:41329`, web: `photoCollapse.thumb`). */
 private val Thumb = YeetSize.controlM
 
 /** Панель не короче экрана + 120 и уходит под нижнюю панель: свёрнутое состояние держится при малом контенте (web: `.y-details .y-sheet--panel`). */
 private val PanelOverscroll = 120.dp
 
 /**
- * Детали вещи и образа (Wardrobe / Item Details `349:9258 → 349:9976`, Outfit Details `349:8637 → 349:10430`,
+ * Детали вещи и образа (Wardrobe / Item Details `1371:41024 → 1371:41076`, Outfit Details `1371:41156 → 1371:41329`,
  * Animations «new things» `354:17405 → 354:17449`). React: `<DetailsScreen media thumb title titleChip actions onBack bottom stamp>`.
  *
  * В покое: шапка `Bar`, под ней фото — квадрат во всю ширину минус поля, под фото — панель деталей (`Sheet` Panel).
@@ -99,7 +99,7 @@ private val PanelOverscroll = 120.dp
  * @param titleChip пилюля по центру шапки в покое («Новая вещь»).
  * @param actions кнопки справа в шапке, по умолчанию — «Ещё».
  * @param bottom закреплённый низ: `BottomBar`. Панель уходит под него, контент получает отступ по его высоте.
- * @param stamp штамп «Надеть»: закреплён справа внизу поверх контента и не едет со скроллом (`349:8637`).
+ * @param stamp штамп «Надеть»: закреплён справа внизу поверх контента и не едет со скроллом (`1371:41156`).
  * @param scrollState скролл панели: по нему считается сворачивание (как `scrollTop` в вебе).
  * @param systemBarsPadding отступы под статус-бар (шапка) и навигацию (штамп); `false` — экран внутри другого контейнера.
  */

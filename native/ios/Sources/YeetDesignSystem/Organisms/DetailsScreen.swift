@@ -5,8 +5,8 @@ private struct YeetDetailsOffsetKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
-/// Детали вещи и образа (React: `DetailsScreen` + `usePhotoCollapse`; Figma: Wardrobe / Item Details `349:9258 → 349:9976`,
-/// Outfit Details `349:8637 → 349:10430`, Animations «new things» `354:17405 → 354:17449`).
+/// Детали вещи и образа (React: `DetailsScreen` + `usePhotoCollapse`; Figma: Wardrobe / Item Details `1371:41024 → 1371:41076`,
+/// Outfit Details `1371:41156 → 1371:41329`, Animations «new things» `354:17405 → 354:17449`).
 ///
 /// В покое: фото во всю ширину минус поля в 20 под шапкой, под ним панель деталей (`YeetSheet(type: .panel)`).
 /// После 24 pt скролла (обратно — при ≤ 8: гистерезис, чтобы шапка не дрожала на границе):

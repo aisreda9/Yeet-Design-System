@@ -15,7 +15,7 @@ public struct YeetCropRect: Equatable {
         self.height = height
     }
 
-    /// Рамка из флоу Search / Photo / Crop `261:1590`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315.
+    /// Рамка из флоу Search / Photo / Crop `1371:38089`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315.
     public static let `default` = YeetCropRect(x: 20 / 393, y: 315 / 852, width: 353 / 393, height: 226 / 852)
 
     /// Масштаб вокруг центра.
@@ -38,7 +38,7 @@ private struct YeetCropCornerShape: Shape {
     }
 }
 
-/// Рамка обрезки фото (React: `CropFrame`; Figma: Search / Photo / Crop `261:1590`): снаружи — затемнение `bgOverlay`,
+/// Рамка обрезки фото (React: `CropFrame`; Figma: Search / Photo / Crop `1371:38089`): снаружи — затемнение `bgOverlay`,
 /// по углам — белые уголки. Рамку двигают пальцем, углы тянут (зона 44), двумя пальцами масштабируют вокруг центра;
 /// рамка не выходит за фото и не меньше `minSide`. Начало жеста — хаптика `threshold`.
 ///

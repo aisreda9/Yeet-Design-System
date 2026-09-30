@@ -5,7 +5,7 @@ import { haptic } from '../utils/haptic';
 import { useReducedMotion } from '../motion';
 
 /**
- * Выбор вещей в образ (Outfit Creation / Item Selection `414:1459`, пустой `414:1541`): панель с секциями «Верх / Низ / Обувь»,
+ * Выбор вещей в образ (Outfit Creation / Item Selection `1371:41906`, пустой `1371:41989`): панель с секциями «Верх / Низ / Обувь»,
  * между секциями — разделитель с полями 20. Фон `elevated`, радиус сверху, тень — как у панели шторки.
  */
 export type ItemSlotsProps = ComponentPropsWithRef<'div'>;

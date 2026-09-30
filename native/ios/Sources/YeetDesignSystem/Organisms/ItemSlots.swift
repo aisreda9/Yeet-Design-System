@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Выбор вещей в образ (React: `ItemSlots`; Figma: Outfit Creation / Item Selection `414:1459`, пустой `414:1541`):
+/// Выбор вещей в образ (React: `ItemSlots`; Figma: Outfit Creation / Item Selection `1371:41906`, пустой `1371:41989`):
 /// панель с секциями «Верх / Низ / Обувь», между секциями — разделитель во всю ширину. Фон `bgElevated`, радиус 32 сверху, тень.
 public struct YeetItemSlots<Content: View>: View {
     private let content: Content

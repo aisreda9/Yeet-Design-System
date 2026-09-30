@@ -48,7 +48,7 @@
   position: absolute; z-index: var(--layer-bar); left: var(--space-20); top: 118px; width: 353px; transform-origin: top left; /* stylelint-disable-line unit-disallowed-list -- фото 353 в 118 от верха кадра из Figma Animations */
   transition: transform var(--motion-collapse);
 }
-/* миниатюра 48 по центру строки кнопок шапки — экран 349:10430 (в кадре Animations 354:17449 — 52) */
+/* миниатюра 48 по центру строки кнопок шапки — экран 1371:41329 (в кадре Animations 354:17449 — 52) */
 .y-collapse.is-collapsed .y-collapse__photo { transform: translate(153px, -48px) scale(0.136); } /* stylelint-disable-line unit-disallowed-list -- сдвиг миниатюры в шапку из кадра Figma */
 .y-collapse__scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
 .y-collapse__panel {

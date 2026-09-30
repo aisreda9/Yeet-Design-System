@@ -1,6 +1,6 @@
 import type { ProseProps } from '../templates';
 
-/** Тексты Legal из Figma (`513:6603`, `513:6707`), май 2026. */
+/** Тексты Legal из Figma (`1371:43055`, `1371:43118`), май 2026. */
 
 const mail = 'hello@yeetstyle.ru';
 

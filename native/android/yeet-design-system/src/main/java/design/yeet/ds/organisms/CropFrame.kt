@@ -70,7 +70,7 @@ import kotlin.math.roundToInt
 @Immutable
 data class CropRect(val x: Float, val y: Float, val w: Float, val h: Float) {
     companion object {
-        /** Рамка из флоу Search / Photo / Crop `261:1590`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
+        /** Рамка из флоу Search / Photo / Crop `1371:38089`: 353 × 226 в 20 от краёв экрана 393 × 852, верх на 315. */
         val Default = CropRect(20f / 393f, 315f / 852f, 353f / 393f, 226f / 852f)
     }
 }
@@ -91,7 +91,7 @@ private const val ActiveRingAlpha = 0.4f
 private enum class CropMode { Move, NW, NE, SW, SE }
 
 /**
- * Рамка обрезки фото (Search / Photo / Crop `261:1590`). React: `<CropFrame src value onChange hint min>`.
+ * Рамка обрезки фото (Search / Photo / Crop `1371:38089`). React: `<CropFrame src value onChange hint min>`.
  * Снаружи рамки — затемнение `bgOverlay`, по углам — белые уголки 2 dp (радиус 20). Рамку двигают пальцем, углы тянут
  * (противоположный угол стоит на месте), двумя пальцами масштабируют вокруг центра; рамка не выходит за фото
  * и не меньше `min`. Начало жеста — хаптика `Threshold`. Геометрия в долях контейнера — рамка остаётся на месте

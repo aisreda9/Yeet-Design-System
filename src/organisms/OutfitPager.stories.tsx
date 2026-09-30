@@ -58,8 +58,8 @@ const meta: Meta<Args> = {
       description: {
         component:
           'Пейджер образов: свайп по коллажу листает, дальше 30 % или бросок — следующий, на краях — резинка (`useSwipePager`). ' +
-          '**Стопка** (`axis="y"`, главная `232:1355`, «Удиви меня» `798:1741`): коллаж 353, соседние образы — превью 96 (или 150) в 20 над и под ним, смена на пружине `--motion-swap`; тап по превью — к нему. ' +
-          '**Лента** (`axis="x"`, «С чем носить» `463:1534`): страницы 353 через 20, соседние за краем экрана, `--motion-page`; вертикальный жест остаётся скроллу. ' +
+          '**Стопка** (`axis="y"`, главная `1371:36589`, «Удиви меня» `1371:42686`): коллаж 353, соседние образы — превью 96 (или 150) в 20 над и под ним, смена на пружине `--motion-swap`; тап по превью — к нему. ' +
+          '**Лента** (`axis="x"`, «С чем носить» `1371:42779`): страницы 353 через 20, соседние за краем экрана, `--motion-page`; вертикальный жест остаётся скроллу. ' +
           'Слоты поверх текущего коллажа: `weather` (WeatherCard tilt), `stamp` (звезда поворачивается на 180° при смене), `skip` («Не нравится»). ' +
           'Клавиатура: кнопки «Предыдущий / Следующий образ» в порядке Tab (видны при фокусе), стрелки, Home, End; смена объявляется через `aria-live`. ' +
           'При «Уменьшении движения» палец ведёт 1 : 1, а доводка и смена мгновенные (токены `--motion-*` = 1ms). ' +
@@ -133,22 +133,22 @@ const flowDoc = (story: string) => ({ controls: { disable: true }, docs: { descr
 export const InFlow: Story = {
   name: 'В флоу: главная',
   tags: ['bare'],
-  parameters: flowDoc('Outfits / Everyday / Sunny `232:1355`: стопка, превью 96, погода и штамп «Надеть». Rain Alert `295:488` — тот же экран с `WeatherCard alert`.'),
-  render: () => <Usage screen="Outfits / Everyday / Sunny" note="232:1355"><TodayFlow /></Usage>,
+  parameters: flowDoc('Outfits / Everyday / Sunny `1371:36589`: стопка, превью 96, погода и штамп «Надеть». Rain Alert `1371:36745` — тот же экран с `WeatherCard alert`.'),
+  render: () => <Usage screen="Outfits / Everyday / Sunny" note="1371:36589"><TodayFlow /></Usage>,
 };
 
 export const InFlowSurprise: Story = {
   name: 'В флоу: «Удиви меня»',
   tags: ['bare'],
-  parameters: flowDoc('Stylist / Outfit of the Day `798:1741`: стопка с превью 150, «Сохранить» и «Не нравится».'),
-  render: () => <Usage screen="Stylist / Outfit of the Day" note="798:1741"><SurpriseFlow /></Usage>,
+  parameters: flowDoc('Stylist / Outfit of the Day `1371:42686`: стопка с превью 150, «Сохранить» и «Не нравится».'),
+  render: () => <Usage screen="Stylist / Outfit of the Day" note="1371:42686"><SurpriseFlow /></Usage>,
 };
 
 export const InFlowTrips: Story = {
   name: 'В флоу: «С чем носить»',
   tags: ['bare'],
-  parameters: flowDoc('Stylist / Trips / List `463:1534`: лента образов, под ней поводы — чипсы и свайп ведут один индекс.'),
-  render: () => <Usage screen="Stylist / Trips / List" note="463:1534"><TripsFlow /></Usage>,
+  parameters: flowDoc('Stylist / Trips / List `1371:42779`: лента образов, под ней поводы — чипсы и свайп ведут один индекс.'),
+  render: () => <Usage screen="Stylist / Trips / List" note="1371:42779"><TripsFlow /></Usage>,
 };
 
 /** Клавиатура: Tab до кнопки «Следующий образ», Enter и стрелки листают, объявление через aria-live. */

@@ -28,7 +28,7 @@ const meta: Meta<Args> = {
     docs: {
       description: {
         component:
-          'Рамка обрезки фото (Search / Photo / Crop `261:1590`): вне рамки — затемнение `--color-bg-overlay`, по углам белые уголки 32 × 2 с радиусом 20, подсказка `Hint onPhoto` в 20 над кнопкой L. ' +
+          'Рамка обрезки фото (Search / Photo / Crop `1371:38089`): вне рамки — затемнение `--color-bg-overlay`, по углам белые уголки 32 × 2 с радиусом 20, подсказка `Hint onPhoto` в 20 над кнопкой L. ' +
           'Рамку двигают пальцем, углы тянут (зона захвата 44), двумя пальцами — масштаб вокруг центра. Рамка не выходит за фото и не меньше `min`. ' +
           'Геометрия — в долях контейнера (`CropRect` 0…1), `cropDefault` — рамка 353 × 226 как во флоу. Клавиатура: Tab на рамку, стрелки двигают (Shift — крупнее), + / − масштабируют.',
       },
@@ -56,9 +56,9 @@ export const Variants: Story = {
 export const InFlow: Story = {
   name: 'В флоу',
   tags: ['bare'],
-  parameters: { controls: { disable: true }, docs: { description: { story: 'Search / Photo / Crop `261:1590`: фото на весь экран, статус-бар и «Назад» поверх, внизу «Найти похожее». Экран `PhotoCrop` переводит на компонент задача screens (#30).' } } },
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Search / Photo / Crop `1371:38089`: фото на весь экран, статус-бар и «Назад» поверх, внизу «Найти похожее». Экран `PhotoCrop` переводит на компонент задача screens (#30).' } } },
   render: () => (
-    <Usage screen="Search / Photo / Crop" note="261:1590">
+    <Usage screen="Search / Photo / Crop" note="1371:38089">
       <div style={{ position: 'relative', width: 'var(--screen-width)', height: 'var(--screen-height)', borderRadius: 56, overflow: 'hidden' }}>
         <CropFrame src={demoPhoto} />
         <div style={{ position: 'absolute', left: 0, right: 0, top: 0, zIndex: 3 }}><StatusBar tone="onPhoto" /></div>

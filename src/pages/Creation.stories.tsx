@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 export const NewItem: Story = {
   name: 'New Item / Removing Background',
   render: () => (
-    // как во флоу: детали в панели под фото, заголовок H2; при скролле фото уходит в миниатюру вместо пилюли (349:10770)
+    // как во флоу: детали в панели под фото, заголовок H2; при скролле фото уходит в миниатюру вместо пилюли (1371:40849)
     <DetailsScreen media={<PhotoArea><LoadingState label="Удаляем фон" /></PhotoArea>} titleChip="Новая вещь" actions={[]} title="Детали новой вещи">
       <InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup>
       <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
@@ -34,7 +34,7 @@ const steps = (value: string, size: 'S' | 'M' = 'S') => (
   <SegmentControl size={size} fit={size === 'M'} value={value} segments={[{ value: 'items', icon: 'wardrobe', ariaLabel: 'Гардероб' }, { value: 'canvas', icon: 'collage', ariaLabel: 'Коллаж' }, { value: 'info', icon: 'info', ariaLabel: 'Описание' }]} />
 );
 
-/** Выбор вещей (Figma `414:1459`, пустой `414:1541`): панель `ItemSlots`, выбранная вещь по центру ряда, «+» в конце. */
+/** Выбор вещей (Figma `1371:41906`, пустой `1371:41989`): панель `ItemSlots`, выбранная вещь по центру ряда, «+» в конце. */
 function ItemSelectionScreen({ empty }: { empty?: boolean }) {
   return (
     <Screen header={<Header type="bar" center={steps('items', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={empty ? undefined : <BottomBar label="Далее" />} flush>

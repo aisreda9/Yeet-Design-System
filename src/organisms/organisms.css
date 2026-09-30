@@ -334,8 +334,8 @@
 .y-slot__row > .y-slot__add:not(:only-child) { justify-items: start; padding-left: 22px; } /* флоу: «+» в 22 от края слота, рядом с карточкой */ /* stylelint-disable-line unit-disallowed-list -- «+» в 22 от края слота (Figma) */
 
 /* ─── OutfitPager (#25) ─── */
-/* Геометрия Figma: коллаж 353; стопка — превью в 20 над и под коллажем: 96 на главной (232:1355, scale 0.272), 150 в «Удиви меня» (798:1741);
-   лента (463:1534) — шаг 353 + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
+/* Геометрия Figma: коллаж 353; стопка — превью в 20 над и под коллажем: 96 на главной (1371:36589, scale 0.272), 150 в «Удиви меня» (1371:42686);
+   лента (1371:42779) — шаг 353 + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
 .y-outfit-pager {
   --pager-size: 353px; --pager-top: 0px; --pager-bleed: var(--space-20); /* stylelint-disable-line unit-disallowed-list -- коллаж 353 из Figma; 0px — длина для calc() */
   position: relative; flex: none; width: var(--pager-size); max-width: 100%; margin-inline: auto;

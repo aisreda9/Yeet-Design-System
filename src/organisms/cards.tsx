@@ -251,7 +251,7 @@ export function WeatherCard({ temperature, description, weather = 'sunny', icon,
 }
 
 /** Сообщение в чате со стилистом. `from="user"` — сообщение пользователя (blue, справа). Figma: chat-bubble · From. */
-/** Аватар ИИ-стилиста 64: иллюстрация из флоу Stylist (`413:846`, `699:2858`). Декоративный — имя стилиста уже в тексте. */
+/** Аватар ИИ-стилиста 64: иллюстрация из флоу Stylist (`1371:38928`, `1371:39070`). Декоративный — имя стилиста уже в тексте. */
 export type StylistAvatarProps = Omit<ComponentPropsWithRef<'img'>, 'src' | 'width' | 'height'> & { /** Сторона в px. */ size?: number };
 
 export function StylistAvatar({ size = 64, className, ...rest }: StylistAvatarProps) {
