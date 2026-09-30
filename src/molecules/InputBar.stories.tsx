@@ -22,6 +22,12 @@ export const Focus: Story = {
   play: async ({ canvasElement }) => { canvasElement.querySelector('input')?.focus(); },
 };
 
+/** `focused` — состояние фокуса статично, без фокуса и мигания: для экранов флоу «Query Focused» и скриншот-тестов. */
+export const Focused: Story = {
+  name: 'Фокус (focused)',
+  args: { value: '', placeholder: 'Название вещи', trailing: undefined, focused: true },
+};
+
 export const PhotoPreview: Story = {
   name: 'Превью фото справа',
   args: { value: '', trailing: { icon: 'search-by-image', label: 'Выбранное фото', image: demoPhoto } },
