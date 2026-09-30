@@ -40,7 +40,7 @@ export const States: Story = {
       <Usage screen="default"><p className="y-caption y-text--secondary">и <Link href="#terms">условиями использования</Link></p></Usage>
       <Usage screen="focus" note="Tab: обводка accent"><p className="y-caption y-text--secondary">и <Focused /></p></Usage>
       <Usage screen="visited" note="цвет не меняется"><p className="y-caption y-text--secondary">и <Link href="">условиями использования</Link></p></Usage>
-      <Usage screen="на Body" note="цвет текста вокруг"><p className="y-body">Напишите на <Link href="mailto:hello@yeet.app">hello@yeet.app</Link></p></Usage>
+      <Usage screen="на Body" note="цвет текста вокруг"><p className="y-body">Напиши на <Link href="mailto:hello@yeet.app">hello@yeet.app</Link></p></Usage>
     </UsageGrid>
   ),
 };

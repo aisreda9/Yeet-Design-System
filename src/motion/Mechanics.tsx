@@ -43,7 +43,7 @@ export function SheetDemo() {
         <List>{['Все', 'Весна', 'Лето', 'Осень', 'Зима'].map((s) => <ListItem key={s} type="radio" label={s} checked={s === season} onClick={() => setSeason(s)} />)}</List>
       </Sheet>
     ) : open === 'dialog' ? (
-      <Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда" cancel="Отмена" confirm="Очистить" onCancel={close} onConfirm={close} />
+      <Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда" cancel="Отменить" confirm="Очистить" onCancel={close} onConfirm={close} />
     ) : undefined;
   return (
     <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} overlay={layer && <Overlay onClose={close}>{layer}</Overlay>}>
@@ -147,7 +147,7 @@ export function ProfileDemo() {
   const close = () => setOpen(undefined);
   const layer =
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={(id) => { close(); setAccounts((a) => [...a.filter((x) => x.id === id), ...a.filter((x) => x.id !== id)]); }} onAdd={close} onEdit={close} onSettings={close} /> :
-    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(close, motionMs('--motion-select')); }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
+    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(close, motionMs('--motion-select')); }} chips={['За всё время', 'За полгода', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
     <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={layer && <Overlay onClose={close}>{layer}</Overlay>}>
       <Row gap={0} align="center" justify="space-between">

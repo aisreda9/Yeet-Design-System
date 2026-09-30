@@ -14,7 +14,7 @@ type Action = { icon: IconName; label: string; onClick?: () => void };
 
 type HeaderFields = {
   large: { title: string; subtitle?: ReactNode; /** Вторая строка H1 акцентом с раскрывашкой: «на каждый день ⌃» (выбор повода на главной). */ accent?: { label: string; onClick?: () => void }; action?: Action };
-  bar: { /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8-13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] };
+  bar: { /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8–13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] };
   back: { title: string; /** Подзаголовок Body серым через 12 под заголовком (Password Recovery, First Item Prompt). */ subtitle?: ReactNode; onBack?: () => void; /** Текстовое действие справа — Tertiary M с отступами 20: «Пропустить». */ textAction?: { label: string; onClick?: () => void } };
   search: { query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string };
 };
@@ -97,7 +97,7 @@ export function Header(allProps: HeaderProps) {
         {props.variant === 'search' && (
           <>
             <InputBar
-              placeholder={props.placeholder ?? 'Уточните текстом'}
+              placeholder={props.placeholder ?? 'Уточни текстом'}
               value={props.query}
               onChange={props.onQueryChange}
               fieldIcon="search"

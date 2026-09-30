@@ -174,7 +174,7 @@ export function Stamp({ label, variant, tone, icon = 'thumb-down', done, doneSiz
       <svg className="y-stamp__shape" viewBox="0 0 144 144" aria-hidden>
         <path d={stampStar} fill="currentColor" />
       </svg>
-      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={29} /> : label}</span>
+      <span className="y-stamp__label">{size === 'S' ? <Icon name={icon} size={24} /> : label}</span>
       <span className="y-stamp__done" aria-hidden><Icon name="undo" size={doneSize === 'S' ? 20 : 24} /></span>
     </button>
   );

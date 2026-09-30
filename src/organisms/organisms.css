@@ -296,7 +296,15 @@
   color: var(--color-text-primary); text-align: left; overflow: hidden;
 }
 .y-trip-card--add { align-items: center; justify-content: center; gap: var(--space-12); text-align: center; }
-.y-trip-card__art { position: absolute; left: var(--space-16); right: var(--space-16); bottom: var(--space-20); height: 120px; } /* флоу: вещи 141×120 в 16 от боков и 20 от низа */ /* stylelint-disable-line unit-disallowed-list -- вещи 141 × 120 из Figma */
+/* Коллаж вещей (Figma DS 0.2: trip-card · art): блок от 96 сверху до низа карточки — 173×124 при карточке 173×220; фото обрезаются краями, радиус низа — у карточки.
+   Слоты — центр от левого верхнего угла блока: 1) 129×171 в (19, 97), 28°; 2) 113×151 в (153, 123), −30°; 3) 72×96 в (89, 31), 38°. */
+.y-trip-card__art { position: absolute; left: 0; right: 0; top: 96px; bottom: 0; overflow: hidden; pointer-events: none; } /* stylelint-disable-line unit-disallowed-list -- блок вещей на 96 от верха карточки из Figma: под городом и счётчиками */
+.y-trip-card__photo { position: absolute; object-fit: contain; }
+.y-trip-card__photo--1 { width: 129px; height: 171px; left: -45.5px; top: 11.5px; transform: rotate(28deg); } /* stylelint-disable-line unit-disallowed-list -- слот 1 коллажа из Figma */
+.y-trip-card__photo--2 { width: 113px; height: 151px; left: 96.5px; top: 47.5px; transform: rotate(-30deg); } /* stylelint-disable-line unit-disallowed-list -- слот 2 коллажа из Figma */
+.y-trip-card__photo--3 { width: 72px; height: 96px; left: 53px; top: -17px; transform: rotate(38deg); } /* stylelint-disable-line unit-disallowed-list -- слот 3 коллажа из Figma */
+/* Устаревший `art` без фото: прежняя раскладка иллюстраций 141×120 в 16 от боков и 20 от низа */
+.y-trip-card__art--legacy { left: var(--space-16); right: var(--space-16); top: auto; bottom: var(--space-20); height: 120px; overflow: visible; } /* stylelint-disable-line unit-disallowed-list -- вещи 141 × 120 из Figma 0.1 */
 /* Нажатие карточек (переходы — в начале раздела Cards): после базовых правил карточек (no-descending-specificity) */
 .y-item-card:active, .y-photo-tile:active, .y-prompt-card:active, .y-trip-card:active, .y-outfit-thumb:active {
   transform: scale(var(--gesture-press-scale-card));

@@ -53,7 +53,7 @@ export const CreationOverlays: Story = {
     const clear = await dialog(c, 'Очистить образ?');
     await tap(root, clear.closest('.y-overlay')!);
     await expect(clear).toBeVisible();
-    await tap(root, within(clear).getByRole('button', { name: 'Отмена' }));
+    await tap(root, within(clear).getByRole('button', { name: 'Отменить' }));
     await gone(c, 'alertdialog');
 
     // «Назад» с вещами — диалог; безопасный закрывается и Escape, и выходом
@@ -161,7 +161,7 @@ export const OnboardingChain: Story = {
   },
 };
 
-/** Стилист: «Удиви меня» → стопка до конца → «образы закончились» → «Показать еще»; «С чем носить» → вещь из образа. */
+/** Стилист: «Удиви меня» → стопка до конца → «образы закончились» → «Показать ещё»; «С чем носить» → вещь из образа. */
 export const StylistChain: Story = {
   name: 'Цепочка: стилист',
   args: { start: 'StylistHome' satisfies ScreenId, panel: false },
@@ -174,7 +174,7 @@ export const StylistChain: Story = {
     await expect(topLayer(root).getByRole('button', { name: 'Следующий образ' })).toHaveAttribute('aria-disabled', 'true');
     await tap(root, skip());
     await at(root, 'OutfitOfTheDayEmpty');
-    await tap(root, topLayer(root).getByRole('button', { name: 'Показать еще' }));
+    await tap(root, topLayer(root).getByRole('button', { name: 'Показать ещё' }));
     await at(root, 'OutfitOfTheDay');
     await back(root);
     await at(root, 'StylistHome');

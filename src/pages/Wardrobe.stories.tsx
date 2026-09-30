@@ -128,7 +128,7 @@ function WardrobeItemScreen({ scrolled }: { scrolled?: boolean }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
   return (
     <DetailsScreen media={<PhotoArea kind="container" />} title="Сумка" scrollRef={ref}>
-      <p className="y-body y-text--secondary">10 000 ₽ · Черный<br />Аксессуары · Все сезоны</p>
+      <p className="y-body y-text--secondary">10 000 ₽ · Чёрный<br />Аксессуары · Все сезоны</p>
       <StatRow><StatTile label="Надето раз" value={43} /><StatTile label="Д. простоя" value={12} /><StatTile label="Образы" value={7} /></StatRow>
       <section className="y-section">
         <h3 className="y-h3">Теги</h3>
@@ -170,7 +170,7 @@ function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
       bottom={<BottomBar label="Переместить в гардероб" secondary={{ icon: 'external-link', label: 'Открыть в магазине' }} />}
       scrollRef={ref}
     >
-      <p className="y-body y-text--secondary">10 000 ₽ · Sander · Черный<br />Аксессуары · Все сезоны</p>
+      <p className="y-body y-text--secondary">10 000 ₽ · Sander · Чёрный<br />Аксессуары · Все сезоны</p>
       <Note>Мягкая сумка округлой формы с логотипом и кожаным ремешком</Note>
       <section className="y-section y-item-looks">
         <h3 className="y-h3">Образы с этой вещью</h3>
@@ -198,7 +198,7 @@ export const Archive: Story = {
 export const ClearTrash: Story = {
   name: 'Trash / Items / Dialog / Clear',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отмена" confirm="Очистить" /></Overlay>}>
+    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
       <Grid>{grid.slice(0, 4).map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
     </Screen>
   ),
@@ -326,7 +326,7 @@ export const ArchiveEmpty: Story = {
   name: 'Archive / Items / Empty',
   render: () => (
     <Screen header={<Header type="bar" titleChip="Архив вещей" />}>
-      <div className="y-empty-bar"><EmptyState title="Архив пуст" description="Архивировав вещь, она будет храниться здесь в течение указанного времени" /></div>
+      <div className="y-empty-bar"><EmptyState title="Архив пуст" description="Вещь из архива можно вернуть в гардероб" /></div>
     </Screen>
   ),
 };
@@ -376,7 +376,7 @@ function WishlistNewItemScreen({ filled }: { filled?: boolean }) {
       </InputGroup>
       <InputGroup>
         <Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" />
-        <Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" />
+        <Field label="Цвет" value="Чёрный" colorDot="black" trailingIcon="chevron-up-down" />
         <Field label="Сезон" value="Все" trailingIcon="chevron-up-down" />
       </InputGroup>
       <InputGroup><Field label="Комментарий" multiline={{}} /></InputGroup>

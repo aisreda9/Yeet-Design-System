@@ -114,7 +114,7 @@
   width: var(--stamp-size); height: var(--stamp-size); padding: 0; border: 0; background: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.y-stamp--S { --stamp-size: 64px; } /* stylelint-disable-line unit-disallowed-list */ /* Figma stamp · Secondary: 64, иконка 29 */
+.y-stamp--S { --stamp-size: 64px; } /* stylelint-disable-line unit-disallowed-list */ /* Figma stamp · Secondary: 64, иконка 24, повёрнута на 15° (эталон 0.1) */
 .y-stamp--primary { --y-bg: var(--button-primary-bg); --y-fg: var(--button-primary-fg); }
 .y-stamp--secondary { --y-bg: var(--button-secondary-bg); --y-fg: var(--button-secondary-fg); }
 .y-stamp__shape {

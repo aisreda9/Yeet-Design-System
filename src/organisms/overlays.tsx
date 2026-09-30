@@ -141,7 +141,7 @@ export function Sheet({ title, description, variant, type: legacyType, footer, o
 export type DialogProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'children'> & {
   /**
    * `default` — Tertiary + Primary («Выйти / Сохранить и выйти»).
-   * `destructive` — необратимое действие серым слева, безопасная «Отмена» синей справа («Очистить / Отмена»).
+   * `destructive` — необратимое действие серым слева, безопасная «Отменить» синей справа («Очистить / Отменить»).
    * `danger` — удаление аккаунта: красная Destructive слева, «Отменить» синей справа.
    */
   variant?: 'default' | 'destructive' | 'danger';

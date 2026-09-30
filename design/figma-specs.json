@@ -558,7 +558,7 @@
       }
     },
     {
-      "figma": "stamp · Tone=Secondary (64, иконка 29 −15°)",
+      "figma": "stamp · Tone=Secondary (64, иконка 24 −15°)",
       "story": "atoms-stamp--in-flow",
       "selector": ".y-stamp--S",
       "expect": {
@@ -694,14 +694,14 @@
       }
     },
     {
-      "figma": "trip-card · art 141×120 (16 от боков, 20 от низа)",
+      "figma": "trip-card · art 173×124 (слот Items: от 96 до низа, коллаж)",
       "story": "organisms-tripcard--playground",
       "selector": ".y-trip-card__art",
       "expect": {
-        "width": 141,
-        "height": 120,
-        "left": 16,
-        "top": 80
+        "width": 173,
+        "height": 124,
+        "left": 0,
+        "top": 96
       }
     },
     {

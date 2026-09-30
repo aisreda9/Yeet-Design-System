@@ -185,7 +185,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Архив и корзина */
   Archive: [openItem],
   TrashPopulated: [btn('Очистить корзину', (n) => n.overlay('ClearTrash'))],
-  ClearTrash: [btn('Отмена', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('TrashEmpty'); n.toast('Корзина очищена'); }))],
+  ClearTrash: [btn('Отменить', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('TrashEmpty'); n.toast('Корзина очищена'); }))],
 
   /* Поиск по гардеробу */
   ItemSearchFocused: [...suggestions('ItemSearchResults', 'ItemSearchEmpty'), { sel: '.y-input-bar__field', go: ok('ItemSearchResults') }],
@@ -221,7 +221,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   TripDetails: [{ sel: '.y-segment [role=radio]', text: /^Вещи/, go: (n) => n.swap('TripItems') }, openOutfit],
   TripItems: [{ sel: '.y-segment [role=radio]', text: /^Образы/, go: (n) => n.swap('TripDetails') }, openItem],
   OutfitOfTheDay: [lastSkip, howItWorks],
-  OutfitOfTheDayEmpty: [btn('Показать еще', (n) => n.swap('OutfitOfTheDay')), howItWorks],
+  OutfitOfTheDayEmpty: [btn('Показать ещё', (n) => n.swap('OutfitOfTheDay')), howItWorks],
   WhatToWear: [openItem, howItWorks],
 
   /* Создание образа */
@@ -237,7 +237,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     btn('Выйти', closeThen((n) => n.leave(CREATION))),
     btn('Сохранить и выйти', closeThen(async (n) => { await n.leave(CREATION); n.toast('Образ сохранён'); })),
   ],
-  ClearDialog: [btn('Отмена', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('CanvasDefault'); n.toast('Образ очищен'); }))],
+  ClearDialog: [btn('Отменить', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('CanvasDefault'); n.toast('Образ очищен'); }))],
   ItemFilterSheet: [
     btn('Использовать', closeThen((n, from) => { if (from !== 'Canvas') return n.swap('Canvas'); })),
     btn('Очистить', closeThen((n) => n.toast('Фильтр сброшен'))),

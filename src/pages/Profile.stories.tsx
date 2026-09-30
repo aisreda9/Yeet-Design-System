@@ -33,9 +33,9 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
   const [period, setPeriod] = useState('За всё время');
   const overlay =
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
-    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За пол года', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
+    open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За полгода', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
-    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
+    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" avatarSrc={demoAvatar} />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
       <div className="y-gutter y-profile-bar">
         <Row gap={0} align="center" justify="space-between">
           <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
@@ -66,7 +66,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
           />
         </section>
         {/* порядок как во флоу: цвета → давно не надевалось → сезоны → лучшая инвестиция → другие цифры */}
-        <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Черный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
+        <BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Чёрный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} />
         <Carousel title="Давно не надевалось" itemWidth={173}>
           <ItemCard kind="top" color="black" label="20 дней" />
           <ItemCard kind="top" color="white" label="1 день" />
