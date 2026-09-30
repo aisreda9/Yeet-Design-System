@@ -13,7 +13,7 @@ const meta = {
   tags: ['autodocs'],
   args: { wrap: true, chips: [{ label: 'Все', selected: true }, { label: 'Весна' }, { label: 'Лето' }, { label: 'Осень' }, { label: 'Зима' }] },
   decorators: [unlessBare(withWidth(353))],
-  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 36. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing). С `onToggle` чипс — переключатель (`aria-pressed`), крестик — отдельная кнопка «Удалить: …» (`onRemove`), идентичность — `value` (по умолчанию `label`). Выбор можно отдать группе: `defaultValue` (uncontrolled) или `value` + `onValueChange` (controlled), `multiple={false}` — одиночный.' } } },
+  parameters: { docs: { description: { component: 'Чипсы — Button S: невыбранный Tertiary, выбранный Soft. `removable` — крестик, `dropdown` — фильтр с ⌄ (отступ справа 12, иконка 20), `colorDot` — свотч 16, `editing` — чипс-поле для своего повода или тега (плейсхолдер серым), `onAdd` — кнопка «+» 40 (IconButton Primary S, иконка 20), как высота чипса. Figma: `chip-group` · Wrap, слот; `chip` · State (Default / Editing). С `onToggle` чипс — переключатель (`aria-pressed`), крестик — отдельная кнопка «Удалить: …» (`onRemove`), идентичность — `value` (по умолчанию `label`). Выбор можно отдать группе: `defaultValue` (uncontrolled) или `value` + `onValueChange` (controlled), `multiple={false}` — одиночный.' } } },
 } satisfies Meta<typeof ChipGroup>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -71,6 +71,36 @@ export const InSheet: Story = {
         <Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="grey" /></Grid>
       </Sheet>
     )),
+};
+
+/**
+ * Стек (`wrap`) в шторке, контент 337 (экран 393, Figma #177): чипс не сжимается — не влезающий «Кастомный ×» целиком уходит в третий ряд.
+ * В ленте без `wrap` перенос не нужен: ряд прокручивается (история «В шторке»).
+ */
+export const InSheetWrap: Story = {
+  name: 'В шторке 337',
+  parameters: { controls: { disable: true } },
+  tags: ['bare'],
+  render: () =>
+    onOverlay(() => (
+      <Sheet title="Повод" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}>
+        <ChipGroup
+          wrap
+          aria-label="Повод"
+          onAdd={() => {}}
+          chips={[{ label: 'Прогулка', selected: true }, { label: 'Ужин' }, { label: 'Работа' }, { label: 'Свидание' }, { label: 'Вечеринка' }, { label: 'Путешествие' }, { label: 'Кастомный', removable: true }]}
+        />
+      </Sheet>
+    )),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const chip = canvas.getByRole('button', { name: 'Удалить: Кастомный' }).closest('.y-chip--removable') as HTMLElement;
+    const group = chip.parentElement as HTMLElement;
+    const tops = [...new Set([...group.children].map((c) => Math.round((c as HTMLElement).getBoundingClientRect().top)))];
+    await expect(tops.length).toBe(3);
+    await expect(Math.round(chip.getBoundingClientRect().top)).toBe(tops[2]);
+    await expect(chip.scrollWidth).toBeLessThanOrEqual(chip.clientWidth);
+  },
 };
 
 /**

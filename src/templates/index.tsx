@@ -64,27 +64,33 @@ function isLargeHeader(header: ReactNode) {
  *
  * Полосы затухания появляются, только когда под краем действительно есть контент:
  * верхняя — после начала скролла (под статус-баром или под прилипшими фильтрами), нижняя — пока список не докручен до конца.
+ * Если под краем панель (`Sheet type="panel"`, bg-elevated) — подложка края и затухание берут цвет панели (`--screen-edge-bg`).
  */
 export function Screen({ header, pinHeader, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
   const own = useRef<HTMLElement>(null);
   const ref = scrollRef ?? own;
   // шапка в скролле: закреплён только статус-бар, заголовок уезжает с контентом
   const scrolls = header != null && !(pinHeader ?? !isLargeHeader(header));
-  const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false, stuck: false });
+  const [edges, setEdges] = useState({ top: false, bottom: false, collapsed: false, stuck: false, panelTop: false, panelBottom: false });
   const frame = useRef(0);
   const update = useCallback(() => {
     const el = ref.current;
     if (!el) return;
     // stuck — липкие фильтры прижаты к верху скролла: под ними проявляется затухание
     const sticky = el.querySelector<HTMLElement>(':scope > .y-sticky');
-    const stuck = !!sticky && el.scrollTop > 1 && sticky.getBoundingClientRect().top - el.getBoundingClientRect().top < 1;
+    const box = el.getBoundingClientRect();
+    const stuck = !!sticky && el.scrollTop > 1 && sticky.getBoundingClientRect().top - box.top < 1;
+    // панель (Sheet type="panel", bg-elevated) под краем: подложка и затухание края берут её цвет, а не bg-canvas (#181)
+    const panel = el.querySelector<HTMLElement>(':scope > .y-sheet--panel')?.getBoundingClientRect();
+    const panelTop = !!panel && el.scrollTop > 1 && panel.top - box.top < 1 && panel.bottom > box.top;
+    const panelBottom = !!panel && panel.top < box.bottom && panel.bottom > box.bottom - 1;
     setEdges((prev) => {
       // collapsed — для закреплённой шапки: фото деталей → миниатюра, заголовок `back` → пилюля (у шапки в скролле не выставляется).
       // Гистерезис 24 / 8: шапка при сворачивании меняет высоту, и без запаса заголовок дрожал бы на границе
       const collapsed = prev.collapsed ? el.scrollTop > 8 : el.scrollTop > 24;
-      const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed, stuck };
+      const next = { top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1, collapsed, stuck, panelTop, panelBottom };
       // тот же объект — React не перерисовывает экран на каждое событие скролла
-      return next.top === prev.top && next.bottom === prev.bottom && next.collapsed === prev.collapsed && next.stuck === prev.stuck ? prev : next;
+      return (Object.keys(next) as (keyof typeof next)[]).every((k) => next[k] === prev[k]) ? prev : next;
     });
   // ref.current читается в момент вызова; с [ref] React Compiler не сохраняет мемоизацию (preserve-manual-memoization)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +116,8 @@ export function Screen({ header, pinHeader, bottom, overlay, floating, floatingO
     <div
       className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`, className)}
       style={photo ? { ['--screen-photo' as string]: `url("${photo}")` } : undefined}
-      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={(!scrolls && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}>
+      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={(!scrolls && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}
+      data-panel-top={edges.panelTop || undefined} data-panel-bottom={edges.panelBottom || undefined}>
       {scrolls ? (
         <div className="y-screen__top">
           <StatusBar onAccent={background === 'accent'} onPhoto={background === 'photo'} />
