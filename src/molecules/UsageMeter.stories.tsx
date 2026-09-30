@@ -9,7 +9,7 @@ const meta = {
   args: { percent: 11, label: 'гардероба используется' },
   argTypes: { percent: { control: { type: 'range', min: 0, max: 100 } } },
   decorators: [withWidth(353)],
-  parameters: { docs: { description: { component: 'Доля используемого гардероба: H1 + точечная сетка 30×4. Figma: `usage-meter` · Value, Label.' } } },
+  parameters: { docs: { description: { component: 'Доля используемого гардероба: H1 + точечная сетка 52×8 (точка 2 px, шаг 6). Figma: `usage-meter` · Value, Label.' } } },
 } satisfies Meta<typeof UsageMeter>;
 export default meta;
 export const Playground: StoryObj<typeof meta> = {};
