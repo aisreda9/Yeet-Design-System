@@ -83,7 +83,7 @@ export const ItemActions: Story = {
   render: () => (
     <Screen
       header={<Header type="large" title="Гардероб" />}
-      overlay={<Overlay><Sheet title="Название вещи"><List><ListItem icon="collage" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Белое платье с красными вкраплениями"><List><ListItem icon="collage" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List></Sheet></Overlay>}
     >
       <Grid>{grid.map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
     </Screen>

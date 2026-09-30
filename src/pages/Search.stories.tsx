@@ -59,14 +59,14 @@ export const SearchEmpty: Story = {
 };
 
 function PriceSheet() {
-  const [v, setV] = useState<[number, number]>([0, 30000]);
+  const [v, setV] = useState<[number, number]>([0, 60000]); // флоу 1144:3684: верхняя граница 60 000 ₽, бегунок на середине шкалы
   return (
     <Screen
       header={<Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка' }, { label: 'Цена', selected: true }]} />}
       overlay={
         <Overlay>
           <Sheet title="Цена">
-            <RangeSlider label="Цена" min={0} max={60000} value={v} onChange={setV} histogram={[2, 3, 6, 12, 18, 20, 17, 19, 22, 16, 10, 6, 4, 3, 2, 2, 3, 2, 1, 1]} />
+            <RangeSlider label="Цена" min={0} max={120000} value={v} onChange={setV} histogram={[2, 3, 6, 12, 18, 20, 17, 19, 22, 16, 10, 6, 4, 3, 2, 2, 3, 2, 1, 1]} />
           </Sheet>
         </Overlay>
       }

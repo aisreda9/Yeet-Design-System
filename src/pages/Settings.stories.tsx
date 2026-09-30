@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Flag, Icon, Logo } from '../atoms';
+import { Button, Flag, Icon, Link, Logo } from '../atoms';
 import { demoAvatar } from '../docs/helpers';
 import { AccountCard, Field, InputBar, InputGroup, List, ListGroup, ListItem, StatRow, StatTile } from '../molecules';
 import { Dialog, Header, Overlay, Sheet } from '../organisms';
@@ -60,10 +60,11 @@ export const DeleteAccount: Story = {
       header={header}
       overlay={
         <Overlay>
-          <Dialog tone="danger" title="Аккаунт будет удалён" description="Сима, твой аккаунт sima@space.com будет деактивирован." cancel="Отменить" confirm="Удалить">
+          <Dialog tone="danger" title="Аккаунт будет удалён" description={<>Сима, твой аккаунт <span className="y-text--primary"><Link href="mailto:sima@space.com">sima@space.com</Link></span> будет деактивирован.</>} cancel="Отменить" confirm="Удалить">
             <p className="y-body y-text--secondary">Ты потеряешь:</p>
             <StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow>
-            <p className="y-body y-text--secondary">У тебя будет возможность восстановить аккаунт, войдя с тем же паролем в течение 14 дней.<br /><br />После этого все данные будут удалены навсегда.</p>
+            <p className="y-body y-text--secondary">В течение 14 дней аккаунт можно восстановить — просто войди с тем же паролем.</p>
+            <p className="y-body y-text--secondary">После этого все данные будут удалены навсегда.</p>
           </Dialog>
         </Overlay>
       }
@@ -85,12 +86,20 @@ export const CountrySheet: Story = {
   ),
 };
 
+/** Валюты — порядок и подписи как во флоу (1174:16325): символ перед кодом, где он есть. */
+const currencies = [
+  ['Российский рубль', '₽ · RUB'], ['Доллар США', '$ · USD'], ['Евро', '€ · EUR'], ['Казахстанский тенге', '₸ · KZT'],
+  ['Белорусский рубль', 'BYN'], ['Узбекский сум', 'UZS'], ['Кыргызский сом', 'KGS'], ['Таджикский сомони', 'TJS'],
+  ['Армянский драм', 'AMD'], ['Туркменский манат', 'TMT'], ['Молдавский лей', 'L · MDL'], ['Азербайджанский манат', '₼ · AZN'],
+  ['Украинская гривна', '₴ · UAH'],
+] as const;
+
 export const CurrencySheet: Story = {
   name: 'Settings / Currency / Sheet / Default',
   render: () => (
     <Screen
       header={header}
-      overlay={<Overlay><Sheet title="Валюта"><List><ListItem type="radio" label="Российский рубль" checked trailing="₽ · RUB" /><ListItem type="radio" label="Белорусский рубль" trailing="Br · BYN" /><ListItem type="radio" label="Казахстанский тенге" trailing="₸ · KZT" /><ListItem type="radio" label="Доллар США" trailing="$ · USD" /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Валюта" description="Цены пересчитываются по курсу ЦБ на 10 августа 2026 и помечаются как примерные. Сохранённая цена не меняется."><List>{currencies.map(([label, code]) => <ListItem key={code} type="radio" label={label} checked={code === '₽ · RUB'} trailing={code} />)}</List></Sheet></Overlay>}
     >
       <AccountCard account={{ ...sima, photo: demoAvatar }} kind="settings" />
     </Screen>
