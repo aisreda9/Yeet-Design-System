@@ -51,11 +51,11 @@ export function AccountCard({ account, kind = 'current', onClick, onEdit, onSett
       <span className="y-account__actions">
         {kind === 'current' ? (
           <>
-            <IconButton icon="edit" label="Редактировать профиль" variant="ghost" size="S" onClick={onEdit} />
-            <IconButton icon="settings" label="Настройки" variant="ghost" size="S" onClick={onSettings} />
+            <IconButton icon="edit" label="Редактировать профиль" variant="ghost" size="S" iconSize={24} onClick={onEdit} />
+            <IconButton icon="settings" label="Настройки" variant="ghost" size="S" iconSize={24} onClick={onSettings} />
           </>
         ) : (
-          <IconButton icon="log-out" label="Выйти" variant="ghost" size="S" onClick={onSignOut} />
+          <IconButton icon="log-out" label="Выйти" variant="ghost" size="S" iconSize={24} onClick={onSignOut} />
         )}
       </span>
     </div>
