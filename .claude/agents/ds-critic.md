@@ -1,5 +1,6 @@
 ---
 model: claude-opus-5-5
+effort: medium
 name: ds-critic
 description: Слепой критик вида (Gauntlet Loop). Сравнивает готовый экран или компонент в Storybook с эталоном Figma по двум скриншотам и выносит вердикт «прошёл / не прошёл» со списком расхождений. Не видит рассуждений и заметок строителя, ничего не правит. Используй после реализации экрана флоу и организма, меняющего вид, до гейта QA.
 tools: Read, Glob, Bash, mcp__Figma__get_screenshot, mcp__Figma__get_metadata

@@ -1,5 +1,6 @@
 ---
 model: claude-opus-5-5
+effort: medium
 name: ds-component-engineer
 description: Разработчик компонентов (React + CSS + Storybook) в зонах atoms, molecules, organisms и screens. Реализует и чинит компоненты, истории и экраны флоу по Figma DS 0.2. Используй для правок в src/ кроме токенов, движения (src/motion) и документации (src/docs).
 tools: Read, Grep, Glob, Bash, Edit, Write

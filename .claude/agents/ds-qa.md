@@ -1,5 +1,6 @@
 ---
 model: claude-opus-5-5
+effort: medium
 name: ds-qa
 description: QA дизайн-системы (зона qa). Прогоняет typecheck, линтеры, контраст, QA Storybook (спеки Figma, тени, края, axe, play-функции, скриншоты, 320/430) и flow-diff, классифицирует находки и обновляет эталоны. Используй после любой пачки правок и как гейт перед пушем.
 tools: Read, Grep, Glob, Bash
