@@ -187,9 +187,11 @@ function audit(TAP_MIN) {
     // 5. Зона нажатия
     if (el.matches('button, a[href], input:not([type=hidden]), [role=button], [role=tab], [role=switch], [role=radio], [role=checkbox], [role=slider]') && !el.closest('[aria-hidden="true"]')) {
       // поле ввода нажимается всей обёрткой
-      const hit = el.matches('input') ? (el.closest('label, .y-field, .y-input-group, .y-input-bar__field') ?? el).getBoundingClientRect() : r;
-      // невидимое расширение зоны нажатия через ::after (atoms.css)
-      const after = getComputedStyle(el, '::after');
+      const box = el.matches('input') ? (el.closest('label, .y-field, .y-input-group, .y-input-bar__field') ?? el) : el;
+      const hit = box === el ? r : box.getBoundingClientRect();
+      // невидимое расширение зоны нажатия через ::after (atoms.css); у поля ввода ::after нет (replaced element) — берётся ::after обёртки,
+      // нажатие по нему тоже фокусирует поле (чипс-поле ChipGroup: label.y-button 40 + hit-slop 44)
+      const after = getComputedStyle(box, '::after');
       const grow = after.content !== 'none' && after.position === 'absolute' ? { w: -parseFloat(after.left) - parseFloat(after.right), h: -parseFloat(after.top) - parseFloat(after.bottom) } : { w: 0, h: 0 };
       const size = Math.min(hit.width + Math.max(0, grow.w || 0), hit.height + Math.max(0, grow.h || 0));
       if (size < 24) out.push(['error', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < 24`]);
