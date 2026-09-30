@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../atoms';
 import { demoAvatar, demoPhoto } from '../docs/helpers';
-import { ChipGroup, EmptyState, Hint, InputBar, PhotoTile, RangeSlider } from '../molecules';
+import { ChipGroup, EmptyState, InputBar, PhotoTile, RangeSlider } from '../molecules';
 import { BottomNav, CropFrame, Header, Overlay, ProductCard, Sheet } from '../organisms';
 import { Grid, Row, Screen } from '../templates';
 import { shoes } from './data';
@@ -83,9 +83,8 @@ export const PriceFilter: Story = { name: 'Search / Results / Sheet / Price Filt
 export const PhotoCrop: Story = {
   name: 'Search / Photo / Crop',
   render: () => (
-    // рамка обрезки на всё фото (CropFrame); поверх всё белое: статус-бар, подсказка без подложки
-    <Screen background="photo" className="y-crop-screen" backdrop={<div className="y-crop-layer"><CropFrame src={demoPhoto} hint={null} /></div>} end>
-      <Row justify="center"><Hint tone="onPhoto" icon="fingers-pinch">Выдели вещь, которую ищем</Hint></Row>
+    // рамка обрезки на всё фото (CropFrame, подсказка — его, в 24 над кнопкой); поверх всё белое: статус-бар, подсказка без подложки
+    <Screen background="photo" className="y-crop-screen" backdrop={<div className="y-crop-layer"><CropFrame src={demoPhoto} hint="Выдели вещь, которую ищем" /></div>} end>
       <Button size="L" fullWidth>Найти похожие</Button>
     </Screen>
   ),
