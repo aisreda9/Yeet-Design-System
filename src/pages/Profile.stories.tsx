@@ -7,6 +7,7 @@ import { Row, Screen, Stack } from '../templates';
 import { demoAvatar } from '../docs/helpers';
 import { motionMs } from '../utils/gesture';
 import { sima, tina } from './data';
+import { SCROLLED_LIST, useScrolled } from './scroll';
 import './pages.css';
 
 /* Раздел: профиль — аналитика гардероба, аккаунты, редактирование. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -28,14 +29,15 @@ const price = (sum: string, caption: string) => (
 );
 
 /** Профиль (Figma: Profile / Overview / Analytics): аккаунты и период над панелью со статистикой. */
-function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?: ProfileOverlay }) {
+function ProfileScreen({ accounts, open: initial, scrollTo = 0 }: { accounts: Account[]; open?: ProfileOverlay; /** Прокрутка: заголовок уехал, закреплён только статус-бар (#170). */ scrollTo?: number }) {
   const [open, setOpen] = useState<ProfileOverlay>(initial);
+  const ref = useScrolled(scrollTo);
   const [period, setPeriod] = useState('За всё время');
   const overlay =
     open === 'accounts' ? <AccountsSheet accounts={accounts} onSwitch={() => setOpen(undefined)} onAdd={() => setOpen(undefined)} onEdit={() => setOpen(undefined)} onSettings={() => setOpen(undefined)} /> :
     open === 'period' ? <Sheet title="Статистика"><ChipGroup wrap onToggle={(l) => { setPeriod(l); window.setTimeout(() => setOpen(undefined), motionMs('--motion-select')); /* выбор успевает отрисоваться, потом шторка уходит */ }} chips={['За всё время', 'За полгода', 'За месяц', 'За неделю'].map((label) => ({ label, selected: label === period }))} /></Sheet> : undefined;
   return (
-    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" avatarSrc={demoAvatar} />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} flush>
+    <Screen header={<Header type="large" title="Профиль" />} bottom={<BottomNav active="profile" avatarSrc={demoAvatar} />} overlay={overlay && <Overlay onClose={() => setOpen(undefined)}>{overlay}</Overlay>} scrollRef={ref} flush>
       <div className="y-gutter y-profile-bar">
         <Row gap={0} align="center" justify="space-between">
           <AvatarStack accounts={accounts} onOpen={() => setOpen('accounts')} onAdd={() => setOpen('accounts')} />
@@ -90,6 +92,7 @@ function ProfileScreen({ accounts, open: initial }: { accounts: Account[]; open?
 }
 
 export const ProfileAnalytics: Story = { name: 'Profile / Overview / Analytics', render: () => <ProfileScreen accounts={[sima, tina]} /> };
+export const ProfileAnalyticsScrolled: Story = { name: 'Profile / Overview / Analytics / Scrolled', tags: ['figma:1205:21115'], render: () => <ProfileScreen accounts={[sima, tina]} scrollTo={SCROLLED_LIST} /> };
 export const ProfileSingle: Story = { name: 'Profile / Overview / Single Account', render: () => <ProfileScreen accounts={[sima]} /> };
 export const AccountsMulti: Story = { name: 'Profile / Accounts / Sheet / List', render: () => <ProfileScreen accounts={[sima, tina]} open="accounts" /> };
 export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Single', render: () => <ProfileScreen accounts={[sima]} open="accounts" /> };
