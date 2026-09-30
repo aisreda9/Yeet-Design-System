@@ -44,7 +44,7 @@ function WardrobeItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
 }
 
 export const Wardrobe: Story = { name: 'Wardrobe / Items / Populated', render: () => <WardrobeItemsScreen /> };
-export const WardrobeScrolled: Story = { name: 'Wardrobe / Items / Populated / Scrolled', tags: ['figma:1205:13362'], render: () => <WardrobeItemsScreen scrollTo={SCROLLED_LIST} /> };
+export const WardrobeScrolled: Story = { name: 'Wardrobe / Items / Populated / Scrolled', render: () => <WardrobeItemsScreen scrollTo={SCROLLED_LIST} /> };
 
 export const WardrobeEmpty: Story = {
   name: 'Wardrobe / Items / Empty',
@@ -167,7 +167,7 @@ function WishlistItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
 }
 
 export const Wishlist: Story = { name: 'Wishlist / Items / Populated', render: () => <WishlistItemsScreen /> };
-export const WishlistScrolled: Story = { name: 'Wishlist / Items / Scrolled', tags: ['figma:1205:13506'], render: () => <WishlistItemsScreen scrollTo={SCROLLED_LIST} /> };
+export const WishlistScrolled: Story = { name: 'Wishlist / Items / Scrolled', render: () => <WishlistItemsScreen scrollTo={SCROLLED_LIST} /> };
 
 /** Детали вещи из вишлиста (Figma `1371:43300 → 1371:43256`): описание, образы, BottomBar закреплён. */
 function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {

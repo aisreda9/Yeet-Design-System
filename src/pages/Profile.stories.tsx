@@ -92,7 +92,7 @@ function ProfileScreen({ accounts, open: initial, scrollTo = 0 }: { accounts: Ac
 }
 
 export const ProfileAnalytics: Story = { name: 'Profile / Overview / Analytics', render: () => <ProfileScreen accounts={[sima, tina]} /> };
-export const ProfileAnalyticsScrolled: Story = { name: 'Profile / Overview / Analytics / Scrolled', tags: ['figma:1205:21115'], render: () => <ProfileScreen accounts={[sima, tina]} scrollTo={SCROLLED_LIST} /> };
+export const ProfileAnalyticsScrolled: Story = { name: 'Profile / Overview / Analytics / Scrolled', render: () => <ProfileScreen accounts={[sima, tina]} scrollTo={SCROLLED_LIST} /> };
 export const ProfileSingle: Story = { name: 'Profile / Overview / Single Account', render: () => <ProfileScreen accounts={[sima]} /> };
 export const AccountsMulti: Story = { name: 'Profile / Accounts / Sheet / List', render: () => <ProfileScreen accounts={[sima, tina]} open="accounts" /> };
 export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Single', render: () => <ProfileScreen accounts={[sima]} open="accounts" /> };
