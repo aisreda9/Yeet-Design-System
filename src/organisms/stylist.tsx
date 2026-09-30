@@ -40,18 +40,30 @@ export function StylistPromptCard({ title, description, wide, soon, art, classNa
 }
 
 type TripCardRoot = Omit<ComponentPropsWithRef<'button'>, 'children'>;
-type TripCardFields = { add: true; label?: ReactNode } | { add?: false; city: string; items: number; outfits: number; art?: CollageItem[] };
+type TripCardFields =
+  | { add: true; label?: ReactNode }
+  | {
+      add?: false; city: string; items: number; outfits: number;
+      /** Фото вещей без фона (cutout), до 4 — коллаж под счётчиками (Figma: trip-card · art). Раскладка — 3 слота Figma, 4-е фото пока не показывается. */
+      photos?: string[];
+      /** @deprecated Используй `photos`. Фото (`src`) из `art` уходят в `photos`, иллюстрации без фото — прежней раскладкой. */
+      art?: CollageItem[];
+    };
 
 export type TripCardProps = TripCardRoot & TripCardFields;
 
 /**
  * Карточка поездки в сетке 2 колонки: город H3, счётчики вещей и образов Body серым,
- * вещи снизу — поле 141×120 в 16 от боков и 20 от низа (Figma: trip-card · art).
+ * вещи снизу — коллаж `photos` в блоке от 96 сверху до низа карточки (173×124), фото повёрнуты и обрезаны краями (Figma: trip-card · art).
  * `add` — первая карточка «Собрать новый чемодан» с Primary-кнопкой «+».
  * **Контексты:** Стилист / Поездки.
  */
+/** Слотов коллажа в Figma: большая вещь слева, вторая справа, аксессуар сверху по центру. */
+const TRIP_SLOTS = 3;
+
 export function TripCard(props: TripCardProps) {
-  const { add, label, city, items, outfits, art, className, ...rest } = props as TripCardRoot & Partial<{ add: boolean; label: ReactNode; city: string; items: number; outfits: number; art: CollageItem[] }>;
+  const { add, label, city, items, outfits, photos, art, className, ...rest } = props as TripCardRoot & Partial<{ add: boolean; label: ReactNode; city: string; items: number; outfits: number; photos: string[]; art: CollageItem[] }>;
+  const shots = (photos ?? art?.flatMap((a) => (a.src ? [a.src] : [])) ?? []).slice(0, TRIP_SLOTS);
   if (add)
     return (
       <button type="button" className={cx('y-trip-card', 'y-trip-card--add', className)} {...rest}>
@@ -67,8 +79,12 @@ export function TripCard(props: TripCardProps) {
         <br />
         {plural(outfits ?? 0, ['образ', 'образа', 'образов'])}
       </span>
-      {art && (
-        <span className="y-trip-card__art">
+      {shots.length > 0 ? (
+        <span className="y-trip-card__art" aria-hidden>
+          {shots.map((src, i) => <img key={i} className={`y-trip-card__photo y-trip-card__photo--${i + 1}`} src={src} alt="" draggable={false} />)}
+        </span>
+      ) : art && (
+        <span className="y-trip-card__art y-trip-card__art--legacy">
           <CollageLayer items={art} defaultSize={64} base={141} />
         </span>
       )}

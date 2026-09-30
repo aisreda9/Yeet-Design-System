@@ -2,8 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Icon, Stamp } from '../atoms';
 import { Carousel, ChipGroup, EmptyState, InputBar, SegmentControl } from '../molecules';
-import { ChatBubble, type Garment, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
+import { ChatBubble, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
 import { Grid, Screen } from '../templates';
+import bag from '../docs/cutouts/bag.svg';
+import cap from '../docs/cutouts/cap.svg';
+import coat from '../docs/cutouts/coat.svg';
+import hoodie from '../docs/cutouts/hoodie.svg';
+import jeans from '../docs/cutouts/jeans.svg';
 import './pages.css';
 
 /* Раздел: ИИ-стилист — чат, каталог сценариев, поездки. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -57,7 +62,6 @@ export const StylistHome: Story = {
   ),
 };
 
-const tripArt = (a: Garment, b: Garment, c: Garment) => [{ kind: a, x: 70, y: 28, size: 44 }, { kind: b, x: 28, y: 62, size: 72 }, { kind: c, x: 74, y: 66, size: 64 }];
 
 export const Trips: Story = {
   name: 'Stylist / Trips / List',
@@ -65,11 +69,11 @@ export const Trips: Story = {
     <Screen header={<Header type="bar" titleChip="Всё для поездок" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <Grid>
         <TripCard add />
-        <TripCard city="Самуй" items={12} outfits={8} art={tripArt('container', 'bottom', 'top')} />
-        <TripCard city="Берлин" items={12} outfits={8} art={tripArt('accessories', 'bottom', 'top')} />
-        <TripCard city="Бразилиа" items={4} outfits={1} art={tripArt('accessories', 'bottom', 'top')} />
-        <TripCard city="Париж" items={12} outfits={8} art={tripArt('accessories', 'bottom', 'outerwear')} />
-        <TripCard city="Торонто" items={12} outfits={8} art={tripArt('container', 'top', 'bottom')} />
+        <TripCard city="Самуй" items={12} outfits={8} photos={[hoodie, jeans, bag]} />
+        <TripCard city="Берлин" items={12} outfits={8} photos={[coat, jeans, cap]} />
+        <TripCard city="Бразилиа" items={4} outfits={1} photos={[hoodie, jeans, cap]} />
+        <TripCard city="Париж" items={12} outfits={8} photos={[coat, hoodie, bag]} />
+        <TripCard city="Торонто" items={12} outfits={8} photos={[coat, jeans, bag]} />
       </Grid>
     </Screen>
   ),
