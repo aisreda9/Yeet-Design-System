@@ -1,0 +1,113 @@
+/* CropFrame — стили компонента (TEAM.md §7.4: вынесены из organisms.css). Слой назначает src/styles.css. */
+/* ─── CropFrame (#27) ─── */
+/* Search / Photo / Crop 261:1590: рамка 353 × 226, радиус 20; снаружи — затемнение overlay, по углам — белые уголки 2 px */
+.y-crop {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.y-crop__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.y-crop__frame {
+  position: absolute;
+  z-index: 1;
+  cursor: move;
+  touch-action: none;
+  left: calc(var(--crop-x) * 100%);
+  top: calc(var(--crop-y) * 100%);
+  width: calc(var(--crop-w) * 100%);
+  height: calc(var(--crop-h) * 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 100vmax var(--color-bg-overlay);
+  transition: box-shadow var(--motion-fade);
+}
+.y-crop__frame:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+.y-crop.is-active .y-crop__frame {
+  box-shadow:
+    0 0 0 100vmax var(--color-bg-overlay),
+    inset 0 0 0 var(--border-width-thin) rgb(255 255 255 / 0.4);
+}
+/* уголок 32 видимый, зона захвата 44 (углы выходят за рамку на 10) */
+/* stylelint-disable unit-disallowed-list -- уголок 32 видимый, зона захвата 44, выход за рамку на 10: геометрия Figma, токенов нет */
+.y-crop__corner {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  touch-action: none;
+}
+.y-crop__corner::before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-text-on-photo);
+}
+.y-crop__corner--nw {
+  left: -10px;
+  top: -10px;
+  cursor: nwse-resize;
+}
+.y-crop__corner--ne {
+  right: -10px;
+  top: -10px;
+  cursor: nesw-resize;
+}
+.y-crop__corner--sw {
+  left: -10px;
+  bottom: -10px;
+  cursor: nesw-resize;
+}
+.y-crop__corner--se {
+  right: -10px;
+  bottom: -10px;
+  cursor: nwse-resize;
+}
+.y-crop__corner--nw::before {
+  left: 10px;
+  top: 10px;
+  border-width: 2px 0 0 2px;
+  border-top-left-radius: var(--radius-lg);
+}
+.y-crop__corner--ne::before {
+  right: 10px;
+  top: 10px;
+  border-width: 2px 2px 0 0;
+  border-top-right-radius: var(--radius-lg);
+}
+.y-crop__corner--sw::before {
+  left: 10px;
+  bottom: 10px;
+  border-width: 0 0 2px 2px;
+  border-bottom-left-radius: var(--radius-lg);
+}
+.y-crop__corner--se::before {
+  right: 10px;
+  bottom: 10px;
+  border-width: 0 2px 2px 0;
+  border-bottom-right-radius: var(--radius-lg);
+}
+/* stylelint-enable unit-disallowed-list */
+/* подсказка в 20 над кнопкой L внизу экрана: 20 + 52 + 20 */
+.y-crop__hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--crop-hint-bottom, 92px);
+  z-index: var(--layer-float);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+} /* stylelint-disable-line unit-disallowed-list -- подсказка: 20 + кнопка 52 + 20 */

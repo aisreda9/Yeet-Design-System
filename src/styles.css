@@ -14,4 +14,5 @@
 @import './atoms/atoms.css' layer(yeet.atoms);
 @import './molecules/molecules.css' layer(yeet.molecules);
 @import './organisms/organisms.css' layer(yeet.organisms);
+@import './organisms/crop.css' layer(yeet.organisms);
 @import './templates/templates.css' layer(yeet.templates);
