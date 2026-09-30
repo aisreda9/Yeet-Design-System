@@ -8,6 +8,7 @@
  *    Пробелы — предупреждение (волна 2 доливает экраны), `--strict` делает их ошибкой.
  * 2. Путь `story` каждой строки src/docs/registry.ts существует в собранном Storybook — иначе ошибка.
  * 3. Слаг figma-flows.json без истории — ошибка (flow-diff такой экран не сверит).
+ * 4. `figmaId` каждой строки реестра есть в снимке DS 0.2 (src/docs/figma-nodes.json) — иначе ошибка: узел удалён или перенесён.
  * Отчёт: qa/out/coverage.md.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -72,6 +73,12 @@ if (!registry.length) errors.push('src/docs/registry.ts: не нашёл ни о
 const dead = registry.filter((r) => !paths.has(r.story));
 for (const r of dead) errors.push(`src/docs/registry.ts: \`${r.code}\` → story \`${r.story}\` — такого пути нет в Storybook`);
 
+// ─── Реестр: figmaId есть на странице DS 0.2 ────────────────────────
+const figmaNodes = JSON.parse(read('src/docs/figma-nodes.json')).nodes;
+const figmaIds = [...src.matchAll(/figmaId:\s*['"]([^'"]+)['"]/g)].map((m) => ({ id: m[1], code: [...src.slice(0, m.index).matchAll(/code:\s*['"]([^'"]+)['"]/g)].at(-1)?.[1] ?? '?' }));
+const lost = figmaIds.filter((f) => !figmaNodes[f.id]);
+for (const f of lost) errors.push(`src/docs/registry.ts: \`${f.code}\` → figmaId \`${f.id}\` — такого узла нет в снимке DS 0.2 (src/docs/figma-nodes.json): узел удалён или перенесён, обнови снимок и реестр`);
+
 // ─── Отчёт ──────────────────────────────────────────────────────────
 const screens = frames.filter((f) => f.screen), overlays = frames.filter((f) => !f.screen);
 const full = screens.filter((f) => f.stories.length && f.anchors);
@@ -91,7 +98,7 @@ const lines = [
   '# Покрытие экранов: кадры Figma ↔ истории ↔ flow-diff', '',
   `Кадров New app design: ${frames.length} (экранов ${screens.length}, оверлеев ${overlays.length}). Историй Pages/*: ${pages.length}. Якорей flow-diff: ${Object.keys(flowFrames).length} экранов.`, '',
   `**Кадров без истории: ${noStory.length}** из ${screens.length} экранов. С историей и якорями: ${full.length}. С историей без якорей: ${noAnchors.length}. Оверлеев без истории: ${overlaysNoStory.length} из ${overlays.length}.`, '',
-  `Реестр: ${registry.length} строк, мёртвых путей \`story\`: ${dead.length}.`, '',
+  `Реестр: ${registry.length} строк, мёртвых путей \`story\`: ${dead.length}, figmaId вне снимка DS 0.2: ${lost.length}.`, '',
   'Связь кадра с историей: «якоря» — `design/figma-flows.json` (надёжно, по node-id); «тег» — `tags: [\'figma:<node-id>\']` у истории; «имя» / «префикс имени» — имя истории совпадает с именем кадра или его началом (`Auth / Sign In` → все состояния входа). Префикс — эвристика: состояние экрана считается покрытым историей экрана.', '',
 ];
 if (errors.length) lines.push('## Ошибки', '', ...errors.map((e) => `- ${e}`), '');
@@ -108,5 +115,5 @@ writeFileSync(join(root, 'qa/out/coverage.md'), lines.join('\n'));
 const gh = !!process.env.GITHUB_ACTIONS;
 for (const e of errors) console.log(gh ? `::error::${e.replaceAll('`', '')}` : `✗ ${e}`);
 for (const w of warnings) console.log(gh ? `::warning::Покрытие экранов: ${w} (qa/out/coverage.md)` : `! ${w}`);
-console.log(`\nЭкранов ${screens.length}: без истории ${noStory.length}, без якорей ${noAnchors.length}, полностью ${full.length}. Оверлеев без истории ${overlaysNoStory.length}/${overlays.length}. Историй без кадра ${orphans.length}. Реестр: мёртвых путей ${dead.length}/${registry.length}. Отчёт: qa/out/coverage.md`);
+console.log(`\nЭкранов ${screens.length}: без истории ${noStory.length}, без якорей ${noAnchors.length}, полностью ${full.length}. Оверлеев без истории ${overlaysNoStory.length}/${overlays.length}. Историй без кадра ${orphans.length}. Реестр: мёртвых путей ${dead.length}/${registry.length}, figmaId вне Figma ${lost.length}/${figmaIds.length}. Отчёт: qa/out/coverage.md`);
 if (errors.length || (strict && warnings.length)) process.exit(1);
