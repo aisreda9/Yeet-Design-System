@@ -16,7 +16,7 @@ type HeaderFields = {
   large: { title: string; subtitle?: ReactNode; /** Вторая строка H1 акцентом с раскрывашкой: «на каждый день ⌃» (выбор повода на главной). */ accent?: { label: string; onClick?: () => void }; action?: Action };
   bar: { /** Заголовок простым текстом по центру (Настройки). */ title?: string; titleChip?: string; /** Вторая строка в пилюле заголовка: «8–13 сент · 5 ночей». */ titleChipSub?: string; /** Вместо чипа: шаги создания образа (`SegmentControl` S с иконками). */ center?: ReactNode; /** Появляется по центру, когда контент прокручен (Screen → data-collapsed): миниатюра фото вещи или образа. */ centerOnScroll?: ReactNode; onBack?: () => void; actions?: Action[] };
   back: { title: string; /** Подзаголовок Body серым через 12 под заголовком (Password Recovery, First Item Prompt). */ subtitle?: ReactNode; onBack?: () => void; /** Текстовое действие справа — Tertiary M с отступами 20: «Пропустить». */ textAction?: { label: string; onClick?: () => void } };
-  search: { query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string };
+  search: { query?: string; placeholder?: string; onBack?: () => void; onQueryChange?: (v: string) => void; filters?: Chip[]; /** Поиск по фото: превью выбранного снимка 48 вместо кнопки «Поиск по фото». */ photo?: string; /** Кнопка «Поиск по фото» справа; `false` — поиск по своим вещам (Wardrobe / Item Search). */ photoSearch?: boolean; /** Поле в состоянии фокуса (InputBar `focused`). */ focused?: boolean };
 };
 
 /** Вид шапки: `large` — корневые вкладки, `bar` — экраны с «назад» и пилюлей, `back` — вход и онбординг, `search` — поиск. */
@@ -36,10 +36,10 @@ type HeaderView = { [V in HeaderVariant]: HeaderFields[V] & { variant: V } }[Hea
 export function Header(allProps: HeaderProps) {
   const {
     variant, type, className,
-    title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo,
+    title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo, photoSearch, focused,
     ...rest
   } = allProps as Omit<ComponentPropsWithRef<'header'>, 'title' | 'children' | 'placeholder'> & HeaderAllFields & { variant?: HeaderVariant; type?: HeaderVariant };
-  const props = { title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo, variant: variant ?? type } as HeaderView;
+  const props = { title, subtitle, accent, action, titleChip, titleChipSub, center, centerOnScroll, onBack, actions, textAction, query, placeholder, onQueryChange, filters, photo, photoSearch, focused, variant: variant ?? type } as HeaderView;
   return (
     <header className={cx('y-header', className)} {...rest}>
       <StatusBar />
@@ -101,7 +101,8 @@ export function Header(allProps: HeaderProps) {
               onChange={props.onQueryChange}
               fieldIcon="search"
               leading={{ icon: 'chevron-left', label: 'Назад', onClick: props.onBack }}
-              trailing={props.photo ? { icon: 'image-add', label: 'Выбранное фото', image: props.photo } : { icon: 'image-add', label: 'Поиск по фото' }}
+              trailing={props.photo ? { icon: 'image-add', label: 'Выбранное фото', image: props.photo } : props.photoSearch === false ? undefined : { icon: 'image-add', label: 'Поиск по фото' }}
+              focused={props.focused}
             />
             {props.filters && <ChipGroup chips={props.filters.map((f) => ({ ...f, dropdown: true }))} />}
           </>

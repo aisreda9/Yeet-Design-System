@@ -227,7 +227,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
   ],
   SearchEmpty: [btn('Сбросить поиск', (n) => n.back())],
-  PhotoCrop: [btn('Найти похожие', 'PhotoResults')],
+  PhotoCrop: [btn('Найти похожее', 'PhotoResults')],
   PhotoResults: [{ sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') }],
 
   /* Стилист */

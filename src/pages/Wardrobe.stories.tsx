@@ -176,6 +176,8 @@ function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
     <DetailsScreen
       media={<PhotoArea kind="container" />}
       title="Сумка"
+      // флоу 1174:17064: в прокрученной шапке нет «Ещё»
+      actions={scrolled ? [] : undefined}
       bottom={<BottomBar label="Переместить в гардероб" secondary={{ icon: 'external-link', label: 'Открыть в магазине' }} />}
       scrollRef={ref}
     >
@@ -207,7 +209,7 @@ export const Archive: Story = {
 export const ClearTrash: Story = {
   name: 'Trash / Items / Dialog / Clear',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
+    <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog variant="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
       <Grid>{grid.slice(0, 4).map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
     </Screen>
   ),
@@ -247,7 +249,7 @@ export const OutfitsEmpty: Story = {
   ),
 };
 
-const noFilterResults = <EmptyState title="Упс, не нашли" description={<>Измени фильтры или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить фильтры', variant: 'tertiary' }} />;
+const noFilterResults = <EmptyState title="Упс, не нашли" description={<>Измени фильтры или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить фильтры' }} />;
 
 export const ItemsNoFilterResults: Story = {
   name: 'Wardrobe / Items / No Filter Results',
@@ -282,7 +284,7 @@ export const OutfitsNoFilterResults: Story = {
 export const ItemSearchFocused: Story = {
   name: 'Wardrobe / Item Search / Query Focused',
   render: () => (
-    <Screen header={<Header type="search" placeholder="Название вещи" />}>
+    <Screen header={<Header type="search" placeholder="Название вещи" photoSearch={false} focused />}>
       <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label) => ({ label }))} />
     </Screen>
   ),
@@ -291,7 +293,7 @@ export const ItemSearchFocused: Story = {
 export const ItemSearchResults: Story = {
   name: 'Wardrobe / Item Search / Results',
   render: () => (
-    <Screen header={<Header type="search" query="Футболка" />}>
+    <Screen header={<Header type="search" query="Футболка" photoSearch={false} />}>
       <Grid><ItemCard kind="top" color="white" /><ItemCard kind="top" color="black" /></Grid>
     </Screen>
   ),
@@ -300,8 +302,8 @@ export const ItemSearchResults: Story = {
 export const ItemSearchEmpty: Story = {
   name: 'Wardrobe / Item Search / No Results',
   render: () => (
-    <Screen header={<Header type="search" query="asdasdasd" />}>
-      <div className="y-empty-bar"><EmptyState title="Упс, не нашли" description={<>Измени запрос или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить поиск', variant: 'tertiary' }} /></div>
+    <Screen header={<Header type="search" query="Кожаная куртка" photoSearch={false} />}>
+      <div className="y-empty-bar"><EmptyState title="Упс, не нашли" description={<>Измени запрос или попробуй<br />поискать что-то другое</>} action={{ label: 'Сбросить поиск' }} /></div>
     </Screen>
   ),
 };

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button } from '../atoms';
-import { demoAvatar, demoPhoto } from '../docs/helpers';
+import { Button, IconButton } from '../atoms';
+import { demoPhoto } from '../docs/helpers';
 import { ChipGroup, EmptyState, InputBar, PhotoTile, RangeSlider } from '../molecules';
 import { BottomNav, CropFrame, Header, Overlay, ProductCard, Sheet } from '../organisms';
 import { Grid, Row, Screen } from '../templates';
@@ -31,7 +31,7 @@ export const SearchDiscover: Story = {
         </Row>
       </div>
       <div className="y-discover-query"><InputBar size="L" placeholder="Белые кроссовки Nike" fieldIcon="search" /></div>
-      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquard', 'Обувь для бега'].map((label) => ({ label }))} />
+      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label) => ({ label }))} />
     </Screen>
   ),
 };
@@ -41,8 +41,9 @@ export const SearchResults: Story = {
   render: () => (
     <Screen header={<Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
       <Grid rowGap={16}>
-        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', 'Adidas Samba', 'New Balance 550', 'Puma Palermo', 'Vans Old Skool'].map((n, i) => (
-          <ProductCard key={n} kind="shoe" name={n} price={`${[10400, 14300, 11900, 13500, 9900, 7600][i].toLocaleString('ru-RU')} ₽`} discount={i % 2 ? undefined : '-10%'} liked={i === 1} />
+        {/* ряды 2–3 как во флоу: AF1 '07 и '07 LV8 по 10 400, левая в вишлисте */}
+        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8", "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8"].map((n, i) => (
+          <ProductCard key={i} kind="shoe" name={n} price={`${(i === 1 ? 14300 : 10400).toLocaleString('ru-RU')} ₽`} discount={i % 2 ? undefined : '-10%'} liked={i === 1 || i === 2 || i === 4} />
         ))}
       </Grid>
     </Screen>
@@ -52,8 +53,8 @@ export const SearchResults: Story = {
 export const SearchEmpty: Story = {
   name: 'Search / Text / No Results Filtered',
   render: () => (
-    <Screen header={<Header type="search" query="asdasd" filters={[{ label: 'Сначала дешевле', selected: true }, { label: 'до 60 000 ₽', selected: true }]} />} center>
-      <div className="y-search-empty"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск', variant: 'tertiary' }} /></div>
+    <Screen header={<Header type="search" query="Кроссовки" filters={[{ label: 'Сначала дешевле', selected: true }, { label: 'до 60 000 ₽', selected: true }]} />} center>
+      <div className="y-search-empty"><EmptyState title="Упс, не нашли" description="Измени запрос или попробуй поискать что-то другое" action={{ label: 'Сбросить поиск' }} /></div>
     </Screen>
   ),
 };
@@ -83,9 +84,10 @@ export const PriceFilter: Story = { name: 'Search / Results / Sheet / Price Filt
 export const PhotoCrop: Story = {
   name: 'Search / Photo / Crop',
   render: () => (
-    // рамка обрезки на всё фото (CropFrame, подсказка — его, в 24 над кнопкой); поверх всё белое: статус-бар, подсказка без подложки
-    <Screen background="photo" className="y-crop-screen" backdrop={<div className="y-crop-layer"><CropFrame src={demoPhoto} hint="Выдели вещь, которую ищем" /></div>} end>
-      <Button size="L" fullWidth>Найти похожие</Button>
+    // рамка обрезки на всё фото (CropFrame, подсказка — его, в 24 над кнопкой); поверх всё белое: статус-бар, подсказка без подложки; «Назад» — белый круг слева вверху (1176:19019)
+    <Screen background="photo" className="y-crop-screen" backdrop={<div className="y-crop-layer"><CropFrame src={demoPhoto} /></div>} end>
+      <IconButton className="y-crop-back" icon="chevron-left" label="Назад" variant="inverse" />
+      <Button size="L" fullWidth>Найти похожее</Button>
     </Screen>
   ),
 };
@@ -93,10 +95,11 @@ export const PhotoCrop: Story = {
 export const PhotoResults: Story = {
   name: 'Search / Photo / Results',
   render: () => (
-    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />} bottom={<BottomNav active="search" avatarSrc={demoAvatar} />}>
-      <Grid rowGap={16}>
-        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', 'Adidas Samba', 'New Balance 550'].map((n, i) => (
-          <ProductCard key={n} kind="shoe" name={n} price={`${[10400, 14300, 11900, 13500][i].toLocaleString('ru-RU')} ₽`} />
+    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
+      {/* флоу 1173:14753: без таб-бара, ряд 2 — AF1 '07 со скидкой и '07 LV8, обе в вишлисте; ряды через 24 */}
+      <Grid rowGap={24}>
+        {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8", 'Adidas Samba', 'New Balance 550'].map((n, i) => (
+          <ProductCard key={n} kind="shoe" name={n} price={`${[10400, 14300, 10400, 10400, 11900, 13500][i].toLocaleString('ru-RU')} ₽`} discount={i === 2 ? '-10%' : undefined} liked={i === 2 || i === 3} />
         ))}
       </Grid>
     </Screen>
@@ -108,7 +111,7 @@ const suggestions = ['Nike', 'Crocs', 'Marine Serre', 'Белое платье �
 export const SearchFocused: Story = {
   name: 'Search / Text / Query Focused',
   render: () => (
-    <Screen header={<Header type="search" />}>
+    <Screen header={<Header type="search" focused />}>
       <ChipGroup wrap center chips={suggestions.map((label) => ({ label }))} />
     </Screen>
   ),
@@ -117,8 +120,8 @@ export const SearchFocused: Story = {
 export const PhotoFocused: Story = {
   name: 'Search / Photo / Query Focused',
   render: () => (
-    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
-      <Grid rowGap={16}>
+    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} focused />}>
+      <Grid rowGap={24}>
         {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8"].map((n, i) => (
           <ProductCard key={i} kind="shoe" name={n} price={i % 2 ? '14 300 ₽' : '10 400 ₽'} discount={i ? undefined : '-10%'} liked={i === 1 || i === 2} />
         ))}

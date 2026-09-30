@@ -11,8 +11,8 @@ const meta = {
   title: 'Organisms/Dialog',
   component: Dialog,
   tags: ['autodocs'],
-  args: { tone: 'destructive', title: 'Очистить корзину?', description: 'Все вещи из корзины удаляются навсегда, их уже не вернуть', cancel: 'Отменить', confirm: 'Очистить' },
-  argTypes: { tone: { control: 'inline-radio', options: ['default', 'destructive', 'danger'] }, description: { control: 'text' } },
+  args: { variant: 'destructive', title: 'Очистить корзину?', description: 'Все вещи из корзины удаляются навсегда, их уже не вернуть', cancel: 'Отменить', confirm: 'Очистить' },
+  argTypes: { variant: { control: 'inline-radio', options: ['default', 'destructive', 'danger'] }, description: { control: 'text' } },
   decorators: [unlessBare(onOverlay)],
   parameters: { docs: { description: { component: 'Подтверждение в плавающей форме sheet Modal: H3 + Body grey через 12, блоки через 16, пара кнопок L через 7. **Безопасное действие всегда синее справа.** `destructive` — необратимое серым, `danger` — удаление аккаунта красной кнопкой. Без `cancel` — уведомление с одной кнопкой Tertiary на всю ширину («Ок!»). Figma: `dialog` · Tone, Actions (One / Two), Title, Description, слот Content (FILL).' } } },
 } satisfies Meta<typeof Dialog>;
@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-export const SingleAction: Story = { name: 'Одна кнопка', args: { tone: 'default', title: 'Готово!', description: 'Мы отправили ссылку для сброса пароля на sima@space.com', cancel: undefined, confirm: 'Ок!' } };
+export const SingleAction: Story = { name: 'Одна кнопка', args: { variant: 'default', title: 'Готово!', description: 'Мы отправили ссылку для сброса пароля на sima@space.com', cancel: undefined, confirm: 'Ок!' } };
 
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
@@ -30,7 +30,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={393}>
       <Usage screen="Outfit Creation / Exit">{onOverlay(() => <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" />)}</Usage>
-      <Usage screen="Settings / Delete Account" note="со статистикой">{onOverlay(() => <Dialog tone="danger" title="Аккаунт будет удалён" description="Ты потеряешь:" cancel="Отменить" confirm="Удалить"><StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow></Dialog>)}</Usage>
+      <Usage screen="Settings / Delete Account" note="со статистикой">{onOverlay(() => <Dialog variant="danger" title="Аккаунт будет удалён" description="Ты потеряешь:" cancel="Отменить" confirm="Удалить"><StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow></Dialog>)}</Usage>
       <Usage screen="Auth / Password Recovery / Dialog / Sent" note="одна кнопка">{onOverlay(() => <Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" />)}</Usage>
     </UsageGrid>
   ),
@@ -41,7 +41,7 @@ function KeyboardDemo() {
   return (
     <Screen
       header={<Header type="bar" titleChip="Корзина вещей" />}
-      overlay={<Overlay open={open} onOpenChange={setOpen}><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" onCancel={() => setOpen(false)} onConfirm={() => setOpen(false)} /></Overlay>}
+      overlay={<Overlay open={open} onOpenChange={setOpen}><Dialog variant="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" onCancel={() => setOpen(false)} onConfirm={() => setOpen(false)} /></Overlay>}
     >
       <Button variant="destructive" fullWidth onClick={() => setOpen(true)} aria-haspopup="dialog">Очистить корзину</Button>
     </Screen>
@@ -90,7 +90,7 @@ function DismissDemo() {
       overlay={
         <Overlay open={!!layer} onOpenChange={(o) => !o && close()}>
           {layer === 'actions' && <Sheet title="Название вещи"><List><ListItem icon="undo" label="Вернуть в гардероб" onClick={close} /><ListItem icon="trash" label="Удалить навсегда" onClick={() => setLayer('confirm')} /></List></Sheet>}
-          {layer === 'confirm' && <Dialog tone="destructive" title="Удалить навсегда?" description="Вещь удалится без возможности восстановления" cancel="Отменить" confirm="Удалить" onCancel={() => note('отмена')} onConfirm={close} />}
+          {layer === 'confirm' && <Dialog variant="destructive" title="Удалить навсегда?" description="Вещь удалится без возможности восстановления" cancel="Отменить" confirm="Удалить" onCancel={() => note('отмена')} onConfirm={close} />}
           {layer === 'exit' && <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" onCancel={() => note('выйти')} onConfirm={close} />}
           {layer === 'filter' && <Sheet title="Низ" onClose={() => note('шторка')} footer={[{ label: 'Очистить' }, { label: 'Использовать', onClick: close }]}><p className="y-body">Фильтр</p></Sheet>}
         </Overlay>

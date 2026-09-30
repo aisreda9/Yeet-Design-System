@@ -22,27 +22,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const greeting = 'Привет! Я твой ИИ стилист. Спрашивай про образы, сочетания и что надеть сегодня';
+const greeting = 'Привет! Я твой ИИ-стилист. Спрашивай про образы, сочетания и что надеть сегодня';
 
 /**
  * Чат со стилистом в белой панели с хэндлом, сообщения внизу над полем.
  * `reply` — ответ пользователя уже в ленте (Message Ready); `draft` — текст в поле (Greeting Entered); без них — пустое поле в фокусе.
  */
-function StylistChat({ reply, draft }: { reply?: string; draft?: string }) {
+function StylistChat({ reply, draft, focused }: { reply?: string; draft?: string; focused?: boolean }) {
   return (
     <Screen header={<Header type="large" title="Стилист" />} flush>
-      <Sheet type="panel">
+      <Sheet type="panel" className="y-chat-panel">
         <div className="y-chat-spacer" />
         <ChatBubble avatar={<span className="y-stylist-avatar"><Icon name="ai" /></span>}>{greeting}</ChatBubble>
         {reply && <ChatBubble from="user">{reply}</ChatBubble>}
-        <InputBar placeholder="Спроси у стилиста" value={draft} send={{ label: 'Отправить' }} />
+        <InputBar placeholder="Спроси у стилиста" value={draft} send={{ label: 'Отправить' }} focused={focused} />
       </Sheet>
     </Screen>
   );
 }
 
 export const Stylist: Story = { name: 'Stylist / Home / Message Ready', render: () => <StylistChat reply="Привет" /> };
-export const StylistFocused: Story = { name: 'Stylist / Assistant / Input Focused', render: () => <StylistChat /> };
+export const StylistFocused: Story = { name: 'Stylist / Assistant / Input Focused', render: () => <StylistChat focused /> };
 export const StylistGreeting: Story = { name: 'Stylist / Home / Greeting Entered', render: () => <StylistChat draft="Привет" /> };
 
 export const StylistHome: Story = {
@@ -143,7 +143,7 @@ function SurpriseScreen() {
         index={index}
         onIndexChange={(k) => { setIndex(k); setSaved(false); }}
         stamp={<Stamp label="Сохранить" done={saved} onClick={() => setSaved((v) => !v)} />}
-        skip={<Stamp label="Не нравится" tone="secondary" onClick={() => setIndex((k) => Math.min(k + 1, stylistLooks.length - 1))} />}
+        skip={<Stamp label="Не нравится" variant="secondary" onClick={() => setIndex((k) => Math.min(k + 1, stylistLooks.length - 1))} />}
       />
     </Screen>
   );
@@ -162,7 +162,7 @@ function WhatToWearScreen() {
   const looks = occasions.map((o, k) => ({ ...stylistLooks[k % stylistLooks.length], id: o, name: o.trim() }));
   return (
     <Screen header={<Header type="bar" titleChip="С чем носить" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
-      <OutfitPager axis="x" looks={looks} index={index} onIndexChange={setIndex} aria-label="Образы по поводам" stamp={<Stamp label="Сохранить" />} skip={<Stamp label="Не нравится" tone="secondary" onClick={() => setIndex((k) => Math.min(k + 1, looks.length - 1))} />} />
+      <OutfitPager axis="x" looks={looks} index={index} onIndexChange={setIndex} aria-label="Образы по поводам" stamp={<Stamp label="Сохранить" />} skip={<Stamp label="Не нравится" variant="secondary" onClick={() => setIndex((k) => Math.min(k + 1, looks.length - 1))} />} />
       <div className="y-occasions">
         <ChipGroup chips={occasions.map((label, k) => ({ label: label.trim(), selected: k === index }))} onToggle={(label) => setIndex(occasions.findIndex((o) => o.trim() === label))} />
       </div>

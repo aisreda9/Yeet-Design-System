@@ -57,7 +57,7 @@ function CanvasScreen({ filtered, hint: withHint = filtered, overlay }: { filter
     { id: 'top', kind: 'top', color: 'green' }, { id: 'glasses', kind: 'accessories', color: 'black' },
   ];
   const spots: Record<string, Pick<CanvasItem, 'x' | 'y' | 'size'>> = { bottom: { x: 30, y: 58, size: 140 }, shoes: { x: 72, y: 76, size: 72 }, top: { x: 66, y: 34 }, glasses: { x: 32, y: 18, size: 56 } };
-  const [items, setItems] = useState<CanvasItem[]>(filtered ? wardrobe.slice(0, 2).map((w) => ({ ...w, ...spots[w.id] })) : []);
+  const [items, setItems] = useState<CanvasItem[]>(filtered ? wardrobe.map((w) => ({ ...w, ...spots[w.id] })) : []);
   const [selected, setSelected] = useState<string>();
   const [hint, setHint] = useState(withHint);
   const toggle = (w: (typeof wardrobe)[number]) =>
@@ -86,7 +86,7 @@ export const CanvasHint: Story = { name: 'Outfit Creation / Canvas / Gesture Hin
 export const OutfitCriteria: Story = {
   name: 'Outfit Creation / Criteria / Default',
   render: () => (
-    <Screen header={<Header type="bar" center={steps('info')} />} bottom={<BottomBar label="Создать образ" />}>
+    <Screen header={<Header type="bar" center={steps('info', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={<BottomBar label="Создать образ" />}>
       <InputGroup>
         <Field label="Повод" value="Все" trailingIcon="chevron-up-down" />
         <Field label="Сезон" value="Все" trailingIcon="chevron-up-down" />
@@ -163,7 +163,7 @@ export const ExitDialog: Story = {
 
 export const ClearDialog: Story = {
   name: 'Outfit Creation / Clear / Dialog / Confirmation',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog tone="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog variant="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
 };
 
 export const ItemFilterSheet: Story = {

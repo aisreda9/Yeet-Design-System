@@ -60,7 +60,7 @@ export const DeleteAccount: Story = {
       header={header}
       overlay={
         <Overlay>
-          <Dialog tone="danger" title="Аккаунт будет удалён" description={<>Сима, твой аккаунт <span className="y-text--primary"><Link href="mailto:sima@space.com">sima@space.com</Link></span> будет деактивирован.</>} cancel="Отменить" confirm="Удалить">
+          <Dialog variant="danger" title="Аккаунт будет удалён" description={<>Сима, твой аккаунт <span className="y-text--primary"><Link href="mailto:sima@space.com">sima@space.com</Link></span> будет деактивирован.</>} cancel="Отменить" confirm="Удалить">
             <p className="y-body y-text--secondary">Ты потеряешь:</p>
             <StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow>
             <p className="y-body y-text--secondary">В течение 14 дней аккаунт можно восстановить — просто войди с тем же паролем.</p>
@@ -119,7 +119,7 @@ export const LegalTerms: Story = {
 export const SignOutDialog: Story = {
   name: 'Settings / Sign Out / Dialog / Confirmation',
   render: () => (
-    <Screen header={header} overlay={<Overlay><Dialog tone="destructive" title="Точно хочешь выйти?" description="Тебе потребуется снова войти в аккаунт, чтобы продолжить." cancel="Отменить" confirm="Выйти" /></Overlay>}>
+    <Screen header={header} overlay={<Overlay><Dialog variant="destructive" title="Точно хочешь выйти?" description="Тебе потребуется снова войти в аккаунт, чтобы продолжить." cancel="Отменить" confirm="Выйти" /></Overlay>}>
       <AccountCard account={sima} kind="settings" />
     </Screen>
   ),

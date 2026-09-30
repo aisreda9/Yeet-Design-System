@@ -29,6 +29,7 @@
 
 /* Stylist / Home: сообщения прижаты к низу панели, над полем ввода */
 .y-chat-spacer { flex: 1; min-height: 180px; } /* stylelint-disable-line unit-disallowed-list -- место под аватар стилиста из Figma */
+.y-chat-panel { margin-top: calc(var(--space-8) * -1); } /* флоу 1176:19708: панель чата на 12 под заголовком (y118), а не на 20 */
 
 /* Settings / Main: подвал (1371:39113) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
 .y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
@@ -53,3 +54,5 @@
 .y-crop-screen .y-screen__content { position: relative; z-index: 1; }
 .y-crop-screen .y-screen__content { pointer-events: none; }
 .y-crop-screen .y-screen__content > * { pointer-events: auto; }
+/* «Назад» наверху, как в шапке: контент начинается на 20 ниже статус-бара, кнопка шапки — на 8 */
+.y-crop-screen .y-crop-back { align-self: flex-start; margin: calc(var(--space-8) - var(--space-20)) 0 auto; }
