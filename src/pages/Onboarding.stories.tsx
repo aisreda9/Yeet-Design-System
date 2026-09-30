@@ -42,6 +42,7 @@ export const OnboardingWelcome: Story = {
 
 export const FirstItemPrompt: Story = {
   name: 'Onboarding / First Item Prompt',
+  tags: ['figma:1371-37125'],
   render: () => (
     // Пустой холст ждёт первую вещь; «Добавить» открывает выбор фото. Перенос заголовка — неразрывными пробелами «вещь в гардероб»
     <Screen

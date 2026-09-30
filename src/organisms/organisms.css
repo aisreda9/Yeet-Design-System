@@ -85,7 +85,7 @@
 .y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
 .y-tab-bar__avatar { width: 20px; height: 20px; border: var(--border-width-icon) solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */ /* stylelint-disable-line unit-disallowed-list -- аватар 20 и буква Roboto Slab 14 в таб-баре из Figma */
-.y-tab-bar__avatar--photo { overflow: hidden; } /* фото профиля в той же обводке 1.3: серой у неактивной вкладки */
+.y-tab-bar__avatar--photo { width: var(--space-24); height: var(--space-24); border: 0; border-radius: var(--radius-sm); overflow: hidden; } /* Figma 1186:20825: фото профиля 24 без обводки */
 .y-tab-bar__avatar--photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* Тени закреплённой навигации рисуются поверх полосы затухания (ScrollEdge — absolute и иначе перекрывает тень) */
 .y-bottom-nav > .y-tab-bar,
@@ -250,7 +250,7 @@
   position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; padding: 0; border: 0; background: none; /* stylelint-disable-line unit-disallowed-list -- «×» 24 в 20 от угла: кнопка 44 → 10 от края */
   display: grid; place-items: center; color: var(--color-text-secondary); cursor: pointer;
 }
-.y-photo-area__close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--radius-full); }
+.y-photo-area__close:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset-inset); border-radius: var(--radius-full); }
 
 /* Погода: Figma — Inter 460 12/16, #A7B3BF; предупреждение — белым второй строкой */
 .y-weather {
@@ -427,7 +427,7 @@
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
 }
 .y-item-slot__row::-webkit-scrollbar { display: none; }
-.y-item-slot__row:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; border-radius: var(--card-radius); }
+.y-item-slot__row:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset-inset); border-radius: var(--card-radius); }
 .y-item-slot__item { flex: none; width: var(--slot-card); scroll-snap-align: center; }
 /* «+»: карточка той же ширины без фона, кнопка в 22 от края рядом с последней вещью; в пустой секции — по центру */
 .y-item-slot__add { flex: none; width: var(--slot-card); aspect-ratio: 173 / 172; display: grid; place-items: center start; padding-left: 21px; } /* stylelint-disable-line unit-disallowed-list -- «+» в 21 от края (Figma) */

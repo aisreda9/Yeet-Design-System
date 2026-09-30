@@ -32,8 +32,8 @@
   transition: box-shadow var(--motion-fade);
 }
 .y-crop__frame:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 4px;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: calc(var(--focus-ring-offset) * 2);
 }
 .y-crop.is-active .y-crop__frame {
   box-shadow:

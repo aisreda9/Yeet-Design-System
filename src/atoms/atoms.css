@@ -129,7 +129,7 @@
 .y-stamp__done { opacity: 0; transform: scale(0.6); }
 /* Figma (флоу Outfits / Everyday): подпись штампа (и иконка малого штампа) наклонена на 15° по часовой (rotation −15 в Figma) */
 .y-stamp__label { rotate: 15deg; }
-.y-stamp:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 50%; }
+.y-stamp:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: calc(var(--focus-ring-offset) * 2); border-radius: 50%; }
 /* done: 148 → 78 (×0.53), поворот −60°, чёрный, текст → «отменить». doneSize S: 148 → 56 (×0.378, детали образа 440:3008) */
 .y-stamp--done .y-stamp__shape { transform: scale(var(--stamp-done-scale, 0.53)) rotate(-60deg); color: var(--button-secondary-bg); }
 .y-stamp--done-S { --stamp-done-scale: 0.378; }

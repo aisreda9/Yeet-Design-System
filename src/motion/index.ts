@@ -3,3 +3,4 @@ export { curves, sample, motions, mechanics, type Curve, type MotionSpec, type M
 export { useSwipePager, type SwipePager, type SwipePagerOptions } from './usePager';
 export { usePhotoCollapse, photoCollapse, type PhotoCollapse, type PhotoCollapseOptions } from './useCollapse';
 export { useReducedMotion } from './useReducedMotion';
+export { useScrollToActive } from './useScrollToActive';
