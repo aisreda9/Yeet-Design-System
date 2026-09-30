@@ -821,14 +821,14 @@
       }
     },
     {
-      "figma": "Search / Photo / Crop 261:1590 · рамка 353 × 226, 20 от края, верх 315",
+      "figma": "crop-frame 1356:29832 / 1176:19019 · рамка 353 × 227, 20 от края, верх 313",
       "story": "organisms-cropframe--in-flow",
       "selector": ".y-crop__frame",
       "expect": {
         "width": 353,
-        "height": 226,
+        "height": 227,
         "left": 20,
-        "top": 315,
+        "top": 313,
         "borderRadius": 20
       }
     },

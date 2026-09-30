@@ -227,3 +227,65 @@ export const SearchChain: Story = {
     await at(root, 'SearchResults');
   },
 };
+
+/* ─── Play: тост с «Отменить» — удаление окончательное, когда тост закрылся (#184) ─ */
+
+const cards = (root: HTMLElement) => [...topEl(root).querySelectorAll<HTMLElement>('.y-item-card')].filter((e) => e.style.display !== 'none');
+const toastEl = (root: HTMLElement) => root.querySelector<HTMLElement>('.y-proto__toast .y-snackbar');
+const noToast = (root: HTMLElement, timeout = 1000) => waitFor(() => expect(toastEl(root)).toBeNull(), { timeout });
+/** Вещь в корзине → шторка действий → «Удалить навсегда»: вещь пропадает сразу, тост с «Отменить». */
+const deleteForever = async (root: HTMLElement, c: Canvas) => {
+  await tap(root, cards(root)[0]);
+  await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Удалить навсегда' }));
+  await gone(c, 'dialog');
+  await c.findByText('Вещь удалена навсегда');
+};
+
+/** Корзина: «Отменить» возвращает вещь; «×» и таймер — удаление окончательное; последняя вещь — пустая корзина и обратно. */
+export const TrashUndo: Story = {
+  name: 'Тост: удалить навсегда и отменить',
+  args: { start: 'TrashPopulated' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root, step }) => {
+    const c = within(root);
+    await at(root, 'TrashPopulated');
+    await expect(cards(root)).toHaveLength(2);
+
+    await step('удалить → «Отменить» → вещь на месте', async () => {
+      await deleteForever(root, c);
+      await expect(cards(root)).toHaveLength(1);
+      await tap(root, within(toastEl(root)!).getByRole('button', { name: 'Отменить' }));
+      await noToast(root);
+      await idle(root);
+      await expect(cards(root)).toHaveLength(2);
+    });
+
+    await step('удалить → закрыть тост → вещи нет', async () => {
+      await deleteForever(root, c);
+      await tap(root, within(toastEl(root)!).getByRole('button', { name: 'Закрыть' }));
+      await noToast(root);
+      await expect(cards(root)).toHaveLength(1);
+    });
+
+    await step('удалить последнюю → пустая корзина → «Отменить» → корзина с вещью', async () => {
+      await deleteForever(root, c);
+      await at(root, 'TrashEmpty');
+      await tap(root, within(toastEl(root)!).getByRole('button', { name: 'Отменить' }));
+      await at(root, 'TrashPopulated');
+      await expect(cards(root)).toHaveLength(1);
+    });
+  },
+};
+
+/** Корзина: тост закрылся сам (6 с с «Отменить») — удаление окончательное. Отдельно: ожидание таймера не укладывается в общий сценарий. */
+export const TrashAutoHide: Story = {
+  name: 'Тост: удалить навсегда и дождаться',
+  args: { start: 'TrashPopulated' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'TrashPopulated');
+    await deleteForever(root, c);
+    await expect(cards(root)).toHaveLength(1);
+    await noToast(root, 8000);
+    await expect(cards(root)).toHaveLength(1);
+  },
+};
