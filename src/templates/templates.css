@@ -125,6 +125,7 @@
  */
 .y-prose { display: flex; flex-direction: column; gap: var(--space-24); }
 .y-prose__head, .y-prose__section { display: flex; flex-direction: column; gap: var(--space-12); }
+.y-prose__head { gap: var(--space-28); } /* «Обновлено» на 28 ниже заголовка, как во Flow 2.0 (1204:20720, 1204:20805; #203) */
 .y-prose p, .y-prose ul { margin: 0; }
 .y-prose ul { padding-left: 21px; /* stylelint-disable-line unit-disallowed-list -- отступ маркера 21 из Figma */ display: flex; flex-direction: column; } /* пункты без зазора, как во Flow 2.0 (1204:20720) */
 .y-prose .y-link { color: var(--color-text-primary); } /* почта — основным цветом среди серого текста; подчёркивание и зона нажатия — у Link */

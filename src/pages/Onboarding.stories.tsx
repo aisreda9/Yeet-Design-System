@@ -63,7 +63,7 @@ export const SignIn: Story = {
       </InputGroup>
       <Stack gap={8} align="center">
         <Button size="L" fullWidth>Войти</Button>
-        <Button variant="ghost" size="L">Забыли пароль?</Button>
+        <Button variant="ghost" size="L">Не помнишь пароль?</Button>
       </Stack>
       <Divider label="или" />
       <Button variant="secondary" size="L" leftIcon="apple" fullWidth>Войти с Apple</Button>
@@ -72,7 +72,7 @@ export const SignIn: Story = {
   ),
 };
 
-const recoveryHeader = <Header type="back" title="Забыли пароль?" subtitle={<>Пришлём код на почту, указанную при<br />регистрации</>} />;
+const recoveryHeader = <Header type="back" title="Не помнишь пароль?" subtitle={<>Пришлём код на почту, указанную при<br />регистрации</>} />;
 
 export const PasswordRecovery: Story = {
   name: 'Auth / Password Recovery',
