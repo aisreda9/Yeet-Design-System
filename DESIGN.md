@@ -14,14 +14,14 @@
 
 | Что | Узел | Назначение |
 |---|---|---|
-| **Design System 0.2** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Компоненты на коллекции «Yeet DS 2.0» (Light / Dark) — **источник правды для кода** |
-| Screens Design 0.2 | [`70:12`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=70-12) | Экраны флоу из компонентов DS 0.2, только светлая тема (секция `1168:12824`); тёмные экраны пока не делаем |
-| Screens Design 0.1 | [`1306:22698`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=1306-22698) | Исходные макеты дизайнера (~150 экранов и состояний) — эталон вида, якоря `npm run flow-diff` |
+| **Design System 0.2** | [`942:5666`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=942-5666) | Единая страница: компоненты на коллекции «Yeet DS 2.0» (Light / Dark) и экраны флоу из них (секция Pages, только светлая тема, `1168:12824`) — **источник правды для кода** |
+| New App (Raw) | [`551:2286`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=551-2286) | Оригиналы, только чтение: исходные макеты дизайнера (~140 экранов и состояний, кадры `1371:*`) — эталон вида, якоря `npm run flow-diff`; старые компоненты DS 0.1 |
 | Animations | [`354:17404`](https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=354-17404) | Переходы Smart Animate — источник `--motion-*`. Читается по id, но `get_metadata` без `nodeId` её не перечисляет — открывать по ссылке |
 
 Правило: **компонент DS — закон, экран — пример использования.** Порядок правки — `CONTRIBUTING.md`. Оригинальные страницы YeetStyle 2.0 не трогаем; писать в Figma — под замком (`TEAM.md` §5).
 
-Секции страницы 2.0: 00 Обзор · 01 Foundations · 02 Actions · 03 Inputs · 04 Selection · 05 Navigation & scroll · 06 Overlays · 07 Content · 08 States · 09 System · 10 Screen patterns · 11 Motion.
+Секции страницы 0.2 слева направо — как сайдбар Storybook: Старт `971:3417` · Foundations `971:3420` (вложенная «Анимации» `1005:5032`) · Atoms `1392:18500` · Molecules `1392:31250` · Organisms `1392:31277` · Templates `1392:31304` · Pages `1391:18500`.
+Группа компонента подписана путём истории Storybook (`Molecules/ChipGroup`); колонки «В флоу» в Figma нет — пример использования — экраны в Pages. Прежняя страница Screens Design 0.2 `70:12` влита сюда 30.09 (#166), node-id экранов прежние.
 Коллекции переменных: **«Yeet DS 2.0»** — основная (с тёмной темой, `motion/*` скрыты из пикеров); «Yeet Design System» — исходная, на ней экраны флоу.
 `node-id` каждого компонента — в `registry.ts` (`figmaId`).
 
