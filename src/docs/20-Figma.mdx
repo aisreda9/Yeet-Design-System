@@ -9,6 +9,10 @@ import { ComponentRegistry, StatusLegend } from './blocks';
 Секции слева направо — как сайдбар Storybook: Старт · Foundations (с «Анимациями») · Atoms · Molecules · Organisms · Templates · Pages. Группа компонента подписана путём истории (`Molecules/ChipGroup`),
 внутри уровня — по алфавиту. В секциях компонентов — только компонент со всеми вариантами; пример использования — экраны в Pages.
 
+**Навигация в обе стороны.** Figma → Storybook: подпись группы и строка «Уровень · Код · Storybook» в описании компонента.
+Storybook → Figma: кнопка **Figma ↗** в тулбаре — компонент ведёт на свой узел (`figmaId` в реестре), экран Pages — на кадр в «Pages/Экраны флоу · Light»,
+документация — на секцию уровня. Узлы берутся из снимка `src/docs/figma-nodes.json`; `npm run qa` (coverage) падает, если `figmaId` из реестра в снимке нет.
+
 ## Переменные Figma → токены кода
 
 | Figma | Код |

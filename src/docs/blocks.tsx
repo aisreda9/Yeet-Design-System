@@ -5,6 +5,7 @@ import { itemColors, radii, semanticColors, spaces, textStyles } from '../tokens
 import { tokens as tokenSource } from '../tokens/model';
 import { registry, type Level, type Status } from './registry';
 import { statusMeta } from './status';
+import { figmaSection, figmaUrl } from './figma';
 import { mechanics, motions } from '../motion/motion';
 import '../styles.css';
 
@@ -166,7 +167,6 @@ const levels: { level: string; what: string; rule: string; items: string[] }[] =
   { level: 'Pages', what: 'Экраны флоу с реальными данными', rule: 'Шаблон + содержимое', items: ['Splash', 'Onboarding', 'Auth', 'Сегодня', 'Гардероб', 'Поиск', 'Стилист', 'Поездки', 'Профиль', 'Настройки', '…'] },
 ];
 
-const figmaNode = (id: string) => `https://www.figma.com/design/1LAkot5WySMWhwiiFJqJ0e/YeetStyle-2.0?node-id=${id.replace(':', '-')}`;
 
 /** Бейдж зрелости компонента — тот же, что в сайдбаре Storybook. */
 export function StatusBadge({ status }: { status: Status }) {
@@ -203,11 +203,11 @@ export function ComponentRegistry() {
         <span style={mono}>
           {e.figma ?? '—'}
           {e.figmaId ? (
-            <> · <a href={figmaNode(e.figmaId)} target="_blank" rel="noreferrer">{e.figmaId}</a></>
+            <> · <a href={figmaUrl(e.figmaId)} target="_blank" rel="noreferrer">{e.figmaId}</a></>
           ) : e.figmaWhy && <div style={cap}>нет компонента: {e.figmaWhy}</div>}
           {e.note && <div style={cap}>{e.note}</div>}
         </span>,
-        <Muted>{e.section}</Muted>,
+        <Muted>{(e.figmaId && figmaSection(e.figmaId)) ?? '—'}</Muted>,
         <Muted>{e.story}</Muted>,
       ])}
     />
