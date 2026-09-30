@@ -36,7 +36,7 @@ function StylistChat({ reply, draft }: { reply?: string; draft?: string }) {
   );
 }
 
-export const Stylist: Story = { name: 'Stylist / Home / Message Ready', render: () => <StylistChat reply="Приветы" /> };
+export const Stylist: Story = { name: 'Stylist / Home / Message Ready', render: () => <StylistChat reply="Привет" /> };
 export const StylistFocused: Story = { name: 'Stylist / Assistant / Input Focused', render: () => <StylistChat /> };
 export const StylistGreeting: Story = { name: 'Stylist / Home / Greeting Entered', render: () => <StylistChat draft="Привет" /> };
 
@@ -46,7 +46,7 @@ export const StylistHome: Story = {
     <Screen header={<Header type="large" title="Стилист" subtitle="Нашли классную вещь? Покажем, где купить такую же или похожую." />} bottom={<StylistDock />}>
       <Grid>
         <StylistPromptCard wide title="Конструктор" description="Образы по разным критериям" />
-        <StylistPromptCard title="Удиви меня" description="Рулетка образов, собранных из ваших вещей" />
+        <StylistPromptCard title="Удиви меня" description="Рулетка образов, собранных из твоих вещей" />
         <StylistPromptCard title="С чем носить" description="Максимум из одной вещи" />
         <StylistPromptCard wide title="Для поездок" description="Стиль и лёгкость в любой поездке" art={<ItemArt kind="container" size={150} color="grey" />} />
         <StylistPromptCard soon title="Оживи гардероб" description="Новая жизнь старым вещам" />
@@ -62,7 +62,7 @@ const tripArt = (a: Garment, b: Garment, c: Garment) => [{ kind: a, x: 70, y: 28
 export const Trips: Story = {
   name: 'Stylist / Trips / List',
   render: () => (
-    <Screen header={<Header type="bar" titleChip="Все для поездок" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+    <Screen header={<Header type="bar" titleChip="Всё для поездок" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <Grid>
         <TripCard add />
         <TripCard city="Самуй" items={12} outfits={8} art={tripArt('container', 'bottom', 'top')} />
@@ -75,7 +75,7 @@ export const Trips: Story = {
   ),
 };
 
-const tripHeader = <Header type="bar" titleChip="Бразилиа" titleChipSub="8-13 сент · 5 ночей" actions={[{ icon: 'more', label: 'Ещё' }]} />;
+const tripHeader = <Header type="bar" titleChip="Бразилиа" titleChipSub="8–13 сент · 5 ночей" actions={[{ icon: 'more', label: 'Ещё' }]} />;
 const tripTabs = [{ value: 'outfits', label: 'Образы · 1' }, { value: 'items', label: 'Вещи · 4' }];
 
 export const TripItems: Story = {
@@ -113,7 +113,7 @@ export const OutfitOfTheDayEmpty: Story = {
   render: () => (
     <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <div className="y-empty-bar">
-        <EmptyState title="Не понравилось?" description={<>Добавь больше вещей для создания образов<br />вручную или с помощью ИИ</>} action={{ label: 'Показать еще', variant: 'primary' }} />
+        <EmptyState title="Не понравилось?" description={<>Добавь больше вещей для создания образов<br />вручную или с помощью ИИ</>} action={{ label: 'Показать ещё', variant: 'primary' }} />
       </div>
     </Screen>
   ),

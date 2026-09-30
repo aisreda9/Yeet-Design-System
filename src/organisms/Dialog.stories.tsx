@@ -11,7 +11,7 @@ const meta = {
   title: 'Organisms/Dialog',
   component: Dialog,
   tags: ['autodocs'],
-  args: { tone: 'destructive', title: 'Очистить корзину?', description: 'Все вещи из корзины удаляются навсегда, их уже не вернуть', cancel: 'Отмена', confirm: 'Очистить' },
+  args: { tone: 'destructive', title: 'Очистить корзину?', description: 'Все вещи из корзины удаляются навсегда, их уже не вернуть', cancel: 'Отменить', confirm: 'Очистить' },
   argTypes: { tone: { control: 'inline-radio', options: ['default', 'destructive', 'danger'] }, description: { control: 'text' } },
   decorators: [unlessBare(onOverlay)],
   parameters: { docs: { description: { component: 'Подтверждение в плавающей форме sheet Modal: H3 + Body grey через 12, блоки через 16, пара кнопок L через 7. **Безопасное действие всегда синее справа.** `destructive` — необратимое серым, `danger` — удаление аккаунта красной кнопкой. Без `cancel` — уведомление с одной кнопкой Tertiary на всю ширину («Ок!»). Figma: `dialog` · Tone, Actions (One / Two), Title, Description, слот Content (FILL).' } } },
@@ -41,14 +41,14 @@ function KeyboardDemo() {
   return (
     <Screen
       header={<Header type="bar" titleChip="Корзина вещей" />}
-      overlay={<Overlay open={open} onOpenChange={setOpen}><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отмена" confirm="Очистить" onCancel={() => setOpen(false)} onConfirm={() => setOpen(false)} /></Overlay>}
+      overlay={<Overlay open={open} onOpenChange={setOpen}><Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" onCancel={() => setOpen(false)} onConfirm={() => setOpen(false)} /></Overlay>}
     >
       <Button variant="destructive" fullWidth onClick={() => setOpen(true)} aria-haspopup="dialog">Очистить корзину</Button>
     </Screen>
   );
 }
 
-/** Модальность с клавиатуры: фокус на безопасном действии, Tab по кругу, Escape = «Отмена», фокус возвращается. */
+/** Модальность с клавиатуры: фокус на безопасном действии, Tab по кругу, Escape = «Отменить», фокус возвращается. */
 export const Keyboard: Story = {
   name: 'Клавиатура',
   tags: ['bare'],
@@ -57,12 +57,12 @@ export const Keyboard: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const opener = canvas.getByRole('button', { name: 'Очистить корзину' });
-    await step('Открыть: фокус на «Отмена»', async () => {
+    await step('Открыть: фокус на «Отменить»', async () => {
       await userEvent.click(opener);
       const dialog = await canvas.findByRole('alertdialog', { name: 'Очистить корзину?' });
       await expect(dialog).toHaveAttribute('aria-modal', 'true');
       await expect(dialog).toHaveAccessibleDescription('Все вещи из корзины удаляются навсегда, их уже не вернуть');
-      await waitFor(() => expect(canvas.getByRole('button', { name: 'Отмена' })).toHaveFocus());
+      await waitFor(() => expect(canvas.getByRole('button', { name: 'Отменить' })).toHaveFocus());
     });
     await step('Tab по кругу внутри диалога', async () => {
       await userEvent.tab();
@@ -71,7 +71,7 @@ export const Keyboard: Story = {
       await userEvent.tab({ shift: true });
       await expect(canvas.getByRole('button', { name: 'Очистить' })).toHaveFocus();
     });
-    await step('Escape = «Отмена», фокус возвращается', async () => {
+    await step('Escape = «Отменить», фокус возвращается', async () => {
       await userEvent.keyboard('{Escape}');
       await waitFor(() => expect(canvas.queryByRole('alertdialog')).toBeNull());
       await expect(opener).toHaveFocus();
@@ -90,7 +90,7 @@ function DismissDemo() {
       overlay={
         <Overlay open={!!layer} onOpenChange={(o) => !o && close()}>
           {layer === 'actions' && <Sheet title="Название вещи"><List><ListItem icon="undo" label="Вернуть в гардероб" onClick={close} /><ListItem icon="trash" label="Удалить навсегда" onClick={() => setLayer('confirm')} /></List></Sheet>}
-          {layer === 'confirm' && <Dialog tone="destructive" title="Удалить навсегда?" description="Вещь удалится без возможности восстановления" cancel="Отмена" confirm="Удалить" onCancel={() => note('отмена')} onConfirm={close} />}
+          {layer === 'confirm' && <Dialog tone="destructive" title="Удалить навсегда?" description="Вещь удалится без возможности восстановления" cancel="Отменить" confirm="Удалить" onCancel={() => note('отмена')} onConfirm={close} />}
           {layer === 'exit' && <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" onCancel={() => note('выйти')} onConfirm={close} />}
           {layer === 'filter' && <Sheet title="Низ" onClose={() => note('шторка')} footer={[{ label: 'Очистить' }, { label: 'Использовать', onClick: close }]}><p className="y-body">Фильтр</p></Sheet>}
         </Overlay>
@@ -119,16 +119,16 @@ export const Dismiss: Story = {
   name: 'Закрытие',
   tags: ['bare'],
   args: { title: '', confirm: '' },
-  parameters: { controls: { disable: true }, docs: { description: { story: 'Шторка действий → «Удалить навсегда» → подтверждение в том же слое: фокус переходит на безопасную «Отмена», Escape работает. `destructive` / `danger` (решение D6) не закрываются свайпом и тапом по затемнению — только кнопками и Escape. Любое закрытие вызывает `onCancel` диалога (или `onClose` шторки) ровно один раз. Подтверждение — без хэндла (D1), появляется за `--motion-appear`.' } } },
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Шторка действий → «Удалить навсегда» → подтверждение в том же слое: фокус переходит на безопасную «Отменить», Escape работает. `destructive` / `danger` (решение D6) не закрываются свайпом и тапом по затемнению — только кнопками и Escape. Любое закрытие вызывает `onCancel` диалога (или `onClose` шторки) ровно один раз. Подтверждение — без хэндла (D1), появляется за `--motion-appear`.' } } },
   render: () => <DismissDemo />,
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const log = () => canvas.getByTestId('log').textContent;
-    await step('Шторка → подтверждение в том же слое: фокус на «Отмена», хэндла нет', async () => {
+    await step('Шторка → подтверждение в том же слое: фокус на «Отменить», хэндла нет', async () => {
       await userEvent.click(canvas.getByRole('button', { name: 'Действия' }));
       await userEvent.click(await canvas.findByRole('button', { name: 'Удалить навсегда' }));
       const dialog = await canvas.findByRole('alertdialog', { name: 'Удалить навсегда?' });
-      await waitFor(() => expect(canvas.getByRole('button', { name: 'Отмена' })).toHaveFocus());
+      await waitFor(() => expect(canvas.getByRole('button', { name: 'Отменить' })).toHaveFocus());
       await expect(dialog.querySelector('.y-sheet__handle')).toBeNull();
     });
     await step('Рискованное: затемнение и свайп не закрывают', async () => {

@@ -104,7 +104,7 @@ function SignInDemo() {
       style={{ display: 'grid', gap: 16 }}
       onSubmit={(e) => {
         e.preventDefault();
-        setError(/^\S+@\S+\.\S+$/.test(email) ? '' : 'Проверьте адрес: нужен вид name@mail.ru');
+        setError(/^\S+@\S+\.\S+$/.test(email) ? '' : 'Проверь адрес: нужен вид name@mail.ru');
       }}
     >
       <FormField label="Почта" description="Пришлём код для входа" error={error} required>
@@ -127,7 +127,7 @@ function SignInDemo() {
 
 /**
  * Сценарий проверки: нажать «Получить код» с пустым полем — под полем появляется ошибка красным, скринридер
- * озвучивает её сразу, а на поле — «Почта, недопустимое значение, Пришлём код для входа. Проверьте адрес…».
+ * озвучивает её сразу, а на поле — «Почта, недопустимое значение, Пришлём код для входа. Проверь адрес…».
  * Ввести адрес и отправить снова — ошибка исчезает.
  */
 export const Validation: Story = {
@@ -155,9 +155,9 @@ export const Keyboard: Story = {
     await step('Enter с неверным адресом: ошибка в aria-describedby и live-регионе', async () => {
       await userEvent.type(field, 'sima@mail{Enter}');
       await waitFor(() => expect(field).toHaveAttribute('aria-invalid', 'true'));
-      await expect(describedBy()).toEqual(['Пришлём код для входа', 'Проверьте адрес: нужен вид name@mail.ru']);
-      await expect(field).toHaveAccessibleDescription('Пришлём код для входа Проверьте адрес: нужен вид name@mail.ru');
-      await expect(canvasElement.querySelector('[aria-live="polite"]')).toHaveTextContent('Проверьте адрес');
+      await expect(describedBy()).toEqual(['Пришлём код для входа', 'Проверь адрес: нужен вид name@mail.ru']);
+      await expect(field).toHaveAccessibleDescription('Пришлём код для входа Проверь адрес: нужен вид name@mail.ru');
+      await expect(canvasElement.querySelector('[aria-live="polite"]')).toHaveTextContent('Проверь адрес');
       await expect(field).toHaveFocus();
     });
     await step('Исправить и отправить кнопкой с клавиатуры — ошибка уходит', async () => {

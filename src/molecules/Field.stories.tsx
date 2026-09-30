@@ -58,7 +58,7 @@ export const InFlow: Story = {
     <UsageGrid min={353}>
       <Usage screen="Auth / Sign In"><InputGroup><Field label="E-mail" input={{ type: 'email', defaultValue: 'sima@space.com' }} /><Field label="Пароль" input={{ type: 'password', defaultValue: 'yeet-2026' }} /></InputGroup></Usage>
       <Usage screen="New Item / Details" note="ввод"><InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup></Usage>
-      <Usage screen="New Item / Details" note="ключ — значение, выбор в sheet"><InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /></InputGroup></Usage>
+      <Usage screen="New Item / Details" note="ключ — значение, выбор в sheet"><InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Чёрный" colorDot="black" trailingIcon="chevron-up-down" /></InputGroup></Usage>
       <Usage screen="Settings" note="страна и валюта"><InputGroup><Field label="Страна" value="Россия" trailingIcon="chevron-up-down" /><Field label="Валюта" value="₽ · RUB" trailingIcon="chevron-up-down" /></InputGroup></Usage>
       <Usage screen="Outfit Creation / Info" note="многострочное, 104"><InputGroup><Field label="Название" input={{}} /><Field label="Комментарий" multiline={{}} /></InputGroup></Usage>
       <Usage screen="Auth / Sign In" note="ошибка"><InputGroup><Field label="Пароль" input={{ type: 'password', defaultValue: '12345' }} error /></InputGroup></Usage>

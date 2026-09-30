@@ -182,7 +182,7 @@ function CollapseDemo() {
       <div ref={scroll} className="y-collapse__scroll">
         <div className="y-collapse__panel">
           <h2 className="y-h2">Сумка</h2>
-          <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p>
+          <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Чёрный · Все сезоны</p>
           {Array.from({ length: 6 }, (_, k) => <div key={k} style={{ height: 96, borderRadius: 20, background: 'var(--card-bg)' }} />)}
         </div>
       </div>

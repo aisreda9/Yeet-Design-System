@@ -25,7 +25,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={353}>
       <Usage screen="Profile / Analytics" note="по категориям"><BarChart bars={categories} /></Usage>
-      <Usage screen="Profile / Analytics" note="по цветам"><BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Черный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} /></Usage>
+      <Usage screen="Profile / Analytics" note="по цветам"><BarChart bars={[{ label: 'Синий', color: 'blue', value: 13 }, { label: 'Чёрный', color: 'black', value: 62 }, { label: 'Коричневый', color: 'brown', value: 25 }]} /></Usage>
       <Usage screen="Profile / Analytics" note="по сезонам"><BarChart bars={[{ label: 'Весна', icon: 'flower', value: 20 }, { label: 'Лето', icon: 'sun', value: 70 }, { label: 'Осень', icon: 'leaf', value: 8 }, { label: 'Зима', icon: 'snowflake', value: 1 }]} /></Usage>
     </UsageGrid>
   ),

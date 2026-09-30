@@ -24,7 +24,7 @@ export const NewItem: Story = {
     // как во флоу: детали в панели под фото, заголовок H2; при скролле фото уходит в миниатюру вместо пилюли (1371:40849)
     <DetailsScreen media={<PhotoArea><LoadingState label="Удаляем фон" /></PhotoArea>} titleChip="Новая вещь" actions={[]} title="Детали новой вещи">
       <InputGroup><Field label="Название" input={{}} /><Field label="Стоимость" input={{ inputMode: 'numeric' }} /></InputGroup>
-      <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
+      <InputGroup><Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" /><Field label="Цвет" value="Чёрный" colorDot="black" trailingIcon="chevron-up-down" /><Field label="Сезон" value="Все" trailingIcon="chevron-up-down" /></InputGroup>
     </DetailsScreen>
   ),
 };
@@ -128,7 +128,7 @@ function NewItemScreen({ state, variant }: { state: NewItemState; variant: 1 | 2
       </InputGroup>
       <InputGroup>
         <Field label="Категория" value="Аксессуары" trailingIcon="chevron-up-down" />
-        <Field label="Цвет" value="Черный" colorDot="black" trailingIcon="chevron-up-down" />
+        <Field label="Цвет" value="Чёрный" colorDot="black" trailingIcon="chevron-up-down" />
         <Field label="Сезон" value="Все" trailingIcon="chevron-up-down" />
       </InputGroup>
       <section className="y-section">
@@ -153,7 +153,7 @@ export const NewItemLoadingV1: Story = { name: 'New Item / Photo / Removing Back
 
 export const ShuffleDialog: Story = {
   name: 'Outfit Creation / Shuffle / Dialog / Unsaved Changes',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Перемешать образ?" description="Сохраните текущий образ, прежде чем перемешать вещи" cancel="Перемешать" confirm="Сохранить и начать" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Перемешать образ?" description="Сохрани текущий образ, прежде чем перемешать вещи" cancel="Перемешать" confirm="Сохранить и начать" />} />,
 };
 
 export const ExitDialog: Story = {
@@ -163,7 +163,7 @@ export const ExitDialog: Story = {
 
 export const ClearDialog: Story = {
   name: 'Outfit Creation / Clear / Dialog / Confirmation',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog tone="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отмена" confirm="Очистить" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog tone="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
 };
 
 export const ItemFilterSheet: Story = {

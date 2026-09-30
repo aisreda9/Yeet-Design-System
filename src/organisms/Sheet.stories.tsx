@@ -42,7 +42,7 @@ export const InFlow: Story = {
       <Usage screen="Search" note="страна">{onOverlay(() => <Sheet title="Страна"><InputBar placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked trailing={<Flag code="ru" />} /><ListItem type="radio" label="Беларусь" trailing={<Flag code="by" />} /></List></Sheet>)}</Usage>
       <Usage screen="Outfit Creation / Item Filter" note="с крестиком, без хэндла">{onOverlay(() => <Sheet title="Низ" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}><ChipGroup chips={[{ label: 'Все' }, { label: 'Джинсы', selected: true }, { label: 'Брюки' }, { label: 'Легинсы' }]} /><Grid><ItemCard kind="bottom" color="green" selected /><ItemCard kind="bottom" color="green" selected /></Grid></Sheet>)}</Usage>
       <Usage screen="Outfit Creation / Item Selection" note="панель без хэндла (Show Handle=false)"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Гардероб" handle={false}><ChipGroup chips={[{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }]} /></Sheet></div></Usage>
-      <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Черный · Все сезоны</p></Sheet></div></Usage>
+      <Usage screen="Item Details" note="панель деталей"><div style={{ width: 393, paddingTop: 24 }}><Sheet type="panel" title="Сумка"><p className="y-body y-text--secondary">10 000 ₽ · Аксессуары · Чёрный · Все сезоны</p></Sheet></div></Usage>
     </UsageGrid>
   ),
 };
