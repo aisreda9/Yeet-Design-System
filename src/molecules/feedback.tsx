@@ -131,7 +131,7 @@ const photoArt = {
   camera: { src: photoCamera, size: 95, top: -14 },
 };
 
-/** Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): 173×173, 3D-иллюстрация и подпись в две строки. */
+/** Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): квадрат (173 во флоу), в ряду плитки делят ширину; 3D-иллюстрация и подпись в две строки. */
 export type PhotoTileProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & { source: 'gallery' | 'camera'; label?: string };
 
 export function PhotoTile({ source, label, className, ...rest }: PhotoTileProps) {

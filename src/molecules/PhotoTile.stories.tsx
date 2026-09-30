@@ -9,7 +9,7 @@ const meta = {
   args: { source: 'gallery' },
   argTypes: { source: { control: 'inline-radio', options: ['gallery', 'camera'] }, label: { control: 'text' } },
   decorators: [unlessBare((Story) => <div style={{ width: 173, display: 'flex' }}><Story /></div>)],
-  parameters: { docs: { description: { component: 'Плитка источника фото 173×173: иллюстрация сверху (паддинг 28), подпись Body, gap 24. Figma: `photo-tile` · Label.' } } },
+  parameters: { docs: { description: { component: 'Плитка источника фото: квадрат 173 во флоу, в ряду плитки делят ширину (flex: 1; в модальной шторке 337 — по 165). Иллюстрация сверху (паддинг 28), подпись Body в две строки, gap 22; на 320 плитка растёт по подписи. Figma: `photo-tile` · Label.' } } },
 } satisfies Meta<typeof PhotoTile>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,6 +23,7 @@ export const InFlow: Story = {
   render: () => (
     <UsageGrid min={353}>
       <Usage screen="Photo sheet / Search / Discover"><div style={{ display: 'flex', gap: 8, width: 353 }}><PhotoTile source="gallery" /><PhotoTile source="camera" /></div></Usage>
+      <Usage screen="Profile / Avatar / Sheet" note="модальная шторка: контент 337, плитки по 165"><div style={{ display: 'flex', gap: 7, width: 337 }}><PhotoTile source="gallery" /><PhotoTile source="camera" /></div></Usage>
     </UsageGrid>
   ),
 };
