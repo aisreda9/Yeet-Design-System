@@ -1,4 +1,6 @@
 ---
+model: claude-opus-5-5
+effort: medium
 name: ds-motion-engineer
 description: Моушн-инженер (зона motion). Анимации, переходы, пружины, жесты и хаптика — от кадров Figma Animations до переходов --motion-*/--gesture-*, CSS, демо в Storybook. Используй, когда что-то движется, появляется, откликается на палец или вибрирует.
 disallowedTools: mcp__Figma__use_figma
