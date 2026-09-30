@@ -49,21 +49,23 @@ Storybook → Figma: кнопка **Figma ↗** в тулбаре — компо
 ## Свойства компонентов
 
 Правило: **свойство Figma = пропс кода = параметр в iOS / Android**. Имена совпадают по смыслу, варианты — по значениям в нижнем регистре.
+Словарь — `design/FIGMA-RULES.md` §3: `Style`, `Type` и `Tone`-роль → `variant`; `Tone` как окраска относительно фона (`hint`, `status-bar`) → `tone`.
+Старые `type` у `Header`, `Sheet`, `ListItem` и `tone` у `Dialog`, `Stamp` — `@deprecated`.
 
 | Figma | Код |
 |---|---|
 | `button` · Style=Primary, Size=L, Left Icon | `<Button variant="primary" size="L" leftIcon="plus">` |
 | `icon-button` · Style=Tertiary, Icon=more | `<IconButton variant="tertiary" icon="more" label="Ещё" />` |
-| `stamp` · Tone, State=Done, Label, Icon | `<Stamp tone="primary" done label="Надеть" />` |
+| `stamp` · Tone, State=Done, Label, Icon | `<Stamp variant="primary" done label="Надеть" />` |
 | `badge` · Style=Danger, Label | `<Badge variant="danger">-10%</Badge>` |
 | `input-group` (слот Inputs) + `input` | `<InputGroup><Field label value trailingIcon /></InputGroup>` |
 | `segment-control` · Size=L, Content=Icon | `<SegmentControl size="L" segments={[{ value, icon }]} />` |
 | `list-group` (слот Rows) + `list-group / row` · Label, Trailing | `<ListGroup><ListItem label trailing /></ListGroup>` |
-| `header` · Type=Bar, title-chip | `<Header type="bar" titleChip="Новая вещь" />` |
+| `header` · Type=Bar, title-chip | `<Header variant="bar" titleChip="Новая вещь" />` |
 | `bottom-nav` · FAB=true | `<BottomNav active="wardrobe" fab />` |
-| `sheet` · Footer=Buttons, Type=Panel (слот Content) | `<Sheet type="panel" footer={[…]}>…</Sheet>` |
-| `dialog` · Tone=Destructive | `<Dialog tone="destructive" …>` |
-| `product-card` · Name, Price, Discount, Show Like | `<ProductCard name price discount liked />` |
+| `sheet` · Footer=Buttons, Type=Panel (слот Content) | `<Sheet variant="panel" footer={[…]}>…</Sheet>` |
+| `dialog` · Tone=Destructive | `<Dialog variant="destructive" …>` |
+| `product-card` · Name, Price, Discount, Show Like | `<ProductCard name price discount showLike />` |
 | `chat-bubble` · From=User, Text | `<ChatBubble from="user">…</ChatBubble>` |
 | `weather-card` · Temperature, Description, Icon | `<WeatherCard temperature="20°" description icon="sun" />` |
 | `trip-card` · Type=Add / Trip, City, Meta | `<TripCard add />` / `<TripCard city items outfits />` |
@@ -82,7 +84,7 @@ Storybook → Figma: кнопка **Figma ↗** в тулбаре — компо
 Открыто:
 - 4 фона коллажей с точечным паттерном («Photo & Image Areas», карточки) привязаны к `light-grey` исходной коллекции — PATTERN-заливку нельзя перепривязать через API, только вручную.
 - Скругление последней карточки в сетке Гардероба — 32 вместо 20 (экран флоу).
-- Экраны флоу New app design собраны из «сырых» фреймов на исходной коллекции — переводятся на компоненты 2.0 по одному.
+- Исходные экраны на странице «New App (Raw)» (`551:2286`) собраны из «сырых» фреймов на исходной коллекции — в Pages DS 0.2 переводятся на компоненты 2.0 по одному.
 - Тексты с родом в проде («Забыла пароль?», «Увидела в соцсетях…») — заменить по «Тексты и тон».
 - Code Connect — нужен тариф Figma Organization / Enterprise (сейчас Pro); токенов прозрачности и состояний pressed / disabled / loading у кнопок пока нет.
 

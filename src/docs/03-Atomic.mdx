@@ -25,15 +25,15 @@ import { AtomicMap } from './blocks';
 Компонент знает **роль**, а не **место**. Контекст передаётся через семантические свойства:
 
 - `variant="destructive"` вместо «красная кнопка»;
-- `Header type="search"` вместо «шапка экрана поиска»;
-- `Sheet type="panel"` вместо «белый блок с тенью на деталях вещи».
+- `Header variant="search"` вместо «шапка экрана поиска»;
+- `Sheet variant="panel"` вместо «белый блок с тенью на деталях вещи».
 
 Где и как компонент встречается в продукте — в разделе **«В флоу»** на странице каждого компонента
-и в Figma справа от компонента.
+и на экранах секции Pages в Figma.
 
 ## Соответствие Figma
 
-| Figma (Design System 2.0) | Код | Уровень |
+| Figma (Design System 0.2) | Код | Уровень |
 |---|---|---|
 | `button`, `icon-button`, `badge`, `avatar`, `divider` | `Button`, `IconButton`, `Badge`, `Avatar`, `Divider` | Atom |
 | `scroll-edge` | `ScrollEdge` | Atom |

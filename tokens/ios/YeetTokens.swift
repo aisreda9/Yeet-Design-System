@@ -70,7 +70,7 @@ public enum YeetColor {
     // Акцент, обратная связь, линии
     /// Главное действие, выбранное, фокус · Figma ui-colors/blue
     public static let accent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 1))
-    /// Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, как во флоу New app design (не прозрачный: на сером фоне не темнеет) · Figma ui-colors/blue-10%
+    /// Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, а не прозрачный: на сером фоне не темнеет · Figma ui-colors/blue-10%
     public static let accentSoft = dynamic(UIColor(hex: 0xF1F4FF, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 0.2))
     /// Удаление, ошибка, бейдж скидки · Figma ui-colors/red
     public static let danger = dynamic(UIColor(hex: 0xCC291B, alpha: 1), UIColor(hex: 0xCC291B, alpha: 1))
