@@ -65,7 +65,7 @@ function CanvasScreen({ filtered, hint: withHint = filtered, overlay }: { filter
   return (
     <Screen header={<Header type="bar" center={steps('canvas', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={filtered ? <BottomBar label="Далее" /> : undefined} overlay={overlay && <Overlay>{overlay}</Overlay>} flush>
       <div className="y-gutter">
-        <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar size="S" onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
+        <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
       </div>
       <Sheet type="panel" title="Гардероб">
         <ChipGroup chips={filtered ? [{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }] : [{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }]} />

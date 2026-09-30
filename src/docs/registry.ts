@@ -58,7 +58,7 @@ export const registry: Entry[] = [
   { code: 'StatTile', figma: 'stat-tile', figmaId: '1184:20692', level: 'Molecules', story: 'Molecules/StatTile', note: 'Size: M 80 (H2) / L 88 (H1)', status: 'stable' },
   { code: 'Note', figma: 'note', figmaId: '1187:20746', level: 'Molecules', story: 'Molecules/Note', note: 'описание вещи: light-grey, p20, r20', status: 'stable' },
   { code: 'Hint', figma: 'hint', figmaId: '1183:20594', level: 'Molecules', story: 'Molecules/Hint', note: 'Tone: Default / On Photo', status: 'stable' },
-  { code: 'Snackbar', figma: 'snackbar', figmaId: '1183:20589', level: 'Molecules', story: 'Molecules/Snackbar', note: 'Size: M 52 / S (подсказка на холсте) — в DS 0.2 те же 52 / 20', status: 'stable' },
+  { code: 'Snackbar', figma: 'snackbar', figmaId: '1183:20589', level: 'Molecules', story: 'Molecules/Snackbar', note: 'Size: M 52 / S 48 (подсказка на холсте)', status: 'stable' },
   { code: 'EmptyState', figma: 'empty-state', figmaId: '968:3643', level: 'Molecules', story: 'Molecules/EmptyState', status: 'stable' },
   { code: 'LoadingState', figma: 'loading-state', figmaId: '968:3667', level: 'Molecules', story: 'Molecules/LoadingState', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'PhotoTile', figma: 'photo-tile', figmaId: '1146:6674', level: 'Molecules', story: 'Molecules/PhotoTile', note: 'поглотил brand-card', status: 'stable' },

@@ -319,7 +319,7 @@
    возвращается на пружине quick — анимируется transform, а не width / height */
 .y-canvas__item > .y-item-art { transition: scale var(--motion-drop); }
 .y-canvas__item.is-pinching > .y-item-art { transition: none; }
-.y-canvas__hint { position: absolute; left: var(--space-20); right: var(--space-20); bottom: var(--space-16); } /* Snackbar S 313 × 52 на холсте 353: 20 от боков, 16 от низа (canvas-hint 1174:21691, верх y285 в холсте) */
+.y-canvas__hint { position: absolute; left: var(--space-20); right: var(--space-20); bottom: var(--space-16); } /* Snackbar M 313 × 52 на холсте 353: 20 от боков, 16 от низа (canvas-hint 1174:21691, верх y285 в холсте) */
 
 /* ─── Раскладки экранов ─── */
 /* Главная: превью ↑ коллаж ↓ превью, погода и штамп поверх */

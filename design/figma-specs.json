@@ -635,13 +635,13 @@
       }
     },
     {
-      "figma": "snackbar · Size=S (подсказка на холсте, DS 0.2 canvas-hint 1174:21691: 313×52, паддинг 20, r12)",
+      "figma": "snackbar · Size=S (подсказка на холсте: 313×48, паддинг 16, r12)",
       "story": "molecules-snackbar--small",
       "selector": ".y-snackbar--S",
       "expect": {
         "width": 313,
-        "height": 52,
-        "paddingLeft": 20,
+        "height": 48,
+        "paddingLeft": 16,
         "borderRadius": 12
       }
     },
