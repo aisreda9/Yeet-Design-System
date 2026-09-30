@@ -43,7 +43,7 @@ export function SheetDemo() {
         <List>{['Все', 'Весна', 'Лето', 'Осень', 'Зима'].map((s) => <ListItem key={s} type="radio" label={s} checked={s === season} onClick={() => setSeason(s)} />)}</List>
       </Sheet>
     ) : open === 'dialog' ? (
-      <Dialog tone="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда" cancel="Отменить" confirm="Очистить" onCancel={close} onConfirm={close} />
+      <Dialog variant="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда" cancel="Отменить" confirm="Очистить" onCancel={close} onConfirm={close} />
     ) : undefined;
   return (
     <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} overlay={layer && <Overlay onClose={close}>{layer}</Overlay>}>

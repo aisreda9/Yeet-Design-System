@@ -58,7 +58,7 @@ data class YeetColorScheme(
     // Акцент, обратная связь, линии
     /** Главное действие, выбранное, фокус · Figma ui-colors/blue */
     val accent: Color,
-    /** Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, как во флоу New app design (не прозрачный: на сером фоне не темнеет) · Figma ui-colors/blue-10% */
+    /** Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, а не прозрачный: на сером фоне не темнеет · Figma ui-colors/blue-10% */
     val accentSoft: Color,
     /** Удаление, ошибка, бейдж скидки · Figma ui-colors/red */
     val danger: Color,

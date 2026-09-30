@@ -31,7 +31,7 @@ export type OutfitPagerProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & 
   weather?: ReactNode;
   /** Слот у правого нижнего угла коллажа: `Stamp` «Надеть» / «Сохранить». Звезда поворачивается на 180° при смене образа. */
   stamp?: ReactNode;
-  /** Слот у левого нижнего угла: `Stamp tone="secondary"` «Не нравится» (лента «С чем носить»). */
+  /** Слот у левого нижнего угла: `Stamp variant="secondary"` «Не нравится» (лента «С чем носить»). */
   skip?: ReactNode;
   /** Выключить жест и кнопки (например, пока открыта шторка). */
   disabled?: boolean;
