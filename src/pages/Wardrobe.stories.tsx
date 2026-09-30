@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { type ComponentProps, type ReactNode, useState } from 'react';
 import { IconButton, Stamp } from '../atoms';
 import { ChipGroup, EmptyState, Field, InputGroup, List, ListItem, Note, SegmentControl, Snackbar, StatRow, StatTile } from '../molecules';
 import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
@@ -60,6 +60,7 @@ export const WardrobeEmpty: Story = {
 
 export const FilterSheet: Story = {
   name: 'Wardrobe / Items / Sheet / Category',
+  tags: ['figma:1371-37611'],
   render: () => (
     <Screen
       header={<Header type="large" title="Гардероб" />}
@@ -263,7 +264,7 @@ export const ItemsNoFilterResults: Story = {
           <ChipGroup chips={[{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Сезон · 2', selected: true, dropdown: true }]} />
         </Row>
       </Sticky>
-      <div className="y-wardrobe-empty">{noFilterResults}</div>
+      <div className="y-wardrobe-empty y-wardrobe-empty--items-filtered">{noFilterResults}</div>
     </Screen>
   ),
 };
@@ -276,7 +277,7 @@ export const OutfitsNoFilterResults: Story = {
       <Sticky>
         <ChipGroup chips={[{ label: 'На каждый день', selected: true, dropdown: true }, { label: 'Сезон · 2', selected: true, dropdown: true }, { label: 'Теги · 2', selected: true, dropdown: true }]} />
       </Sticky>
-      <div className="y-wardrobe-empty">{noFilterResults}</div>
+      <div className="y-wardrobe-empty y-wardrobe-empty--outfits-filtered">{noFilterResults}</div>
     </Screen>
   ),
 };
@@ -409,3 +410,95 @@ function WishlistNewItemScreen({ filled }: { filled?: boolean }) {
 
 export const WishlistNewItem: Story = { name: 'Wishlist / New Item / Empty', render: () => <WishlistNewItemScreen /> };
 export const WishlistNewItemCompleted: Story = { name: 'Wishlist / New Item / Completed', render: () => <WishlistNewItemScreen filled /> };
+
+/* ─── Оверлеи гардероба: фильтры, действия, тосты (#207, аудит строки 22–23) ───
+ * По одной истории на тип оверлея; одна и та же шторка над разными экранами — теги `figma:` всех её кадров. */
+
+const itemsBackdrop = <Grid>{grid.map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>;
+
+/** Шторка-фильтр над гардеробом: заголовок → 16 → чипсы, без кнопок — выбор применяется сразу. */
+function FilterSheetScreen({ title, chips }: { title: string; chips: string[] }) {
+  return (
+    <Screen header={wardrobeHeader} overlay={<Overlay><Sheet title={title}><ChipGroup wrap chips={chips.map((label, k) => ({ label, selected: k === 0 }))} /></Sheet></Overlay>}>
+      {itemsBackdrop}
+    </Screen>
+  );
+}
+
+export const SeasonFilterSheet: Story = {
+  name: 'Wardrobe / Items / Sheet / Season Filter',
+  tags: ['figma:1371-37595', 'figma:1371-37759', 'figma:1371-37827'],
+  render: () => <FilterSheetScreen title="Сезон" chips={['Все', 'Весна', 'Лето', 'Осень', 'Зима']} />,
+};
+
+export const TagsFilterSheet: Story = {
+  name: 'Wardrobe / Items / Sheet / Tags Filter',
+  tags: ['figma:1371-37801', 'figma:1371-37775'],
+  render: () => <FilterSheetScreen title="Теги" chips={Array.from({ length: 10 }, (_, k) => `Тег #${k + 1}`)} />,
+};
+
+export const OccasionFilterSheet: Story = {
+  name: 'Wardrobe / Outfits / Sheet / Occasion Filter',
+  tags: ['figma:1371-37867', 'figma:1371-37843', 'figma:1371-37891'],
+  render: () => <FilterSheetScreen title="Повод" chips={['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка', 'Кастомный']} />,
+};
+
+/** Шторка действий: заголовок — имя вещи или повода, необратимое действие последним (Organisms/Sheet → «Действия»). */
+function ActionSheetScreen({ title, actions, header = wardrobeHeader }: { title: string; actions: [NonNullable<ComponentProps<typeof ListItem>['icon']>, string][]; header?: ReactNode }) {
+  return (
+    <Screen header={header} overlay={<Overlay><Sheet title={title}><List>{actions.map(([icon, label]) => <ListItem key={label} icon={icon} label={label} />)}</List></Sheet></Overlay>}>
+      {itemsBackdrop}
+    </Screen>
+  );
+}
+
+export const ArchiveItemActions: Story = {
+  name: 'Archive / Item / Sheet / Actions',
+  tags: ['figma:1371-37535'],
+  render: () => <ActionSheetScreen header={<Header type="bar" titleChip="Архив вещей" />} title="Название вещи" actions={[['undo', 'Вернуть в гардероб'], ['trash', 'Удалить']]} />,
+};
+
+export const OutfitActions: Story = {
+  name: 'Wardrobe / Outfit / Sheet / Actions',
+  tags: ['figma:1371-41135'],
+  render: () => <ActionSheetScreen title="Повод образа" actions={[['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
+};
+
+export const OutfitPermanentDelete: Story = {
+  name: 'Wardrobe / Outfit / Sheet / Permanent Delete Actions',
+  tags: ['figma:1371-40430', 'figma:1371-40451'],
+  render: () => <ActionSheetScreen title="Повод образа" actions={[['pen', 'Редактировать'], ['trash', 'Удалить навсегда']]} />,
+};
+
+export const WishlistItemActions: Story = {
+  name: 'Wishlist / Item / Sheet / Actions',
+  tags: ['figma:1371-40512'],
+  render: () => <ActionSheetScreen title="Название вещи" actions={[['external-link', 'Перейти по ссылке'], ['collage', 'Создать образ'], ['bag-check', 'Переместить в гардероб'], ['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
+};
+
+/** Тост после действия: над контентом; с «Отменить» — для обратимого. */
+function ToastScreen({ text, header = wardrobeHeader, undo }: { text: string; header?: ReactNode; undo?: boolean }) {
+  return (
+    <Screen header={header} floating={undo ? <Snackbar onUndo={() => {}}>{text}</Snackbar> : <Snackbar onClose={() => {}}>{text}</Snackbar>}>
+      {itemsBackdrop}
+    </Screen>
+  );
+}
+
+export const ToastMovedToTrash: Story = {
+  name: 'Archive / Item / Toast / Moved to Trash',
+  tags: ['figma:1371-37560'],
+  render: () => <ToastScreen header={<Header type="bar" titleChip="Архив вещей" />} text="Вещь перемещена в корзину" undo />,
+};
+
+export const ToastMovedToWardrobe: Story = {
+  name: 'Wishlist / Item / Toast / Moved to Wardrobe',
+  tags: ['figma:1371-37590'],
+  render: () => <ToastScreen text="Вещь перемещена в гардероб" />,
+};
+
+export const ToastDeletedPermanently: Story = {
+  name: 'Trash / Item / Toast / Deleted Permanently',
+  tags: ['figma:1371-37585'],
+  render: () => <ToastScreen header={<Header type="bar" title="Корзина вещей" actions={[{ icon: 'trash', label: 'Очистить корзину' }]} />} text="Вещь удалена навсегда" undo />,
+};

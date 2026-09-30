@@ -105,7 +105,7 @@ export function Header(allProps: HeaderProps) {
               onChange={props.onQueryChange}
               fieldIcon="search"
               leading={{ icon: 'chevron-left', label: 'Назад', onClick: props.onBack }}
-              trailing={props.photo ? { icon: 'image-add', label: 'Выбранное фото', image: props.photo } : props.photoSearch === false ? undefined : { icon: 'image-add', label: 'Поиск по фото' }}
+              trailing={props.photo ? { icon: 'search-by-image', label: 'Выбранное фото', image: props.photo } : props.photoSearch === false ? undefined : { icon: 'search-by-image', label: 'Поиск по фото' }}
               focused={props.focused}
             />
             {props.filters && <ChipGroup chips={props.filters.map((f) => ({ ...f, dropdown: true }))} />}

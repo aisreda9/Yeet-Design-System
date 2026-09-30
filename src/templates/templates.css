@@ -103,7 +103,7 @@
 * + .y-section { margin-top: var(--space-4); }
 /* Панель последним блоком на flush-экране доходит до низа экрана */
 .y-screen__content--flush:has(> .y-sheet--panel:last-child) { padding-bottom: 0; }
-.y-screen__content:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+.y-screen__content:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset-inset); }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
 

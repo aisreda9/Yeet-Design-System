@@ -24,7 +24,7 @@ export function OutfitThumbnail({ items, size = 138, className, style, ...rest }
  * Карточка функции стилиста (флоу Stylist / Catalog): H3 + описание Caption сверху, паддинг 20, радиус 20.
  * `wide` — на всю ширину 353×172, иначе половина 173×220. `soon` — функция ещё недоступна: текст серым, бейдж «Скоро».
  * `art` — иллюстрация в правом нижнем углу (чемодан у «Для поездок»).
- * **Контексты:** Стилист — Конструктор, Удиви меня, С чем носить, Для поездок, Оживи гардероб, Докупить, Оцени лук.
+ * **Контексты:** Стилист — Конструктор, Удиви меня, С чем носить, Для поездок, Оживи гардероб, Докупить, Оцени образ.
  */
 export type StylistPromptCardProps = Omit<ComponentPropsWithRef<'button'>, 'children' | 'title'> & { title: string; description?: string; wide?: boolean; soon?: boolean; art?: ReactNode };
 

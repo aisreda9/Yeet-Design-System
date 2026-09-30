@@ -14,6 +14,11 @@
 
 /* Wardrobe / Items / Empty: пустое состояние по центру свободного места, приподнято над таб-баром */
 .y-wardrobe-empty { flex: 1; display: grid; place-items: center; padding-bottom: 98px; } /* stylelint-disable-line unit-disallowed-list -- подъём над таб-баром из Figma */
+/* «Упс, не нашли» под фильтрами — ниже центра: заголовок на y411 у вещей (1141:2212) и y403 у образов (1174:19706) */
+.y-wardrobe-empty--items-filtered { padding-bottom: 12px; } /* stylelint-disable-line unit-disallowed-list -- положение из Figma */
+.y-wardrobe-empty--outfits-filtered { padding-bottom: 28px; } /* stylelint-disable-line unit-disallowed-list -- положение из Figma */
+/* Outfits / Recommendations / Empty (1173:19455): блок прижат к низу, кнопка в 100 над таб-баром */
+.y-recommendations-empty { margin-bottom: calc(var(--space-40) * 2); }
 /* Пустые Архив, Корзина, поиск по гардеробу (шапка 118, низа нет): блок по центру экрана (y426), а не области под шапкой */
 .y-empty-bar { flex: 1; display: grid; place-items: center; padding-bottom: calc(118px - var(--space-24) + var(--space-20)); } /* stylelint-disable-line unit-disallowed-list -- подъём над панелью из Figma */
 
@@ -22,6 +27,7 @@
 
 /* Search / Text / No Results Filtered: блок ниже центра — текст на y460 */
 .y-search-empty { margin-top: 66px; } /* stylelint-disable-line unit-disallowed-list -- положение пустого поиска из Figma */
+.y-search-empty .y-empty > p { max-width: 224px; } /* stylelint-disable-line unit-disallowed-list -- 1141:3067: подзаголовок в две ровные строки, перенос после «попробуй» */
 
 /* Search / Discover: блоки через 32 — фото → поле 32, подзаголовок шапки → фото 28 */
 .y-discover-photos { margin-top: var(--space-8); }
@@ -32,7 +38,7 @@
 .y-chat-panel { margin-top: calc(var(--space-8) * -1); } /* флоу 1176:19708: панель чата на 12 под заголовком (y118), а не на 20 */
 
 /* Settings / Main: подвал (1371:39113) — логотип серым, ссылки и версия Caption, «Удалить аккаунт» */
-.y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-12); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); }
+.y-settings-footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-16); margin-top: var(--space-4); color: var(--color-text-secondary); text-align: center; padding-bottom: var(--space-20); } /* флоу 1149:4140: логотип на 28 под списком, блоки подвала через 16 */
 .y-settings-footer .y-caption { margin: 0; }
 .y-settings-footer .y-button { margin-top: var(--space-20); }
 
@@ -49,10 +55,10 @@
 .y-occasions { margin-top: 81px; } /* stylelint-disable-line unit-disallowed-list -- положение поводов из Figma */
 
 /* Search / Photo / Crop: рамка обрезки на всё фото под контентом; жесты доходят до рамки, кнопки остаются нажимаемыми */
-.y-crop-screen .y-crop-layer { position: absolute; inset: 0; }
+.y-crop-screen .y-crop-layer { position: absolute; inset: 0; z-index: var(--layer-base); } /* свой слой: затемнение рамки (z 1 внутри) не ложится на статус-бар и «Назад» — они белые, как в 1176:19019 */
 .y-crop-screen .y-status-bar,
 .y-crop-screen .y-screen__content { position: relative; z-index: 1; }
 .y-crop-screen .y-screen__content { pointer-events: none; }
 .y-crop-screen .y-screen__content > * { pointer-events: auto; }
-/* «Назад» наверху, как в шапке: контент начинается на 20 ниже статус-бара, кнопка шапки — на 8 */
-.y-crop-screen .y-crop-back { align-self: flex-start; margin: calc(var(--space-8) - var(--space-20)) 0 auto; }
+/* «Назад» наверху: контент начинается на 20 ниже статус-бара, кнопка — на 16 (флоу 1176:19019: центр y102) */
+.y-crop-screen .y-crop-back { align-self: flex-start; margin: calc(var(--space-16) - var(--space-20)) 0 auto; }

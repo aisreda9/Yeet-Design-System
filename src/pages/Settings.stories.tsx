@@ -45,7 +45,7 @@ export const Settings: Story = {
       </ListGroup>
       <div className="y-settings-footer">
         <Logo height={30} />
-        <p className="y-caption">Политикой конфиденциальности <br />Условиями использования</p>
+        <p className="y-caption"><Link href="#">Политикой конфиденциальности</Link> <br /><Link href="#">Условиями использования</Link></p>
         <p className="y-caption">Версия 3.0.28</p>
         <Button variant="destructive" fullWidth>Удалить аккаунт</Button>
       </div>

@@ -54,3 +54,9 @@ Swift и Kotlin (см. «Старт / Процессы / iOS и Android»). В F
   <Do>Карточке погоды — `--color-bg-inverse`</Do>
   <Dont>Использовать `--yeet-item-*` для кнопок и фонов</Dont>
 </div>
+
+## Решения владельца (расходятся с Figma)
+
+- **Плейсхолдер поля — `--color-text-secondary` (#6E6E6E), а не text-primary 40 % из Figma.** 40 % чёрного ≈ #999 даёт 2,8 : 1 на белом — ниже 4,5 : 1 для текста; #6E6E6E проходит. Кроме `Field` и `InputBar` правило действует в любом поле ввода.
+- **Неактивные сегменты и переключатели — серые** (`--color-text-secondary`), и подпись, и иконка; активный — `--color-text-primary` на пилюле. Так же неактивные вкладки `TabBar`.
+- **Кольцо фокуса — `--focus-ring-color` (= `--color-text-accent`)**, толщина `--focus-ring-width`, отступ `--focus-ring-offset` / `--focus-ring-offset-inset`. `--color-accent` в тёмной теме на `bg-subtle` даёт 2,7 : 1 — ниже 3 : 1 для обводок (WCAG 1.4.11).
