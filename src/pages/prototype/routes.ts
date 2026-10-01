@@ -12,6 +12,8 @@ export type Nav = {
   root(id: ScreenId): Promise<void>;
   /** Шторка или диалог поверх текущего экрана. */
   overlay(id: ScreenId): Promise<void>;
+  /** Сменить верхнюю шторку её же состоянием (Figma: Swap overlay) — без ухода и повторного выезда; не шторка — как `swap`. */
+  change(id: ScreenId): Promise<void>;
   /** Закрыть верхний слой (шторку, диалог) с анимацией ухода. */
   close(): Promise<void>;
   /** Уйти из цепочки экранов (создание образа) одним «назад» — к экрану, откуда в неё вошли. */
@@ -117,6 +119,15 @@ const suggestions = (results: ScreenId, empty: ScreenId): Route[] => [
 ];
 
 const comingSoon = (n: Nav) => n.toast('Этого экрана пока нет в макетах');
+/** «+» вишлиста — шторка выбора: вещь или образ (Wishlist / Add / Sheet / Content Type). */
+const wishlistAdd: Route = { sel: '.y-bottom-nav__fab button', go: (n) => n.overlay('WishlistContentTypeSheet') };
+/**
+ * Поиск по фото из шапки: без снимка — шторка «Добавить» (Search / Photo / Sheet / Add), со снимком — «Заменить» (… / Replace).
+ * Галерея и камера — дальше по цепочке поиска по фото, как плитки на «Discover»: обрезка → «Найти похожее» → результаты (#220).
+ */
+const photoAdd: Route = btn('Поиск по фото', (n) => n.overlay('PhotoAddSheet'));
+const photoReplace: Route = btn('Выбранное фото', (n) => n.overlay('PhotoReplaceSheet'));
+const photoToCrop: Route = { sel: '.y-photo-tile', go: closeThen((n) => n.push('PhotoCrop')) };
 const howItWorks: Route = btn('Как это работает', comingSoon);
 /** Кнопка «Добавить» внизу формы новой вещи (не «+» у тегов). */
 const addItem = (go: Go): Route => ({ sel: '.y-button--full', text: 'Добавить', go });
@@ -169,6 +180,8 @@ const clearAsk: Route = { sel: '.y-canvas', on: 'long', not: '.y-canvas__item', 
 const editProfile = (avatar: 'AvatarAddSheet' | 'AvatarReplaceSheet'): Route[] => [
   { sel: '.y-avatar', name: 'Изменить фото профиля', go: (n) => n.overlay(avatar) },
   { sel: '.y-field', text: /^Год рождения/, go: (n) => n.overlay('BirthYearSheet') },
+  { sel: '.y-field', text: /^Пол/, go: (n) => n.overlay('ProfileGenderSheet') },
+  { sel: '.y-field', text: /^Стиль/, go: (n) => n.overlay('ProfileStyleSheet') },
 ];
 const photoPicked = closeThen(async (n, from) => { if (from !== 'ProfileEditAvatar') await n.swap('ProfileEditAvatar'); n.toast('Фото профиля обновлено'); });
 
@@ -210,7 +223,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   CategoryRootSheet: [btn('Применить', applyFilter), btn('Сбросить', resetFilter)],
   SeasonFilterSheet: quickFilter,
   TagsFilterSheet: quickFilter,
-  OccasionFilterSheet: [btn('Добавить', closeThen(comingSoon)), ...quickFilter],
+  // «+» — нативный: чипс-поле своего повода (Custom Occasion Name Empty → Entered), Enter или уход фокуса — новый чипс (#220)
+  OccasionFilterSheet: quickFilter,
   ItemActions: [
     { sel: '.y-list-item', text: 'Создать образ', go: closeThen((n) => n.push('OutfitItems')) },
     { sel: '.y-list-item', text: 'Редактировать', go: closeThen(comingSoon) },
@@ -237,10 +251,14 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     },
   ],
 
-  /* Вишлист */
-  Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', go: ok('ItemDetails') }, { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
-  WishlistOutfits: [...topSeg('wishlist'), ...subSeg, { sel: '.y-collage', name: 'Открыть образ', go: ok('WishlistOutfitDetails') }, { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
-  WishlistEmpty: [...topSeg('wishlist'), { sel: '.y-bottom-nav__fab button', go: ok('WishlistNewItem') }],
+  /* Вишлист: «+» → «Добавить в вишлист» → «Вещь» — форма новой вещи; формы образа в макетах нет (#220) */
+  Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', go: ok('ItemDetails') }, wishlistAdd],
+  WishlistOutfits: [...topSeg('wishlist'), ...subSeg, { sel: '.y-collage', name: 'Открыть образ', go: ok('WishlistOutfitDetails') }, wishlistAdd],
+  WishlistEmpty: [...topSeg('wishlist'), wishlistAdd],
+  WishlistContentTypeSheet: [
+    { sel: '.y-list-item', text: 'Вещь', go: closeThen((n) => n.push('WishlistNewItem')) },
+    { sel: '.y-list-item', text: 'Образ', go: closeThen(comingSoon) },
+  ],
   ItemDetails: [
     btn('Ещё', (n) => n.overlay('WishlistItemActions')),
     btn('Переместить в гардероб', movedToWardrobe),
@@ -287,8 +305,9 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
 
   /* Поиск в сторах */
   SearchDiscover: [{ sel: '.y-photo-tile', go: ok('PhotoCrop') }, ...suggestions('SearchResults', 'SearchEmpty'), { sel: '.y-input-bar__field', go: ok('SearchFocused') }],
-  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty'), btn('Поиск по фото', 'PhotoCrop')],
+  SearchFocused: [...suggestions('SearchResults', 'SearchEmpty'), photoAdd],
   SearchResults: [
+    photoAdd,
     { sel: '.y-chip-group button', text: 'Цена', go: (n) => n.overlay('PriceFilter') },
     { sel: '.y-chip-group button', text: 'Сортировка', go: (n) => n.overlay('SortingSheet') },
     // сердечко переключается само (native); тост — только когда вещь добавляется, не убирается
@@ -296,9 +315,12 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') },
   ],
   SortingSheet: [{ sel: '.y-chip--static', go: closeThen((n) => n.toast('Сортировка изменена')) }],
-  SearchEmpty: [btn('Сбросить поиск', (n) => n.back())],
+  SearchEmpty: [btn('Сбросить поиск', (n) => n.back()), photoAdd],
   PhotoCrop: [btn('Найти похожее', 'PhotoResults')],
-  PhotoResults: [{ sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') }],
+  PhotoResults: [photoReplace, { sel: '.y-product-card', go: (n) => n.toast('Откроется магазин в браузере') }],
+  PhotoFocused: [photoReplace],
+  PhotoAddSheet: [photoToCrop],
+  PhotoReplaceSheet: [photoToCrop, btn('Удалить фотографию', sheet)],
 
   /* Стилист */
   StylistHome: [
@@ -369,11 +391,16 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-settings-footer p:not(:last-of-type)', go: (n, el, e) => { const r = el.getBoundingClientRect(); return n.push(e && e.clientY > r.top + r.height / 2 ? 'LegalTerms' : 'LegalPrivacy'); } },
     { sel: '.y-list-item', go: (n, el) => n.toast(`${label(el)}: откроется во внешнем приложении`) },
   ],
-  CountrySheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Страна изменена')) }],
+  // поле поиска в шторке → та же шторка с полем в фокусе (Settings / Country / Sheet / Search Focused, #220)
+  CountrySheet: [{ sel: '.y-input-bar__field', go: (n) => n.change('CountrySearchFocused') }, { sel: '.y-list-item', go: closeThen((n) => n.toast('Страна изменена')) }],
+  CountrySearchFocused: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Страна изменена')) }],
   CurrencySheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Валюта изменена')) }],
   SignOutDialog: [btn('Отменить', sheet), btn('Выйти', closeThen((n) => n.root('SignIn')))],
   ProfileEdit: editProfile('AvatarAddSheet'),
   ProfileEditAvatar: editProfile('AvatarReplaceSheet'),
+  // пол и стиль: выбор чипсом применяется сразу — шторка закрывается (#220)
+  ProfileGenderSheet: [{ sel: '.y-chip--static', go: sheet }],
+  ProfileStyleSheet: [{ sel: '.y-chip--static', go: sheet }],
   BirthYearSheet: [{ sel: '.y-list-item', go: closeThen((n) => n.toast('Год рождения изменён')) }],
   AvatarAddSheet: [{ sel: '.y-photo-tile', go: photoPicked }],
   AvatarReplaceSheet: [
