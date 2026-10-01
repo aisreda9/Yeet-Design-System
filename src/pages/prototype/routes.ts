@@ -88,13 +88,22 @@ const gridSearch: Route[] = [
 ];
 const openItem: Route = { sel: '.y-item-card', go: ok('WardrobeItemDetails') };
 const openOutfit: Route = { sel: '.y-collage', name: 'Открыть образ', go: ok('OutfitDetails') };
+/**
+ * Шторка действий образа: долгий тап по образу в списке и «Ещё» в деталях (решение владельца, #216 строка 35):
+ * заголовок — повод, «Редактировать» и «Удалить навсегда» (Figma `1173:16639`). `OutfitActions` ни откуда не открывается.
+ */
+const outfitMenu: Route = { sel: '.y-collage', on: 'long', go: (n) => n.overlay('OutfitPermanentDelete') };
 /** Шаги создания образа в шапке. */
 const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): Route[] =>
   ([['Гардероб', 'OutfitItems'], ['Коллаж', 'Canvas'], ['Описание', 'OutfitCriteria']] as const)
     .filter(([l]) => l !== self)
     .map(([l, id]) => ({ sel: '.y-segment [role=radio]', text: l, go: (n: Nav) => n.swap(id) }));
 
-/** Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ. */
+/**
+ * Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ.
+ * «на каждый день ⌄» (`.y-header__accent`) — нативная кнопка: открывает шторку «Повод» самого экрана
+ * (Figma OPEN_OVERLAY → Outfits / Everyday / Sheet / Occasion Filter `1173:14091`, история `TodayOccasions`); выбор повода меняет акцент (#216, строка 34).
+ */
 const today: Route[] = [{ sel: '.y-outfit-thumb', go: ok('OutfitDetails') }, openOutfit];
 
 /** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. Чипсы на фокусе — не кнопки. */
@@ -173,7 +182,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   SignIn: [{ sel: 'a', text: /политикой/, go: ok('LegalPrivacy') }, { sel: 'a', text: /условиями/, go: ok('LegalTerms') }, btn('Войти', 'OnboardingName'), btn('Не помнишь пароль?', 'PasswordRecovery'), btn('Войти с Apple', 'OnboardingName')],
   OnboardingName: [btn('Далее', 'FirstItemPrompt')],
   FirstOutfit: [btn('Пропустить', (n) => n.root('Today')), btn('Сохранить образ и завершить', async (n) => { await n.root('Today'); n.toast('Образ сохранён'); })],
-  FirstItemPrompt: [btn('Пропустить', 'FirstOutfit'), btn('Добавить', ok('NewItem'))],
+  // Figma 1173:21880: «Добавить» → форма Variant 01, «Пропустить» → главная (#216, строки 32–33)
+  FirstItemPrompt: [btn('Пропустить', (n) => n.root('Today')), btn('Добавить', ok('NewItemNoPhotoV1'))],
   PasswordRecovery: [btn('Отправить код', (n) => n.overlay('PasswordRecoverySent'))],
   PasswordRecoverySent: [btn('Ок!', closeThen((n) => n.back()))],
 
@@ -188,7 +198,7 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   WardrobeEmpty: [...topSeg('items'), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   ItemsNoFilterResults: [...topSeg('items'), ...gridSearch, ...itemFilters, btn('Сбросить фильтры', (n) => n.swap('Wardrobe')), { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
-  OutfitsPopulated: [...topSeg('outfits'), ...outfitFilters, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
+  OutfitsPopulated: [...topSeg('outfits'), ...outfitFilters, outfitMenu, openOutfit, { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsEmpty: [...topSeg('outfits'), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   OutfitsNoFilterResults: [...topSeg('outfits'), ...outfitFilters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
@@ -204,11 +214,22 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
   WardrobeItemDetails: [btn('Ещё', (n) => n.overlay('ItemActions')), openOutfit],
   // штамп в истории без состояния: «Отменить» возвращать нечего
-  OutfitDetails: [btn('Ещё', (n) => n.overlay('OutfitActions')), openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
+  OutfitDetails: [btn('Ещё', (n) => n.overlay('OutfitPermanentDelete')), openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
   OutfitActions: [
     { sel: '.y-list-item', text: 'Редактировать', go: closeThen((n) => n.push('OutfitItems')) },
     // образ в истории без состояния: «Отменить» открывает его снова
     { sel: '.y-list-item', text: 'Удалить', go: closeThen(async (n) => { await n.back(); n.toast('Образ удалён', { undo: (u) => u.push('OutfitDetails') }); }) },
+  ],
+  OutfitPermanentDelete: [
+    { sel: '.y-list-item', text: 'Редактировать', go: closeThen((n) => n.push('OutfitItems')) },
+    // из деталей — «назад» к списку; образ в истории без состояния: «Отменить» открывает его снова
+    {
+      sel: '.y-list-item', text: 'Удалить навсегда',
+      go: closeThen(async (n, from) => {
+        if (from === 'OutfitDetails') await n.back();
+        n.toast('Образ удалён навсегда', { undo: (u) => (from === 'OutfitDetails' ? u.push('OutfitDetails') : undefined) });
+      }),
+    },
   ],
 
   /* Вишлист */
@@ -232,7 +253,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
     btn('Переместить в гардероб', async (n) => { await n.root('OutfitsPopulated'); n.toast('Образ перемещён в гардероб'); }),
     openItem,
   ],
-  WishlistNewItem: [btn('Добавить', async (n) => { await n.root('Wishlist'); n.toast('Вещь добавлена в вишлист'); })],
+  // поле формы → заполненная форма (Figma 1173:18306 → 1173:18555, #216, строка 36)
+  WishlistNewItem: [{ sel: '.y-field :is(input, textarea)', go: (n) => n.swap('WishlistNewItemCompleted') }, btn('Добавить', async (n) => { await n.root('Wishlist'); n.toast('Вещь добавлена в вишлист'); })],
   WishlistNewItemCompleted: [btn('Добавить', async (n) => { await n.root('Wishlist'); n.toast('Вещь добавлена в вишлист'); })],
 
   /* Архив и корзина */
@@ -317,8 +339,9 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   /* Новая вещь: без фото → загрузка (сама) → фото добавлено → «Добавить» */
   NewItemNoPhotoV1: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItemLoadingV1') }],
   NewItemNoPhotoV2: [{ sel: '.y-photo-area__add', go: (n) => n.swap('NewItem') }],
-  NewItemPhotoV1: [addItem(addedItem)],
-  NewItemPhotoV2: [addItem(addedItem)],
+  // поле формы → заполненная форма, как у вишлиста
+  NewItemPhotoV1: [{ sel: '.y-field input', go: (n) => n.swap('NewItemCompletedV1') }, addItem(addedItem)],
+  NewItemPhotoV2: [{ sel: '.y-field input', go: (n) => n.swap('NewItemCompletedV2') }, addItem(addedItem)],
   NewItemCompletedV1: [addItem(addedItem)],
   NewItemCompletedV2: [addItem(addedItem)],
 

@@ -31,6 +31,9 @@ const tap = async (root: HTMLElement, el: Element) => { await userEvent.click(el
 const dialog = (c: Canvas, name: string) => c.findByRole('alertdialog', { name });
 const sheet = (c: Canvas, name: string) => c.findByRole('dialog', { name });
 const gone = (c: Canvas, role: 'dialog' | 'alertdialog') => waitFor(() => expect(c.queryByRole(role)).toBeNull());
+/** Заголовки шторок действий — имя вещи и повод образа, как в Figma (#216, строки 1–2). */
+const ITEM = 'Белое платье с красными вкраплениями';
+const OCCASION = 'На каждый день';
 
 /** Создание образа: перемешать, фильтр вещей, очистить (долгое нажатие на холст), выход с несохранёнными вещами. */
 export const CreationOverlays: Story = {
@@ -130,7 +133,7 @@ export const NewItemChain: Story = {
   },
 };
 
-/** Онбординг: вход → имя → первая вещь (или «Пропустить») → первый образ → главная. С каждого шага — «Назад». */
+/** Онбординг: вход → имя → первая вещь; «Пропустить» — сразу на главную (Figma `1173:21880`). С каждого шага — «Назад». */
 export const OnboardingChain: Story = {
   name: 'Цепочка: онбординг',
   args: { start: 'SignIn' satisfies ScreenId, panel: false },
@@ -145,19 +148,66 @@ export const OnboardingChain: Story = {
     await tap(root, topLayer(root).getByRole('button', { name: 'Далее' }));
     await at(root, 'FirstItemPrompt');
 
-    await tap(root, topLayer(root).getByRole('button', { name: 'Пропустить' }));
-    await at(root, 'FirstOutfit');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Добавить' }));
+    await at(root, 'NewItemNoPhotoV1');
     await back(root);
     await at(root, 'FirstItemPrompt');
 
+    await tap(root, topLayer(root).getByRole('button', { name: 'Пропустить' }));
+    await at(root, 'Today');
+  },
+};
+
+/** Первая вещь в онбординге — форма Variant 01: без фото → загрузка (сама) → фото → поле → заполнено → «Добавить» → первый образ → главная. */
+export const OnboardingFirstItem: Story = {
+  name: 'Цепочка: первая вещь в онбординге',
+  args: { start: 'FirstItemPrompt' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'FirstItemPrompt');
     await tap(root, topLayer(root).getByRole('button', { name: 'Добавить' }));
-    await at(root, 'NewItem');
-    await at(root, 'NewItemPhotoV2', 5000);
+    await at(root, 'NewItemNoPhotoV1');
+    await tap(root, q(root, '.y-photo-area__add'));
+    await at(root, 'NewItemLoadingV1');
+    await at(root, 'NewItemPhotoV1', 5000);
+    await tap(root, q(root, '.y-field input'));
+    await at(root, 'NewItemCompletedV1');
     await tap(root, submit(root));
     await at(root, 'FirstOutfit');
     await c.findByText('Первая вещь добавлена');
     await tap(root, topLayer(root).getByRole('button', { name: 'Сохранить образ и завершить' }));
     await at(root, 'Today');
+  },
+};
+
+/** Главная: «на каждый день ⌄» открывает шторку «Повод» (Figma OPEN_OVERLAY `1173:14091`), выбор меняет акцент в шапке. */
+export const TodayOccasion: Story = {
+  name: 'Цепочка: повод на главной',
+  args: { start: 'Today' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'Today');
+    await tap(root, q(root, '.y-header__accent'));
+    await tap(root, await within(await sheet(c, 'Повод')).findByRole('button', { name: 'Офис' }));
+    await gone(c, 'dialog');
+    await waitFor(() => expect(q(root, '.y-header__accent')).toHaveTextContent('офис'));
+  },
+};
+
+/** Вишлист: «+» → пустая форма → поле → заполненная форма → «Добавить» → вишлист с тостом. */
+export const WishlistNewItemChain: Story = {
+  name: 'Цепочка: новая вещь в вишлисте',
+  args: { start: 'Wishlist' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'Wishlist');
+    await tap(root, q(root, '.y-bottom-nav__fab button'));
+    await at(root, 'WishlistNewItem');
+    await tap(root, q(root, '.y-field input'));
+    await at(root, 'WishlistNewItemCompleted');
+    await tap(root, submit(root));
+    await at(root, 'Wishlist');
+    await c.findByText('Вещь добавлена в вишлист');
   },
 };
 
@@ -236,7 +286,7 @@ const noToast = (root: HTMLElement, timeout = 1000) => waitFor(() => expect(toas
 /** Вещь в корзине → шторка действий → «Удалить навсегда»: вещь пропадает сразу, тост с «Отменить». */
 const deleteForever = async (root: HTMLElement, c: Canvas) => {
   await tap(root, cards(root)[0]);
-  await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Удалить навсегда' }));
+  await tap(root, await within(await sheet(c, ITEM)).findByRole('button', { name: 'Удалить навсегда' }));
   await gone(c, 'dialog');
   await c.findByText('Вещь удалена навсегда');
 };
@@ -331,7 +381,7 @@ export const FiltersChain: Story = {
   },
 };
 
-/** «Ещё» в деталях: вещь из вишлиста → шторка действий → в гардероб с «Отменить»; образ → шторка действий → удалить. */
+/** «Ещё» в деталях: вещь из вишлиста → шторка действий → в гардероб с «Отменить»; образ («Ещё» и долгое нажатие в списке) → шторка действий → удалить навсегда. */
 export const MoreChain: Story = {
   name: 'Цепочка: «Ещё» в деталях',
   args: { start: 'Wishlist' satisfies ScreenId, panel: false },
@@ -340,7 +390,7 @@ export const MoreChain: Story = {
     await tap(root, q(root, '.y-product-card'));
     await at(root, 'ItemDetails');
     await tap(root, topLayer(root).getByRole('button', { name: 'Ещё' }));
-    await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Переместить в гардероб' }));
+    await tap(root, await within(await sheet(c, ITEM)).findByRole('button', { name: 'Переместить в гардероб' }));
     await gone(c, 'dialog');
     await at(root, 'Wardrobe');
     await c.findByText('Вещь перемещена в гардероб');
@@ -351,10 +401,22 @@ export const MoreChain: Story = {
     await tap(root, q(root, '.y-collage'));
     await at(root, 'OutfitDetails');
     await tap(root, topLayer(root).getByRole('button', { name: 'Ещё' }));
-    await tap(root, await within(await sheet(c, 'Повод образа')).findByRole('button', { name: 'Удалить' }));
+    await tap(root, await within(await sheet(c, OCCASION)).findByRole('button', { name: 'Удалить навсегда' }));
     await gone(c, 'dialog');
     await at(root, 'OutfitsPopulated');
-    await c.findByText('Образ удалён');
+    await c.findByText('Образ удалён навсегда');
+    await tap(root, within(toastEl(root)!).getByRole('button', { name: 'Отменить' }));
+    await at(root, 'OutfitDetails');
+    await back(root);
+    await at(root, 'OutfitsPopulated');
+
+    // долгое нажатие (правая кнопка) на образ в списке — та же шторка (решение владельца, #216 строка 35)
+    q(root, '.y-collage').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    await idle(root);
+    await tap(root, await within(await sheet(c, OCCASION)).findByRole('button', { name: 'Удалить навсегда' }));
+    await gone(c, 'dialog');
+    await at(root, 'OutfitsPopulated');
+    await c.findByText('Образ удалён навсегда');
   },
 };
 
@@ -368,7 +430,7 @@ export const ArchiveLongPress: Story = {
     const before = cards(root).length;
     cards(root)[0].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
     await idle(root);
-    await tap(root, await within(await sheet(c, 'Название вещи')).findByRole('button', { name: 'Вернуть в гардероб' }));
+    await tap(root, await within(await sheet(c, ITEM)).findByRole('button', { name: 'Вернуть в гардероб' }));
     await gone(c, 'dialog');
     await c.findByText('Вещь возвращена в гардероб');
     await expect(cards(root)).toHaveLength(before - 1);

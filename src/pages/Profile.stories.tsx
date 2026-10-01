@@ -91,7 +91,9 @@ function ProfileScreen({ accounts, open: initial, scrollTo = 0 }: { accounts: Ac
 }
 
 export const ProfileAnalytics: Story = { name: 'Profile / Overview / Analytics', render: () => <ProfileScreen accounts={[sima, tina]} /> };
-export const ProfileAnalyticsScrolled: Story = { name: 'Profile / Overview / Analytics / Scrolled', render: () => <ProfileScreen accounts={[sima, tina]} scrollTo={SCROLLED_LIST} /> };
+/** Прокрутка как в Figma `1205:21115`: заголовок «Чаще всего надевалось» на y82 (#216, строка 22). */
+const PROFILE_SCROLLED = SCROLLED_LIST + 120;
+export const ProfileAnalyticsScrolled: Story = { name: 'Profile / Overview / Analytics / Scrolled', render: () => <ProfileScreen accounts={[sima, tina]} scrollTo={PROFILE_SCROLLED} /> };
 export const ProfileSingle: Story = { name: 'Profile / Overview / Single Account', render: () => <ProfileScreen accounts={[sima]} /> };
 export const AccountsMulti: Story = { name: 'Profile / Accounts / Sheet / List', render: () => <ProfileScreen accounts={[sima, tina]} open="accounts" /> };
 export const AccountsSingle: Story = { name: 'Profile / Accounts / Sheet / Single', render: () => <ProfileScreen accounts={[sima]} open="accounts" /> };
