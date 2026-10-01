@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type ComponentProps, type ReactNode, useState } from 'react';
 import { IconButton, Stamp } from '../atoms';
 import { type Chip, ChipGroup, EmptyState, Field, InputGroup, List, ListItem, Note, SegmentControl, Snackbar, StatRow, StatTile } from '../molecules';
-import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
+import { BottomBar, BottomNav, type CollageItem, Dialog, type Garment, garmentNames, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
+import { useGridReorder } from '../motion';
 import { DetailsScreen, Grid, Row, Screen, Sticky } from '../templates';
 import { grid, shoes } from './data';
 import { CategorySheet, ChipSheet, colors, OCCASION_PLACEHOLDER, occasions, seasons } from './sheets';
@@ -29,6 +30,9 @@ const tabs = [{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 
 function WardrobeItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
   const [tab, setTab] = useState('items');
   const ref = useScrolled(scrollTo);
+  // перестановка долгим тапом (#209): удержание и сдвиг — подъём, соседи раздвигаются; порядок — в состоянии экрана
+  const [items, setItems] = useState(() => [...grid, ...grid].map((kind, i): { id: string; kind: Garment } => ({ id: `w${i}`, kind })));
+  const reorder = useGridReorder({ items, getKey: (it) => it.id, onReorder: setItems, getLabel: (it) => garmentNames[it.kind] });
   return (
     <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} scrollRef={ref}>
       <SegmentControl value={tab} onChange={setTab} segments={tabs} />
@@ -39,7 +43,10 @@ function WardrobeItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
           <ChipGroup chips={[{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }, { label: 'Теги', dropdown: true }]} />
         </Row>
       </Sticky>
-      <Grid>{[...grid, ...grid].map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
+      <Grid {...reorder.gridProps}>
+        {reorder.items.map((it) => <ItemCard key={it.id} kind={it.kind} {...reorder.itemProps(it.id)} />)}
+        {reorder.announcer}
+      </Grid>
     </Screen>
   );
 }
@@ -156,13 +163,15 @@ export const WardrobeItemDetailsScrolled: Story = { name: 'Wardrobe / Item Detai
 function WishlistItemsScreen({ scrollTo = 0, overlay }: { scrollTo?: number; overlay?: ReactNode }) {
   const ref = useScrolled(scrollTo);
   // прокрученное состояние — 6 позиций, как в Figma `1205:13506`: первая — Air Force, дальше Ava Edge (#216, строка 23)
-  const list = scrollTo ? [...shoes, shoes[1], shoes[1]] : shoes;
+  const [list, setList] = useState(() => (scrollTo ? [...shoes, shoes[1], shoes[1]] : shoes).map((name, i) => ({ id: `p${i}`, name })));
+  const reorder = useGridReorder({ items: list, getKey: (it) => it.id, onReorder: setList, getLabel: (it) => it.name });
   return (
     <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} overlay={overlay && <Overlay>{overlay}</Overlay>} scrollRef={ref}>
       <SegmentControl value="wishlist" segments={tabs} />
       <SegmentControl size="S" fit value="items" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
-      <Grid rowGap={24}>
-        {list.map((n, i) => <ProductCard key={i} kind="shoe" name={n} price={n === shoes[0] ? '10 400 ₽' : '14 300 ₽'} showLike={false} />)}
+      <Grid rowGap={24} {...reorder.gridProps}>
+        {reorder.items.map((it) => <ProductCard key={it.id} kind="shoe" name={it.name} price={it.name === shoes[0] ? '10 400 ₽' : '14 300 ₽'} showLike={false} {...reorder.itemProps(it.id)} />)}
+        {reorder.announcer}
       </Grid>
     </Screen>
   );

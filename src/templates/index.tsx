@@ -1,4 +1,4 @@
-import { isValidElement, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { isValidElement, useCallback, useEffect, useRef, useState, type ComponentPropsWithRef, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { ScrollEdge } from '../atoms';
 import { Header, StatusBar } from '../organisms';
 import { cx } from '../utils/cx';
@@ -171,8 +171,9 @@ export function Sticky({ children }: { children: ReactNode }) {
  * Сетка карточек в 2 колонки по ширине экрана (173 + 7 + 173). Вещи, товары, поездки, карточки стилиста.
  * `rowGap` — больше, если под карточкой есть подпись (товары в поиске).
  */
-export function Grid({ rowGap, children }: { rowGap?: number; children: ReactNode }) {
-  return <div className="y-grid" style={rowGap ? { rowGap } : undefined}>{children}</div>;
+export function Grid({ rowGap, children, className, style, ...rest }: { rowGap?: number; children: ReactNode } & Omit<ComponentPropsWithRef<'div'>, 'children'>) {
+  // остальные атрибуты — на контейнер: перестановка долгим тапом (`useGridReorder` → gridProps, #209)
+  return <div {...rest} className={cx('y-grid', className)} style={rowGap ? { rowGap, ...style } : style}>{children}</div>;
 }
 
 /**
