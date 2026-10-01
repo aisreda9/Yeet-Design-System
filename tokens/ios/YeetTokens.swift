@@ -182,6 +182,8 @@ public enum YeetComponent {
     public static let sheetHandle: Color = YeetColor.handle
     /// Заголовок → контент и заголовок → описание (решение владельца 29.09, #58)
     public static let sheetTitleGap: CGFloat = YeetSpace.s16
+    /// Заголовок компактной шапки: Body полужирным (у Body один вес, #217)
+    public static let headerCompactWeight: CGFloat = 600
 }
 
 public enum YeetSpace {
@@ -216,12 +218,12 @@ public enum YeetRadius {
     public static let lg: CGFloat = 20
     /// Кнопки-капсулы, верх sheet, подсказка стилиста
     public static let xl: CGFloat = 32
-    /// Tab-bar, низ плавающего sheet (концентрично углу экрана)
+    /// Tab-bar и док: отступ 8, концентрично углу экрана 56 (шторки — radius.overlay, #217)
     public static let bar: CGFloat = 48
     /// Аватар, радио
     public static let full: CGFloat = 999
-    /// Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58)
-    public static let overlay: CGFloat = 48
+    /// Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 16 (#217)
+    public static let overlay: CGFloat = 40
 }
 
 /// Макет: iPhone 393 × 852, поля 20.

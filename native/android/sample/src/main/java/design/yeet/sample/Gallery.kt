@@ -254,7 +254,7 @@ fun Gallery(
         }
     }
     Overlay(visible = modal == Modal.Dialog, onClose = { modal = Modal.None }) {
-        Dialog(title = "Точно хочешь выйти?", description = "Изменения не сохранятся", cancel = "Выйти", confirm = "Сохранить и выйти", onCancel = { modal = Modal.None }, onConfirm = { modal = Modal.None })
+        Dialog(title = "Точно хочешь выйти?", description = "Изменения не сохранятся", cancel = "Выйти", confirm = "Сохранить", onCancel = { modal = Modal.None }, onConfirm = { modal = Modal.None })
     }
     Overlay(visible = modal == Modal.Destructive, onClose = { modal = Modal.None }) {
         Dialog(

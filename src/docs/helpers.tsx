@@ -82,11 +82,11 @@ export const unlessBare = (decorator: Decorator): Decorator => (Story, ctx) => (
 export const withWidth = (width: number) => (Story: () => ReactNode) => <div style={{ width }}><Story /></div>;
 
 /**
- * Декоратор: sheet / dialog на затемнении, как на экране. Ширина — из переключателя «Экран» (`--screen-width`, 320–430),
+ * Декоратор: sheet / dialog на затемнении, как на экране: 16 от краёв и низа, как `.y-overlay` (#217). Ширина — из переключателя «Экран» (`--screen-width`, 320–430),
  * чтобы ошибки ширины были видны на уровне организма; в узком окне Docs не шире холста.
  */
 export const onOverlay = (Story: () => ReactNode) => (
-  <div style={{ width: 'var(--screen-width, 393px)', maxWidth: '100%', background: 'var(--color-bg-overlay)', padding: '40px 8px 8px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
+  <div style={{ width: 'var(--screen-width, 393px)', maxWidth: '100%', background: 'var(--color-bg-overlay)', padding: '40px 16px 16px', borderRadius: 56, overflow: 'hidden' }}><Story /></div>
 );
 
 /**

@@ -191,6 +191,8 @@ object YeetComponent {
     val sheetTopGap = YeetSpace.s8
     /** Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
     val sheetTitleGap = YeetSpace.s16
+    /** Заголовок компактной шапки: Body полужирным (у Body один вес, #217) */
+    val headerCompactWeight = FontWeight(600)
 }
 
 /** Цвет вещи — атрибут одежды, не интерфейс. */
@@ -241,12 +243,12 @@ object YeetRadius {
     val lg = 20.dp
     /** Кнопки-капсулы, верх sheet, подсказка стилиста */
     val xl = 32.dp
-    /** Tab-bar, низ плавающего sheet (концентрично углу экрана) */
+    /** Tab-bar и док: отступ 8, концентрично углу экрана 56 (шторки — radius.overlay, #217) */
     val bar = 48.dp
     /** Аватар, радио */
     val full = 999.dp
-    /** Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) */
-    val overlay = 48.dp
+    /** Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 16 (#217) */
+    val overlay = 40.dp
 }
 
 /** Базовый экран макетов (iPhone 15/16), боковые поля. */

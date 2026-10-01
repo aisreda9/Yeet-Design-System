@@ -71,7 +71,7 @@ public struct YeetDotPattern: View {
 }
 
 /// Коллаж образа 353 × 353 (React: `OutfitCollage`): точечный фон с отступом 14, вещи разложены свободно (x, y в %).
-/// `label` — повод бейджем Secondary в 20 от угла, `footer` — белая плашка снизу с отступом 8 (цена образа, переход).
+/// `label` — повод бейджем Secondary в 20 от угла, `footer` — белая плашка снизу с отступом 8, радиус 12 — концентрично карточке 20 (цена образа, переход, #217).
 public struct YeetOutfitCollage<Footer: View>: View {
     private let items: [YeetCollageItem]
     private let label: String?
@@ -107,7 +107,7 @@ public struct YeetOutfitCollage<Footer: View>: View {
                     .padding(.horizontal, YeetSpace.s20)
                     .padding(.vertical, YeetSpace.s16)
                     .frame(maxWidth: .infinity)
-                    .background(RoundedRectangle(cornerRadius: YeetRadius.md, style: .continuous).fill(YeetColor.bgElevated))
+                    .background(RoundedRectangle(cornerRadius: YeetRadius.sm, style: .continuous).fill(YeetColor.bgElevated))
                     .padding(YeetSpace.s8)
             }
         }

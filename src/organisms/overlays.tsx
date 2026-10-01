@@ -58,7 +58,7 @@ export type SheetProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'child
   /** Абзац-пояснение под заголовком: Body серым, 16 под заголовком и 20 до контента (Settings / Currency `1371:43380`). */
   description?: ReactNode;
   /**
-   * `modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, радиус 48 на все углы (`--radius-overlay`, концентрично углу экрана).
+   * `modal` — плавающая карточка поверх overlay: отступ 16 от краёв экрана, радиус 40 на все углы (`--radius-overlay`, концентрично углу экрана 56, #217).
    * `panel` — постоянная панель деталей во всю ширину, 32 сверху, с тенью.
    */
   variant?: 'modal' | 'panel';
@@ -140,7 +140,7 @@ export function Sheet({ title, description, variant, type: legacyType, footer, o
 
 export type DialogProps = Omit<ComponentPropsWithRef<'section'>, 'title' | 'children'> & {
   /**
-   * `default` — Tertiary + Primary («Выйти / Сохранить и выйти»).
+   * `default` — Tertiary + Primary («Выйти / Сохранить»).
    * `destructive` — необратимое действие серым слева, безопасная «Отменить» синей справа («Очистить / Отменить»).
    * `danger` — удаление аккаунта: красная Destructive слева, «Отменить» синей справа.
    */
@@ -230,7 +230,7 @@ export type OverlayProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
  * Модальный слой: затемнение `--color-bg-overlay` и прижатая к низу плавающая шторка.
  *
  * **Движение.** Появление — шторка снизу на пружине quick (`--motion-nav`), затемнение `--motion-fade`; уход быстрее —
- * `--motion-exit`, шторка уезжает целиком за край: 100 % + отступ 8. Всё на transition — появление и уход прерываются
+ * `--motion-exit`, шторка уезжает целиком за край: 100 % + отступ 16. Всё на transition — появление и уход прерываются
  * и разворачиваются из текущего положения.
  *
  * **Смахивание** (если есть `onClose` или `onOpenChange`): тянется за пальцем 1 : 1 вниз и с сопротивлением `--gesture-rubber-band` вверх,

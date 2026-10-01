@@ -139,7 +139,7 @@ export function PhotoTile({ source, label, className, ...rest }: PhotoTileProps)
   return (
     <button type="button" className={cx('y-photo-tile', className)} {...rest}>
       <span className="y-photo-tile__art" aria-hidden>
-        <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top, left: (63 - art.size) / 2 }} />
+        <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top }} />
       </span>
       {label ?? (source === 'camera' ? <>Сделать<br />фото</> : <>Выбрать<br />из галереи</>)}
     </button>

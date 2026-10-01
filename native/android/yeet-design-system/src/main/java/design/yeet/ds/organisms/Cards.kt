@@ -239,7 +239,7 @@ fun Modifier.collagePattern(color: androidx.compose.ui.graphics.Color): Modifier
 /**
  * Коллаж образа 353×353 (квадрат по ширине): `cardBg` + точечный паттерн, вещи раскладываются свободно.
  * @param label повод: «Прогулка», «Ужин» — бейдж Secondary в 20 от угла.
- * @param footer панель снизу: цена образа, переход (белая плашка, радиус 16, отступ 8).
+ * @param footer панель снизу: цена образа, переход (белая плашка, радиус 12 — концентрично карточке 20 при отступе 8, #217).
  */
 @Composable
 fun OutfitCollage(
@@ -265,7 +265,7 @@ fun OutfitCollage(
                     .align(Alignment.BottomCenter)
                     .padding(8.dp)
                     .fillMaxWidth()
-                    .background(c.bgElevated, RoundedCornerShape(YeetTheme.radius.md))
+                    .background(c.bgElevated, RoundedCornerShape(YeetTheme.radius.sm))
                     .padding(horizontal = 20.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,

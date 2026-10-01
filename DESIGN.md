@@ -1,7 +1,7 @@
 # Yeet Design System
 
 Указатель по дизайн-системе приложения **YeetStyle (yeet)** — умного гардероба: что где лежит, ID страниц Figma и сводные таблицы токенов.
-Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->100<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
+Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->155<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
 здесь она не дублируется. Storybook публикуется на GitHub Pages (`.github/workflows/storybook.yml`); локально — `npm ci && npm run storybook`.
 
 > Таблицы токенов ниже **генерируются** из `tokens/tokens.json` (`npm run docs-tokens`, проверка — `npm run docs-tokens -- --check`): блоки между `<!-- gen:… -->` руками не правятся.
@@ -74,13 +74,14 @@
 | `ui-colors/blue-text` | `--color-text-accent` | `#0100F4` | `#8A8AFF` | Акцентный текст, выбранное |
 | `ui-colors/red-text` | `--color-text-danger` | `#CC291B` | `#FF6B5C` | Ошибки, деструктивные действия |
 | `ui-colors/blue` | `--color-accent` | `#0100F4` | `#4B4BFF` | Главное действие, выбранное, фокус |
-| `ui-colors/blue-10%` | `--color-accent-soft` | `#F1F4FF` | `#4B4BFF` @ 20% | Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, как во флоу New app design (не прозрачный: на сером фоне не темнеет) |
+| `ui-colors/blue-10%` | `--color-accent-soft` | `#F1F4FF` | `#4B4BFF` @ 20% | Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, а не прозрачный: на сером фоне не темнеет |
 | `ui-colors/red` | `--color-danger` | `#CC291B` | `#CC291B` | Удаление, ошибка, бейдж скидки |
 | `ui-colors/red-10%` | `--color-danger-soft` | `#FF4230` @ 10% | `#FF6B5C` @ 18% | Фон Destructive-кнопки |
 | `ui-colors/black-10%` | `--color-border-subtle` | `#000000` @ 10% | `#F5F5F7` @ 12% | Обводки свотчей, гистограмма, фон неактивных точек |
 | `ui-colors/divider` | `--color-divider` | `#000000` @ 5% | `#F5F5F7` @ 8% | Разделители строк в input-group и list-group |
 | `ui-colors/pattern-dot` | `--color-pattern-dot` | `#000000` @ 23% | `#F5F5F7` @ 23% | Точки фона коллажа и холста (2 px, шаг 10) |
 | `ui-colors/handle` | `--color-handle` | `#000000` @ 17% | `#F5F5F7` @ 14% | Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) |
+| `ui-colors/shadow` | `--color-shadow` | `#000000` @ 12% | `#000000` @ 50% | Цвет плавающей тени shadow/floating |
 <!-- /gen:colors -->
 
 <!-- gen:contrast -->
@@ -131,7 +132,7 @@
 ### 3.4 Отступы — `spaces/*`
 
 <!-- gen:space -->
-Шкала — 14 шагов: `0, 2, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 52, 56` (`--space-<значение>`).
+Шкала — 15 шагов: `0, 2, 4, 8, 12, 16, 20, 24, 28, 32, 40, 44, 48, 52, 56` (`--space-<значение>`).
 <!-- /gen:space -->
 
 ### 3.5 Скругления
@@ -139,14 +140,15 @@
 <!-- gen:radius -->
 | Токен | Значение | Где |
 |---|---|---|
+| `--radius-8` | 8 | Острый угол карточки погоды |
 | `--radius-xs` | 4 | Хэндл sheet |
 | `--radius-sm` | 12 | Badge |
 | `--radius-md` | 16 | Snackbar, cap столбца графика |
 | `--radius-lg` | 20 | Карточки, поля, фото |
 | `--radius-xl` | 32 | Кнопки-капсулы, верх sheet, подсказка стилиста |
-| `--radius-bar` | 48 | Tab-bar, низ плавающего sheet (концентрично углу экрана) |
+| `--radius-bar` | 48 | Tab-bar и док: отступ 8, концентрично углу экрана 56 (шторки — radius.overlay, #217) |
 | `--radius-full` | 999 | Аватар, радио |
-| `--radius-overlay` | 48 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 8 (#58) |
+| `--radius-overlay` | 40 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 16 (#217) |
 
 Компонентные радиусы ссылаются на эти: `--card-radius` → `lg`, `--sheet-radius` → `xl`.
 <!-- /gen:radius -->

@@ -14,7 +14,7 @@ type Args = { title: string; description: string; type: 'modal' | 'panel'; foote
 const content = {
   actions: <List><ListItem icon="ai" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List>,
   chips: <ChipGroup wrap chips={[{ label: 'Все', selected: true }, { label: 'Весна' }, { label: 'Лето' }, { label: 'Осень' }, { label: 'Зима' }]} />,
-  photo: <><div style={{ display: 'flex', gap: 7 }}>{/* Figma tiles gap 7: две плитки 165 × 165 в ряду 337 (1173:16889) */}<PhotoTile source="gallery" /><PhotoTile source="camera" /></div><Button variant="destructive" fullWidth>Удалить фотографию</Button></>,
+  photo: <><div style={{ display: 'flex', gap: 7 }}>{/* Figma tiles gap 7: две плитки ~157 × 157 в ряду 321 (1173:16889, #217) */}<PhotoTile source="gallery" /><PhotoTile source="camera" /></div><Button variant="destructive" fullWidth>Удалить фотографию</Button></>,
 };
 
 const meta: Meta<Args> = {
@@ -23,7 +23,7 @@ const meta: Meta<Args> = {
   args: { title: 'Название вещи', description: '', type: 'modal', footer: false, handle: true, content: 'actions' },
   argTypes: { description: { control: 'text' }, type: { control: 'inline-radio', options: ['modal', 'panel'] }, content: { control: 'inline-radio', options: ['actions', 'chips', 'photo'] } },
   decorators: [unlessBare(onOverlay)],
-  parameters: { docs: { description: { component: 'Bottom sheet. **Modal** — плавающая карточка: 8 от краёв экрана, радиус 48 на все углы (`--radius-overlay`, концентрично углу экрана), паддинг 8/20/20; хэндл 48×4 → 16 → H3 → 16 → слот Content → 16 → пара кнопок L через 7. **Panel** — панель деталей во всю ширину, 32 сверху, тень. `handle={false}` — без хэндла, контент на 20 от верха (панель выбора вещей); `onClose` — «×» Ghost S справа от заголовка вместо хэндла. `description` — абзац Body серым под заголовком: 16 от заголовка, 20 до контента (Валюта). Высокая модальная шторка не выше экрана, контент прокручивается. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Show Handle, Show Close, Title, слот Content.' } } },
+  parameters: { docs: { description: { component: 'Bottom sheet. **Modal** — плавающая карточка: 16 от краёв экрана, радиус 40 на все углы (`--radius-overlay`, концентрично углу экрана 56, #217), при 393 — 361, контент 321, паддинг 8/20/20; хэндл 48×4 → 16 → H3 → 16 → слот Content → 16 → пара кнопок L через 7. **Panel** — панель деталей во всю ширину, 32 сверху, тень. `handle={false}` — без хэндла, контент на 20 от верха (панель выбора вещей); `onClose` — «×» Ghost S справа от заголовка вместо хэндла. `description` — абзац Body серым под заголовком: 16 от заголовка, 20 до контента (Валюта). Высокая модальная шторка не выше экрана, контент прокручивается. **Всё временное — sheet, а не новый экран.** Figma: `sheet` · Type, Footer, Show Handle, Show Close, Title, слот Content.' } } },
   render: ({ title, description, type, footer, handle, content: c }) => <Sheet title={title || undefined} description={description || undefined} type={type} handle={handle} footer={footer ? [{ label: 'Сбросить' }, { label: 'Применить' }] : undefined}>{content[c]}</Sheet>,
 };
 export default meta;

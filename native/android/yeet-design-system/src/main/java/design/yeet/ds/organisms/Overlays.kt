@@ -101,7 +101,7 @@ import androidx.compose.ui.window.Dialog as WindowDialog
 
 /* ─── Значения, которых ещё нет в токенах ───────────────────────────── */
 
-/** Все 4 угла шторки и диалога (`radius-overlay`, концентрично экрану 56 при отступе 8, #58). */
+/** Все 4 угла шторки и диалога (`radius-overlay` 40, концентрично экрану 56 при отступе 16, #217). */
 private val OverlayRadius: Dp get() = YeetRadius.overlay
 
 /** Верх высокой шторки — 8 под статус-баром (D2, `sheet-top-gap`). На Android статус-бар — WindowInsets.statusBars. */
@@ -111,7 +111,7 @@ private val SheetTopGap: Dp get() = YeetComponent.sheetTopGap
 private val SheetTitleGap: Dp get() = YeetComponent.sheetTitleGap
 
 /** Отступ плавающей шторки от краёв экрана и от клавиатуры (D3, D4). */
-private val OverlayInset: Dp get() = YeetSpace.s8
+private val OverlayInset: Dp get() = YeetSpace.s16
 
 /** Пара кнопок футера — через 7 (Figma, в токенах шага 7 нет). */
 private val FooterGap = 7.dp
@@ -123,12 +123,12 @@ data class FooterAction(val label: String, val variant: ButtonStyle? = null, val
 
 /**
  * Figma sheet · Type.
- * `Modal` — плавающая карточка поверх overlay: отступ 8 от краёв экрана, все углы 48 (`radius-overlay`, концентрично углу экрана).
+ * `Modal` — плавающая карточка поверх overlay: отступ 16 от краёв экрана, все углы 40 (`radius-overlay`, концентрично углу экрана 56, #217).
  * `Panel` — постоянная панель экрана (детали, стилист, профиль) во всю ширину, 32 сверху, с тенью.
  */
 enum class SheetType { Modal, Panel }
 
-/** Форма плавающего sheet / dialog: все 4 угла 48 (`radius-overlay`). */
+/** Форма плавающего sheet / dialog: все 4 угла 40 (`radius-overlay`). */
 val SheetModalShape: Shape
     get() = RoundedCornerShape(OverlayRadius)
 
@@ -350,7 +350,7 @@ private fun PanelSheet(
 
 /**
  * Figma dialog · Tone.
- * `Default` — Tertiary + Primary («Выйти / Сохранить и выйти»).
+ * `Default` — Tertiary + Primary («Выйти / Сохранить»).
  * `Destructive` — необратимое действие серым слева, безопасная «Отмена» синей справа («Очистить / Отмена»).
  * `Danger` — удаление аккаунта: красная Destructive слева, «Отменить» синей справа.
  */
@@ -435,7 +435,7 @@ internal val LocalOverlay = staticCompositionLocalOf<OverlayController?> { null 
 /**
  * Модальный слой (web: Overlay): затемнение `bgOverlay` и прижатая к низу плавающая шторка.
  *
- * **Геометрия.** 8 от краёв слева и справа; снизу `max(8, навигационная панель)`, над клавиатурой — 8 от клавиатуры (D3, D4);
+ * **Геометрия.** 16 от краёв слева и справа; снизу `max(16, навигационная панель)`, над клавиатурой — 16 от клавиатуры (D3, D4, #217);
  * сверху не выше «статус-бар + 8» (D2) — высокая шторка прокручивает тело, шапка и футер на месте.
  *
  * **Движение.** Шторка выезжает на пружине без перелёта `sheet` (`motion.spring.critical`, D5), [Dialog] — `appear`;
@@ -580,7 +580,7 @@ fun Overlay(
         val dragDim = if (sheetHeight > 0f) 1f - (offset.coerceAtLeast(0f) / sheetHeight).coerceIn(0f, 1f) else 1f
         SideEffect { window?.setDimAmount(overlayAlpha * enter.value.coerceIn(0f, 1f) * dragDim) }
 
-        // Снизу: над клавиатурой — 8 от неё, иначе max(8, навигационная панель)
+        // Снизу: над клавиатурой — 16 от неё, иначе max(16, навигационная панель)
         val gap = with(density) { OverlayInset.roundToPx() }
         val navBottom = WindowInsets.navigationBars.getBottom(density)
         val imeBottom = WindowInsets.ime.getBottom(density)

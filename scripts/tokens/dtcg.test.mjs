@@ -1,5 +1,6 @@
 // Проверка валидатора DTCG: node --test scripts/tokens/ (запускается в CI, qa.yml).
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { readTokens, validate } from './dtcg.mjs';
 
@@ -72,4 +73,18 @@ test('after — ссылка на dimension-токен', () => {
   const t = fresh();
   t.component['sheet-top-gap'].$extensions['com.yeet'].after = '{color.surface.bg-canvas}';
   expectError(t, /sheet-top-gap \(after\): ссылка \{color\.surface\.bg-canvas\}: тип color, ожидается dimension/);
+});
+
+test('компонентный fontWeight: число 1…1000, иначе ошибка (#217)', () => {
+  const t = fresh();
+  assert.equal(t.component['header-compact-weight'].$type, 'fontWeight');
+  t.component['header-compact-weight'].$value = 0;
+  expectError(t, /header-compact-weight: вес — число 1…1000/);
+});
+
+test('компонентный fontWeight попадает в CSS, Swift и Kotlin (#217)', async () => {
+  const read = (p) => readFile(new URL(p, root), 'utf8');
+  assert.match(await read('src/tokens/tokens.generated.css'), /--header-compact-weight: 600;/);
+  assert.match(await read('tokens/ios/YeetTokens.swift'), /public static let headerCompactWeight: CGFloat = 600\n/);
+  assert.match(await read('tokens/android/YeetTokens.kt'), /val headerCompactWeight = FontWeight\(600\)\n/);
 });

@@ -49,6 +49,7 @@ const css = {
   dimension: (v) => (isDim(v) ? `${v.value}${v.unit}` : v),
   duration: (v) => (isDim(v) ? `${ms(v)}ms` : v),
   cubicBezier: (v) => (Array.isArray(v) ? `cubic-bezier(${v.join(', ')})` : v),
+  fontWeight: (v) => (typeof v === 'number' ? String(v) : v),
   fontFamily: (v) => (Array.isArray(v) ? v.map((f, i) => (i === 0 || /\s/.test(f) ? `'${f}'` : f)).join(', ') : v),
   shadow: (v) => (isObj(v) ? [v.offsetX, v.offsetY, v.blur, ...(v.spread && css.dimension(v.spread) !== '0px' ? [v.spread] : [])].map(css.dimension).concat(css.color(v.color)).join(' ') : v),
   spring: (v) => (isObj(v) ? springLinear({ ...v, duration: ms(v.duration) }) : v),
@@ -62,6 +63,7 @@ const swift = {
   dimension: (v) => (isDim(v) ? num(v.value) : v),
   duration: (v) => (isDim(v) ? num(ms(v) / 1000) : v),
   cubicBezier: (v) => (Array.isArray(v) ? v.join(', ') : v),
+  fontWeight: (v) => (typeof v === 'number' ? num(v) : v), // вес CSS как CGFloat: YeetTextStyle.withWeight(_:) / Font.Weight(css:)
   shadow: (v) => (isObj(v) ? { color: swift.color(v.color), x: v.offsetX.value, y: v.offsetY.value, blur: v.blur.value } : v),
   spring: (v) => (isObj(v) && isDim(v.duration) ? { ...v, duration: ms(v.duration) / 1000 } : v),
   typography: (v) => (isObj(v) && isDim(v.fontSize) ? { weight: v.fontWeight, size: v.fontSize.value, lineHeight: lineHeightPx(v), tracking: v.letterSpacing.value } : v),
@@ -72,6 +74,7 @@ const kotlin = {
   color: (v) => { if (!isColor(v)) return v; const c = rgba(v); return c.a === 0 ? 'Color.Transparent' : `Color(0x${Math.round(c.a * 255).toString(16).padStart(2, '0').toUpperCase()}${c.hex})`; },
   dimension: (v) => (isDim(v) ? `${v.value}.dp` : v),
   duration: (v) => (isDim(v) ? ms(v) : v),
+  fontWeight: (v) => (typeof v === 'number' ? `FontWeight(${v})` : v),
   cubicBezier: (v) => (Array.isArray(v) ? `CubicBezierEasing(${v.map((x) => num(x) + 'f').join(', ')})` : v),
   shadow: (v) => (isObj(v) ? { color: kotlin.color(v.color), x: v.offsetX.value, y: v.offsetY.value, blur: v.blur.value } : v),
   spring: (v) => (isObj(v) && 'mass' in v ? { dampingRatio: `${num(dampingRatio(v))}f`, stiffness: `${v.stiffness}f` } : v),

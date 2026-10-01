@@ -40,7 +40,6 @@
 .y-header__row--back { display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr); }
 .y-header__row--back > .y-header__text-action { grid-column: 3; justify-self: end; }
 .y-header__compact-title {
-  --header-compact-weight: 600; /* TODO(tokens): body/semibold — у Body один вес (--font-weight-body) */
   grid-column: 2; min-width: 0; font: var(--typography-body); font-weight: var(--header-compact-weight); letter-spacing: var(--typography-body-letter-spacing);
   color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none;
   opacity: 0; transition: opacity var(--motion-exit); /* уходит быстрее, чем появляется (exit < fade) */
@@ -111,8 +110,8 @@
 .y-sheet__handle { align-self: center; width: 48px; height: 4px; border-radius: var(--radius-xs); background: var(--sheet-handle); } /* ≈ 1,5:1 к фону шторки (D8) */ /* stylelint-disable-line unit-disallowed-list -- хэндл шторки 48 × 4 (D8) */
 .y-dock > .y-sheet__handle { margin-bottom: 22px; } /* stylelint-disable-line unit-disallowed-list -- хэндл → поле 30 (22 + gap 8) в доке, Figma 1173:18217 (#210: было 14 — док стоял на 8 ниже) */
 /* Кнопки футера — равные половины через 7; не влезает подпись — обе на всю ширину, одна под другой, безопасная снизу (C11, D7).
-   Ширина по подписи, но не шире футера: длиннее строки — многоточие. Поля 16 вместо 20 — только запас до переноса:
-   короткая подпись по центру выглядит так же, а «Сохранить и выйти» при 393 остаётся в половине 165, как в Figma. */
+   Ширина по подписи, но не шире футера: длиннее строки — многоточие. Подписи диалогов короткие («Выйти / Сохранить» — решение владельца #217),
+   чтобы помещаться в половину 157 (контент 321). */
 .y-sheet__footer { display: flex; flex-wrap: wrap; gap: 7px; } /* stylelint-disable-line unit-disallowed-list -- зазор кнопок футера 7 из Figma */
 .y-sheet__footer > .y-button { flex: 1 1 calc(50% - 3.5px); min-width: fit-content; padding-inline: var(--space-16); } /* stylelint-disable-line unit-disallowed-list -- половина зазора 7 */
 .y-sheet__footer-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -120,8 +119,8 @@
 .y-sheet__head > .y-icon-button { margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) calc(-1 * var(--space-8)) auto; }
 .y-dialog__text { display: flex; flex-direction: column; gap: var(--sheet-title-gap); } /* заголовок → 16 → описание (#58) */
 .y-dialog__more { display: flex; flex-direction: column; gap: var(--space-12); } /* блоки после описания — через 12 (Figma 1176:11793 «Аккаунт будет удалён», #210) */
-/* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 8 от краёв экрана,
-   все 4 угла --radius-overlay (48, концентрично углу экрана 56); хэндл → 16 → заголовок → --sheet-title-gap (16) → контент / описание (#58) */
+/* Modal (Figma: sheet · Type=Modal, New app design → Profile / Accounts / Sheet): плавающая карточка 16 от краёв экрана,
+   все 4 угла --radius-overlay (40 = 56 − 16, концентрично углу экрана, #217); при 393 шторка 361, контент 321; хэндл → 16 → заголовок → --sheet-title-gap (16) → контент / описание (#58) */
 .y-sheet--modal { gap: var(--space-16); border-radius: var(--radius-overlay); }
 .y-sheet--modal > .y-sheet__title + *,
 .y-sheet--modal > .y-sheet__head + * { margin-top: calc(var(--sheet-title-gap) - var(--space-16)); }
@@ -158,7 +157,7 @@
      При «Уменьшении движения» токен сам даёт 1ms. Вернуть перелёт: --sheet-spring: var(--motion-nav). */
   --sheet-spring: var(--motion-sheet);
   /* верх высокой шторки — под статус-баром + 8 (D2): токен --sheet-top-gap */
-  display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-8) var(--space-8);
+  display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sheet-top-gap) var(--space-16) var(--space-16); /* 16 от краёв и низа экрана: радиус 40 концентричен углу 56 (#217) */
 }
 .y-overlay::before {
   content: ''; position: absolute; inset: 0; background: var(--color-bg-overlay);
@@ -175,12 +174,12 @@
 .y-overlay .y-sheet .y-chip-group--scroll { touch-action: pan-x pan-y; }
 @starting-style {
   .y-overlay::before { opacity: 0; }
-  .y-overlay .y-sheet { transform: translateY(calc(100% + var(--space-8))); } /* плавающая шторка уходит за край целиком, с отступом 8 */
+  .y-overlay .y-sheet { transform: translateY(calc(100% + var(--space-16))); } /* плавающая шторка уходит за край целиком, с отступом 16 */
 }
 .y-overlay.is-dragging::before, .y-overlay.is-dragging .y-sheet { transition: none; } /* палец ведёт 1 : 1 */
 .y-overlay.is-leaving { pointer-events: none; }
 .y-overlay.is-leaving::before { opacity: 0; transition: opacity var(--motion-exit); }
-.y-overlay.is-leaving .y-sheet { transform: translateY(calc(100% + var(--space-8))); transition: transform var(--motion-exit); }
+.y-overlay.is-leaving .y-sheet { transform: translateY(calc(100% + var(--space-16))); transition: transform var(--motion-exit); }
 .y-overlay [data-focus-quiet]:focus-visible { outline: none; } /* фокус при открытии не с клавиатуры — без кольца, до первой клавиши */
 
 /* ─── Cards ─── */
@@ -234,7 +233,7 @@
 .y-collage__footer {
   position: absolute; left: var(--space-8); right: var(--space-8); bottom: var(--space-8); z-index: var(--layer-raised);
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
-  padding: var(--space-16) var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-md); /* флоу Analytics: белая плашка без тени */
+  padding: var(--space-16) var(--space-20); background: var(--color-bg-elevated); border-radius: var(--radius-sm); /* флоу Analytics: белая плашка без тени; радиус 12 = 20 карточки − отступ 8 (#217) */
 }
 
 .y-photo-area {
@@ -416,7 +415,7 @@
 /* Раскрытая строка ListItem Expandable: ряд под ней (подкатегории) — часть списка, строка → чипсы → строка по 20, как шаг List:
    +4 к gap тела сверху и снизу, Wardrobe / Items / Sheet / Category 1144:3290 */
 .y-sheet__body > .y-list:has(> .y-list-item[aria-expanded='true']:last-child) + :not(.y-list) { margin-block: var(--space-4); }
-/* Ряд фото-плиток → кнопка под ним 20: Profile / Avatar / Sheet / Replace 1173:16889 (шторка 285; плитки 165 × 165 через 7 — Row в экране) */
+/* Ряд фото-плиток → кнопка под ним 20: Profile / Avatar / Sheet / Replace 1173:16889 (шторка 285; плитки ~157 × 157 через 7 в контенте 321, #217 — Row в экране) */
 .y-sheet__body > :has(> .y-photo-tile) + * { margin-top: var(--space-4); }
 
 /* ─── Аватар стилиста (#27) ─── */
