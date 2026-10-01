@@ -1,7 +1,7 @@
 # Yeet Design System
 
 Указатель по дизайн-системе приложения **YeetStyle (yeet)** — умного гардероба: что где лежит, ID страниц Figma и сводные таблицы токенов.
-Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->153<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
+Сама спецификация живёт в **Storybook** (MDX `src/docs/*.mdx`, истории компонентов «В флоу», <!-- gen:screens -->155<!-- /gen:screens --> экранов флоу) и в **`src/docs/registry.ts`** —
 здесь она не дублируется. Storybook публикуется на GitHub Pages (`.github/workflows/storybook.yml`); локально — `npm ci && npm run storybook`.
 
 > Таблицы токенов ниже **генерируются** из `tokens/tokens.json` (`npm run docs-tokens`, проверка — `npm run docs-tokens -- --check`): блоки между `<!-- gen:… -->` руками не правятся.
@@ -146,7 +146,7 @@
 | `--radius-md` | 16 | Snackbar, cap столбца графика |
 | `--radius-lg` | 20 | Карточки, поля, фото |
 | `--radius-xl` | 32 | Кнопки-капсулы, верх sheet, подсказка стилиста |
-| `--radius-bar` | 48 | Tab-bar, низ плавающего sheet (концентрично углу экрана) |
+| `--radius-bar` | 48 | Tab-bar и док: отступ 8, концентрично углу экрана 56 (шторки — radius.overlay, #217) |
 | `--radius-full` | 999 | Аватар, радио |
 | `--radius-overlay` | 40 | Все 4 угла bottom sheet и dialog: концентрично экрану 56 при отступе 16 (#217) |
 

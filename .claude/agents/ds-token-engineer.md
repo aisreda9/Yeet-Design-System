@@ -18,7 +18,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write
 - `npm run tokens` (Style Dictionary v5) → `src/tokens/tokens.generated.css`, `tokens/ios/YeetTokens.swift`, `tokens/android/YeetTokens.kt`, `native/**/Generated`. **Сгенерированное руками не правится**; при конфликте — любая сторона и перегенерировать.
 - Три слоя: `--yeet-*` → семантика (`--color-*`, `--space-*`, `--radius-*`, `--motion-*`) → компонентные (`--sheet-*`, `--button-*`). Компоненты читают только два верхних.
 - Бренды — эксперимент, только web (ADR 0002). Контраст — ADR 0006, AA 4,5 : 1 для текста.
-- Ждут токенов по правилу шторки (#58): `--radius-overlay` = 48 (все углы шторки и диалога), `--sheet-top-gap`, `--sheet-handle` — FIGMA-RULES §7.
+- Ждут токенов по правилу шторки (#58): `--radius-overlay` = 40 (все углы шторки и диалога, отступ 16, #217), `--sheet-top-gap`, `--sheet-handle` — FIGMA-RULES §7.
 
 ## Порядок работы
 

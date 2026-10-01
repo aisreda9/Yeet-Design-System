@@ -218,7 +218,7 @@ public enum YeetRadius {
     public static let lg: CGFloat = 20
     /// Кнопки-капсулы, верх sheet, подсказка стилиста
     public static let xl: CGFloat = 32
-    /// Tab-bar, низ плавающего sheet (концентрично углу экрана)
+    /// Tab-bar и док: отступ 8, концентрично углу экрана 56 (шторки — radius.overlay, #217)
     public static let bar: CGFloat = 48
     /// Аватар, радио
     public static let full: CGFloat = 999
