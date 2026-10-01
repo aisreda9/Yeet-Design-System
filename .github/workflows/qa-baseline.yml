@@ -125,15 +125,7 @@ jobs:
             echo "::error::npm run qa завершился с кодом $code — эталоны не закоммичены."
             exit "$code"
           fi
-      - name: Сверка экранов с флоу Figma (npm run flow-diff -- --strict)
-        id: flowdiff
-        continue-on-error: true
-        run: npm run flow-diff -- --strict
-      - name: Покрытие экранов и пути story реестра
-        id: coverage
-        continue-on-error: true
-        run: node scripts/qa/coverage.mjs
-      # Play-тесты — как job «Play-тесты историй» в qa.yml: vitest + браузер Playwright на хосте (не в образе)
+      # Браузер Playwright на хосте (не в образе): нужен flow-diff и play-тестам, как в qa.yml
       - name: Версия Playwright
         id: pw
         run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -147,6 +139,14 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
+      - name: Сверка экранов с флоу Figma (npm run flow-diff -- --strict)
+        id: flowdiff
+        continue-on-error: true
+        run: npm run flow-diff -- --strict
+      - name: Покрытие экранов и пути story реестра
+        id: coverage
+        continue-on-error: true
+        run: node scripts/qa/coverage.mjs
       - name: Play-тесты (npm run test-storybook)
         id: play
         continue-on-error: true
