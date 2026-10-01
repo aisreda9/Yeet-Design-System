@@ -5,6 +5,7 @@ import { type Chip, ChipGroup, EmptyState, Field, InputGroup, List, ListItem, No
 import { BottomBar, BottomNav, type CollageItem, Dialog, Header, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Row, Screen, Sticky } from '../templates';
 import { grid, shoes } from './data';
+import { CategorySheet, ChipSheet, colors, OCCASION_PLACEHOLDER, occasions, seasons } from './sheets';
 import { SCROLLED, SCROLLED_LIST, useScrolled } from './scroll';
 import './pages.css';
 
@@ -61,22 +62,22 @@ export const WardrobeEmpty: Story = {
 export const FilterSheet: Story = {
   name: 'Wardrobe / Items / Sheet / Category',
   tags: ['figma:1371-37611'],
-  render: () => (
-    <Screen
-      header={<Header type="large" title="Гардероб" />}
-      overlay={
-        <Overlay>
-          <Sheet title="Категория" footer={[{ label: 'Сбросить' }, { label: 'Применить' }]}>
-            <List><ListItem type="expandable" icon="outerwear" label="Верхняя одежда" /><ListItem type="expandable" icon="top" label="Верх" expanded /></List>
-            <ChipGroup wrap chips={[{ label: 'Футболка', selected: true }, { label: 'Поло' }, { label: 'Топ' }, { label: 'Рубашка' }]} />
-            <List><ListItem type="expandable" icon="bottom" label="Низ" /><ListItem type="expandable" icon="shoe" label="Обувь" /><ListItem type="expandable" icon="accessories" label="Аксессуары" /></List>
-          </Sheet>
-        </Overlay>
-      }
-    >
+  render: () => <CategoryFilterScreen expanded />,
+};
+
+/** Шторка категорий над гардеробом: открывается с чипса «Категория» свёрнутой (Figma OPEN_OVERLAY → Category Root `1173:16925`), строки раскрываются по нажатию. */
+function CategoryFilterScreen({ expanded }: { expanded?: boolean }) {
+  return (
+    <Screen header={<Header type="large" title="Гардероб" />} overlay={<Overlay><CategorySheet expanded={expanded} footer /></Overlay>}>
       <Grid>{grid.map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
     </Screen>
-  ),
+  );
+}
+
+export const CategoryRootSheet: Story = {
+  name: 'Wardrobe / Items / Sheet / Category Root',
+  tags: ['figma:1371-37683'],
+  render: () => <CategoryFilterScreen />,
 };
 
 export const ItemActions: Story = {
@@ -130,10 +131,10 @@ const bagLooks: CollageItem[][] = [
 ];
 
 /** Детали вещи из гардероба (Figma `1371:41024 → 1371:41076`): статистика, теги, образы с вещью. */
-function WardrobeItemScreen({ scrolled }: { scrolled?: boolean }) {
+function WardrobeItemScreen({ scrolled, overlay }: { scrolled?: boolean; overlay?: ReactNode }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
   return (
-    <DetailsScreen media={<PhotoArea kind="container" />} title="Сумка" scrollRef={ref}>
+    <DetailsScreen media={<PhotoArea kind="container" />} title="Сумка" scrollRef={ref} overlay={overlay && <Overlay>{overlay}</Overlay>}>
       <p className="y-body y-text--secondary">10 000 ₽ · Чёрный<br />Аксессуары · Все сезоны</p>
       <StatRow><StatTile label="Надето раз" value={43} /><StatTile label="Д. простоя" value={12} /><StatTile label="Образы" value={7} /></StatRow>
       <section className="y-section">
@@ -152,12 +153,12 @@ export const WardrobeItemDetails: Story = { name: 'Wardrobe / Item Details', ren
 export const WardrobeItemDetailsScrolled: Story = { name: 'Wardrobe / Item Details / Scrolled', render: () => <WardrobeItemScreen scrolled /> };
 
 /** Вишлист: вещи. Фильтров нет — при скролле не прилипает ничего, кроме статус-бара (#170, Figma `1205:13506`). */
-function WishlistItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
+function WishlistItemsScreen({ scrollTo = 0, overlay }: { scrollTo?: number; overlay?: ReactNode }) {
   const ref = useScrolled(scrollTo);
   // прокрученное состояние — 6 позиций, как в Figma `1205:13506`: первая — Air Force, дальше Ava Edge (#216, строка 23)
   const list = scrollTo ? [...shoes, shoes[1], shoes[1]] : shoes;
   return (
-    <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} scrollRef={ref}>
+    <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} overlay={overlay && <Overlay>{overlay}</Overlay>} scrollRef={ref}>
       <SegmentControl value="wishlist" segments={tabs} />
       <SegmentControl size="S" fit value="items" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
       <Grid rowGap={24}>
@@ -207,8 +208,10 @@ export const Archive: Story = {
   ),
 };
 
+/** Очистить корзину: Figma DS 0.2 `1147:7271` (якорь flow2 `clear-trash`), кадр Raw `1371:43664`. */
 export const ClearTrash: Story = {
   name: 'Trash / Items / Dialog / Clear',
+  tags: ['figma:1371-43664'],
   render: () => (
     <Screen header={<Header type="bar" titleChip="Корзина вещей" />} overlay={<Overlay><Dialog variant="destructive" title="Очистить корзину?" description="Все вещи из корзины удаляются навсегда, их уже не вернуть" cancel="Отменить" confirm="Очистить" /></Overlay>}>
       <Grid>{grid.slice(0, 4).map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>
@@ -428,7 +431,7 @@ function FilterSheetScreen({ title, chips, add }: { title: string; chips: (strin
 export const SeasonFilterSheet: Story = {
   name: 'Wardrobe / Items / Sheet / Season Filter',
   tags: ['figma:1371-37595', 'figma:1371-37759', 'figma:1371-37827'],
-  render: () => <FilterSheetScreen title="Сезон" chips={['Все', 'Весна', 'Лето', 'Осень', 'Зима']} />,
+  render: () => <FilterSheetScreen title="Сезон" chips={seasons} />,
 };
 
 export const TagsFilterSheet: Story = {
@@ -440,7 +443,22 @@ export const TagsFilterSheet: Story = {
 export const OccasionFilterSheet: Story = {
   name: 'Wardrobe / Outfits / Sheet / Occasion Filter',
   tags: ['figma:1371-37867', 'figma:1371-37843', 'figma:1371-37891'],
-  render: () => <FilterSheetScreen title="Повод" add chips={['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка', { label: 'Кастомный', removable: true }]} />,
+  render: () => <FilterSheetScreen title="Повод" add chips={[...occasions, { label: 'Кастомный', removable: true }]} />,
+};
+
+/** Свой повод в фильтре образов (Figma `1174:15803` / `1174:15958`): «+» добавил чипс-поле с × в конец, плейсхолдер «Название»; клавиатура — системная, в истории её нет. */
+const customOccasion = (label: string): Chip => ({ label, editing: true, removable: true, placeholder: OCCASION_PLACEHOLDER });
+
+export const OutfitsCustomOccasionEmpty: Story = {
+  name: 'Wardrobe / Outfits / Sheet / Custom Occasion Name Empty',
+  tags: ['figma:1371-42346'],
+  render: () => <FilterSheetScreen title="Повод" add chips={[...occasions, customOccasion('')]} />,
+};
+
+export const OutfitsCustomOccasionEntered: Story = {
+  name: 'Wardrobe / Outfits / Sheet / Custom Occasion Name Entered',
+  tags: ['figma:1371-42373'],
+  render: () => <FilterSheetScreen title="Повод" add chips={[...occasions, customOccasion('Кастом')]} />,
 };
 
 /** Шторка действий: заголовок — имя вещи или повода, необратимое действие последним (Organisms/Sheet → «Действия»). */
@@ -470,6 +488,12 @@ export const OutfitPermanentDelete: Story = {
   render: () => <ActionSheetScreen title="На каждый день" actions={[['pen', 'Редактировать'], ['trash', 'Удалить навсегда']]} />,
 };
 
+/** «+» в вишлисте: что добавить — вещь или образ (Figma `1173:16729`). */
+export const WishlistContentTypeSheet: Story = {
+  name: 'Wishlist / Add / Sheet / Content Type',
+  tags: ['figma:1371-40549'],
+  render: () => <WishlistItemsScreen overlay={<Sheet title="Добавить в вишлист"><List><ListItem icon="wardrobe" label="Вещь" /><ListItem icon="collage" label="Образ" /></List></Sheet>} />,
+};
 export const WishlistItemActions: Story = {
   name: 'Wishlist / Item / Sheet / Actions',
   tags: ['figma:1371-40512'],
@@ -501,4 +525,25 @@ export const ToastDeletedPermanently: Story = {
   name: 'Trash / Item / Toast / Deleted Permanently',
   tags: ['figma:1371-37585'],
   render: () => <ToastScreen header={<Header type="bar" title="Корзина вещей" actions={[{ icon: 'trash', label: 'Очистить корзину' }]} />} text="Вещь удалена навсегда" undo />,
+};
+
+/* ─── Редактирование вещи: шторки полей (#220) ───────────────────────
+ * Экрана «Wardrobe / Edit Item» в макетах нет (PROTOTYPE-FIGMA §8.4), шторки показаны над деталями вещи, откуда ведёт «Редактировать». */
+
+export const EditItemCategorySheet: Story = {
+  name: 'Wardrobe / Edit Item / Sheet / Category Expanded',
+  tags: ['figma:1371-43540'],
+  render: () => <WardrobeItemScreen overlay={<CategorySheet expanded />} />,
+};
+
+export const EditItemColorSheet: Story = {
+  name: 'Wardrobe / Edit Item / Sheet / Color',
+  tags: ['figma:1371-43606'],
+  render: () => <WardrobeItemScreen overlay={<ChipSheet title="Цвет" chips={colors} />} />,
+};
+
+export const EditItemSeasonSheet: Story = {
+  name: 'Wardrobe / Edit Item / Sheet / Season',
+  tags: ['figma:1371-43648'],
+  render: () => <WardrobeItemScreen overlay={<ChipSheet title="Сезон" chips={seasons} />} />,
 };

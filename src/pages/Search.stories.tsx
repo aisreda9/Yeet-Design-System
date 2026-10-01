@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Button, IconButton } from '../atoms';
 import { demoPhoto } from '../docs/helpers';
 import { ChipGroup, EmptyState, InputBar, PhotoTile, RangeSlider, Snackbar } from '../molecules';
 import { BottomNav, CropFrame, Header, Overlay, ProductCard, Sheet } from '../organisms';
 import { Grid, Row, Screen } from '../templates';
 import { shoes } from './data';
+import { PhotoSheet } from './sheets';
 import './pages.css';
 
 /* Раздел: поиск в сторах — по тексту и по фото. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -119,10 +120,9 @@ export const PhotoCrop: Story = {
   ),
 };
 
-export const PhotoResults: Story = {
-  name: 'Search / Photo / Results',
-  render: () => (
-    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />}>
+function PhotoResultsScreen({ overlay }: { overlay?: ReactNode }) {
+  return (
+    <Screen header={<Header type="search" photo={demoPhoto} filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />} overlay={overlay && <Overlay>{overlay}</Overlay>}>
       {/* флоу 1173:14753: без таб-бара; скидка на 1-й карточке, в вишлисте 2-я и 3-я; ряды через 24 */}
       <Grid rowGap={24}>
         {["Nike Air Force 1 '07 Edge", 'Nike Ava Edge', "Nike Air Force 1 '07", "Nike Air Force 1 '07 LV8", 'Adidas Samba', 'New Balance 550'].map((n, i) => (
@@ -130,7 +130,29 @@ export const PhotoResults: Story = {
         ))}
       </Grid>
     </Screen>
+  );
+}
+
+export const PhotoResults: Story = { name: 'Search / Photo / Results', render: () => <PhotoResultsScreen /> };
+
+/**
+ * Поиск по фото: выбрать снимок (Figma `1173:16811`) — над результатами текстового поиска, где в шапке «Поиск по фото»;
+ * заменить или удалить снимок (`1147:3377`) — над результатами по фото. Входа в прототипе Figma у обеих шторок нет.
+ */
+export const PhotoAddSheet: Story = {
+  name: 'Search / Photo / Sheet / Add',
+  tags: ['figma:1371-43675'],
+  render: () => (
+    <Screen header={<Header type="search" query="Белые кроссовки" filters={[{ label: 'Сортировка' }, { label: 'Цена' }]} />} overlay={<Overlay><PhotoSheet label="Поиск по фото" /></Overlay>}>
+      {resultsBackdrop}
+    </Screen>
   ),
+};
+
+export const PhotoReplaceSheet: Story = {
+  name: 'Search / Photo / Sheet / Replace',
+  tags: ['figma:1371-43687'],
+  render: () => <PhotoResultsScreen overlay={<PhotoSheet label="Поиск по фото" replace />} />,
 };
 
 const suggestions = ['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'];

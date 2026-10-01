@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { Stamp } from '../atoms';
 import { Carousel, ChipGroup, EmptyState, InputBar, SegmentControl } from '../molecules';
-import { ChatBubble, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
+import { ChatBubble, Dialog, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, Overlay, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
 import { useScrollToActive } from '../motion';
 import { Grid, Screen } from '../templates';
 import bag from '../docs/cutouts/bag.svg';
@@ -117,6 +117,7 @@ export const TripDetails: Story = {
 /** «Удиви меня»: образы закончились (Figma `1371:42727`, дубль `1371:42753`; в макете оба кадра названы «Default»). */
 export const OutfitOfTheDayEmpty: Story = {
   name: 'Stylist / Outfit of the Day / No More Outfits',
+  tags: ['figma:1371-42753'],
   render: () => (
     <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <div className="y-empty-bar">
@@ -135,11 +136,11 @@ const stylistLooks: PagerLook[] = [
 ];
 
 /** «Удиви меня» (Figma `1371:42686`): стопка образов с превью 150, «Сохранить» и «Не нравится» — следующий образ. */
-function SurpriseScreen() {
+function SurpriseScreen({ overlay }: { overlay?: ReactNode }) {
   const [index, setIndex] = useState(1);
   const [saved, setSaved] = useState(false);
   return (
-    <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
+    <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />} overlay={overlay && <Overlay>{overlay}</Overlay>}>
       <OutfitPager
         looks={stylistLooks}
         preview={150}
@@ -153,6 +154,23 @@ function SurpriseScreen() {
 }
 
 export const OutfitOfTheDay: Story = { name: 'Stylist / Outfit of the Day / Default', render: () => <SurpriseScreen /> };
+
+/**
+ * Об инструменте «Удиви меня»: уведомление с одной кнопкой «Ок!». Текст — DS 0.2 `1176:11772`;
+ * в New App (Raw) кадр `1371:41487` ошибочно назван «Outfit Creation / Exit / Dialog / Unsaved Changes».
+ */
+export const AboutSurpriseDialog: Story = {
+  name: 'Stylist / Outfit of the Day / Dialog / About Surprise Me',
+  tags: ['figma:1371-41487'],
+  render: () => <SurpriseScreen overlay={<Dialog title="Удиви меня" description="Об этом инструменте" confirm="Ок!" />} />,
+};
+
+/** Конструктор: пустой экран — только шапка (DS 0.2 `1176:20253`; в New App (Raw) кадр `1371:42665` назван «Stylist / Outfit of the Day / Default»). */
+export const ConstructorEmpty: Story = {
+  name: 'Stylist / Constructor / Empty',
+  tags: ['figma:1371-42665'],
+  render: () => <Screen header={<Header type="bar" titleChip="Конструктор" actions={[{ icon: 'info', label: 'Как это работает' }]} />} />,
+};
 
 const occasions = ['Прогулка', 'Вечеринка', 'Офис', 'На каждый день', 'Свидание', 'Вечеринка ', 'Офис '];
 
