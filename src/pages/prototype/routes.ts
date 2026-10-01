@@ -252,7 +252,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
 
   /* Вишлист: «+» → «Добавить в вишлист» → «Вещь» — форма новой вещи; формы образа в макетах нет (#220) */
-  Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', go: ok('ItemDetails') }, wishlistAdd],
+  // удержание без движения — шторка действий, как в гардеробе; удержание и сдвиг — перестановка (#209)
+  Wishlist: [...topSeg('wishlist'), ...subSeg, { sel: '.y-product-card', on: 'long', go: (n) => n.overlay('WishlistItemActions') }, { sel: '.y-product-card', go: ok('ItemDetails') }, wishlistAdd],
   WishlistOutfits: [...topSeg('wishlist'), ...subSeg, { sel: '.y-collage', name: 'Открыть образ', go: ok('WishlistOutfitDetails') }, wishlistAdd],
   WishlistEmpty: [...topSeg('wishlist'), wishlistAdd],
   WishlistContentTypeSheet: [

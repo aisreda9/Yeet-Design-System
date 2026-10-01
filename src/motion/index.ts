@@ -4,3 +4,4 @@ export { useSwipePager, type SwipePager, type SwipePagerOptions } from './usePag
 export { usePhotoCollapse, photoCollapse, type PhotoCollapse, type PhotoCollapseOptions } from './useCollapse';
 export { useReducedMotion } from './useReducedMotion';
 export { useScrollToActive } from './useScrollToActive';
+export { useGridReorder, type GridReorder, type GridReorderOptions } from './useGridReorder';
