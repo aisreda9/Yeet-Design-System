@@ -263,7 +263,7 @@ div.y-list-item { cursor: default; }
 /* RangeSlider */
 /* stylelint-disable unit-disallowed-list -- геометрия из Figma: ползунок 24, гистограмма 64, линия 1; токенов нет */
 .y-range { position: relative; width: 100%; display: flex; flex-direction: column; gap: var(--space-8); }
-.y-range__hist { width: 100%; height: 64px; display: block; margin-bottom: -12px; }
+.y-range__hist { width: 100%; height: 64px; display: block; margin-bottom: -20px; } /* gap 8 + половина трека 12: столбцы стоят на линии трека, Figma 1144:3684 */
 .y-range__hist-all { fill: var(--color-bg-subtle); }
 .y-range__hist-on { fill: var(--color-border-subtle); clip-path: inset(0 calc(100% - var(--hi)) 0 var(--lo)); }
 .y-range__track { position: relative; height: 24px; margin: 0 12px; }

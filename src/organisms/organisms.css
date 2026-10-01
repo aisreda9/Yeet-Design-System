@@ -258,7 +258,7 @@
 /* Погода: Figma — Inter 460 12/16, #A7B3BF; предупреждение — белым второй строкой */
 .y-weather {
   display: inline-flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16) var(--space-20);
-  background: var(--color-bg-inverse); color: var(--color-text-inverse); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--space-8);
+  background: var(--color-bg-inverse); color: var(--color-text-inverse); border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-8);
 }
 .y-weather__temp { display: flex; align-items: center; gap: var(--space-8); font: 400 24px/24px var(--font-display); letter-spacing: -0.4px; } /* stylelint-disable-line unit-disallowed-list -- цифра погоды Roboto Slab 24/24 из Figma */
 .y-weather__desc { font-weight: var(--font-weight-body); color: var(--color-text-inverse-secondary); }

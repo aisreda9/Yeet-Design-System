@@ -84,6 +84,8 @@ public enum YeetColor {
     public static let patternDot = dynamic(UIColor(hex: 0x000000, alpha: 0.23), UIColor(hex: 0xF5F5F7, alpha: 0.23))
     /// Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) · Figma ui-colors/handle
     public static let handle = dynamic(UIColor(hex: 0x000000, alpha: 0.17), UIColor(hex: 0xF5F5F7, alpha: 0.14))
+    /// Цвет плавающей тени shadow/floating · Figma ui-colors/shadow
+    public static let shadow = dynamic(UIColor(hex: 0x000000, alpha: 0.12), UIColor(hex: 0x000000, alpha: 0.5))
 }
 
 /// Цвет вещи — атрибут одежды, не интерфейс.
@@ -201,6 +203,8 @@ public enum YeetSpace {
 }
 
 public enum YeetRadius {
+    /// Острый угол карточки погоды
+    public static let r8: CGFloat = 8
     /// Хэндл sheet
     public static let xs: CGFloat = 4
     /// Badge
