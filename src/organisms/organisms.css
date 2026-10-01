@@ -215,16 +215,18 @@
 .y-product-card__like.is-popping .y-icon { animation: y-like-pop var(--motion-drop); }
 @keyframes y-like-pop { from { transform: scale(0.6); } }
 
-/* Коллаж. Figma pattern: точка 2×2 в клетке 10×10, поле точек с отступом 14 от краёв карточки, сетка по центру (353: точки x35–357 — поля 15 / 16) */
+/* Коллаж. Figma pattern: точка 2×2 в клетке 10×10, поле точек `dots` с отступом 14 от краёв карточки, сетка по центру (353: поля точек по 15,5); скругление поля 12 срезает 4 угловые точки (решение владельца) */
 .y-collage {
   position: relative; flex: none; width: 100%; aspect-ratio: 1; border-radius: var(--card-radius); overflow: hidden;
   background-color: var(--card-bg);
   padding: 14px; /* stylelint-disable-line unit-disallowed-list -- поле точек 14 от краёв карточки (Figma pattern) */
-  background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px), linear-gradient(var(--card-bg), var(--card-bg)); /* stylelint-disable-line unit-disallowed-list -- точка 2 × 2 (Figma pattern) */
-  background-size: 10px 10px, auto; background-position: center, 0 0; /* stylelint-disable-line unit-disallowed-list -- клетка 10 × 10 (Figma pattern); сетка по центру — поля точек ровные с обеих сторон, без полуточек у края */
-  background-origin: content-box, border-box; background-clip: content-box, border-box;
 }
-.y-collage--plain { background-image: none; } /* Pattern=None: карточка без точек («Лучшая инвестиция») */
+.y-collage::before {
+  content: ""; position: absolute; inset: 14px; border-radius: var(--radius-sm); pointer-events: none; /* stylelint-disable-line unit-disallowed-list -- поле точек 14 от краёв карточки (Figma `dots`) */
+  background-image: radial-gradient(circle, var(--color-pattern-dot) 1px, transparent 1.2px); /* stylelint-disable-line unit-disallowed-list -- точка 2 × 2 (Figma pattern) */
+  background-size: 10px 10px; background-position: center; /* stylelint-disable-line unit-disallowed-list -- клетка 10 × 10 (Figma pattern); сетка по центру — поля точек ровные с обеих сторон */
+}
+.y-collage--plain::before { content: none; } /* Pattern=None: карточка без точек («Лучшая инвестиция») */
 .y-collage__layer { position: absolute; inset: 0; pointer-events: none; } /* слой вещей: по нему считается масштаб (useFitScale) */
 .y-collage__item { position: absolute; transform: translate(-50%, -50%); }
 .y-collage__layer > .y-collage__item { pointer-events: auto; }
