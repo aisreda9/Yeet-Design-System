@@ -26,7 +26,7 @@ export function OutfitThumbnail({ items, size = 138, className, style, ...rest }
  * `art` — иллюстрация в правом нижнем углу (чемодан у «Для поездок»).
  * **Контексты:** Стилист — Конструктор, Удиви меня, С чем носить, Для поездок, Оживи гардероб, Докупить, Оцени образ.
  */
-export type StylistPromptCardProps = Omit<ComponentPropsWithRef<'button'>, 'children' | 'title'> & { title: string; description?: string; wide?: boolean; soon?: boolean; art?: ReactNode };
+export type StylistPromptCardProps = Omit<ComponentPropsWithRef<'button'>, 'children' | 'title'> & { title: string; /** Caption серым; `\n` — перенос строки, как в Figma. */ description?: string; wide?: boolean; soon?: boolean; art?: ReactNode };
 
 export function StylistPromptCard({ title, description, wide, soon, art, className, ...rest }: StylistPromptCardProps) {
   return (

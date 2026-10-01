@@ -46,7 +46,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+/** Аргументы по умолчанию — как у компонента `button` в Figma (942:6953): Primary L «Далее». */
+export const Playground: Story = { args: { children: 'Далее' } };
 
 export const Variants: Story = {
   parameters: { controls: { disable: true } },

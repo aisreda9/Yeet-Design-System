@@ -13,7 +13,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+/** Аргументы по умолчанию — как у компонента `empty-state` в Figma (968:3643): «Гардероб пуст», без кнопки. */
+export const Playground: Story = { args: { title: 'Гардероб пуст', description: 'Добавь первую вещь, чтобы начать создавать образы', action: undefined } };
 
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },

@@ -14,7 +14,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+/** Аргументы по умолчанию — как у компонента `input-bar` в Figma (942:7282): справа кнопка Primary «+». */
+export const Playground: Story = { args: { trailing: { icon: 'plus', label: 'Добавить', variant: 'primary' } } };
 
 export const Focus: Story = {
   name: 'Фокус',

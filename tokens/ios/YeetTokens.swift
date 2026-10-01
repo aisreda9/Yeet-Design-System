@@ -196,6 +196,7 @@ public enum YeetSpace {
     public static let s28: CGFloat = 28
     public static let s32: CGFloat = 32
     public static let s40: CGFloat = 40
+    public static let s44: CGFloat = 44
     public static let s48: CGFloat = 48
     public static let s52: CGFloat = 52
     public static let s56: CGFloat = 56

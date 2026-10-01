@@ -24,8 +24,8 @@ export const Catalog: Story = {
     <div style={{ width: 353 }}><Grid>
       <StylistPromptCard wide title="Конструктор" description="Образы по разным критериям" />
       <StylistPromptCard title="Удиви меня" description="Рулетка образов, собранных из твоих вещей" />
-      <StylistPromptCard title="С чем носить" description="Максимум из одной вещи" />
-      <StylistPromptCard wide title="Для поездок" description="Стиль и лёгкость в любой поездке" art={<ItemArt kind="container" size={150} color="grey" />} />
+      <StylistPromptCard title="С чем носить" description={'Максимум\nиз одной вещи'} />
+      <StylistPromptCard wide title="Для поездок" description={'Стиль и лёгкость\nв любой поездке'} art={<ItemArt kind="container" size={150} color="grey" />} />
       <StylistPromptCard soon title="Оживи гардероб" description="Новая жизнь старым вещам" />
       <StylistPromptCard soon title="Докупить" description="Подберём интересное из сторов" />
     </Grid></div>
