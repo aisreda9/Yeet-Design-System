@@ -14,6 +14,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Имена jobs («qa», «Play-тесты историй») — это имена check-runs, которые qa-baseline.yml ставит на коммит эталонов
+# вместо повторного прогона. Переименовал job или добавил проверку — поправь и qa-baseline.yml.
 jobs:
   qa:
     runs-on: ubuntu-latest
