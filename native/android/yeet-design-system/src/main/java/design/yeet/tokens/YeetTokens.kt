@@ -229,7 +229,7 @@ object YeetSpace {
 
 object YeetRadius {
     /** Острый угол карточки погоды */
-    val 8 = 8.dp
+    val r8 = 8.dp
     /** Хэндл sheet */
     val xs = 4.dp
     /** Badge */

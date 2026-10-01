@@ -204,7 +204,7 @@ public enum YeetSpace {
 
 public enum YeetRadius {
     /// Острый угол карточки погоды
-    public static let 8: CGFloat = 8
+    public static let r8: CGFloat = 8
     /// Хэндл sheet
     public static let xs: CGFloat = 4
     /// Badge

@@ -98,6 +98,8 @@ export function cssName(path) {
 }
 
 const name = (fn) => (token) => fn(token.path);
+// Swift/Kotlin: имя не может начинаться с цифры — radius.8 → r8 (как YeetSpace.s32).
+const leaf = (p) => (/^\d/.test(p.at(-1)) ? `${p[0][0]}${p.at(-1)}` : camel(p.at(-1)));
 const value = (platform, type) => ({
   type: 'value', transitive: true,
   filter: (token) => token.$type === type,
@@ -117,8 +119,8 @@ export function registerTransforms(StyleDictionary) {
     groups[id] = names;
   }
   StyleDictionary.registerTransform({ name: 'yeet/name/css', type: 'name', transform: name(cssName) });
-  StyleDictionary.registerTransform({ name: 'yeet/name/swift', type: 'name', transform: name((p) => swiftName(camel(p.at(-1)))) });
-  StyleDictionary.registerTransform({ name: 'yeet/name/kotlin', type: 'name', transform: name((p) => kotlinName(camel(p.at(-1)))) });
+  StyleDictionary.registerTransform({ name: 'yeet/name/swift', type: 'name', transform: name((p) => swiftName(leaf(p))) });
+  StyleDictionary.registerTransform({ name: 'yeet/name/kotlin', type: 'name', transform: name((p) => kotlinName(leaf(p))) });
   StyleDictionary.registerTransformGroup({ name: 'yeet/css', transforms: ['yeet/name/css', ...groups.css] });
   StyleDictionary.registerTransformGroup({ name: 'yeet/swift', transforms: ['yeet/name/swift', ...groups.swift] });
   StyleDictionary.registerTransformGroup({ name: 'yeet/kotlin', transforms: ['yeet/name/kotlin', ...groups.kotlin] });
