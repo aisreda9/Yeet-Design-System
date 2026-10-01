@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from 'react';
-import { Icon, Stamp } from '../atoms';
+import { Stamp } from '../atoms';
 import { Carousel, ChipGroup, EmptyState, InputBar, SegmentControl } from '../molecules';
 import { ChatBubble, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
 import { useScrollToActive } from '../motion';
@@ -36,7 +36,7 @@ function StylistChat({ reply, draft, focused, back }: { reply?: string; draft?: 
     <Screen header={<Header type="large" title="Стилист" action={back ? { icon: 'cross', label: 'Назад' } : undefined} />} flush>
       <Sheet type="panel" className="y-chat-panel">
         <div className="y-chat-spacer" />
-        <ChatBubble avatar={<span className="y-stylist-avatar"><Icon name="ai" /></span>}>{greeting}</ChatBubble>
+        <ChatBubble avatar>{greeting}</ChatBubble>
         {reply && <ChatBubble from="user">{reply}</ChatBubble>}
         <InputBar placeholder="Спроси у стилиста" value={draft} send={{ label: 'Отправить' }} focused={focused} />
       </Sheet>
@@ -51,15 +51,15 @@ export const StylistGreeting: Story = { name: 'Stylist / Home / Greeting Entered
 export const StylistHome: Story = {
   name: 'Stylist / Catalog',
   render: () => (
-    <Screen header={<Header type="large" title="Стилист" subtitle="Нашли классную вещь? Покажем, где купить такую же или похожую." />} bottom={<StylistDock />}>
+    <Screen header={<Header type="large" title="Стилист" subtitle={<>Нашли классную вещь?<br />Покажем, где купить такую же или похожую.</>} />} bottom={<StylistDock />}>
       <Grid>
         <StylistPromptCard wide title="Конструктор" description="Образы по разным критериям" />
         <StylistPromptCard title="Удиви меня" description="Рулетка образов, собранных из твоих вещей" />
-        <StylistPromptCard title="С чем носить" description="Максимум из одной вещи" />
-        <StylistPromptCard wide title="Для поездок" description="Стиль и лёгкость в любой поездке" art={<ItemArt kind="container" size={150} color="grey" />} />
+        <StylistPromptCard title="С чем носить" description={'Максимум\nиз одной вещи'} />
+        <StylistPromptCard wide title="Для поездок" description={'Стиль и лёгкость\nв любой поездке'} art={<ItemArt kind="container" size={150} color="grey" />} />
         <StylistPromptCard soon title="Оживи гардероб" description="Новая жизнь старым вещам" />
         <StylistPromptCard soon title="Докупить" description="Подберём интересное из сторов" />
-        <StylistPromptCard wide soon title="Оцени образ" description="Разбор образов и рекомендации" />
+        <StylistPromptCard wide soon title="Оцени образ" description={'Разбор образов\nи рекомендации'} />
       </Grid>
     </Screen>
   ),
@@ -173,7 +173,7 @@ function WhatToWearScreen() {
     <Screen header={<Header type="bar" titleChip="С чем носить" actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
       <OutfitPager axis="x" looks={looks} index={index} onIndexChange={setIndex} aria-label="Образы по поводам" stamp={<Stamp label="Сохранить" />} skip={<Stamp label="Не нравится" variant="secondary" onClick={() => setIndex((k) => Math.min(k + 1, looks.length - 1))} />} />
       <div className="y-occasions" ref={chipsRef}>
-        <ChipGroup chips={occasions.map((label, k) => ({ label: label.trim(), selected: k === index }))} onToggle={(label) => setIndex(occasions.findIndex((o) => o.trim() === label))} />
+        <ChipGroup chips={occasions.map((label, k) => ({ label: label.trim(), value: `${k}`, selected: k === index }))} onToggle={(k) => setIndex(Number(k))} />
       </div>
       <Carousel ref={cardsRef} itemWidth={173}>
         <ItemCard kind="top" color="green" />

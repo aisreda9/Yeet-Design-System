@@ -125,7 +125,7 @@ function FirstOutfitScreen() {
       header={<Header type="back" title="Пример твоего первого образа" subtitle={<>Можешь поиграться с вещами и подвигать<br />их на карточке образа</>} textAction={{ label: 'Пропустить' }} />}
       bottom={<BottomBar label="Сохранить образ и завершить" />}
     >
-      <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} />
+      <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} className="y-first-outfit-canvas" />
     </Screen>
   );
 }
