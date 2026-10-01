@@ -38,7 +38,11 @@ const AXE_ERRORS = new Set(['critical', 'serious']);
  * Известные нарушения, которые пока не валят CI: `${check}|${story}` → ссылка на issue.
  * Попадают в отчёт отдельным разделом. Как только нарушение исчезло — скрипт попросит убрать запись.
  */
-const KNOWN = {};
+const KNOWN = {
+  // #13: выбранный soft-чип в тёмной теме 4,42 : 1 (button-soft, известно и в `npm run contrast`). Виден axe с #215: у коллажа
+  // больше нет background-image (точки — в ::before), и axe стал вычислять фон, а не пропускать. Уйдёт с палитрой #13.
+  'axe: color-contrast|foundations-анимации--occasion-pager': 'https://github.com/indiekola/Yeet-Design-System/issues/13',
+};
 
 /* ─── Окружение: скриншоты — только в закреплённом образе ────────────── */
 if (!inImage() && !args['no-docker']) {
