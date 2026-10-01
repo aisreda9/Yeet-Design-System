@@ -14,7 +14,7 @@ type Args = { title: string; description: string; type: 'modal' | 'panel'; foote
 const content = {
   actions: <List><ListItem icon="ai" label="Создать образ" /><ListItem icon="pen" label="Редактировать" /><ListItem icon="archive" label="Архивировать" /><ListItem icon="trash" label="Удалить" /></List>,
   chips: <ChipGroup wrap chips={[{ label: 'Все', selected: true }, { label: 'Весна' }, { label: 'Лето' }, { label: 'Осень' }, { label: 'Зима' }]} />,
-  photo: <><div style={{ display: 'flex', gap: 8 }}><PhotoTile source="gallery" /><PhotoTile source="camera" /></div><Button variant="destructive" fullWidth>Удалить фотографию</Button></>,
+  photo: <><div style={{ display: 'flex', gap: 7 }}>{/* Figma tiles gap 7: две плитки 165 × 165 в ряду 337 (1173:16889) */}<PhotoTile source="gallery" /><PhotoTile source="camera" /></div><Button variant="destructive" fullWidth>Удалить фотографию</Button></>,
 };
 
 const meta: Meta<Args> = {

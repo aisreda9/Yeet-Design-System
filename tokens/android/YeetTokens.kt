@@ -221,6 +221,7 @@ object YeetSpace {
     val s28 = 28.dp
     val s32 = 32.dp
     val s40 = 40.dp
+    val s44 = 44.dp
     val s48 = 48.dp
     val s52 = 52.dp
     val s56 = 56.dp

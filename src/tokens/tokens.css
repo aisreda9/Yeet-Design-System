@@ -15,3 +15,13 @@
 @import './tokens.generated.css';
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Плавающая тень shadow/floating: цвет — из переменной --color-shadow (ui-colors/shadow), а не литерал из генератора.
+   Тёмную тему генератор собирает копией, поэтому ссылку на цвет держит CSS. Объявлено там же, где меняются тема и бренд:
+   var() подставляется в месте объявления, иначе обёртка с data-theme унаследовала бы тень светлой темы.
+   Геометрия 0 / 8 / 40 — как shadow.floating в tokens.json. */
+:root,
+[data-theme],
+[data-brand] {
+  --shadow-floating: 0 var(--space-8) var(--space-40) var(--color-shadow);
+}
