@@ -4,6 +4,7 @@ import { ChipGroup, Field, InputGroup, LoadingState, SegmentControl, Snackbar } 
 import { BottomBar, type CanvasItem, Dialog, type Garment, Header, ItemCard, ItemSlot, ItemSlots, OutfitCanvas, Overlay, PhotoArea, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Screen } from '../templates';
 import { SCROLLED, useScrolled } from './scroll';
+import { CategorySheet, PhotoSheet } from './sheets';
 import type { ItemColor } from '../tokens/tokens';
 import './pages.css';
 
@@ -35,9 +36,9 @@ const steps = (value: string, size: 'S' | 'M' = 'S') => (
 );
 
 /** Выбор вещей (Figma `1371:41906`, пустой `1371:41989`): панель `ItemSlots`, выбранная вещь по центру ряда, «+» в конце. */
-function ItemSelectionScreen({ empty }: { empty?: boolean }) {
+function ItemSelectionScreen({ empty, overlay }: { empty?: boolean; overlay?: ReactNode }) {
   return (
-    <Screen header={<Header type="bar" center={steps('items', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={empty ? undefined : <BottomBar label="Далее" />} flush>
+    <Screen header={<Header type="bar" center={steps('items', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={empty ? undefined : <BottomBar label="Далее" />} overlay={overlay && <Overlay>{overlay}</Overlay>} flush>
       <ItemSlots>
         <ItemSlot title="Верх" onAdd={() => {}}>{!empty && <ItemCard kind="top" color="green" onRemove={() => {}} />}</ItemSlot>
         <ItemSlot title="Низ" onAdd={() => {}} />
@@ -105,7 +106,7 @@ export const OutfitCriteria: Story = {
 
 type NewItemState = 'no-photo' | 'photo' | 'loading' | 'focused' | 'completed';
 
-function NewItemScreen({ state, variant }: { state: NewItemState; variant: 1 | 2 }) {
+function NewItemScreen({ state, variant, overlay }: { state: NewItemState; variant: 1 | 2; overlay?: ReactNode }) {
   const collapsed = state === 'focused' || state === 'completed';
   const ref = useScrolled(collapsed ? SCROLLED : 0);
   const media =
@@ -120,6 +121,7 @@ function NewItemScreen({ state, variant }: { state: NewItemState; variant: 1 | 2
       actions={[]}
       title={variant === 1 ? 'Детали вещи' : 'Детали новой вещи'}
       bottom={state === 'photo' || state === 'completed' ? <BottomBar label="Добавить" /> : undefined}
+      overlay={overlay && <Overlay>{overlay}</Overlay>}
       scrollRef={ref}
     >
       <InputGroup>
@@ -149,6 +151,28 @@ export const NewItemCompletedV1: Story = { name: 'New Item / Details / Completed
 export const NewItemCompletedV2: Story = { name: 'New Item / Details / Completed Variant 02', render: () => <NewItemScreen state="completed" variant={2} /> };
 export const NewItemLoadingV1: Story = { name: 'New Item / Photo / Removing Background Variant 01', render: () => <NewItemScreen state="loading" variant={1} /> };
 
+/* ─── Новая вещь: шторки фото и категории (#220) ─────────────────────── */
+
+/** Фото вещи: шторка над формой без фото (Figma `1173:16837`). */
+export const NewItemPhotoSheet: Story = {
+  name: 'New Item / Photo / Sheet / Add',
+  tags: ['figma:1371-40568'],
+  render: () => <NewItemScreen state="no-photo" variant={2} overlay={<PhotoSheet label="Фото вещи" />} />,
+};
+
+/** Поле «Категория» формы: выбор применяется сразу. Корень списка (`1144:3161`) — с кнопками, раскрытый «Верх» (`1173:17360`) — без них, как в макете. */
+export const NewItemCategoryRoot: Story = {
+  name: 'New Item / Details / Sheet / Category Root',
+  tags: ['figma:1371-43882'],
+  render: () => <NewItemScreen state="photo" variant={2} overlay={<CategorySheet footer />} />,
+};
+
+export const NewItemCategoryExpanded: Story = {
+  name: 'New Item / Details / Sheet / Category Expanded',
+  tags: ['figma:1371-41398'],
+  render: () => <NewItemScreen state="photo" variant={2} overlay={<CategorySheet expanded />} />,
+};
+
 /* ─── Создание образа: диалоги и шторка фильтра (#30) ───────────────── */
 
 export const ShuffleDialog: Story = {
@@ -164,6 +188,13 @@ export const ExitDialog: Story = {
 export const ClearDialog: Story = {
   name: 'Outfit Creation / Clear / Dialog / Confirmation',
   render: () => <CanvasScreen filtered hint={false} overlay={<Dialog variant="destructive" title="Очистить образ?" description="Все выбранные вещи будут убраны" cancel="Отменить" confirm="Очистить" />} />,
+};
+
+/** Категория при выборе вещей (Figma `1173:17042`): раскрыт «Верх», выбрана «Футболка», «Сбросить» / «Применить». */
+export const OutfitItemsCategorySheet: Story = {
+  name: 'Outfit Creation / Items / Sheet / Category with Selection',
+  tags: ['figma:1371-41747'],
+  render: () => <ItemSelectionScreen overlay={<CategorySheet expanded footer />} />,
 };
 
 export const ItemFilterSheet: Story = {

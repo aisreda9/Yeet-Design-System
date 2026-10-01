@@ -4,6 +4,7 @@ import { Stamp } from '../atoms';
 import { type Chip, ChipGroup, EmptyState } from '../molecules';
 import { BottomNav, Header, OutfitPager, Overlay, type PagerLook, Sheet, WeatherCard } from '../organisms';
 import { Screen } from '../templates';
+import { OCCASION_PLACEHOLDER, occasions as occasionChips } from './sheets';
 import './pages.css';
 
 /* Раздел: главная — образы на каждый день. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -30,17 +31,22 @@ const todayLooks: PagerLook[] = [
  * `occasions` — открыта шторка «Повод» из акцента шапки (DS 0.2 `1173:14091` / `1144:3546`, их кадры в New App (Raw) — `1371:43786` / `1371:43810`,
  *   теги истории: coverage сверяет теги только с кадрами Raw): чипсы с «+», «Все» выбран, свой повод с ×, под ней дождливый день.
  */
-const occasionChips = ['Все', 'На каждый день', 'Офис', 'Свидание', 'Вечеринка'];
-function TodayScreen({ weather, worn: initialWorn = false, occasions = false }: { weather?: 'rain'; worn?: boolean; occasions?: boolean }) {
-  const [occasionOpen, setOccasionOpen] = useState(occasions);
+function TodayScreen({ weather, worn: initialWorn = false, occasions = false, customName }: {
+  weather?: 'rain';
+  worn?: boolean;
+  occasions?: boolean;
+  /** Шторка «Повод» с чипсом-полем своего повода вместо «Кастомный»: `''` — пустое (`1174:15483`), текст — введён (`1174:15648`). */
+  customName?: string;
+}) {
+  const [occasionOpen, setOccasionOpen] = useState(occasions || customName !== undefined);
   // В шторке по умолчанию выбран «Все», а в шапке — повод дня
   const [occasion, setOccasion] = useState('Все');
-  const [custom, setCustom] = useState<Chip[]>([{ label: 'Кастомный', removable: true }]);
+  const [custom, setCustom] = useState<Chip[]>(customName === undefined ? [{ label: 'Кастомный', removable: true }] : [{ label: customName, value: 'new', editing: true, removable: true, placeholder: OCCASION_PLACEHOLDER }]);
   const [index, setIndex] = useState(1);
   const [worn, setWorn] = useState(initialWorn);
-  const rain = weather === 'rain' || initialWorn || occasions; // «Надето» и выбор повода в макете — в дождливый день
+  const rain = weather === 'rain' || initialWorn || occasions || customName !== undefined; // «Надето» и выбор повода в макете — в дождливый день
   const pick = (o: string) => { setOccasion(o); setOccasionOpen(false); };
-  const addCustom = () => setCustom((cur) => (cur.some((c) => c.editing) ? cur : [...cur, { label: '', value: 'new', editing: true, removable: true, placeholder: 'Свой повод' }]));
+  const addCustom = () => setCustom((cur) => (cur.some((c) => c.editing) ? cur : [...cur, { label: '', value: 'new', editing: true, removable: true, placeholder: OCCASION_PLACEHOLDER }]));
   const editCustom = (v: string) => setCustom((cur) => cur.map((c) => (c.editing ? { ...c, label: v } : c)));
   const doneCustom = (v: string) => setCustom((cur) => cur.flatMap((c) => (c.editing ? (v.trim() ? [{ label: v.trim(), removable: true }] : []) : [c])));
   const removeCustom = (v: string) => {
@@ -85,6 +91,9 @@ export const Today: Story = { name: 'Outfits / Everyday / Sunny', render: () => 
 export const TodayRain: Story = { name: 'Outfits / Everyday / Rain Alert', render: () => <TodayScreen weather="rain" /> };
 export const TodayWorn: Story = { name: 'Outfits / Everyday / Wear Action Active', render: () => <TodayScreen worn /> };
 export const TodayOccasions: Story = { name: 'Outfits / Everyday / Occasion Selector Open', tags: ['figma:1371-43786', 'figma:1371-43810'], render: () => <TodayScreen occasions /> };
+/** Свой повод: «+» в шторке добавил чипс-поле с × (плейсхолдер «Название»); клавиатура — системная, в истории её нет. */
+export const TodayCustomOccasionEmpty: Story = { name: 'Outfits / Everyday / Sheet / Custom Occasion Name Empty', tags: ['figma:1371-43828'], render: () => <TodayScreen customName="" /> };
+export const TodayCustomOccasionEntered: Story = { name: 'Outfits / Everyday / Sheet / Custom Occasion Name Entered', tags: ['figma:1371-43855'], render: () => <TodayScreen customName="Кастом" /> };
 
 export const RecommendationsEmpty: Story = {
   name: 'Outfits / Recommendations / Empty Wardrobe',

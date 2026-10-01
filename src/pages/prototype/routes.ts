@@ -68,9 +68,12 @@ const subSeg: Route[] = [
   { sel: '.y-segment--S [role=radio]', text: 'Вещи', go: (n, el) => { if (!active(el)) return n.swap('Wishlist'); } },
   { sel: '.y-segment--S [role=radio]', text: 'Образы', go: (n, el) => { if (!active(el)) return n.swap('WishlistOutfits'); } },
 ];
-/** Фильтры гардероба: у каждого чипса своя шторка (Figma: Items «Категория» / «Сезон» / «Теги», Outfits «Повод» / «Сезон» / «Теги», #210). */
+/**
+ * Фильтры гардероба: у каждого чипса своя шторка (Figma: Items «Категория» / «Сезон» / «Теги», Outfits «Повод» / «Сезон» / «Теги», #210).
+ * «Категория» открывает список свёрнутым (Figma OPEN_OVERLAY → Category Root `1173:16925`), строки раскрываются в самой шторке (#220).
+ */
 const chipSheet = (text: RegExp, id: ScreenId): Route => ({ sel: '.y-chip-group button', text, go: (n) => n.overlay(id) });
-const itemFilters: Route[] = [chipSheet(/^Категория/, 'FilterSheet'), chipSheet(/^Сезон/, 'SeasonFilterSheet'), chipSheet(/^Теги/, 'TagsFilterSheet')];
+const itemFilters: Route[] = [chipSheet(/^Категория/, 'CategoryRootSheet'), chipSheet(/^Сезон/, 'SeasonFilterSheet'), chipSheet(/^Теги/, 'TagsFilterSheet')];
 // первый чипс образов — повод: «Повод» или выбранный («На каждый день»)
 const outfitFilters: Route[] = [chipSheet(/^Сезон/, 'SeasonFilterSheet'), chipSheet(/^Теги/, 'TagsFilterSheet'), { sel: '.y-chip-group button', go: (n) => n.overlay('OccasionFilterSheet') }];
 /** Выбор в шторке-фильтре без кнопок применяется сразу: «Все» сбрасывает фильтр, остальное — фильтрует. */
@@ -173,7 +176,7 @@ const photoPicked = closeThen(async (n, from) => { if (from !== 'ProfileEditAvat
  * Диалоги, которые закрываются и тапом по затемнению, и смахиванием (правило #89): подтверждения без риска.
  * Рискованные (`tone` destructive / danger: очистить, выйти из аккаунта, удалить) — только кнопками и Escape.
  */
-export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'ShuffleDialog', 'ExitDialog']);
+export const LOOSE_DIALOGS = new Set<ScreenId>(['PasswordRecoverySent', 'ShuffleDialog', 'ExitDialog', 'AboutSurpriseDialog']);
 
 /** Переходы конкретных экранов: элемент → куда. Порядок важен: побеждает первое совпадение. */
 export const routes: Partial<Record<ScreenId, Route[]>> = {
@@ -203,6 +206,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   OutfitsNoFilterResults: [...topSeg('outfits'), ...outfitFilters, btn('Сбросить фильтры', (n) => n.swap('OutfitsPopulated')), { sel: '.y-bottom-nav__fab button', go: ok('OutfitItems') }],
   Toast: [...gridSearch, openItem, { sel: '.y-bottom-nav__fab button', go: ok('NewItemNoPhotoV2') }],
   FilterSheet: [btn('Применить', applyFilter), btn('Сбросить', resetFilter)],
+  // Figma `1173:16925`: «Применить» → No Filter Results, «Сбросить» → Populated
+  CategoryRootSheet: [btn('Применить', applyFilter), btn('Сбросить', resetFilter)],
   SeasonFilterSheet: quickFilter,
   TagsFilterSheet: quickFilter,
   OccasionFilterSheet: [btn('Добавить', closeThen(comingSoon)), ...quickFilter],
@@ -312,7 +317,9 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
   TripDetails: [{ sel: '.y-segment [role=radio]', text: /^Вещи/, go: (n) => n.swap('TripItems') }, openOutfit],
   TripItems: [{ sel: '.y-segment [role=radio]', text: /^Образы/, go: (n) => n.swap('TripDetails') }, openItem],
-  OutfitOfTheDay: [lastSkip, howItWorks],
+  // «Как это работает» (i) → диалог «Удиви меня» (DS 0.2 `1176:11772`): реакции в Figma нет, триггер — по имени диалога (#220)
+  OutfitOfTheDay: [lastSkip, btn('Как это работает', (n) => n.overlay('AboutSurpriseDialog'))],
+  AboutSurpriseDialog: [btn('Ок!', sheet)],
   OutfitOfTheDayEmpty: [btn('Показать ещё', (n) => n.swap('OutfitOfTheDay')), howItWorks],
   WhatToWear: [openItem, howItWorks],
 

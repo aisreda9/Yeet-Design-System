@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type ReactNode } from 'react';
-import { Avatar, Button, Icon } from '../atoms';
-import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, List, ListItem, PhotoTile, StatRow, StatTile, UsageMeter } from '../molecules';
+import { Avatar, Icon } from '../atoms';
+import { type Account, AvatarStack, BarChart, Carousel, ChipGroup, Field, InputGroup, List, ListItem, StatRow, StatTile, UsageMeter } from '../molecules';
 import { AccountsSheet, BottomNav, Header, ItemCard, OutfitCollage, Overlay, Sheet } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
 import { demoAvatar } from '../docs/helpers';
 import { motionMs } from '../utils/gesture';
 import { sima, tina } from './data';
 import { SCROLLED_LIST, useScrolled } from './scroll';
+import { ChipSheet, PhotoSheet } from './sheets';
 import './pages.css';
 
 /* Раздел: профиль — аналитика гардероба, аккаунты, редактирование. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -133,12 +134,18 @@ export const BirthYearSheet: Story = {
 };
 
 /** Фото профиля: галерея или камера, у готового фото — ещё «Удалить фотографию». */
-const avatarSheet = (replace?: boolean) => (
-  <Sheet label="Фото профиля">
-    <Row gap={7}><PhotoTile source="gallery" /><PhotoTile source="camera" /></Row>
-    {replace && <Button variant="tertiary" size="L" fullWidth>Удалить фотографию</Button>}
-  </Sheet>
-);
+export const AvatarAddSheet: Story = { name: 'Profile / Avatar / Sheet / Add', render: () => <ProfileEditScreen overlay={<PhotoSheet label="Фото профиля" />} /> };
+export const AvatarReplaceSheet: Story = { name: 'Profile / Avatar / Sheet / Replace', render: () => <ProfileEditScreen photo={demoAvatar} overlay={<PhotoSheet label="Фото профиля" replace />} /> };
 
-export const AvatarAddSheet: Story = { name: 'Profile / Avatar / Sheet / Add', render: () => <ProfileEditScreen overlay={avatarSheet()} /> };
-export const AvatarReplaceSheet: Story = { name: 'Profile / Avatar / Sheet / Replace', render: () => <ProfileEditScreen photo={demoAvatar} overlay={avatarSheet(true)} /> };
+/** Пол и стиль: выбор чипсами применяется сразу, выбрано текущее значение поля (Figma `1147:3502`, `1173:14403`). */
+export const ProfileGenderSheet: Story = {
+  name: 'Profile / Edit / Sheet / Gender',
+  tags: ['figma:1371-40486'],
+  render: () => <ProfileEditScreen photo={demoAvatar} overlay={<ChipSheet title="Пол" chips={['Женский', 'Мужской', 'Унисекс']} />} />,
+};
+
+export const ProfileStyleSheet: Story = {
+  name: 'Profile / Edit / Sheet / Style',
+  tags: ['figma:1371-40498'],
+  render: () => <ProfileEditScreen photo={demoAvatar} overlay={<ChipSheet title="Стиль" chips={['Кэжуал', 'Деловой', 'Тренди', 'Минимал']} />} />,
+};

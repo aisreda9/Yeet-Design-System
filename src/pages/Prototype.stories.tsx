@@ -219,6 +219,10 @@ export const StylistChain: Story = {
     const card = (name: RegExp) => [...topEl(root).querySelectorAll<HTMLElement>('.y-prompt-card')].find((e) => name.test(e.textContent ?? ''))!;
     await tap(root, card(/^Удиви меня/));
     await at(root, 'OutfitOfTheDay');
+    // (i) «Как это работает» → диалог об инструменте, «Ок!» закрывает
+    await tap(root, topLayer(root).getByRole('button', { name: 'Как это работает' }));
+    await tap(root, within(await dialog(within(root), 'Удиви меня')).getByRole('button', { name: 'Ок!' }));
+    await gone(within(root), 'alertdialog');
     const skip = () => topLayer(root).getByRole('button', { name: 'Не нравится' });
     await tap(root, skip()); // второй образ → третий, последний
     await expect(topLayer(root).getByRole('button', { name: 'Следующий образ' })).toHaveAttribute('aria-disabled', 'true');
@@ -360,9 +364,21 @@ export const FiltersChain: Story = {
     await tap(root, await within(await sheet(c, 'Сезон')).findByRole('button', { name: 'Весна' }));
     await gone(c, 'dialog');
     await at(root, 'ItemsNoFilterResults');
+    // «Категория» — список свёрнут (Category Root), «Верх» раскрывается в самой шторке (Category Expanded)
     await tap(root, chip(/^Категория/));
-    await tap(root, within(await sheet(c, 'Категория')).getByRole('button', { name: 'Сбросить' }));
+    const category = await sheet(c, 'Категория');
+    await expect(within(category).queryByText('Футболка')).toBeNull();
+    await userEvent.click(within(category).getByRole('button', { name: 'Верх' }));
+    await expect(within(category).getByRole('button', { name: 'Верх' })).toHaveAttribute('aria-expanded', 'true');
+    await expect(within(category).getByText('Футболка')).toBeVisible();
+    await tap(root, within(category).getByRole('button', { name: 'Сбросить' }));
     await gone(c, 'dialog');
+    await at(root, 'Wardrobe');
+    await tap(root, chip(/^Категория/));
+    await tap(root, within(await sheet(c, 'Категория')).getByRole('button', { name: 'Применить' }));
+    await gone(c, 'dialog');
+    await at(root, 'ItemsNoFilterResults');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Сбросить фильтры' }));
     await at(root, 'Wardrobe');
 
     await tap(root, topLayer(root).getByRole('radio', { name: 'Образы' }));
