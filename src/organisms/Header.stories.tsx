@@ -39,7 +39,11 @@ const meta: Meta<Args> = {
 export default meta;
 type Story = StoryObj<Args>;
 
-export const Playground: Story = {};
+/** По умолчанию — как компонент в Figma (`967:3624`): Large с «⋮». Строка заголовка растёт до 48 (IconButton), шапка 118. */
+export const Playground: Story = { args: { withAction: true } };
+
+/** Large без кнопки: корневые вкладки (Гардероб, Поиск). Строка заголовка — высота строки H1 36, шапка 106 (флоу: заголовок y70). */
+export const Large: Story = { args: { variant: 'large', withAction: false } };
 
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type ReactNode, useState } from 'react';
-import { Button, Divider, Link, Logo } from '../atoms';
+import { ArtPlaceholder, Button, Divider, Link, Logo } from '../atoms';
 import { Field, InputGroup } from '../molecules';
 import { BottomBar, type CanvasItem, Dialog, Header, OutfitCanvas, Overlay } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
@@ -32,11 +32,12 @@ export const OnboardingWelcome: Story = {
   name: 'Onboarding / Welcome',
   render: () => (
     <Screen bottom={<BottomBar label="Начать бесплатно" />}>
-      {/* флоу: заголовок на y70, подзаголовок через 12; ниже — место под анимацию */}
+      {/* флоу: заголовок на y70, подзаголовок через 12; ниже — место под анимацию: пока её перерисовывают — заглушка (#220) */}
       <Stack gap={12} className="y-welcome">
         <h1 className="y-h1">Полный шкаф,<br />а надеть нечего?</h1>
         <p className="y-body y-text--secondary">Создавай образы из своих вещей,<br />находи похожие и покупай то, что действительно подходит твоему стилю</p>
       </Stack>
+      <ArtPlaceholder stretch />
     </Screen>
   ),
 };

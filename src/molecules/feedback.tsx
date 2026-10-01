@@ -1,8 +1,9 @@
 import { useCallback, useContext, useEffect, useRef, useState, type ComponentPropsWithRef, type FocusEvent, type PointerEvent, type ReactNode } from 'react';
-import { Button, Icon } from '../atoms';
+import { ArtPlaceholder, Button, Icon } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { cx } from '../utils/cx';
 import { gesture, motionMs } from '../utils/gesture';
+import { SHOW_ILLUSTRATIONS } from '../utils/illustrations';
 import { LeavingContext } from '../utils/usePresence';
 import photoCamera from '../icons/art/photo-camera.png';
 import photoGallery from '../icons/art/photo-gallery.png';
@@ -131,15 +132,23 @@ const photoArt = {
   camera: { src: photoCamera, size: 95, top: -14 },
 };
 
-/** Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): квадрат (173 во флоу), в ряду плитки делят ширину; 3D-иллюстрация и подпись в две строки. */
-export type PhotoTileProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & { source: 'gallery' | 'camera'; label?: string };
+/**
+ * Плитка выбора источника фото (Figma: photo-tile · Source Gallery / Camera): квадрат (173 во флоу), в ряду плитки делят ширину;
+ * арт 63 и подпись в две строки. Пока 3D-иллюстрации перерисовываются, вместо них — заглушка `ArtPlaceholder` 63 (решение владельца, #220).
+ */
+export type PhotoTileProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & {
+  source: 'gallery' | 'camera';
+  label?: string;
+  /** 3D-иллюстрация вместо заглушки. По умолчанию — `SHOW_ILLUSTRATIONS` (`src/utils/illustrations.ts`, сейчас выключено). */
+  illustration?: boolean;
+};
 
-export function PhotoTile({ source, label, className, ...rest }: PhotoTileProps) {
+export function PhotoTile({ source, label, illustration = SHOW_ILLUSTRATIONS, className, ...rest }: PhotoTileProps) {
   const art = photoArt[source];
   return (
     <button type="button" className={cx('y-photo-tile', className)} {...rest}>
       <span className="y-photo-tile__art" aria-hidden>
-        <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top }} />
+        {illustration ? <img src={art.src} alt="" width={art.size} height={art.size} style={{ top: art.top }} /> : <ArtPlaceholder size={63} />}
       </span>
       {label ?? (source === 'camera' ? <>Сделать<br />фото</> : <>Выбрать<br />из галереи</>)}
     </button>
