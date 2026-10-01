@@ -29,7 +29,7 @@ export const InFlow: Story = {
   tags: ['bare'],
   render: () => (
     <UsageGrid min={393}>
-      <Usage screen="Outfit Creation / Exit">{onOverlay(() => <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" />)}</Usage>
+      <Usage screen="Outfit Creation / Exit">{onOverlay(() => <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить" />)}</Usage>
       <Usage screen="Settings / Delete Account" note="со статистикой">{onOverlay(() => <Dialog variant="danger" title="Аккаунт будет удалён" description="Ты потеряешь:" cancel="Отменить" confirm="Удалить"><StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow></Dialog>)}</Usage>
       <Usage screen="Auth / Password Recovery / Dialog / Sent" note="одна кнопка">{onOverlay(() => <Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" />)}</Usage>
     </UsageGrid>
@@ -91,7 +91,7 @@ function DismissDemo() {
         <Overlay open={!!layer} onOpenChange={(o) => !o && close()}>
           {layer === 'actions' && <Sheet title="Название вещи"><List><ListItem icon="undo" label="Вернуть в гардероб" onClick={close} /><ListItem icon="trash" label="Удалить навсегда" onClick={() => setLayer('confirm')} /></List></Sheet>}
           {layer === 'confirm' && <Dialog variant="destructive" title="Удалить навсегда?" description="Вещь удалится без возможности восстановления" cancel="Отменить" confirm="Удалить" onCancel={() => note('отмена')} onConfirm={close} />}
-          {layer === 'exit' && <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" onCancel={() => note('выйти')} onConfirm={close} />}
+          {layer === 'exit' && <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить" onCancel={() => note('выйти')} onConfirm={close} />}
           {layer === 'filter' && <Sheet title="Низ" onClose={() => note('шторка')} footer={[{ label: 'Очистить' }, { label: 'Использовать', onClick: close }]}><p className="y-body">Фильтр</p></Sheet>}
         </Overlay>
       }

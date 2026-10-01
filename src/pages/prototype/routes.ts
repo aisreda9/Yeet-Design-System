@@ -353,11 +353,11 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   CanvasHint: [...steps('Коллаж'), btn('Перемешать', (n) => n.toast('Вещи перемешаны')), itemFilter],
   ShuffleDialog: [
     btn('Перемешать', closeThen((n) => n.toast('Вещи перемешаны'))),
-    btn('Сохранить и начать', closeThen((n) => n.toast('Образ сохранён, вещи перемешаны'))),
+    btn('Сохранить', closeThen((n) => n.toast('Образ сохранён, вещи перемешаны'))),
   ],
   ExitDialog: [
     btn('Выйти', closeThen((n) => n.leave(CREATION))),
-    btn('Сохранить и выйти', closeThen(async (n) => { await n.leave(CREATION); n.toast('Образ сохранён'); })),
+    btn('Сохранить', closeThen(async (n) => { await n.leave(CREATION); n.toast('Образ сохранён'); })),
   ],
   ClearDialog: [btn('Отменить', sheet), btn('Очистить', closeThen(async (n) => { await n.swap('CanvasDefault'); n.toast('Образ очищен'); }))],
   ItemFilterSheet: [

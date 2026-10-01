@@ -350,7 +350,7 @@ private fun PanelSheet(
 
 /**
  * Figma dialog · Tone.
- * `Default` — Tertiary + Primary («Выйти / Сохранить и выйти»).
+ * `Default` — Tertiary + Primary («Выйти / Сохранить»).
  * `Destructive` — необратимое действие серым слева, безопасная «Отмена» синей справа («Очистить / Отмена»).
  * `Danger` — удаление аккаунта: красная Destructive слева, «Отменить» синей справа.
  */

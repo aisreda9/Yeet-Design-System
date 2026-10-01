@@ -177,12 +177,12 @@ export const NewItemCategoryExpanded: Story = {
 
 export const ShuffleDialog: Story = {
   name: 'Outfit Creation / Shuffle / Dialog / Unsaved Changes',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Перемешать образ?" description="Сохрани текущий образ, прежде чем перемешать вещи" cancel="Перемешать" confirm="Сохранить и начать" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Перемешать образ?" description="Сохрани текущий образ, прежде чем перемешать вещи" cancel="Перемешать" confirm="Сохранить" />} />,
 };
 
 export const ExitDialog: Story = {
   name: 'Outfit Creation / Exit / Dialog / Unsaved Changes',
-  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить и выйти" />} />,
+  render: () => <CanvasScreen filtered hint={false} overlay={<Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить" />} />,
 };
 
 export const ClearDialog: Story = {

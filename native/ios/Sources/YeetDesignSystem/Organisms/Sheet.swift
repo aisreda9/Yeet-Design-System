@@ -486,7 +486,7 @@ private struct YeetOptionalLabel: ViewModifier {
 
 /// Тон диалога (React: `DialogProps.tone`, Figma: dialog · Tone). Безопасное действие всегда синее справа.
 public enum YeetDialogTone: String, CaseIterable, Identifiable {
-    /// Tertiary + Primary («Выйти / Сохранить и выйти»).
+    /// Tertiary + Primary («Выйти / Сохранить»).
     case `default`
     /// Необратимое действие серым слева, безопасная «Отмена» синей справа («Очистить / Отмена»).
     case destructive
@@ -823,7 +823,7 @@ private struct SheetPreview: View {
                 title: dialog == .danger ? "Удалить аккаунт?" : dialog == .destructive ? "Очистить корзину?" : "Выйти без сохранения?",
                 description: "Это действие нельзя отменить",
                 cancel: dialog == .default ? "Выйти" : "Отмена",
-                confirm: dialog == .danger ? "Удалить" : dialog == .destructive ? "Очистить" : "Сохранить и выйти",
+                confirm: dialog == .danger ? "Удалить" : dialog == .destructive ? "Очистить" : "Сохранить",
                 onCancel: { dialog = nil },
                 onConfirm: { dialog = nil }
             )
