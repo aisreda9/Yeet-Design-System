@@ -10,6 +10,7 @@ npm run qa -- --no-docker                 # без Docker: всё, кроме с
 npm run qa -- --tap-min=40                # порог зоны нажатия для предупреждения (по умолчанию 44)
 npm run contrast                          # контраст токенов; --all — все пары, --brands=error — бренды как ошибка
 npm run flow-diff                         # экраны против флоу Figma: qa/out/flow-diff.md
+npm run figma-sync                        # переменные Figma «Yeet DS 2.0» (снимок design/figma-variables.json) против токенов
 npm run test-storybook                    # play-тесты: каждая история — тест в headless Chromium (vitest)
 node scripts/qa/coverage.mjs              # покрытие: кадры Figma ↔ истории ↔ якоря, пути story реестра: qa/out/coverage.md
 node scripts/qa/boxes.mjs <экран> [селектор] # координаты блоков экрана для ручной сверки
