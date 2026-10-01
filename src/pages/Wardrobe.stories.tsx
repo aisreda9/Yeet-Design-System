@@ -154,14 +154,14 @@ export const WardrobeItemDetailsScrolled: Story = { name: 'Wardrobe / Item Detai
 /** Вишлист: вещи. Фильтров нет — при скролле не прилипает ничего, кроме статус-бара (#170, Figma `1205:13506`). */
 function WishlistItemsScreen({ scrollTo = 0 }: { scrollTo?: number }) {
   const ref = useScrolled(scrollTo);
-  // прокрученное состояние — с длинным списком, иначе экрану некуда скроллиться
-  const list = scrollTo ? [...shoes, ...shoes, ...shoes] : shoes;
+  // прокрученное состояние — 6 позиций, как в Figma `1205:13506`: первая — Air Force, дальше Ava Edge (#216, строка 23)
+  const list = scrollTo ? [...shoes, shoes[1], shoes[1]] : shoes;
   return (
     <Screen header={<Header type="large" title="Гардероб" />} bottom={<BottomNav active="wardrobe" fab />} scrollRef={ref}>
       <SegmentControl value="wishlist" segments={tabs} />
       <SegmentControl size="S" fit value="items" segments={[{ value: 'items', label: 'Вещи' }, { value: 'outfits', label: 'Образы' }]} />
       <Grid rowGap={24}>
-        {list.map((n, i) => <ProductCard key={i} kind="shoe" name={n} price={i % shoes.length ? '14 300 ₽' : '10 400 ₽'} showLike={false} />)}
+        {list.map((n, i) => <ProductCard key={i} kind="shoe" name={n} price={n === shoes[0] ? '10 400 ₽' : '14 300 ₽'} showLike={false} />)}
       </Grid>
     </Screen>
   );
@@ -286,7 +286,7 @@ export const ItemSearchFocused: Story = {
   name: 'Wardrobe / Item Search / Query Focused',
   render: () => (
     <Screen header={<Header type="search" placeholder="Название вещи" photoSearch={false} focused />}>
-      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label) => ({ label }))} />
+      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label, k) => ({ label, value: `${k}` }))} />
     </Screen>
   ),
 };
@@ -366,7 +366,7 @@ export const TrashItemActions: Story = {
   render: () => (
     <Screen
       header={<Header type="bar" title="Корзина вещей" actions={[{ icon: 'trash', label: 'Очистить корзину' }]} />}
-      overlay={<Overlay><Sheet title="Название вещи"><List><ListItem icon="undo" label="Вернуть в гардероб" /><ListItem icon="trash" label="Удалить навсегда" /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Белое платье с красными вкраплениями"><List><ListItem icon="undo" label="Вернуть в гардероб" /><ListItem icon="trash" label="Удалить навсегда" /></List></Sheet></Overlay>}
     >
       <Grid><ItemCard kind="top" color="white" /><ItemCard kind="top" color="black" /></Grid>
     </Screen>
@@ -455,25 +455,25 @@ function ActionSheetScreen({ title, actions, header = wardrobeHeader }: { title:
 export const ArchiveItemActions: Story = {
   name: 'Archive / Item / Sheet / Actions',
   tags: ['figma:1371-37535'],
-  render: () => <ActionSheetScreen header={<Header type="bar" titleChip="Архив вещей" />} title="Название вещи" actions={[['undo', 'Вернуть в гардероб'], ['trash', 'Удалить']]} />,
+  render: () => <ActionSheetScreen header={<Header type="bar" titleChip="Архив вещей" />} title="Белое платье с красными вкраплениями" actions={[['undo', 'Вернуть в гардероб'], ['trash', 'Удалить']]} />,
 };
 
 export const OutfitActions: Story = {
   name: 'Wardrobe / Outfit / Sheet / Actions',
   tags: ['figma:1371-41135'],
-  render: () => <ActionSheetScreen title="Повод образа" actions={[['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
+  render: () => <ActionSheetScreen title="На каждый день" actions={[['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
 };
 
 export const OutfitPermanentDelete: Story = {
   name: 'Wardrobe / Outfit / Sheet / Permanent Delete Actions',
   tags: ['figma:1371-40430', 'figma:1371-40451'],
-  render: () => <ActionSheetScreen title="Повод образа" actions={[['pen', 'Редактировать'], ['trash', 'Удалить навсегда']]} />,
+  render: () => <ActionSheetScreen title="На каждый день" actions={[['pen', 'Редактировать'], ['trash', 'Удалить навсегда']]} />,
 };
 
 export const WishlistItemActions: Story = {
   name: 'Wishlist / Item / Sheet / Actions',
   tags: ['figma:1371-40512'],
-  render: () => <ActionSheetScreen title="Название вещи" actions={[['external-link', 'Перейти по ссылке'], ['collage', 'Создать образ'], ['bag-check', 'Переместить в гардероб'], ['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
+  render: () => <ActionSheetScreen title="Белое платье с красными вкраплениями" actions={[['external-link', 'Перейти по ссылке'], ['collage', 'Создать образ'], ['bag-check', 'Переместить в гардероб'], ['pen', 'Редактировать'], ['trash', 'Удалить']]} />,
 };
 
 /** Тост после действия: над контентом; с «Отменить» — для обратимого. */

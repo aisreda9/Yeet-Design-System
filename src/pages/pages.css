@@ -30,6 +30,9 @@
 /* Onboarding / First Item Prompt (1173:21880): пустой холст на y294 — на 8 ниже, чем под шапкой с подзаголовком по умолчанию (#210) */
 .y-first-item-canvas { margin-top: var(--space-8); }
 
+/* Onboarding / First Outfit / Preview (1173:21962): подзаголовок → коллаж 28, на 4 больше шапки по умолчанию (аудит #216, строка 7) */
+.y-first-outfit-canvas { margin-top: var(--space-4); }
+
 /* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
 .y-item-looks { gap: var(--space-20); }
 

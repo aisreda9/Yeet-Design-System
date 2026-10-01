@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button, Flag, Icon, Link, Logo } from '../atoms';
-import { demoAvatar } from '../docs/helpers';
 import { AccountCard, Field, InputBar, InputGroup, List, ListGroup, ListItem, StatRow, StatTile } from '../molecules';
 import { Dialog, Header, Overlay, Sheet } from '../organisms';
 import { Prose, Screen } from '../templates';
@@ -101,7 +100,7 @@ export const CurrencySheet: Story = {
       header={header}
       overlay={<Overlay><Sheet title="Валюта" description="Цены пересчитываются по курсу ЦБ на 10 августа 2026 и помечаются как примерные. Сохранённая цена не меняется."><List>{currencies.map(([label, code]) => <ListItem key={code} type="radio" label={label} checked={code === '₽ · RUB'} trailing={code} />)}</List></Sheet></Overlay>}
     >
-      <AccountCard account={{ ...sima, photo: demoAvatar }} kind="settings" />
+      <AccountCard account={sima} kind="settings" />
     </Screen>
   ),
 };

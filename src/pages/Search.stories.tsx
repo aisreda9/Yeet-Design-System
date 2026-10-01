@@ -31,7 +31,7 @@ export const SearchDiscover: Story = {
         </Row>
       </div>
       <div className="y-discover-query"><InputBar size="L" placeholder="Белые кроссовки Nike" fieldIcon="search" /></div>
-      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label) => ({ label }))} />
+      <ChipGroup wrap center chips={['Nike', 'Crocs', 'Marine Serre', 'Белое платье с красными вкраплениями', 'Marine Serre', 'JAC58S Pina Jacquemus', 'Обувь для бега'].map((label, k) => ({ label, value: `${k}` }))} />
     </Screen>
   ),
 };
@@ -139,7 +139,7 @@ export const SearchFocused: Story = {
   name: 'Search / Text / Query Focused',
   render: () => (
     <Screen header={<Header type="search" focused />}>
-      <ChipGroup wrap center chips={suggestions.map((label) => ({ label }))} />
+      <ChipGroup wrap center chips={suggestions.map((label, k) => ({ label, value: `${k}` }))} />
     </Screen>
   ),
 };
