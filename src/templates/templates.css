@@ -2,7 +2,7 @@
 
 .y-screen {
   position: relative; display: flex; flex-direction: column; overflow: hidden;
-  width: var(--screen-width); height: var(--screen-height); border-radius: 56px; /* угол экрана iPhone: низ шторки 48 = 56 − 8 */ /* stylelint-disable-line unit-disallowed-list -- угол корпуса iPhone, токена нет */
+  width: var(--screen-width); height: var(--screen-height); border-radius: 56px; /* угол экрана iPhone: шторка 40 = 56 − 16 (#217) */ /* stylelint-disable-line unit-disallowed-list -- угол корпуса iPhone, токена нет */
   background: var(--color-bg-canvas); color: var(--color-text-primary);
   /* stylelint-disable-next-line unit-disallowed-list, color-no-hex -- рамка и тень макета телефона в Storybook, не часть интерфейса */
   box-shadow: 0 0 0 10px #111, 0 30px 80px rgb(0 0 0 / 0.25);

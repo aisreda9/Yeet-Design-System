@@ -165,6 +165,7 @@ export function swift({ dictionary, options }, source) {
     else if (isRef(o) && o.startsWith('{color.')) L.push(`    public static let ${t.name}: Color = YeetColor.${v.get(refPath(o)).name}`);
     else if (isRef(o) && o.startsWith('{radius.')) L.push(`    public static let ${t.name}: CGFloat = YeetRadius.${v.get(refPath(o)).name}`);
     else if (isRef(o) && o.startsWith('{space.')) L.push(`    public static let ${t.name}: CGFloat = YeetSpace.s${v.refKey(o)}`);
+    else if (t.$type === 'fontWeight') L.push(`    public static let ${t.name}: CGFloat = ${t.$value}`); // вес CSS 1…1000: YeetTextStyle.withWeight(_:)
     else throw new Error(`Unsupported component token ${t.path.join('.')}`);
   }
   L.push('}', '');
@@ -286,10 +287,11 @@ export function kotlin({ dictionary }, source) {
   }
   L.push('', 'object YeetComponent {');
   for (const t of components) {
-    if (t.$type !== 'dimension') continue;
+    if (t.$type !== 'dimension' && t.$type !== 'fontWeight') continue;
     const o = v.orig(t);
     if (t.$description) L.push(`    /** ${t.$description} */`);
-    if (o.startsWith('{radius.')) L.push(`    val ${t.name} = YeetRadius.${v.get(refPath(o)).name}`);
+    if (t.$type === 'fontWeight') L.push(`    val ${t.name} = ${t.$value}`); // FontWeight(600) — трансформ yeet/kotlin/fontWeight
+    else if (o.startsWith('{radius.')) L.push(`    val ${t.name} = YeetRadius.${v.get(refPath(o)).name}`);
     else if (o.startsWith('{space.')) L.push(`    val ${t.name} = YeetSpace.s${v.refKey(o)}`);
     else throw new Error(`Unsupported component token ${t.path.join('.')}`);
   }

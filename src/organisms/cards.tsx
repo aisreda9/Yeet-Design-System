@@ -201,7 +201,7 @@ export function CollageLayer({ items, defaultSize = 96, base = 353, pad, ref, cl
  * Коллаж образа: вещи на точечном фоне, повод-бейдж и панель снизу.
  * `plain` — без точек, просто карточка light-grey (Figma: outfit-collage · Pattern=None): одна вещь в «Лучшей инвестиции» профиля.
  */
-export type OutfitCollageProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { items: CollageItem[] | AutoCollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. Паддинг 16/20, 8 от краёв. */ footer?: ReactNode; plain?: boolean };
+export type OutfitCollageProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { items: CollageItem[] | AutoCollageItem[]; /** Повод: «Прогулка», «Ужин». */ label?: string; /** Панель снизу: цена образа, переход. Паддинг 16/20, 8 от краёв, радиус 12 (концентрично карточке 20). */ footer?: ReactNode; plain?: boolean };
 
 export function OutfitCollage({ items, label, footer, plain, className, ...rest }: OutfitCollageProps) {
   // автораскладка обходит бейдж повода (20 + 28 + 12) и панель цены (8 + 72 + 12)

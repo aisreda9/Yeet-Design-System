@@ -14,7 +14,7 @@
  * Ошибка (exit 1): упавшая история, ошибка в консоли, отклонение от design/figma-specs.json,
  * перекрытая или обрезанная тень, текст вылез из блока, элемент вылез за экран, визуальная
  * разница с эталоном выше порога, нет эталона, axe serious / critical, зона нажатия < 24.
- * Предупреждение: зона нажатия < 44, axe moderate / minor.
+ * Предупреждение: зона нажатия < 44, axe moderate / minor, концентричность (радиус шторки / плашки ≠ радиус контейнера − отступ, #217).
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -201,6 +201,47 @@ function audit(TAP_MIN) {
       if (size < 24) out.push(['error', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < 24`]);
       else if (size < TAP_MIN) out.push(['warn', 'зона нажатия', `${name(el)} ${Math.round(r.width)}×${Math.round(r.height)} < ${TAP_MIN} — расширить hit-area`]);
     }
+  }
+
+  // 6. Концентричность (#217): у поверхности, прилегающей к скруглённому углу контейнера, радиус = радиус контейнера − отступ
+  // (минимум 4; капсула остаётся капсулой). Проверяются только поверхности с фиксированным положением: модальная шторка и диалог
+  // в углу экрана, абсолютно спозиционированные плашки в углу карточки. Прокручиваемый контент и панели — нет.
+  const radii = (cs) => ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map((k) => parseFloat(cs[k]) || 0);
+  const painted = (cs) => opaque(cs) || parseFloat(cs.borderTopWidth) > 0 || cs.overflowX !== 'visible';
+  const screenFrame = '.y-screen, .y-proto__frame';
+  for (const el of all) {
+    const cs = getComputedStyle(el);
+    const R = radii(cs);
+    if (Math.max(...R) <= 0 || !painted(cs)) continue;
+    const b = el.getBoundingClientRect();
+    if (b.width < 8 || b.height < 8) continue;
+    if (Math.min(...R) >= Math.min(b.width, b.height) / 2 - 0.5) continue; // капсула (кнопка, бейдж, аватар) остаётся капсулой
+    let a = el.parentElement, A = null;
+    for (; a && a !== root; a = a.parentElement) {
+      const ac = getComputedStyle(a);
+      if (Math.max(...radii(ac)) > 0 && painted(ac)) { A = radii(ac); break; }
+    }
+    if (!A) continue;
+    if (a.matches(screenFrame)) {
+      // у угла экрана — только плавающие шторка и диалог; панели и контент экрана прокручиваются или прижаты к краю по замыслу
+      if (!el.matches('.y-overlay .y-sheet--modal, .y-overlay [role="dialog"], .y-overlay [role="alertdialog"]')) continue;
+    } else {
+      // в карточке — только то, что стоит на месте: absolute / fixed, без прокрутки между ним и карточкой
+      if (cs.position !== 'absolute' && cs.position !== 'fixed') continue;
+      if (inScroller(el, 'y') && a.contains(inScroller(el, 'y')) && inScroller(el, 'y') !== a) continue;
+      if (inScroller(el, 'x') && a.contains(inScroller(el, 'x')) && inScroller(el, 'x') !== a) continue;
+    }
+    const ab = a.getBoundingClientRect();
+    const ins = [[b.left - ab.left, b.top - ab.top], [ab.right - b.right, b.top - ab.top], [ab.right - b.right, ab.bottom - b.bottom], [b.left - ab.left, ab.bottom - b.bottom]];
+    const bad = [];
+    for (let c = 0; c < 4; c++) {
+      const [dx, dy] = ins[c];
+      if (dx < -0.5 || dy < -0.5) continue; // вылезает за контейнер — не про угол
+      if (Math.max(dx, dy) >= A[c]) continue; // не прилегает к углу: дальше радиуса контейнера скругление не видно рядом
+      const want = Math.max(4, A[c] - Math.max(dx, dy));
+      if (Math.abs(R[c] - want) > 1) bad.push(`${['TL', 'TR', 'BR', 'BL'][c]} ${R[c]} ≠ ${want} (${A[c]} − ${Math.round(Math.max(dx, dy))})`);
+    }
+    if (bad.length) out.push(['warn', 'концентричность', `${name(el)} в ${name(a)}: ${bad.join(', ')}`]);
   }
   return out;
 }

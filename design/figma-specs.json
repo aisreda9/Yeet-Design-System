@@ -249,13 +249,13 @@
       }
     },
     {
-      "figma": "photo-tile",
+      "figma": "photo-tile (поля 20 / 12 — минимум, содержимое по центру: в квадрате 173 арт на 28 от верха; квадрат ~157 в шторке 321, #217)",
       "story": "molecules-phototile--playground",
       "selector": ".y-photo-tile",
       "expect": {
         "width": 173,
         "height": 173,
-        "paddingTop": 28,
+        "paddingTop": 20,
         "paddingLeft": 20,
         "gap": 22,
         "borderRadius": 20
@@ -315,7 +315,7 @@
       }
     },
     {
-      "figma": "sheet",
+      "figma": "sheet (radius/overlay 40 — концентрично экрану 56 при отступе 16, #217)",
       "story": "organisms-sheet--playground",
       "selector": ".y-sheet",
       "expect": {
@@ -323,8 +323,8 @@
         "paddingLeft": 20,
         "paddingBottom": 20,
         "gap": 16,
-        "borderTopLeftRadius": 48,
-        "borderBottomLeftRadius": 48
+        "borderTopLeftRadius": 40,
+        "borderBottomLeftRadius": 40
       }
     },
     {
@@ -719,7 +719,7 @@
       "story": "organisms-dialog--single-action",
       "selector": ".y-sheet__footer .y-button",
       "expect": {
-        "width": 337,
+        "width": 321,
         "height": 52
       }
     },

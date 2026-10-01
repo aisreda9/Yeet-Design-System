@@ -12,7 +12,7 @@ const meta: Meta<Args> = {
   tags: ['autodocs'],
   args: { label: 'Прогулка', withFooter: false, plain: false },
   decorators: [unlessBare((Story) => <div style={{ width: 353 }}><Story /></div>)],
-  parameters: { docs: { description: { component: 'Коллаж образа 353×353, радиус 20, точечный фон; вещи раскладываются свободно (слот Items в Figma). Повод — Badge secondary, панель снизу — цена образа (паддинг 16/20, 8 от краёв). `plain` — без точек, просто карточка light-grey (одна вещь, «Лучшая инвестиция»). `OutfitThumbnail` — превью 138. Figma: `outfit-collage` · Pattern (Dots / None), `outfit-thumbnail`.' } } },
+  parameters: { docs: { description: { component: 'Коллаж образа 353×353, радиус 20, точечный фон; вещи раскладываются свободно (слот Items в Figma). Повод — Badge secondary, панель снизу — цена образа (паддинг 16/20, 8 от краёв, радиус 12 — концентрично карточке 20). `plain` — без точек, просто карточка light-grey (одна вещь, «Лучшая инвестиция»). `OutfitThumbnail` — превью 138. Figma: `outfit-collage` · Pattern (Dots / None), `outfit-thumbnail`.' } } },
   render: ({ label, withFooter, plain }) => (
     <OutfitCollage plain={plain} label={label || undefined} items={look} footer={withFooter ? <><span><span className="y-h2" style={{ display: 'block' }}>120 640 ₽</span><span className="y-caption y-text--secondary">4 вещи</span></span><Icon name="chevron-right" /></> : undefined} />
   ),
