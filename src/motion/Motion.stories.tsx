@@ -247,6 +247,7 @@ async function holdAndDrag(from: HTMLElement, to: HTMLElement, opts: { release?:
 
 export const GridReorderPointer: Story = {
   name: 'Сетка: перестановка — палец',
+  tags: ['no-visual'], // play-тест поведения: конечный кадр зависит от тайминга жеста; вид проверяет «Сетка: перестановка долгим тапом»
   parameters: { docs: { description: { story: 'Play-тест: подъём долгим нажатием, перенос первой вещи на 2 позиции вперёд, проверка порядка и хаптики; затем Esc посреди жеста возвращает порядок.' } } },
   render: () => <ReorderDemo />,
   play: async ({ canvasElement: root, step }) => {
@@ -280,6 +281,7 @@ export const GridReorderPointer: Story = {
 
 export const GridReorderKeyboard: Story = {
   name: 'Сетка: перестановка — клавиатура',
+  tags: ['no-visual'], // play-тест поведения: конечный кадр зависит от тайминга жеста; вид проверяет «Сетка: перестановка долгим тапом»
   parameters: { docs: { description: { story: 'Play-тест: фокус на вещи, пробел — взять, стрелки — двигать, пробел — поставить; Escape — отмена. Каждое перемещение объявляется через aria-live.' } } },
   render: () => <ReorderDemo />,
   play: async ({ canvasElement: root, step }) => {
