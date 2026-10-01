@@ -249,11 +249,12 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     const t = e.target as HTMLElement;
     if (e.key === 'Escape' && top().overlay) { e.preventDefault(); e.stopPropagation(); void run(() => nav.close(), t); return; }
     // элементы-ссылки без собственной кнопки (коллаж, плитка) активируются с клавиатуры
-    if ((e.key === 'Enter' || e.key === ' ') && t.hasAttribute('data-proto-link') && !t.matches(INTERACTIVE)) { e.preventDefault(); t.click(); }
+    // в сетке с перестановкой пробел — «взять» (#209), открывает только Enter
+    if ((e.key === 'Enter' || (e.key === ' ' && !t.closest('[data-reorder]'))) && t.hasAttribute('data-proto-link') && !t.matches(INTERACTIVE)) { e.preventDefault(); t.click(); }
   };
 
   /* ─── Жесты: долгое нажатие, свайп назад от левого края, смахивание шторки ─── */
-  const press = useRef<{ id: number; x: number; y: number; timer: number; t: Element } | null>(null);
+  const press = useRef<{ id: number; x: number; y: number; timer: number; t: Element; armed?: () => void } | null>(null);
   const edge = useRef<{ id: number; x0: number; y0: number; active: boolean; w: number; cur: Layer; prev: Layer; speed: ReturnType<typeof velocityTracker> } | null>(null);
   const sheet = useRef<{ id: number; x0: number; y0: number; active: boolean; h: number; offset: number; ov: HTMLElement; s: HTMLElement; speed: ReturnType<typeof velocityTracker> } | null>(null);
 
@@ -267,6 +268,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     const hit = resolve(t, 'long');
     if (hit) {
       const timer = window.setTimeout(() => {
+        // сетка с перестановкой (#209): удержание и сдвиг — перестановка, поэтому шторка — на отпускании без движения
+        if (hit.target.closest('[data-reorder]') && press.current) { press.current.armed = () => void run(hit.route.go, hit.target); return; }
         press.current = null;
         suppress.current = true;
         window.setTimeout(() => { suppress.current = false; }, 400);
@@ -332,7 +335,13 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   };
 
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const held = press.current;
     cancelPress();
+    if (held?.armed && held.id === e.pointerId && e.type === 'pointerup') {
+      suppress.current = true;
+      window.setTimeout(() => { suppress.current = false; }, 0);
+      held.armed();
+    }
     const g = edge.current;
     if (g && e.pointerId === g.id) {
       edge.current = null;

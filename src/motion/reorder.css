@@ -1,0 +1,56 @@
+/*
+ * Перестановка в сетке долгим тапом (#209, useGridReorder): Гардероб и Вишлист.
+ * В покое ничего не рисует — только переходы; экран без жеста выглядит как раньше.
+ * Длительности и кривые — только токены: соседи раздвигаются на --motion-drop, подъём — --motion-lift,
+ * возврат (мимо, Esc, далеко за сетку) — --motion-return инлайном из хука.
+ */
+
+/* Долгое нажатие на тач — не выделение текста и не системное меню картинки */
+.y-reorder-item {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* `transform` — нажатие карточки (как в organisms.css), `translate` — FLIP соседей и посадка, `scale` и тень — подъём */
+[data-reorder] .y-reorder-item {
+  transition:
+    transform var(--motion-press),
+    translate var(--motion-drop),
+    scale var(--motion-drop),
+    box-shadow var(--motion-drop);
+}
+[data-reorder] .y-reorder-item .y-item-card {
+  transition:
+    transform var(--motion-press),
+    box-shadow var(--motion-drop);
+}
+
+/* Поднятая: scale --gesture-lift-scale (при «Уменьшении движения» токен = 1 — остаётся только тень), над соседями */
+[data-reorder] .y-reorder-item.is-lifted {
+  position: relative;
+  z-index: 1;
+  cursor: grabbing;
+  transform: none;
+  scale: var(--gesture-lift-scale);
+  transition:
+    translate var(--motion-drop),
+    scale var(--motion-lift),
+    box-shadow var(--motion-lift);
+  transition-delay: initial;
+}
+/* Тень — на самой карточке (у ProductCard это фото, а не подпись) */
+[data-reorder] .y-reorder-item.is-lifted.y-item-card,
+[data-reorder] .y-reorder-item.is-lifted .y-item-card {
+  transform: none;
+  box-shadow: var(--shadow-floating);
+}
+[data-reorder] .y-reorder-item.is-lifted .y-item-card {
+  transition: box-shadow var(--motion-lift);
+}
+
+/* Палец ведёт 1 : 1 — translate без перехода */
+[data-reorder] .y-reorder-item.is-dragging {
+  transition:
+    scale var(--motion-lift),
+    box-shadow var(--motion-lift);
+}

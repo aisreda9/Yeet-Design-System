@@ -4,10 +4,11 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
 import { Carousel, ChipGroup, List, ListGroup, ListItem } from '../molecules';
 import { BottomNav, ItemCard, OutfitCollage, Overlay, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
-import { motionMs } from '../utils/gesture';
+import { gesture, motionMs } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
 import { LeavingContext, usePresence } from '../utils/usePresence';
 import { DragGrid } from './DragGrid';
+import { ReorderDemo } from './ReorderDemo';
 import { CanvasDemo, FeedbackDemo, HapticChip, HeaderScrollDemo, PageStackDemo, ProfileDemo, SelectDemo, SheetDemo } from './Mechanics';
 import { curves, sample, usePhotoCollapse, useSwipePager } from '.';
 import './motion.css';
@@ -219,6 +220,94 @@ function PressDemo() {
 export const Press: Story = { name: 'Микро: нажатие', render: () => <PressDemo /> };
 
 export const DragDrop: Story = { name: 'Микро: перетаскивание', render: () => <DragGrid /> };
+
+/* ─── Сетка: перестановка долгим тапом (#209, useGridReorder) ───────────── */
+
+export const GridReorder: Story = {
+  name: 'Сетка: перестановка долгим тапом',
+  parameters: { docs: { description: { story: 'Удержание 400 мс и сдвиг дальше 10 pt — подъём (1.04, тень floating, `lift`). Соседи раздвигаются FLIP на `--motion-drop`, каждая новая позиция — `select`. Отпускание — вещь садится (`drop`); Esc или палец далеко за сеткой — всё назад на `--motion-return`. У краёв экрана — автоскролл. Так же в Гардеробе и Вишлисте.' } } },
+  render: () => <ReorderDemo />,
+};
+
+/** Порядок вещей в сетке демо — строкой из id. */
+const orderOf = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('[data-reorder-key]')].map((n) => n.dataset.reorderKey).join('');
+const statusOf = (root: HTMLElement) => root.querySelector('[role=status][aria-live]')?.textContent ?? '';
+
+/** Указатель мышью (pointerId 1): нажать, подержать дольше долгого нажатия, провести к центру `to` шагами, отпустить. */
+async function holdAndDrag(from: HTMLElement, to: HTMLElement, opts: { release?: boolean } = {}) {
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+  const fire = (type: string, x: number, y: number) =>
+    from.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: y }));
+  fire('pointerdown', x0, y0);
+  await wait(gesture.longPress + 100);
+  for (let i = 1; i <= 10; i++) { fire('pointermove', x0 + ((x1 - x0) * i) / 10, y0 + ((y1 - y0) * i) / 10); await wait(16); }
+  if (opts.release !== false) fire('pointerup', x1, y1);
+}
+
+export const GridReorderPointer: Story = {
+  name: 'Сетка: перестановка — палец',
+  parameters: { docs: { description: { story: 'Play-тест: подъём долгим нажатием, перенос первой вещи на 2 позиции вперёд, проверка порядка и хаптики; затем Esc посреди жеста возвращает порядок.' } } },
+  render: () => <ReorderDemo />,
+  play: async ({ canvasElement: root, step }) => {
+    const card = (k: string) => root.querySelector<HTMLElement>(`[data-reorder-key="${k}"]`)!;
+    const log: string[] = [];
+    const on = (e: Event) => log.push((e as CustomEvent<string>).detail);
+    window.addEventListener('yeet:haptic', on);
+    try {
+      await step('Удержание и сдвиг — подъём, перенос на 2 позиции', async () => {
+        await expect(orderOf(root)).toBe('abcdefghijkl');
+        await holdAndDrag(card('a'), card('c'));
+        await waitFor(() => expect(orderOf(root)).toBe('bcadefghijkl'));
+        await expect(log).toEqual(['lift', 'select', 'drop']);
+        await expect(statusOf(root)).toBe('Перемещено на позицию 3 из 12');
+        await waitFor(() => expect(card('a').classList.contains('is-lifted')).toBe(false));
+      });
+      await step('Esc посреди жеста — всё на место', async () => {
+        await wait(motionMs('--motion-drop', 744));
+        await holdAndDrag(card('b'), card('d'), { release: false });
+        await waitFor(() => expect(orderOf(root)).toBe('cadbefghijkl'));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(orderOf(root)).toBe('bcadefghijkl'));
+        await expect(statusOf(root)).toMatch(/^Перестановка отменена/);
+        card('b').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1, pointerType: 'mouse' }));
+      });
+    } finally {
+      window.removeEventListener('yeet:haptic', on);
+    }
+  },
+};
+
+export const GridReorderKeyboard: Story = {
+  name: 'Сетка: перестановка — клавиатура',
+  parameters: { docs: { description: { story: 'Play-тест: фокус на вещи, пробел — взять, стрелки — двигать, пробел — поставить; Escape — отмена. Каждое перемещение объявляется через aria-live.' } } },
+  render: () => <ReorderDemo />,
+  play: async ({ canvasElement: root, step }) => {
+    const card = (k: string) => root.querySelector<HTMLElement>(`[data-reorder-key="${k}"]`)!;
+    await step('Пробел, стрелка вправо дважды, пробел', async () => {
+      card('a').focus();
+      await userEvent.keyboard(' ');
+      await expect(statusOf(root)).toMatch(/взято, позиция 1 из 12/);
+      await expect(card('a').classList.contains('is-lifted')).toBe(true);
+      await userEvent.keyboard('{ArrowRight}');
+      await expect(statusOf(root)).toBe('Перемещено на позицию 2 из 12');
+      await userEvent.keyboard('{ArrowRight}');
+      await expect(statusOf(root)).toBe('Перемещено на позицию 3 из 12');
+      await userEvent.keyboard(' ');
+      await expect(orderOf(root)).toBe('bcadefghijkl');
+      await expect(card('a').classList.contains('is-lifted')).toBe(false);
+      await expect(document.activeElement).toBe(card('a'));
+    });
+    await step('Стрелка вниз — на ряд, Escape — отмена', async () => {
+      await userEvent.keyboard(' ');
+      await userEvent.keyboard('{ArrowDown}');
+      await expect(orderOf(root)).toBe('bcdeafghijkl');
+      await userEvent.keyboard('{Escape}');
+      await expect(orderOf(root)).toBe('bcadefghijkl');
+      await expect(statusOf(root)).toMatch(/^Перестановка отменена\. Верхняя одежда: позиция 3 из 12/);
+    });
+  },
+};
 
 /* ─── Листание поводов ──────────────────────────────────────────────── */
 

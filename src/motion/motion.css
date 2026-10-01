@@ -131,3 +131,7 @@
 /* тень только у открытого экрана: закрытый стоит за правым краем, и его тень не должна заглядывать в кадр */
 .y-stack__page--top::before { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: var(--shadow-floating); opacity: var(--stack); transition: opacity var(--motion-page); }
 .y-stack[data-dragging] .y-stack__page, .y-stack[data-dragging] .y-stack__page::before, .y-stack[data-dragging] .y-stack__page::after { transition: none; }
+
+/* Сетка: перестановка долгим тапом (#209) — прокручиваемый экран демо, чтобы было видно автоскролл */
+.y-reorder-demo { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-8) var(--space-20) var(--space-20); }
+.y-reorder-demo__haptic { display: flex; justify-content: center; padding: var(--space-12) var(--space-20) var(--space-20); }
