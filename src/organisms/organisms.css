@@ -275,9 +275,6 @@
 .y-bubble--own { background: var(--color-accent-soft); border-radius: var(--radius-lg) var(--radius-lg) var(--space-8) var(--radius-lg); margin-left: auto; margin-right: var(--space-12); width: fit-content; } /* свой пузырь на 32 от края экрана: поле 20 + 12 (Figma 1176:20046, #210) */
 .y-bubble-row { display: flex; align-items: flex-end; gap: var(--space-4); }
 .y-bubble-row__avatar { flex: none; width: 64px; height: 64px; display: grid; place-items: center; } /* stylelint-disable-line unit-disallowed-list -- аватар стилиста 64 из Figma */
-/* Аватар стилиста в чате (во флоу — 3D-персонаж 64; здесь заглушка) */
-.y-stylist-avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--card-bg); color: var(--color-text-primary); } /* stylelint-disable-line unit-disallowed-list -- аватар стилиста 64 из Figma */
-
 /* Превью образа — тоже точечный фон */
 .y-outfit-thumb {
   position: relative; flex: none; padding: 0; border: 0; cursor: pointer; border-radius: var(--radius-lg); overflow: hidden;
@@ -290,6 +287,7 @@
   color: var(--color-text-primary); text-align: left;
 }
 .y-prompt-card--wide { grid-column: 1 / -1; height: 172px; } /* stylelint-disable-line unit-disallowed-list -- высота широкой карточки 172 из Figma */
+.y-prompt-card > .y-caption { white-space: pre-line; } /* перенос строки подписи из текста (\n), как в Figma: «Максимум\nиз одной вещи» (#216, #20) */
 .y-prompt-card--soon { cursor: default; }
 .y-prompt-card--soon > .y-h3 { color: var(--color-text-secondary); }
 .y-prompt-card__soon { position: absolute; left: var(--space-20); bottom: var(--space-20); }
@@ -411,6 +409,15 @@
 /* stylelint-disable-next-line no-descending-specificity -- должно стоять после .y-sheet__body (та же специфичность, margin-top): перенос выше сдвинул бы тело шторки */
 .y-sheet__description + * { margin-top: var(--space-4); }
 .y-sheet--panel > .y-sheet__description + * { margin-top: 0; } /* в панели gap 20 — описание → контент 20, а не 24 (C14) */
+
+/* ─── Sheet · шаг 20 внутри тела (#216) ─── */
+/* Поле поиска → список 20, а не 16 (gap тела): Settings / Country 1147:3725, как поле → фильтры в шапке поиска */
+.y-sheet__body > .y-input-bar + .y-list { margin-top: var(--space-4); }
+/* Раскрытая строка ListItem Expandable: ряд под ней (подкатегории) — часть списка, строка → чипсы → строка по 20, как шаг List:
+   +4 к gap тела сверху и снизу, Wardrobe / Items / Sheet / Category 1144:3290 */
+.y-sheet__body > .y-list:has(> .y-list-item[aria-expanded='true']:last-child) + :not(.y-list) { margin-block: var(--space-4); }
+/* Ряд фото-плиток → кнопка под ним 20: Profile / Avatar / Sheet / Replace 1173:16889 (шторка 285; плитки 165 × 165 через 7 — Row в экране) */
+.y-sheet__body > :has(> .y-photo-tile) + * { margin-top: var(--space-4); }
 
 /* ─── Аватар стилиста (#27) ─── */
 .y-stylist-face { display: block; object-fit: contain; user-select: none; }

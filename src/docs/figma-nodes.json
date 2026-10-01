@@ -10,6 +10,7 @@
     "942:6151": ["core · Foundations/Токены и семантика, Типографика, Отступы и радиусы", "SECTION", "Foundations"],
     "942:5714": ["ui-icons · Foundations/Иконки, Atoms/Icon", "SECTION", "Foundations"],
     "942:6149": ["shapes · Foundations", "SECTION", "Foundations"],
+    "942:13600": ["main-action", "COMPONENT", "Foundations"],
     "942:5752": ["logos · Atoms/Logo", "SECTION", "Foundations"],
     "1180:20027": ["yeet", "COMPONENT_SET", "Foundations"],
     "1061:1733": ["weather-icons", "FRAME", "Foundations"],
