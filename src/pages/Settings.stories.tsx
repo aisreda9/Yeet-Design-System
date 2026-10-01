@@ -73,17 +73,20 @@ export const DeleteAccount: Story = {
   ),
 };
 
-export const CountrySheet: Story = {
-  name: 'Settings / Country / Sheet / Default',
-  render: () => (
+/** Страна: поиск и список с флагами; `focused` — поле поиска в фокусе (Figma `1174:16113`), клавиатура — системная, в истории её нет. */
+function CountrySheetScreen({ focused }: { focused?: boolean }) {
+  return (
     <Screen
       header={header}
-      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиск по странам" fieldIcon="search" /><List><ListItem type="radio" label="Россия" checked trailing={<Flag code="ru" />} /><ListItem type="radio" label="Беларусь" trailing={<Flag code="by" />} /><ListItem type="radio" label="Казахстан" trailing={<Flag code="kz" />} /><ListItem type="radio" label="Грузия" trailing={<Flag code="ge" />} /></List></Sheet></Overlay>}
+      overlay={<Overlay><Sheet title="Страна"><InputBar size="L" placeholder="Поиск по странам" fieldIcon="search" focused={focused} /><List><ListItem type="radio" label="Россия" checked trailing={<Flag code="ru" />} /><ListItem type="radio" label="Беларусь" trailing={<Flag code="by" />} /><ListItem type="radio" label="Казахстан" trailing={<Flag code="kz" />} /><ListItem type="radio" label="Грузия" trailing={<Flag code="ge" />} /></List></Sheet></Overlay>}
     >
       <AccountCard account={sima} kind="settings" />
     </Screen>
-  ),
-};
+  );
+}
+
+export const CountrySheet: Story = { name: 'Settings / Country / Sheet / Default', render: () => <CountrySheetScreen /> };
+export const CountrySearchFocused: Story = { name: 'Settings / Country / Sheet / Search Focused', tags: ['figma:1371-43471'], render: () => <CountrySheetScreen focused /> };
 
 /** Валюты — порядок и подписи как во флоу (1174:16325): символ перед кодом, где он есть. */
 const currencies = [

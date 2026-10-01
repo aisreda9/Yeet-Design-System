@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Button, Divider, Link, Logo } from '../atoms';
 import { Field, InputGroup } from '../molecules';
 import { BottomBar, type CanvasItem, Dialog, Header, OutfitCanvas, Overlay } from '../organisms';
 import { Row, Screen, Stack } from '../templates';
+import { PhotoSheet } from './sheets';
 import './pages.css';
 
 /* Раздел: запуск, онбординг, вход и восстановление пароля. Id историй — pages-экраны-флоу--<slug> (flow-diff). */
@@ -40,18 +41,31 @@ export const OnboardingWelcome: Story = {
   ),
 };
 
-export const FirstItemPrompt: Story = {
-  name: 'Onboarding / First Item Prompt',
-  tags: ['figma:1371-37125'],
-  render: () => (
-    // Пустой холст ждёт первую вещь; «Добавить» открывает выбор фото. Перенос заголовка — неразрывными пробелами «вещь в гардероб»
+/** Первая вещь: пустой холст ждёт вещь. `overlay` — шторка поверх (выбор фото). */
+function FirstItemScreen({ overlay }: { overlay?: ReactNode }) {
+  return (
+    // Перенос заголовка — неразрывными пробелами «вещь в гардероб»
     <Screen
       header={<Header type="back" title={'Добавь первую вещь\u00a0в\u00a0гардероб'} subtitle={<>Сфотографируй на ровной поверхности,<br />а мы вырежем фон, определим цвет и категорию</>} textAction={{ label: 'Пропустить' }} />}
       bottom={<BottomBar label="Добавить" />}
+      overlay={overlay && <Overlay>{overlay}</Overlay>}
     >
       <OutfitCanvas items={[]} aria-label="Холст первой вещи" className="y-first-item-canvas" />
     </Screen>
-  ),
+  );
+}
+
+export const FirstItemPrompt: Story = {
+  name: 'Onboarding / First Item Prompt',
+  tags: ['figma:1371-37125'],
+  render: () => <FirstItemScreen />,
+};
+
+/** Фото первой вещи: галерея или камера (Figma `1147:3351`). В прототипе «Добавить» ведёт сразу в форму (Figma `1173:21880`), шторка — без входа. */
+export const FirstItemAddPhoto: Story = {
+  name: 'Onboarding / First Item / Sheet / Add Photo',
+  tags: ['figma:1371-43702'],
+  render: () => <FirstItemScreen overlay={<PhotoSheet label="Фото вещи" />} />,
 };
 
 export const SignIn: Story = {
