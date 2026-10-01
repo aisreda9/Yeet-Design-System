@@ -146,6 +146,13 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
       async overlay(id) {
         commit([...layersRef.current, make(id)]);
       },
+      async change(id) {
+        if (!top().overlay || !screens[id].overlay) return api.swap(id);
+        const layer = make(id);
+        commit([...layersRef.current.slice(0, -1), layer]);
+        // шторка уже на месте: появление (@starting-style) сразу в конечное положение
+        el(layer)?.getAnimations({ subtree: true }).forEach((a) => a.finish());
+      },
       async close() {
         const cur = top();
         if (!cur.overlay) return;

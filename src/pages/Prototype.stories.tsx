@@ -71,7 +71,7 @@ export const CreationOverlays: Story = {
   },
 };
 
-/** Настройки и профиль: выход из аккаунта, фото профиля (добавить, заменить, удалить), год рождения. */
+/** Настройки и профиль: выход из аккаунта, страна (поиск в фокусе), фото профиля (добавить, заменить, удалить), год рождения, пол и стиль. */
 export const ProfileOverlays: Story = {
   name: 'Оверлеи: настройки и профиль',
   args: { start: 'Settings' satisfies ScreenId, panel: false },
@@ -80,6 +80,15 @@ export const ProfileOverlays: Story = {
     await tap(root, await c.findByRole('button', { name: 'Выйти' }));
     await tap(root, within(await dialog(c, 'Точно хочешь выйти?')).getByRole('button', { name: 'Отменить' }));
     await gone(c, 'alertdialog');
+
+    // «Страна»: тап по поиску — та же шторка с полем в фокусе (Search Focused), выбор страны закрывает её (#220)
+    await tap(root, c.getByRole('button', { name: /^Страна/ }));
+    await tap(root, (await sheet(c, 'Страна')).querySelector('.y-input-bar__field')!);
+    await at(root, 'CountrySearchFocused');
+    await expect((await sheet(c, 'Страна')).querySelector('.y-input-bar')).toHaveClass('is-focused');
+    await tap(root, within(await sheet(c, 'Страна')).getByText('Беларусь'));
+    await gone(c, 'dialog');
+    await c.findByText('Страна изменена');
 
     await tap(root, root.querySelector('.y-account')!); // строка со своей кнопкой «Выйти» — не role=button
     await c.findByText('Редактирование профиля');
@@ -92,6 +101,14 @@ export const ProfileOverlays: Story = {
 
     await tap(root, c.getByRole('button', { name: /^Год рождения/ }));
     await tap(root, within(await sheet(c, 'Год рождения')).getByText('1995'));
+    await gone(c, 'dialog');
+
+    // пол и стиль: выбор чипсом закрывает шторку (#220)
+    await tap(root, c.getByRole('button', { name: /^Пол/ }));
+    await tap(root, await within(await sheet(c, 'Пол')).findByRole('button', { name: 'Мужской' }));
+    await gone(c, 'dialog');
+    await tap(root, c.getByRole('button', { name: /^Стиль/ }));
+    await tap(root, await within(await sheet(c, 'Стиль')).findByRole('button', { name: 'Минимал' }));
     await gone(c, 'dialog');
   },
 };
@@ -191,10 +208,43 @@ export const TodayOccasion: Story = {
     await tap(root, await within(await sheet(c, 'Повод')).findByRole('button', { name: 'Офис' }));
     await gone(c, 'dialog');
     await waitFor(() => expect(q(root, '.y-header__accent')).toHaveTextContent('офис'));
+
+    // «+» → чипс-поле своего повода (Custom Occasion Name Empty) → ввод (Entered) → Enter: новый чипс, выбор меняет акцент (#220)
+    await tap(root, q(root, '.y-header__accent'));
+    const occasion = await sheet(c, 'Повод');
+    await userEvent.click(within(occasion).getByRole('button', { name: 'Добавить' }));
+    const name = await within(occasion).findByRole('textbox', { name: 'Название' });
+    await expect(name).toHaveValue('');
+    await userEvent.type(name, 'Кастом{Enter}');
+    await tap(root, await within(occasion).findByRole('button', { name: 'Кастом' }));
+    await gone(c, 'dialog');
+    await waitFor(() => expect(q(root, '.y-header__accent')).toHaveTextContent('кастом'));
+    await expect(c.queryByText('Этого экрана пока нет в макетах')).toBeNull();
   },
 };
 
-/** Вишлист: «+» → пустая форма → поле → заполненная форма → «Добавить» → вишлист с тостом. */
+/** Фильтр образов: «+» в шторке «Повод» → чипс-поле своего повода → ввод → Enter: новый чипс, по нему — фильтр (#220). */
+export const OutfitsCustomOccasion: Story = {
+  name: 'Цепочка: свой повод в фильтре образов',
+  args: { start: 'OutfitsPopulated' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'OutfitsPopulated');
+    await tap(root, topLayer(root).getByRole('button', { name: /^Повод/ }));
+    const occasion = await sheet(c, 'Повод');
+    await userEvent.click(within(occasion).getByRole('button', { name: 'Добавить' }));
+    const name = await within(occasion).findByRole('textbox', { name: 'Название' });
+    await expect(name).toHaveValue('');
+    await userEvent.type(name, 'Кастом{Enter}');
+    await expect(c.queryByText('Этого экрана пока нет в макетах')).toBeNull();
+    await expect(within(occasion).getByRole('button', { name: 'Удалить: Кастом' })).toBeVisible();
+    await tap(root, await within(occasion).findByRole('button', { name: 'Кастом' }));
+    await gone(c, 'dialog');
+    await at(root, 'OutfitsNoFilterResults');
+  },
+};
+
+/** Вишлист: «+» → «Добавить в вишлист» («Образ» — макета нет, тост) → «Вещь» → пустая форма → поле → заполненная форма → «Добавить» → вишлист с тостом. */
 export const WishlistNewItemChain: Story = {
   name: 'Цепочка: новая вещь в вишлисте',
   args: { start: 'Wishlist' satisfies ScreenId, panel: false },
@@ -202,6 +252,12 @@ export const WishlistNewItemChain: Story = {
     const c = within(root);
     await at(root, 'Wishlist');
     await tap(root, q(root, '.y-bottom-nav__fab button'));
+    await tap(root, await within(await sheet(c, 'Добавить в вишлист')).findByRole('button', { name: 'Образ' }));
+    await gone(c, 'dialog');
+    await c.findByText('Этого экрана пока нет в макетах');
+    await tap(root, q(root, '.y-bottom-nav__fab button'));
+    await tap(root, await within(await sheet(c, 'Добавить в вишлист')).findByRole('button', { name: 'Вещь' }));
+    await gone(c, 'dialog');
     await at(root, 'WishlistNewItem');
     await tap(root, q(root, '.y-field input'));
     await at(root, 'WishlistNewItemCompleted');
@@ -279,6 +335,31 @@ export const SearchChain: Story = {
     const chip = [...topEl(root).querySelectorAll<HTMLElement>('.y-chip-group > .y-button')].find((b) => !/^Белое платье/.test(b.textContent ?? ''))!;
     await tap(root, chip);
     await at(root, 'SearchResults');
+  },
+};
+
+/** Поиск по фото из шапки: без снимка — шторка «Добавить», галерея → обрезка → результаты; со снимком — «Заменить», камера → обрезка (#220). */
+export const PhotoSearchChain: Story = {
+  name: 'Цепочка: поиск по фото из шапки',
+  args: { start: 'SearchResults' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root }) => {
+    const c = within(root);
+    await at(root, 'SearchResults');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Поиск по фото' }));
+    const add = await sheet(c, 'Поиск по фото');
+    await expect(within(add).queryByRole('button', { name: 'Удалить фотографию' })).toBeNull();
+    await tap(root, add.querySelector('.y-photo-tile')!); // «Выбрать из галереи»
+    await gone(c, 'dialog');
+    await at(root, 'PhotoCrop');
+    await tap(root, topLayer(root).getByRole('button', { name: 'Найти похожее' }));
+    await at(root, 'PhotoResults');
+
+    await tap(root, topLayer(root).getByRole('button', { name: 'Выбранное фото' }));
+    const replace = await sheet(c, 'Поиск по фото');
+    await expect(within(replace).getByRole('button', { name: 'Удалить фотографию' })).toBeVisible();
+    await tap(root, replace.querySelectorAll('.y-photo-tile')[1]); // «Сделать фото»
+    await gone(c, 'dialog');
+    await at(root, 'PhotoCrop');
   },
 };
 

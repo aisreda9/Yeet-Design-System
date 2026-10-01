@@ -420,9 +420,21 @@ export const WishlistNewItemCompleted: Story = { name: 'Wishlist / New Item / Co
 const itemsBackdrop = <Grid>{grid.map((k, i) => <ItemCard key={i} kind={k} />)}</Grid>;
 
 /** Шторка-фильтр над гардеробом: заголовок → 16 → чипсы, без кнопок — выбор применяется сразу. `add` — синий «+» перед чипсами (свой повод). */
+/**
+ * Шторка-фильтр с чипсами. `add` — «+» своего повода, как в шторке «Повод» на главной: чипс-поле с плейсхолдером
+ * (Custom Occasion Name Empty), ввод (… Entered), Enter или уход фокуса — новый чипс с ×; пустое поле исчезает (#220).
+ */
 function FilterSheetScreen({ title, chips, add }: { title: string; chips: (string | Chip)[]; add?: boolean }) {
+  const [list, setList] = useState<Chip[]>(() => chips.map((c, k) => ({ ...(typeof c === 'string' ? { label: c } : c), selected: k === 0 })));
+  const addCustom = () => setList((cur) => (cur.some((c) => c.editing) ? cur : [...cur, { label: '', value: 'new', editing: true, removable: true, placeholder: OCCASION_PLACEHOLDER }]));
+  const editCustom = (v: string) => setList((cur) => cur.map((c) => (c.editing ? { ...c, label: v } : c)));
+  const doneCustom = (v: string) => setList((cur) => cur.flatMap((c) => (c.editing ? (v.trim() ? [{ label: v.trim(), removable: true }] : []) : [c])));
+  const removeCustom = (v: string) => setList((cur) => cur.filter((c) => (c.value ?? c.label) !== v));
+  const chipGroup = add
+    ? <ChipGroup wrap chips={list} onAdd={addCustom} onEdit={editCustom} onEditDone={doneCustom} onRemove={removeCustom} />
+    : <ChipGroup wrap chips={list} />;
   return (
-    <Screen header={wardrobeHeader} overlay={<Overlay><Sheet title={title}><ChipGroup wrap onAdd={add ? () => {} : undefined} chips={chips.map((c, k) => ({ ...(typeof c === 'string' ? { label: c } : c), selected: k === 0 }))} /></Sheet></Overlay>}>
+    <Screen header={wardrobeHeader} overlay={<Overlay><Sheet title={title}>{chipGroup}</Sheet></Overlay>}>
       {itemsBackdrop}
     </Screen>
   );
