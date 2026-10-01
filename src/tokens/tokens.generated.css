@@ -59,6 +59,7 @@
   --space-48: 48px;
   --space-52: 52px;
   --space-56: 56px;
+  --radius-8: 8px;
   --radius-xs: 4px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -154,6 +155,7 @@
   --color-divider: rgb(0 0 0 / 0.05); /* ui-colors/divider */
   --color-pattern-dot: rgb(0 0 0 / 0.23); /* ui-colors/pattern-dot */
   --color-handle: rgb(0 0 0 / 0.17); /* ui-colors/handle */
+  --color-shadow: rgb(0 0 0 / 0.12); /* ui-colors/shadow */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.12);
 }
 
@@ -181,6 +183,7 @@
   --color-divider: rgb(245 245 247 / 0.08); /* ui-colors/divider */
   --color-pattern-dot: rgb(245 245 247 / 0.23); /* ui-colors/pattern-dot */
   --color-handle: rgb(245 245 247 / 0.14); /* ui-colors/handle */
+  --color-shadow: rgb(0 0 0 / 0.5); /* ui-colors/shadow */
   --shadow-floating: 0px 8px 40px rgb(0 0 0 / 0.5);
 }
 

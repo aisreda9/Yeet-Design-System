@@ -72,6 +72,8 @@ data class YeetColorScheme(
     val patternDot: Color,
     /** Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) · Figma ui-colors/handle */
     val handle: Color,
+    /** Цвет плавающей тени shadow/floating · Figma ui-colors/shadow */
+    val shadow: Color,
 )
 
 val YeetLightColors = YeetColorScheme(
@@ -97,6 +99,7 @@ val YeetLightColors = YeetColorScheme(
     divider = Color(0x0D000000),
     patternDot = Color(0x3B000000),
     handle = Color(0x2B000000),
+    shadow = Color(0x1F000000),
 )
 
 val YeetDarkColors = YeetColorScheme(
@@ -122,6 +125,7 @@ val YeetDarkColors = YeetColorScheme(
     divider = Color(0x14F5F5F7),
     patternDot = Color(0x3BF5F5F7),
     handle = Color(0x24F5F5F7),
+    shadow = Color(0x80000000),
 )
 
 /** Бренд-варианты: переопределяют семантические цвета поверх светлой / тёмной темы (web: data-brand). */
@@ -224,6 +228,8 @@ object YeetSpace {
 }
 
 object YeetRadius {
+    /** Острый угол карточки погоды */
+    val 8 = 8.dp
     /** Хэндл sheet */
     val xs = 4.dp
     /** Badge */
