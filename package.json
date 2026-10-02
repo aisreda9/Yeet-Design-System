@@ -13,6 +13,7 @@
     "build-storybook": "node scripts/build-tokens.mjs && node scripts/build-assets.mjs && storybook build -o storybook-static && node scripts/postbuild.mjs",
     "typecheck": "tsc --noEmit",
     "qa": "node scripts/qa/run.mjs",
+    "qa:changed": "node scripts/qa/run.mjs --changed",
     "contrast": "node scripts/check-contrast.mjs",
     "figma-sync": "node scripts/tokens/figma-sync.mjs",
     "flow-diff": "node scripts/qa/flow-diff.mjs",

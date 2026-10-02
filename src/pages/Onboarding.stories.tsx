@@ -92,6 +92,7 @@ const recoveryHeader = <Header type="back" title="Не помнишь парол
 
 export const PasswordRecovery: Story = {
   name: 'Auth / Password Recovery',
+  tags: ['visual'], // play только ставит фокус, как во флоу — экран снимается (play-истории без `visual` не снимаются)
   render: () => (
     // Во флоу поле пустое и в фокусе (открыта клавиатура). Кнопка во флоу подписана «Войти» — опечатка макета: действие — отправить код
     <Screen header={recoveryHeader}>

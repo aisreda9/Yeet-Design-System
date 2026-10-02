@@ -4,6 +4,8 @@
  *   npm run build-storybook && npm run qa            — проверки + отчёт qa/out/report.md
  *   npm run qa -- --update-baseline                  — принять текущие скриншоты как эталон (qa/baseline, в git)
  *   npm run qa -- --only=organisms-header            — только истории с этим префиксом
+ *   npm run qa:changed  (npm run qa -- --changed)    — только истории, задетые веткой относительно origin/main (scripts/qa/changed.mjs);
+ *                                                      --changed=<ref> — относительно другой ветки. Локальное ускорение, CI — полный прогон
  *   npm run qa -- --no-docker                        — без образа: всё, кроме сравнения скриншотов
  *   npm run qa -- --tap-min=40                       — порог зоны нажатия для предупреждения (по умолчанию 44)
  *   npm run qa -- --diff-px=20                       — допуск визуальной разницы в пикселях (по умолчанию 0)
@@ -15,12 +17,17 @@
  * перекрытая или обрезанная тень, текст вылез из блока, элемент вылез за экран, визуальная
  * разница с эталоном выше порога, нет эталона, axe serious / critical, зона нажатия < 24.
  * Предупреждение: зона нажатия < 44, axe moderate / minor, концентричность (радиус шторки / плашки ≠ радиус контейнера − отступ, #217).
+ *
+ * Визуальная регрессия — по всем историям, кроме no-visual: тег `no-visual` или play-функция (тег `play-fn`, Storybook ставит сам)
+ * без тега `visual`. Play-история — тест поведения, её конечный кадр зависит от тайминга; `visual` ставят, когда play только
+ * готовит состояние для скриншота (фокус) или проверяет геометрию, ничего не меняя. Остальные проверки — для всех историй.
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
-import { IMAGE, hasDocker, imageMatchesPlaywright, inImage, rerunInImage, root, startStorybook, storyIndex } from './lib.mjs';
+import { changedStories } from './changed.mjs';
+import { IMAGE, hasDocker, imageMatchesPlaywright, inImage, rerunInImage, root, staticDir, startStorybook, storyIndex } from './lib.mjs';
 
 const outDir = join(root, 'qa/out');
 const baseDir = join(root, 'qa/baseline');
@@ -44,9 +51,35 @@ const KNOWN = {
   'axe: color-contrast|foundations-анимации--occasion-pager': 'https://github.com/indiekola/Yeet-Design-System/issues/13',
 };
 
+/** Визуальная регрессия для истории: не `no-visual` и не play-история без `visual`. */
+const noVisual = (story) => story.tags?.includes('no-visual') || (story.tags?.includes('play-fn') && !story.tags.includes('visual'));
+
+/* ─── --changed: выбор историй на хосте (в образе нет git-рабочей копии), в образ — готовый список ── */
+const changedFile = join(root, 'node_modules/.cache/qa-changed.json');
+/** @type {Set<string> | null} */
+let selected = null;
+if (args['changed-file']) selected = new Set(JSON.parse(readFileSync(join(root, args['changed-file']), 'utf8')));
+else if (args.changed) {
+  if (!existsSync(join(staticDir, 'index.json'))) { console.error('Нет storybook-static: сначала `npm run build-storybook`.'); process.exit(2); }
+  const all = storyIndex();
+  const pick = changedStories(root, all, args.changed === true ? 'origin/main' : args.changed);
+  if (pick.full) console.log(`--changed: полный прогон, ${all.length} историй — ${pick.full}`);
+  else {
+    selected = pick.ids;
+    console.log(`--changed: выбрано ${selected.size} из ${all.length} историй`);
+    for (const [file, from] of pick.why) console.log(`  ${file} → ${from.length ? from.map((f) => f.replace(/^src\//, '')).join(', ') : 'ничего'}`);
+    if (pick.ignored.length) console.log(`  не влияют на истории: ${pick.ignored.join(', ')}`);
+    mkdirSync(dirname(changedFile), { recursive: true });
+    writeFileSync(changedFile, JSON.stringify([...selected]));
+  }
+  if (!selected?.size && !pick.full) { console.log('--changed: затронутых историй нет — QA не нужен.'); process.exit(0); }
+}
+/** Прогон не по всем историям: «лишний эталон» и устаревшие исключения KNOWN не проверяются. */
+const partial = Boolean(args.only || selected);
+
 /* ─── Окружение: скриншоты — только в закреплённом образе ────────────── */
 if (!inImage() && !args['no-docker']) {
-  if (hasDocker()) process.exit(rerunInImage('scripts/qa/run.mjs', argv));
+  if (hasDocker()) process.exit(rerunInImage('scripts/qa/run.mjs', selected ? [...argv.filter((a) => !a.startsWith('--changed')), '--changed-file=node_modules/.cache/qa-changed.json'] : argv.filter((a) => !a.startsWith('--changed'))));
   console.warn(`Docker не найден: скриншоты с эталоном не сравниваются (${IMAGE.split('@')[0]}).`);
 }
 const pw = imageMatchesPlaywright();
@@ -57,7 +90,7 @@ if (args['update-baseline'] && !visual) { console.error('Эталоны сним
 /* ─── Сервер и браузер (scripts/qa/lib.mjs) ─────────────────────────── */
 const { origin, browser, close } = await startStorybook();
 
-const stories = storyIndex().filter((e) => !args.only || e.id.startsWith(args.only));
+const stories = storyIndex().filter((e) => (!args.only || e.id.startsWith(args.only)) && (!selected || selected.has(e.id)));
 const specs = JSON.parse(readFileSync(join(root, 'design/figma-specs.json'), 'utf8'));
 const axeSource = readFileSync(join(root, 'node_modules/axe-core/axe.min.js'), 'utf8');
 
@@ -325,9 +358,9 @@ for (const story of stories) {
     const shot = await target.screenshot();
     writeFileSync(join(outDir, 'screens', file), shot);
     screens++;
+    // no-visual (прототип, play-тесты поведения) — без пиксельного эталона: экраны прототипа покрыты Pages/*, конечный кадр play зависит от тайминга
+    if (!visual || noVisual(story)) continue;
     shotFiles.add(file);
-    // интерактивные истории (прототип) с анимациями и панелью — без пиксельного эталона: экраны в них те же, что в Pages/*, и покрыты там
-    if (!visual || story.tags?.includes('no-visual')) continue;
     if (args['update-baseline']) {
       // эталон переписывается, только если картинка действительно другая: субпороговый шум (затемнение, панели)
       // иначе давал бы бинарные правки PNG и конфликты между параллельными PR
@@ -351,11 +384,11 @@ for (const story of stories) {
   }
 }
 
-// эталон без истории (история удалена или переименована) — эталоны должны отражать ровно текущий Storybook
-if (visual && !args.only && existsSync(baseDir)) {
+// эталон без истории (история удалена, переименована или стала no-visual) — эталоны должны отражать ровно текущий Storybook
+if (visual && !partial && existsSync(baseDir)) {
   for (const f of readdirSync(baseDir).filter((f) => f.endsWith('.png') && !shotFiles.has(f))) {
     if (args['update-baseline']) { rmSync(join(baseDir, f)); rewritten++; continue; }
-    add('error', 'лишний эталон', f.replace(/--(light|dark)\.png$/, ''), f.match(/--(\w+)\.png$/)?.[1] ?? '', `qa/baseline/${f} — истории нет; \`npm run qa -- --update-baseline\``);
+    add('error', 'лишний эталон', f.replace(/--(light|dark)\.png$/, ''), f.match(/--(\w+)\.png$/)?.[1] ?? '', `qa/baseline/${f} — истории нет или она no-visual (play без тега visual); \`npm run qa -- --update-baseline\``);
   }
 }
 
@@ -387,7 +420,7 @@ const errors = list.filter((i) => i.level === 'error');
 const warns = list.filter((i) => i.level === 'warn');
 const knownList = list.filter((i) => i.level === 'known');
 // запись в KNOWN, которая больше ничего не гасит, — ошибка: исключения не должны переживать починку
-if (!args.only) for (const k of Object.keys(KNOWN)) if (!knownList.some((i) => `${i.check}|${i.story}` === k)) errors.push({ level: 'error', check: 'устаревшее исключение', story: k.split('|')[1], theme: '', detail: `уберите из KNOWN в run.mjs: ${k}` });
+if (!partial) for (const k of Object.keys(KNOWN)) if (!knownList.some((i) => `${i.check}|${i.story}` === k)) errors.push({ level: 'error', check: 'устаревшее исключение', story: k.split('|')[1], theme: '', detail: `уберите из KNOWN в run.mjs: ${k}` });
 const visualLine = visual
   ? args['update-baseline'] ? `эталоны: снято ${screens}, изменено и удалено ${rewritten}` : `визуальная регрессия: сравнено ${compared}/${screens}, расхождений ${diffs}`
   : `визуальная регрессия: **не проверялась** (нет закреплённого образа${process.env.CI ? '' : ', локальный прогон'})`;
@@ -398,7 +431,7 @@ const byCheck = (arr) => Object.entries(arr.reduce((m, i) => ((m[i.check] = (m[i
 const md = [
   `# QA Storybook`,
   ``,
-  `Историй: **${stories.length}** × ${THEMES.length} темы · скриншотов: ${screens} · спеки Figma: **${specOk}/${specResults.length}** · ${visualLine} · зона нажатия ≥ ${TAP_MIN}`,
+  `Историй: **${stories.length}**${selected ? ' (--changed: только задетые веткой)' : ''} × ${THEMES.length} темы · скриншотов: ${screens} · спеки Figma: **${specOk}/${specResults.length}** · ${visualLine} · зона нажатия ≥ ${TAP_MIN}`,
   ``,
   `**Ошибок: ${errors.length}** · известных: ${knownList.length} · предупреждений: ${warns.length}`,
   ``,

@@ -19,6 +19,7 @@ export const Playground: Story = { args: { trailing: { icon: 'plus', label: 'Д�
 
 export const Focus: Story = {
   name: 'Фокус',
+  tags: ['visual'], // play только ставит фокус — скриншот нужен (scripts/qa/run.mjs: play-истории без `visual` не снимаются)
   args: { value: '' },
   play: async ({ canvasElement }) => { canvasElement.querySelector('input')?.focus(); },
 };
