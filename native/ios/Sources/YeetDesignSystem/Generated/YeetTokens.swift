@@ -184,6 +184,10 @@ public enum YeetComponent {
     public static let sheetTitleGap: CGFloat = YeetSpace.s16
     /// Заголовок компактной шапки: Body полужирным (у Body один вес, #217)
     public static let headerCompactWeight: CGFloat = 600
+    /// Низ стопки образов без таб-бара («Удиви меня»): нижнее превью заходит на 3 в поле экрана (1371:42686)
+    public static let outfitPagerEnd: CGFloat = -3
+    /// Низ стопки образов над таб-баром (главная): 29 до таб-бара = поле 24 + 5 (1371:36589)
+    public static let outfitPagerEndTabBar: CGFloat = 5
 }
 
 public enum YeetSpace {
@@ -429,6 +433,10 @@ public enum YeetGesture {
     public static let snackbar: TimeInterval = 4
     /// Время показа snackbar с действием
     public static let snackbarAction: TimeInterval = 6
+    /// Зона у края скролла, где перетаскиваемая вещь прокручивает экран (перестановка в сетке)
+    public static let autoscrollEdge: CGFloat = 64
+    /// Скорость автоскролла в самом краю зоны; к границе зоны падает до 0
+    public static let autoscrollSpeed: CGFloat = 12
 }
 
 /// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.

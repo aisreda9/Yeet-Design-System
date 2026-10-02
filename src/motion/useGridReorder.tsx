@@ -14,12 +14,9 @@ import { VisuallyHidden } from '../utils/VisuallyHidden';
 import { useReducedMotion } from './useReducedMotion';
 import './reorder.css';
 
-/**
- * Автоскролл у краёв скролла при перетаскивании: зона у края и скорость в самом краю.
- * Токена пока нет (кандидаты `--gesture-autoscroll-edge` / `-speed`, #209) — числа живут здесь.
- */
-const AUTOSCROLL_EDGE = 64; // px
-const AUTOSCROLL_SPEED = 12; // px за кадр в самом краю
+/** Автоскролл у краёв скролла при перетаскивании: зона у края и скорость в самом краю (`--gesture-autoscroll-edge` / `-speed`). */
+const AUTOSCROLL_EDGE = gesture.autoscrollEdge; // px
+const AUTOSCROLL_SPEED = gesture.autoscrollSpeed; // px за кадр в самом краю
 /** «Далеко за сетку»: палец ушёл за её край дальше размера карточки — перестановка отменяется. */
 const CANCEL_CARDS = 1;
 

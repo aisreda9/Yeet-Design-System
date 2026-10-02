@@ -42,22 +42,6 @@
 .y-swap__look.is-next { transform: translateY(372px) scale(0.27); } /* stylelint-disable-line unit-disallowed-list -- позиция превью из кадра Figma */
 .y-swap__stamp { position: absolute; right: var(--space-12); top: 356px; z-index: var(--layer-float); transition: transform var(--motion-swap); } /* stylelint-disable-line unit-disallowed-list -- штамп в 356 от верха кадра из Figma */
 
-/* Сворачивание фото в шапку */
-.y-collapse__bar { position: relative; z-index: var(--layer-float); display: flex; justify-content: space-between; padding: var(--space-8) var(--space-20); background: var(--color-bg-canvas); }
-.y-collapse__photo {
-  position: absolute; z-index: var(--layer-bar); left: var(--space-20); top: 118px; width: 353px; transform-origin: top left; /* stylelint-disable-line unit-disallowed-list -- фото 353 в 118 от верха кадра из Figma Animations */
-  transition: transform var(--motion-collapse);
-}
-/* миниатюра 48 по центру строки кнопок шапки — экран 1371:41329 (в кадре Animations 354:17449 — 52) */
-.y-collapse.is-collapsed .y-collapse__photo { transform: translate(153px, -48px) scale(0.136); } /* stylelint-disable-line unit-disallowed-list -- сдвиг миниатюры в шапку из кадра Figma */
-.y-collapse__scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
-.y-collapse__panel {
-  display: flex; flex-direction: column; gap: var(--space-12); margin-top: 380px; min-height: 900px; padding: var(--space-24) var(--space-20); /* stylelint-disable-line unit-disallowed-list -- панель под фото 380 и высота прокрутки 900 из кадра Figma */
-  background: var(--color-bg-elevated); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-floating);
-  transition: margin var(--motion-collapse);
-}
-.y-collapse.is-collapsed .y-collapse__panel { margin-top: var(--space-8); }
-
 /* Листание поводов */
 .y-pager { overflow: hidden; padding: var(--space-24) var(--space-20) 0; touch-action: pan-y; cursor: grab; user-select: none; }
 .y-pager__track { display: flex; gap: var(--space-20); transition: transform var(--motion-page); }

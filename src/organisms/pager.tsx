@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
 import { IconButton } from '../atoms';
 import { cx } from '../utils/cx';
+import { gesture } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
 import { useSwipePager } from '../motion';
 import { OutfitCollage, type AutoCollageItem, type CollageItem } from './cards';
@@ -103,6 +104,8 @@ const place = (k: number, i: number) => (k === i ? 'is-current' : k === i - 1 ? 
  *   превью растягиваются (`fitStack`): при 393 × 852 — 96 на главной и 150 в «Удиви меня» (`1371:42686`), как в Figma.
  *   Погода и штамп поверх, штамп поворачивается на 180° с каждой сменой.
  * - Лента (`x`, Figma `1371:42779`, Animations `798:2215 → 799:2433`): страницы во всю ширину контента через 20, соседние за краем экрана.
+ * - Тап по превью (сдвиг пальца < `--gesture-touch-slop`) — листает к нему, хаптика `select`. Хозяин может перехватить тап
+ *   раньше в фазе захвата (прототип открывает детали образа) — тогда листания нет.
  * - Клавиатура: кнопки «Предыдущий / Следующий образ» в порядке Tab, видны только при фокусе с клавиатуры; с них же листают
  *   стрелки по оси, Home и End.
  *   Скрытые образы — `aria-hidden` и `inert`, текущий объявляется через `aria-live`.
@@ -131,6 +134,26 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
     go(to);
   };
   const stop = { onPointerDown: (e: { stopPropagation: () => void }) => e.stopPropagation() }; // слоты жест не ловят
+
+  /**
+   * Тап по превью — к нему. Скрытые образы `inert`, клик до них не доходит, а приходит в саму ленту: ищем превью под пальцем
+   * по координатам (как `throughPreview` прототипа). Палец сдвинулся на `--gesture-touch-slop` и больше — это свайп, не тап.
+   * Хозяин может перехватить тап раньше (прототип в фазе захвата открывает детали образа и останавливает событие).
+   */
+  const downAt = useRef<{ x: number; y: number } | null>(null);
+  const onPointerDown = (e: PointerEvent) => { downAt.current = { x: e.clientX, y: e.clientY }; bind.onPointerDown(e); };
+  const onClick = (e: MouseEvent) => {
+    const d = downAt.current;
+    if (disabled || !box.current || (e.target as Element).closest('.y-outfit-pager__look.is-current, .y-outfit-pager__frame, .y-outfit-pager__nav')) return;
+    if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) >= gesture.slop) return;
+    for (const look of box.current.querySelectorAll<HTMLElement>('.y-outfit-pager__look:is(.is-prev, .is-next)')) {
+      const r = (look.querySelector('.y-collage') ?? look).getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) continue;
+      haptic('select');
+      go(index + (look.classList.contains('is-prev') ? -1 : 1));
+      return;
+    }
+  };
   const style = {
     '--drag': `${drag ?? 0}px`, '--index': index, '--turn': `${index * 180}deg`,
     '--pager-size': `${fit.size}px`, '--pager-preview': `${fit.preview}px`, '--pager-scale': fit.preview / fit.size, '--pager-k': fit.size / BASE,
@@ -152,14 +175,15 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
       {...bind}
+      onPointerDown={onPointerDown}
+      // тап по превью дублирует кнопки «Назад / Дальше» (.y-outfit-pager__nav) и стрелки — клавиатурный путь есть
+      onClick={onClick}
     >
       <div className="y-outfit-pager__viewport">
         <div className="y-outfit-pager__track">
           {looks.map((look, k) => {
             const hidden = k !== index;
             return (
-              // тап по превью дублирует кнопки «Назад / Дальше» (.y-outfit-pager__nav) и стрелки — клавиатурный путь есть
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
               <div
                 key={look.id}
                 className={cx('y-outfit-pager__look', place(k, index))}
@@ -168,7 +192,6 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
                 aria-label={`${k + 1} из ${count}${look.name ? `: ${look.name}` : ''}`}
                 aria-hidden={hidden || undefined}
                 inert={hidden || undefined}
-                onClick={hidden && !disabled && Math.abs(k - index) === 1 ? () => { haptic('select'); go(k); } : undefined} // тап по превью — к нему
                 style={{ '--k': k } as CSSProperties}
               >
                 <OutfitCollage items={look.items} label={look.label} />

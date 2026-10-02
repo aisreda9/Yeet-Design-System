@@ -193,6 +193,10 @@ object YeetComponent {
     val sheetTitleGap = YeetSpace.s16
     /** Заголовок компактной шапки: Body полужирным (у Body один вес, #217) */
     val headerCompactWeight = FontWeight(600)
+    /** Низ стопки образов без таб-бара («Удиви меня»): нижнее превью заходит на 3 в поле экрана (1371:42686) */
+    val outfitPagerEnd = -3.dp
+    /** Низ стопки образов над таб-баром (главная): 29 до таб-бара = поле 24 + 5 (1371:36589) */
+    val outfitPagerEndTabBar = 5.dp
 }
 
 /** Цвет вещи — атрибут одежды, не интерфейс. */
@@ -412,6 +416,10 @@ object YeetGesture {
     const val snackbarMillis = 4000L
     /** Время показа snackbar с действием */
     const val snackbarActionMillis = 6000L
+    /** Зона у края скролла, где перетаскиваемая вещь прокручивает экран (перестановка в сетке) */
+    val autoscrollEdge = 64.dp
+    /** Скорость автоскролла в самом краю зоны; к границе зоны падает до 0 */
+    const val autoscrollSpeed = 12f
 }
 
 /** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */

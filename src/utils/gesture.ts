@@ -19,6 +19,10 @@ export const gesture = {
   /** Показ snackbar без действия / с действием, мс. */
   snackbar: g.snackbar.value,
   snackbarAction: g['snackbar-action'].value,
+  /** Зона у края скролла, где перетаскивание прокручивает экран, px. */
+  autoscrollEdge: g['autoscroll-edge'].value,
+  /** Скорость автоскролла в самом краю зоны, px за кадр. */
+  autoscrollSpeed: g['autoscroll-speed'].value,
 } as const;
 
 /**

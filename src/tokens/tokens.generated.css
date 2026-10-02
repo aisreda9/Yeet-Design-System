@@ -122,6 +122,8 @@
   --gesture-rubber-band: 0.55; /* Сопротивление за границей: скролл, масштаб 40–300 на холсте */
   --gesture-snackbar: 4000ms; /* Время показа snackbar без действия (с действием — 6000) */
   --gesture-snackbar-action: 6000ms; /* Время показа snackbar с действием */
+  --gesture-autoscroll-edge: 64px; /* Зона у края скролла, где перетаскиваемая вещь прокручивает экран (перестановка в сетке) */
+  --gesture-autoscroll-speed: 12; /* Скорость автоскролла в самом краю зоны; к границе зоны падает до 0 */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -395,6 +397,8 @@
   --sheet-handle: var(--color-handle); /* Хэндл шторки, 48 × 4 (D8) */
   --sheet-title-gap: var(--space-16); /* Заголовок → контент и заголовок → описание (решение владельца 29.09, #58) */
   --header-compact-weight: 600; /* Заголовок компактной шапки: Body полужирным (у Body один вес, #217) */
+  --outfit-pager-end: -3px; /* Низ стопки образов без таб-бара («Удиви меня»): нижнее превью заходит на 3 в поле экрана (1371:42686) */
+  --outfit-pager-end-tab-bar: 5px; /* Низ стопки образов над таб-баром (главная): 29 до таб-бара = поле 24 + 5 (1371:36589) */
 }
 
 .y-h1 { font: var(--font-weight-h1) 32px/36px var(--font-display); letter-spacing: -1px; margin: 0; }
