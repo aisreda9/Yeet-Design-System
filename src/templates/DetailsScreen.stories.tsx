@@ -70,6 +70,7 @@ const panelTop = (screen: HTMLElement) => Math.round(screen.querySelector('.y-sh
 /** Жест шторки: дальше половины хода — сворачивается, меньше — возвращается. */
 export const Gesture: Story = {
   name: 'Шторка: жест',
+  tags: ['no-visual'], // play-тест поведения: конечный кадр зависит от тайминга доводки; вид проверяют «Слоты» и экраны деталей
   args: Slots.args,
   parameters: { docs: { description: { story: 'Play-тест: панель протянута на 60 % хода и отпущена — свернулась (панель на y138, фото — миниатюра 48); на 30 % — вернулась. Без броска: палец стоит перед отпусканием.' } } },
   play: async ({ canvasElement, step }) => {
