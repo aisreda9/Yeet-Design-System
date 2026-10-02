@@ -1,5 +1,5 @@
 import { useSlidingPill } from '../utils/useSlidingPill';
-import type { ComponentPropsWithRef, KeyboardEvent, ReactNode, Ref } from 'react';
+import { useEffect, useRef, type ComponentPropsWithRef, type KeyboardEvent, type ReactNode, type Ref } from 'react';
 import { Button, ColorDot, Icon, IconButton, type ControlSize } from '../atoms';
 import type { IconName } from '../icons/icons';
 import type { ItemColor } from '../tokens/tokens';
@@ -145,6 +145,14 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
   const toggleable = managed || !!onToggle;
   // Лента без единого интерактивного элемента всё равно скроллится: фокус на самой ленте (axe scrollable-region-focusable)
   const hasFocusable = toggleable || !!onAdd || chips.some((c) => c.dropdown || c.removable || c.editing);
+  // Чипс-поле появилось после «+» — фокус в него (Figma `1174:15483`: поле в фокусе). Поле, которое было с первого рендера, фокус не забирает
+  const editInput = useRef<HTMLInputElement>(null);
+  const editing = chips.some((c) => c.editing);
+  const hadEditing = useRef(editing);
+  useEffect(() => {
+    if (editing && !hadEditing.current) editInput.current?.focus();
+    hadEditing.current = editing;
+  }, [editing]);
   return (
     <div tabIndex={!wrap && !hasFocusable ? 0 : undefined} className={cx('y-chip-group', wrap ? 'y-chip-group--wrap' : 'y-chip-group--scroll', center && 'y-chip-group--center', className)} {...rest}>
       {onAdd && <IconButton icon="plus" label="Добавить" variant="primary" size="S" onClick={onAdd} />}
@@ -154,6 +162,7 @@ export function ChipGroup({ chips, value: valueProp, defaultValue, onValueChange
           return (
             <label key="editing" className={cx('y-button y-button--S y-style--tertiary y-chip--editing', (c.dropdown || c.removable) && 'y-chip--trailing', c.removable && 'y-chip--removable')}>
               <input
+                ref={editInput}
                 className="y-chip__input"
                 value={c.label}
                 placeholder={c.placeholder}

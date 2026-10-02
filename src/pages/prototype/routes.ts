@@ -106,10 +106,12 @@ const steps = (self: 'Гардероб' | 'Коллаж' | 'Описание'): 
 
 /**
  * Главная: штамп «Надеть» и свайп образов — нативные (OutfitPager), тап по коллажу открывает образ.
+ * Тап по превью соседнего образа (`.is-prev` / `.is-next`) — тоже детали образа, как в Figma (PROTOTYPE-FIGMA §Sunny, `1173:16192`),
+ * а не листание к нему, как в истории компонента (#234). Превью `inert`, клик приходит в ленту — Prototype переадресует его превью под пальцем.
  * «на каждый день ⌄» (`.y-header__accent`) — нативная кнопка: открывает шторку «Повод» самого экрана
  * (Figma OPEN_OVERLAY → Outfits / Everyday / Sheet / Occasion Filter `1173:14091`, история `TodayOccasions`); выбор повода меняет акцент (#216, строка 34).
  */
-const today: Route[] = [{ sel: '.y-outfit-thumb', go: ok('OutfitDetails') }, openOutfit];
+const today: Route[] = [{ sel: '.y-outfit-pager__look:is(.is-prev, .is-next)', go: ok('OutfitDetails') }, openOutfit];
 
 /** Слова из подсказок поиска: длинная фраза «не находится», остальные ведут к результатам. Чипсы на фокусе — не кнопки. */
 const noResults = /^Белое платье/;
@@ -165,6 +167,19 @@ const removeItem = (text: string, empty?: ScreenId): Go => closeThen(async (n, f
     },
   });
 });
+
+/**
+ * Штамп «Надеть» в деталях образа — нативный: нажатие переводит его в «выполнено» (Done Size=S, Variant 02 `1174:19564`), тост
+ * с «Отменить» возвращает штамп. Повторное нажатие по выполненному штампу — отмена самим штампом, без тоста (#234).
+ * Маршрут срабатывает до обработчика штампа: `aria-pressed` — состояние до нажатия.
+ */
+const wearStamp: Route = {
+  sel: '.y-stamp', native: true,
+  go: (n, el) => {
+    if (el.getAttribute('aria-pressed') === 'true') return;
+    n.toast('Образ отмечен как надетый', { undo: () => { if (el.isConnected && el.getAttribute('aria-pressed') === 'true') el.click(); } });
+  },
+};
 
 /* ─── Создание образа: диалоги и фильтр вещей (#54) ──────────────────── */
 const CREATION: ScreenId[] = ['OutfitItems', 'Canvas', 'CanvasDefault', 'CanvasHint', 'OutfitCriteria'];
@@ -233,7 +248,8 @@ export const routes: Partial<Record<ScreenId, Route[]>> = {
   ],
   WardrobeItemDetails: [btn('Ещё', (n) => n.overlay('ItemActions')), openOutfit],
   // штамп в истории без состояния: «Отменить» возвращать нечего
-  OutfitDetails: [btn('Ещё', (n) => n.overlay('OutfitPermanentDelete')), openItem, { sel: '.y-stamp', go: (n) => n.toast('Образ отмечен как надетый', { undo: () => undefined }) }],
+  OutfitDetails: [btn('Ещё', (n) => n.overlay('OutfitPermanentDelete')), openItem, wearStamp],
+  OutfitDetailsWorn: [btn('Ещё', (n) => n.overlay('OutfitPermanentDelete')), openItem, wearStamp],
   OutfitActions: [
     { sel: '.y-list-item', text: 'Редактировать', go: closeThen((n) => n.push('OutfitItems')) },
     // образ в истории без состояния: «Отменить» открывает его снова

@@ -53,10 +53,14 @@ const pause = (ms: number) => new Promise((f) => setTimeout(f, ms));
  * `share` — доля полного хода панели, > 0 — вверх.
  */
 async function pull(screen: HTMLElement, share: number) {
+  await pullBy(screen, share * parseFloat(screen.style.getPropertyValue('--details-travel')));
+}
+
+/** То же на `px` пикселей, > 0 — вверх. */
+async function pullBy(screen: HTMLElement, px: number) {
   const panel = screen.querySelector<HTMLElement>('.y-sheet--panel')!;
-  const travel = parseFloat(screen.style.getPropertyValue('--details-travel'));
   const r = panel.getBoundingClientRect();
-  const x = r.left + r.width / 2, y = r.top + 24, dy = -share * travel;
+  const x = r.left + r.width / 2, y = r.top + 24, dy = -px;
   const at = (type: string, yy: number) => panel.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 11, pointerType: 'touch', isPrimary: true, clientX: x, clientY: yy }));
   at('pointerdown', y);
   for (let i = 1; i <= 12; i++) { at('pointermove', y + (dy * i) / 12); await pause(16); }
@@ -72,7 +76,7 @@ export const Gesture: Story = {
   name: 'Шторка: жест',
   tags: ['no-visual'], // play-тест поведения: конечный кадр зависит от тайминга доводки; вид проверяют «Слоты» и экраны деталей
   args: Slots.args,
-  parameters: { docs: { description: { story: 'Play-тест: панель протянута на 60 % хода и отпущена — свернулась (панель на y138, фото — миниатюра 48); на 30 % — вернулась. Без броска: палец стоит перед отпусканием.' } } },
+  parameters: { docs: { description: { story: 'Play-тест: панель протянута на 60 % хода и отпущена — свернулась (панель на y138, фото — миниатюра 48); на 30 % — вернулась. Рывок вверх на 450 (дальше хода — прокрутка контента) и вниз на 450 — развернулась. Без броска: палец стоит перед отпусканием.' } } },
   play: async ({ canvasElement, step }) => {
     const screen = canvasElement.querySelector<HTMLElement>('.y-details')!;
     const media = screen.querySelector<HTMLElement>('.y-details__media')!;
@@ -105,6 +109,18 @@ export const Gesture: Story = {
       await expect(screen).not.toHaveAttribute('data-collapsed');
       await expect(panelTop(screen)).toBe(rest);
       await expect(Math.round(media.getBoundingClientRect().width)).toBe(353);
+    });
+    // #234: рывок дальше полного хода прокручивает контент; жест вниз докручивает его к началу и тем же движением разворачивает панель
+    await step('Рывок вверх на 450 → вниз на 450 → развернулось', async () => {
+      const main = screen.querySelector<HTMLElement>('.y-screen__content')!;
+      await pullBy(screen, 450);
+      await waitFor(() => expect(p(screen)).toBe(1), { timeout: 2000 });
+      await expect(main.scrollTop).toBeGreaterThan(0);
+      await pullBy(screen, -450);
+      await waitFor(() => expect(p(screen)).toBe(0), { timeout: 2000 });
+      await expect(main.scrollTop).toBe(0);
+      await expect(screen).not.toHaveAttribute('data-collapsed');
+      await expect(panelTop(screen)).toBe(rest);
     });
   },
 };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { useState } from 'react';
 import { useArgs } from 'storybook/preview-api';
 import { ChipGroup, type Chip } from '.';
@@ -26,7 +26,7 @@ export const Playground: Story = {
   },
 };
 
-/** Свой повод: «+» добавляет чипс-поле с × (Editing · Trailing=Remove), Enter сохраняет его обычным чипсом, × отменяет ввод. */
+/** Свой повод: «+» добавляет чипс-поле с × (Editing · Trailing=Remove) и ставит в него фокус, Enter сохраняет его обычным чипсом, × отменяет ввод. */
 function EditingDemo() {
   const field: Chip = { label: '', editing: true, removable: true, placeholder: 'Свой повод' };
   const [chips, setChips] = useState<Chip[]>([{ label: 'Прогулка' }, { label: 'Ужин', selected: true }, field]);
@@ -43,11 +43,14 @@ export const Editing: Story = {
   render: () => <EditingDemo />,
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await step('× у чипса-поля отменяет ввод, «+» возвращает поле', async () => {
+    await step('Поле с первого рендера фокус не забирает', async () => {
+      await expect(canvas.getByRole('textbox', { name: 'Свой повод' })).not.toHaveFocus();
+    });
+    await step('× у чипса-поля отменяет ввод, «+» возвращает поле в фокусе (Figma 1174:15483)', async () => {
       await userEvent.click(canvas.getByRole('button', { name: 'Удалить' }));
       await expect(canvas.queryByRole('textbox')).toBeNull();
       await userEvent.click(canvas.getByRole('button', { name: 'Добавить' }));
-      await expect(canvas.getByRole('textbox', { name: 'Свой повод' })).toBeInTheDocument();
+      await waitFor(() => expect(canvas.getByRole('textbox', { name: 'Свой повод' })).toHaveFocus());
     });
     await step('Ввод и Enter сохраняют чипс', async () => {
       await userEvent.type(canvas.getByRole('textbox'), 'Театр{Enter}');

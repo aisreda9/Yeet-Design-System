@@ -22,7 +22,7 @@
 .y-proto__dim { position: absolute; inset: 0; z-index: 10; background: black; opacity: 0; pointer-events: none; }
 
 /* stylelint-disable-next-line declaration-property-value-allowed-list -- обвязка прототипа поверх затемнения */
-.y-proto__toast { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 30; display: flex; justify-content: center; pointer-events: none; }
+.y-proto__toast { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 30; display: flex; justify-content: center; pointer-events: none; transition: bottom var(--motion-appear); }
 .y-proto__toast > * { pointer-events: auto; }
 
 /* Общий навбар корневых вкладок (#220): один инстанс BottomNav над слоями, навбары экранов под ним скрыты.

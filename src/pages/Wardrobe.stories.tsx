@@ -110,11 +110,16 @@ export const Toast: Story = {
 
 const outfit: CollageItem[] = [{ kind: 'accessories', x: 32, y: 20, size: 64 }, { kind: 'top', x: 68, y: 34, size: 120, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 150, color: 'green' }, { kind: 'shoe', x: 72, y: 74, size: 80, color: 'brown' }];
 
-/** Детали образа (Figma `1371:41156 → 1371:41329`): в шапке при скролле — мини-коллаж, штамп «Надеть» закреплён поверх. */
-function OutfitDetailsScreen({ scrolled }: { scrolled?: boolean }) {
+/**
+ * Детали образа (Figma `1371:41156 → 1371:41329`): в шапке при скролле — мини-коллаж, штамп «Надеть» закреплён поверх.
+ * Нажали «Надеть» — штамп выполнен и сжат до S 56 с «отменить» (Variant 02: DS 0.2 `1174:19564`, штамп `1174:19568`; Raw `1371:41262`),
+ * повторное нажатие — отменить. `worn` — начальное состояние.
+ */
+function OutfitDetailsScreen({ scrolled, worn: initialWorn = false }: { scrolled?: boolean; worn?: boolean }) {
   const ref = useScrolled(scrolled ? SCROLLED : 0);
+  const [worn, setWorn] = useState(initialWorn);
   return (
-    <DetailsScreen media={<OutfitCollage items={outfit} />} title="На каждый день" stamp={<Stamp label="Надеть" />} scrollRef={ref}>
+    <DetailsScreen media={<OutfitCollage items={outfit} />} title="На каждый день" stamp={<Stamp label="Надеть" doneSize="S" done={worn} onClick={() => setWorn((w) => !w)} />} scrollRef={ref}>
       <p className="y-body y-text--secondary">Все сезоны</p>
       <StatRow><StatTile label="Надето раз" value={8} /><StatTile label="Д. простоя" value={1} /><StatTile label="Вещи" value={4} /></StatRow>
       <section className="y-section">
@@ -131,6 +136,8 @@ function OutfitDetailsScreen({ scrolled }: { scrolled?: boolean }) {
 
 export const OutfitDetails: Story = { name: 'Wardrobe / Outfit Details', render: () => <OutfitDetailsScreen /> };
 export const OutfitDetailsScrolled: Story = { name: 'Wardrobe / Outfit Details / Scrolled', render: () => <OutfitDetailsScreen scrolled /> };
+/** Образ надет: штамп State=Done, Done Size=S (DS 0.2 `1174:19564`; тег — кадр Raw `1371:41262`: coverage сверяет теги с кадрами Raw). */
+export const OutfitDetailsWorn: Story = { name: 'Wardrobe / Outfit Details / Variant 02', tags: ['figma:1371-41262'], render: () => <OutfitDetailsScreen worn /> };
 
 const bagLooks: CollageItem[][] = [
   [{ kind: 'bottom', x: 28, y: 56, size: 150, color: 'black' }, { kind: 'top', x: 64, y: 36, size: 120, color: 'brown' }, { kind: 'container', x: 76, y: 70, size: 64, color: 'black' }],
@@ -194,7 +201,7 @@ function WishlistItemScreen({ scrolled }: { scrolled?: boolean }) {
     >
       <p className="y-body y-text--secondary">10 000 ₽ · Sander · Чёрный<br />Аксессуары · Все сезоны</p>
       <Note>Мягкая сумка округлой формы с логотипом и кожаным ремешком</Note>
-      <section className="y-section y-item-looks">
+      <section className="y-section">
         <h3 className="y-h3">Образы с этой вещью</h3>
         <div className="y-stack-8">{bagLooks.map((items, i) => <OutfitCollage key={i} items={items} />)}</div>
       </section>
