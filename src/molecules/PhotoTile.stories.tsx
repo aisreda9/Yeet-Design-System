@@ -7,9 +7,9 @@ const meta = {
   component: PhotoTile,
   tags: ['autodocs'],
   args: { source: 'gallery' },
-  argTypes: { source: { control: 'inline-radio', options: ['gallery', 'camera'] }, label: { control: 'text' } },
+  argTypes: { source: { control: 'inline-radio', options: ['gallery', 'camera'] }, label: { control: 'text' }, illustration: { control: 'boolean' } },
   decorators: [unlessBare((Story) => <div style={{ width: 173, display: 'flex' }}><Story /></div>)],
-  parameters: { docs: { description: { component: 'Плитка источника фото: квадрат 173 во флоу, в ряду плитки делят ширину (flex: 1; в модальной шторке 321 — по ~157). Иллюстрация сверху (паддинг 28), подпись Body в две строки, gap 22; на 320 плитка растёт по подписи. Figma: `photo-tile` · Label.' } } },
+  parameters: { docs: { description: { component: 'Плитка источника фото: квадрат 173 во флоу, в ряду плитки делят ширину (flex: 1; в модальной шторке 321 — по ~157). Арт 63 сверху (паддинг 28) — пока иллюстрации перерисовываются, заглушка `ArtPlaceholder` (#220; `illustration` — вернуть 3D-рисунок), подпись Body в две строки, gap 22; на 320 плитка растёт по подписи. Figma: `photo-tile` · Label.' } } },
 } satisfies Meta<typeof PhotoTile>;
 export default meta;
 type Story = StoryObj<typeof meta>;

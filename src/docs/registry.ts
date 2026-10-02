@@ -122,4 +122,7 @@ export const registry: Entry[] = [
   { code: 'BarChart', figma: 'bar-chart / bar', figmaId: '1186:16573', figmaWhy: 'столбец внутри bar-chart 1018:5224; в коде — элемент BarChart (`.y-bar-chart__bar`), отдельного компонента и истории нет', level: 'Molecules', story: 'Molecules/BarChart', status: 'stable' },
   { code: 'Screen', figma: 'system / keyboard', figmaId: '951:3442', figmaWhy: 'системная клавиатура только для макетов: в приложении её рисует ОС, компонента в коде и истории нет', level: 'Templates', story: 'Templates/Screen', status: 'beta', statusWhy: 'только для макетов, в коде не рисуется' },
   { code: 'Stamp', figma: 'shapes / main-action', figmaId: '942:13600', figmaWhy: 'форма звезды главного действия; в коде — путь `stampStar` внутри Stamp, отдельного компонента и истории нет', level: 'Atoms', story: 'Atoms/Stamp', status: 'stable' },
+
+  // Временная заглушка иллюстраций (решение владельца, #220)
+  { code: 'ArtPlaceholder', figma: 'заглушка иллюстрации (приветствие, плитки фото, карточки стилиста)', figmaId: null, figmaWhy: 'временная замена иллюстраций, пока их перерисовывают (#220); в Figma не заводится', level: 'Atoms', story: 'Atoms/ArtPlaceholder', note: 'вернуть рисунки — SHOW_ILLUSTRATIONS в src/utils/illustrations.ts', status: 'beta', statusWhy: 'нет компонента в Figma' },
 ];

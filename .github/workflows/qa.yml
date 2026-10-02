@@ -56,6 +56,8 @@ jobs:
       - if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright-core install-deps chromium
       - run: npm run contrast
+      - name: Переменные Figma «Yeet DS 2.0» против токенов (npm run figma-sync)
+        run: npm run figma-sync
       - name: QA (тени, края, спеки Figma, доступность, скриншоты)
         run: npm run qa
       - name: Сверка экранов с флоу Figma (тексты, позиции, шрифты, цвета)

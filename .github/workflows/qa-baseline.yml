@@ -104,6 +104,10 @@ jobs:
         id: contrast
         continue-on-error: true
         run: npm run contrast
+      - name: Переменные Figma «Yeet DS 2.0» против токенов (npm run figma-sync)
+        id: figmasync
+        continue-on-error: true
+        run: npm run figma-sync
       - name: Пересъёмка эталонов (npm run qa -- --update-baseline в закреплённом образе)
         id: qa
         run: |
@@ -158,6 +162,7 @@ jobs:
           TOKENS: ${{ steps.tokens.outcome }}
           TYPECHECK: ${{ steps.typecheck.outcome }}
           CONTRAST: ${{ steps.contrast.outcome }}
+          FIGMASYNC: ${{ steps.figmasync.outcome }}
           QA_CODE: ${{ steps.qa.outputs.code }}
           FLOWDIFF: ${{ steps.flowdiff.outcome }}
           COVERAGE: ${{ steps.coverage.outcome }}
@@ -167,6 +172,7 @@ jobs:
           [ "$TOKENS" = success ] || red+=('токены')
           [ "$TYPECHECK" = success ] || red+=('typecheck')
           [ "$CONTRAST" = success ] || red+=('контраст')
+          [ "$FIGMASYNC" = success ] || red+=('figma-sync')
           [ "$QA_CODE" = 0 ] || red+=("npm run qa (код $QA_CODE)")
           [ "$FLOWDIFF" = success ] || red+=('flow-diff')
           [ "$COVERAGE" = success ] || red+=('покрытие')
@@ -228,7 +234,7 @@ jobs:
               -f name="$1" -f head_sha="$sha" -f status=completed -f conclusion=success \
               -f details_url="$run_url" -f "output[title]=$2" -f "output[summary]=$3" --jq .html_url
           }
-          post 'qa' 'QA пройден в прогоне QA baseline' "$(printf '%s\n\n%s\n\n%s\n\nПрогон QA baseline: %s\n\nЭталоны пересняты в закреплённом образе; токены, typecheck, контраст, flow-diff --strict, покрытие — зелёные.' \
+          post 'qa' 'QA пройден в прогоне QA baseline' "$(printf '%s\n\n%s\n\n%s\n\nПрогон QA baseline: %s\n\nЭталоны пересняты в закреплённом образе; токены, typecheck, контраст, figma-sync, flow-diff --strict, покрытие — зелёные.' \
             "Проверено на \`$sha\`." "$qa_stats" "$qa_errors" "$run_url")"
           post 'Play-тесты историй' 'Play-тесты пройдены в прогоне QA baseline' "$(printf '%s\n\n%s\n\nПрогон QA baseline: %s' \
             "Проверено на \`$sha\`." "${play_line:-npm run test-storybook: успешно}" "$run_url")"

@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type ReactNode, useRef, useState } from 'react';
-import { Stamp } from '../atoms';
+import { ArtPlaceholder, Stamp } from '../atoms';
 import { Carousel, ChipGroup, EmptyState, InputBar, SegmentControl } from '../molecules';
 import { ChatBubble, Dialog, Header, ItemArt, ItemCard, OutfitCollage, OutfitPager, Overlay, type PagerLook, Sheet, StylistDock, StylistPromptCard, TripCard } from '../organisms';
 import { useScrollToActive } from '../motion';
 import { Grid, Screen } from '../templates';
+import { SHOW_ILLUSTRATIONS } from '../utils/illustrations';
 import bag from '../docs/cutouts/bag.svg';
 import cap from '../docs/cutouts/cap.svg';
 import coat from '../docs/cutouts/coat.svg';
@@ -56,7 +57,8 @@ export const StylistHome: Story = {
         <StylistPromptCard wide title="Конструктор" description="Образы по разным критериям" />
         <StylistPromptCard title="Удиви меня" description="Рулетка образов, собранных из твоих вещей" />
         <StylistPromptCard title="С чем носить" description={'Максимум\nиз одной вещи'} />
-        <StylistPromptCard wide title="Для поездок" description={'Стиль и лёгкость\nв любой поездке'} art={<ItemArt kind="container" size={150} color="grey" />} />
+        {/* чемодан — иллюстрация: пока перерисовывается, на её месте заглушка того же размера (#220) */}
+        <StylistPromptCard wide title="Для поездок" description={'Стиль и лёгкость\nв любой поездке'} art={SHOW_ILLUSTRATIONS ? <ItemArt kind="container" size={150} color="grey" /> : <ArtPlaceholder size={150} />} />
         <StylistPromptCard soon title="Оживи гардероб" description="Новая жизнь старым вещам" />
         <StylistPromptCard soon title="Докупить" description="Подберём интересное из сторов" />
         <StylistPromptCard wide soon title="Оцени образ" description={'Разбор образов\nи рекомендации'} />
