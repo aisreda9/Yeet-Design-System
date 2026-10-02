@@ -405,9 +405,10 @@
    Когда превью мало (низкий экран), карточка опускается: верх коробки не выше 20 от верха стопки — с наклоном она не заходит на шапку */
 .y-outfit-pager__weather { --weather-lift: 0px; left: var(--space-20); top: max(calc(-43px - var(--weather-lift)), calc(var(--space-20) - var(--pager-top))); } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma); 0px — длина для calc() */
 .y-outfit-pager__weather:has(.y-weather__alert) { --weather-lift: var(--space-16); }
+.y-outfit-pager[data-compact] .y-outfit-pager__weather { display: none; } /* низкий экран: коллаж меньше 90 % — погоду не показываем (решение владельца, 02.10) */
 .y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
-.y-outfit-pager__stamp { right: var(--space-20); top: calc(var(--pager-size) - 73px); } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа, на любом размере */
-.y-outfit-pager__skip { left: var(--space-20); top: calc(var(--pager-size) - 32px); } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma): 32 выше низа */
+.y-outfit-pager__stamp { --slot-k: min(var(--pager-k), 1); right: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 73px * var(--slot-k)); scale: var(--slot-k); transform-origin: right top; } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа; на узком коллаже уменьшается вместе с ним (решение владельца, 02.10) */
+.y-outfit-pager__skip { --slot-k: min(var(--pager-k), 1); left: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 32px * var(--slot-k)); scale: var(--slot-k); transform-origin: left top; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma); на узком коллаже уменьшается вместе с ним */
 /* звезда поворачивается на 180° с каждой сменой образа (Animations «scale»), нажатие и done — своими переходами */
 .y-outfit-pager__stamp .y-stamp__shape { rotate: var(--turn, 0deg); transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select), rotate var(--motion-swap); }
 

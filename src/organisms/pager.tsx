@@ -65,6 +65,9 @@ function fitStack(width: number, height: number, gap: number, end: number): Fit 
  * Размер коллажа и превью от контейнера. Лента и стопка вне экрана: коллаж = ширина, превью = `preview`.
  * Стопка, которая растягивается в колонке (`flex-grow` > 0 — так её ставит `Screen`), заполняет высоту: `fitStack`.
  */
+/** Коллаж уже 90 % макетного (≈ 318 при 353): погода не помещается над коллажем — скрываем (решение владельца, 02.10). */
+const COMPACT = 0.9;
+
 function useFit(ref: { current: HTMLElement | null }, axis: 'x' | 'y', preview: number): Fit {
   const [fit, setFit] = useState<Fit>({ size: BASE, preview });
   useLayoutEffect(() => {
@@ -142,6 +145,7 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
       className={cx('y-outfit-pager', `y-outfit-pager--${axis}`, className)}
       {...rest}
       data-dragging={dragging || undefined}
+      data-compact={fit.size / BASE < COMPACT || undefined}
       style={{ ...styleProp, ...style }}
       role="group"
       aria-roledescription="карусель"
