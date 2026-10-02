@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "qa": "node scripts/qa/run.mjs",
     "contrast": "node scripts/check-contrast.mjs",
+    "figma-sync": "node scripts/tokens/figma-sync.mjs",
     "flow-diff": "node scripts/qa/flow-diff.mjs",
     "test-storybook": "node scripts/build-assets.mjs && vitest run --project=storybook",
     "assets": "node scripts/build-assets.mjs",
