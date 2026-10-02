@@ -308,7 +308,7 @@
     },
     {
       "figma": "header · Large без кнопки (флоу: заголовок y70, шапка 106)",
-      "story": "organisms-header--playground",
+      "story": "organisms-header--large",
       "selector": ".y-header",
       "expect": {
         "height": 106

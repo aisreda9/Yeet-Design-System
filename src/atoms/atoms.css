@@ -172,3 +172,13 @@
 .y-link:visited { color: inherit; } /* посещённая ссылка не перекрашивается: цвет задаёт текст, а не история браузера */
 .y-link:hover { text-decoration-thickness: 2px; }
 /* stylelint-enable unit-disallowed-list */
+
+/* ArtPlaceholder — временная заглушка иллюстрации (#220): фон bg-subtle, иконка-картинка серым по центру.
+   Скругление по правилу концентричности задаёт контейнер; отдельно стоящая заглушка — как карточка.
+   TODO(tokens): компонентного токена радиуса заглушки нет — локальная переменная --art-placeholder-radius */
+.y-art-placeholder {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box;
+  background: var(--color-bg-subtle); color: var(--color-text-secondary);
+  border-radius: var(--art-placeholder-radius, var(--card-radius));
+}
+.y-art-placeholder--stretch { display: flex; flex: 1 1 auto; align-self: stretch; }
