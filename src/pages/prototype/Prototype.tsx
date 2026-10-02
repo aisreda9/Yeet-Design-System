@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { Snackbar } from '../../molecules';
+import { BottomNav, type Tab } from '../../organisms';
 import { cx } from '../../utils/cx';
 import { gesture, motionMs, velocityTracker } from '../../utils/gesture';
 import { auto, globalRoutes, HOME, label, LOOSE_DIALOGS, routes, START, type Go, type Nav, type Route } from './routes';
-import { screens, type ScreenId } from './screens';
+import { screens, TAB_ROOTS, type ScreenId } from './screens';
 import './prototype.css';
 
 /** Ссылки в `routes.ts` на экраны, которых нет в историях (переименовали или удалили) — в консоль, а не молчаливым тапом в пустоту. */
@@ -23,10 +24,21 @@ if (import.meta.env?.DEV) {
  * Стек слоёв: экран поверх экрана (push / pop), шторки и диалоги поверх экрана, корни вкладок и сегменты — проявлением.
  * Компоненты экранов не меняются: элементы находятся по селектору и подписи (`routes.ts`), нативные жесты компонентов
  * (шторка профиля, холст, поля) работают как в историях.
+ *
+ * Общий таб-бар (#220): у каждого экрана свой `BottomNav`, и при смене вкладки он менялся бы целиком вместе с экраном.
+ * Поэтому над слоями лежит один общий `BottomNav` (`.y-proto__shell`) с состоянием верхнего экрана (вкладка, FAB, фото профиля),
+ * а навбары экранов под ним скрыты (`data-shell` у рамки). Смена вкладки проявляет только контент, а общий навбар остаётся тем же
+ * инстансом: подложка переезжает, таб-бар сжимается, «+» выезжает (`--motion-nav`). Нажатия по общему навбару уходят в навбар
+ * верхнего экрана — маршруты и play-тесты не меняются. Push, «Назад» и свайп назад двигают экраны целиком: на время перехода
+ * общий навбар прячется, и навбар экрана едет вместе с ним.
  */
 
 type Layer = { key: number; id: ScreenId; overlay: boolean };
 type ToastState = { key: number; text: string; undo?: (nav: Nav) => void | Promise<void>; offset: number };
+type Shell = { active: Tab; fab: boolean; avatarSrc?: string };
+const TABS = Object.keys(TAB_ROOTS) as Tab[];
+/** Навбар экрана в слое (у шторки и диалога он скрыт — берётся экран под ними). */
+const NAV = '.y-screen > .y-bottom-nav';
 
 const INTERACTIVE = 'button, a[href], input, textarea, select, [role=slider], [role=switch], [role=checkbox]';
 /** Контролы внутри карточек и экранов, у которых своё действие: тап по ним не ведёт по флоу. */
@@ -50,6 +62,9 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const suppress = useRef(false);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [hotspots, setHotspots] = useState(false);
+  const [shell, setShell] = useState<Shell | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const shellState = useRef<Shell | null>(null);
   /** Вещь, по которой нажали последней: экран и номер карточки. Её убирает `take()`. */
   const picked = useRef<{ screen: ScreenId; index: number } | null>(null);
   /** Убранные из списков вещи: экран → номера карточек. Новый слой экрана начинает с полного списка, кроме возврата по «Отменить». */
@@ -80,10 +95,52 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   };
   const screenCount = () => layersRef.current.filter((l) => !l.overlay).length;
 
+  /* ─── Общий навбар ─── */
+  const screenTop = () => [...layersRef.current].reverse().find((l) => !l.overlay);
+  const navOf = (l?: Layer) => el(l)?.querySelector<HTMLElement>(NAV) ?? undefined;
+  /** Края экрана под навбаром: затухание над ним и цвет панели под краем (Screen → data-edge-bottom, data-panel-bottom). */
+  const mirrorEdges = () => {
+    const scr = navOf(screenTop())?.parentElement, host = shellRef.current;
+    if (!scr || !host) return;
+    for (const a of ['data-edge-bottom', 'data-panel-bottom']) host.toggleAttribute(a, scr.hasAttribute(a));
+  };
+  const shellOff = () => frame.current?.removeAttribute('data-shell');
+  /**
+   * Общий навбар принимает состояние навбара верхнего экрана. `animate` — смена вкладки на месте (проявление):
+   * подложка, таб-бар и «+» едут на своих переходах. Иначе — встаёт сразу, без анимации (после push, «Назад», с нуля).
+   */
+  const shellSync = (animate: boolean) => {
+    const n = navOf(screenTop());
+    if (!n) return shellOff();
+    const i = [...n.querySelectorAll('.y-tab-bar__tab')].findIndex((b) => b.getAttribute('aria-current') === 'page');
+    const next: Shell = { active: TABS[Math.max(0, i)], fab: !!n.querySelector('.y-bottom-nav__fab.is-open'), avatarSrc: n.querySelector('.y-tab-bar__avatar--photo img')?.getAttribute('src') ?? undefined };
+    const on = !!frame.current?.hasAttribute('data-shell'), cur = shellState.current;
+    shellState.current = next;
+    // то же состояние — ничего не трогаем: переход вкладки (пружина 744 мс) доигрывает после проявления экрана (240 мс)
+    if (on && cur && cur.active === next.active && cur.fab === next.fab && cur.avatarSrc === next.avatarSrc) return mirrorEdges();
+    const jump = !animate || !on;
+    if (jump) shellRef.current?.setAttribute('data-jump', '');
+    flushSync(() => setShell(next));
+    mirrorEdges();
+    frame.current?.setAttribute('data-shell', '');
+    if (jump) requestAnimationFrame(() => requestAnimationFrame(() => shellRef.current?.removeAttribute('data-jump')));
+  };
+  /** Элемент общего навбара → тот же элемент в навбаре верхнего экрана (по пути от корня навбара). */
+  const toScreenNav = (t: Element): Element => {
+    const host = shellRef.current?.querySelector('.y-bottom-nav'), twin = navOf(screenTop());
+    if (!host || !twin || !host.contains(t)) return t;
+    const path: number[] = [];
+    for (let e: Element = t; e !== host; e = e.parentElement!) path.unshift([...e.parentElement!.children].indexOf(e));
+    let m: Element | undefined = twin;
+    for (const i of path) m = m?.children[i];
+    return m ?? t;
+  };
+
   const nav = useMemo<Nav>(() => {
     const api: Nav = {
       async push(id) {
         const prev = top();
+        shellOff();
         commit([...layersRef.current, make(id)]);
         const cur = top(), ce = el(cur), pe = el(prev), pd = dimOf(pe), ms = motionMs('--motion-page'), ease = cssVar('--ease-out', 'ease-out');
         show(pe, true);
@@ -95,6 +152,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         ]);
         anims(pe).concat(anims(pd)).forEach((a) => a.cancel());
         show(pe, false);
+        shellSync(false);
         focusTop();
       },
       async back() {
@@ -103,6 +161,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         if (screenCount() < 2) return cur.id === HOME ? undefined : api.root(HOME);
         const prev = layersRef.current[layersRef.current.length - 2];
         const ce = el(cur), pe = el(prev), pd = dimOf(pe), ms = motionMs('--motion-page'), ease = cssVar('--ease-out', 'ease-out');
+        shellOff();
         show(pe, true);
         const shadow = '-12px 0 32px rgb(0 0 0 / 0.18)';
         await Promise.all([
@@ -112,6 +171,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         ]);
         commit(layersRef.current.filter((l) => l.key !== cur.key));
         show(pe, false);
+        shellSync(false);
         focusTop();
       },
       async swap(id) {
@@ -119,18 +179,24 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         commit([...layersRef.current, layer]);
         const oe = el(old);
         show(oe, true);
+        // у обоих экранов навбар — общий остаётся и едет в новое состояние, проявляется только контент
+        if (frame.current?.hasAttribute('data-shell') && navOf(layer)) shellSync(true); else shellOff();
         await play(el(layer), [{ opacity: 0 }, { opacity: 1 }], motionMs('--motion-appear'), cssVar('--ease-standard', 'ease'));
         show(oe, false);
         commit(layersRef.current.filter((l) => l.key !== old.key));
+        shellSync(false);
         focusTop();
       },
       async root(id) {
         const olds = layersRef.current, layer = make(id);
         commit([...olds, layer]);
         olds.forEach((o) => show(el(o), true));
+        // корневые вкладки: общий навбар остаётся тем же инстансом — подложка переезжает, «+» выезжает, таб-бар сжимается
+        if (frame.current?.hasAttribute('data-shell') && navOf(layer) && !olds.at(-1)?.overlay) shellSync(true); else shellOff();
         await play(el(layer), [{ opacity: 0 }, { opacity: 1 }], motionMs('--motion-appear'), cssVar('--ease-standard', 'ease'));
         olds.forEach((o) => show(el(o), false));
         commit([layer]);
+        shellSync(false);
         focusTop();
       },
       async leave(ids) {
@@ -219,7 +285,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const loose = (l: Layer) => l.overlay && (LOOSE_DIALOGS.has(l.id) || !el(l)?.querySelector('[role=alertdialog]'));
 
   /** Маршрут для элемента под пальцем: поля и контролы с собственным действием остаются нативными. */
-  const resolve = (target: Element, kind: 'tap' | 'long') => {
+  const resolve = (from: Element, kind: 'tap' | 'long') => {
+    const target = toScreenNav(from);
     const layerEl = target.closest<HTMLElement>('[data-proto-layer]');
     const layer = layersRef.current.find((l) => String(l.key) === layerEl?.dataset.protoLayer);
     if (!layerEl || !layer) return null;
@@ -304,6 +371,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         if (Math.hypot(dx, dy) < gesture.slop) return;
         if (Math.abs(dy) > Math.abs(dx) || dx < 0) { edge.current = null; return; }
         g.active = true;
+        shellOff();
         frame.current!.setPointerCapture(e.pointerId);
         show(el(g.prev), true);
         cancelPress();
@@ -363,6 +431,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         if (go) commit(layersRef.current.filter((l) => l.key !== g.cur.key));
         [ce, pe, pd].forEach((n) => anims(n).forEach((a) => a.cancel()));
         show(pe, false);
+        shellSync(false);
         busy.current = false;
         focusTop();
       });
@@ -390,6 +459,19 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     cancelPress();
     void run(hit.route.go, hit.target);
   };
+
+  /* Общий навбар: с первого экрана; затухание над ним следит за скроллом верхнего экрана */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => queueMicrotask(() => shellSync(false)), []); // после коммита: flushSync внутри эффекта React не выполнит
+  useEffect(() => {
+    const scr = navOf(screenTop())?.parentElement;
+    if (!scr) return;
+    mirrorEdges();
+    const mo = new MutationObserver(mirrorEdges);
+    mo.observe(scr, { attributes: true, attributeFilter: ['data-edge-bottom', 'data-panel-bottom'] });
+    return () => mo.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layers]);
 
   /* Убранные вещи остаются скрытыми, пока слой их экрана в стеке */
   useLayoutEffect(() => hideRemoved(), [layers]);
@@ -428,6 +510,13 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
               }
             });
           }
+        }
+        // общий навбар подсвечивается как навбар верхнего экрана
+        const below = [...layersRef.current].reverse().find((l) => !l.overlay);
+        const twin = below && els.current.get(below.key)?.querySelector(NAV), host = shellRef.current?.querySelector('.y-bottom-nav');
+        if (twin && host) {
+          const a = [...twin.querySelectorAll('*')], b = [...host.querySelectorAll('*')];
+          b.forEach((n, i) => { const v = a[i]?.getAttribute('data-proto-link'); if (v != null) n.setAttribute('data-proto-link', v); else n.removeAttribute('data-proto-link'); });
         }
       });
     };
@@ -480,6 +569,11 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
             </div>
           );
         })}
+        {shell && (
+          <div ref={shellRef} className="y-proto__shell" inert={topLayer.overlay || undefined}>
+            <BottomNav active={shell.active} fab={shell.fab} avatarSrc={shell.avatarSrc} />
+          </div>
+        )}
         {toast && (
           <div key={toast.key} className="y-proto__toast" style={{ bottom: toast.offset }}>
             <Snackbar autoHide onClose={() => setToast((t) => (t?.key === toast.key ? null : t))} onUndo={toast.undo ? () => void run((n) => toast.undo!(n), frame.current!) : undefined}>{toast.text}</Snackbar>
