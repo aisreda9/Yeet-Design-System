@@ -25,6 +25,19 @@
 .y-proto__toast { position: absolute; left: var(--screen-gutter); right: var(--screen-gutter); z-index: 30; display: flex; justify-content: center; pointer-events: none; }
 .y-proto__toast > * { pointer-events: auto; }
 
+/* Общий навбар корневых вкладок (#220): один инстанс BottomNav над слоями, навбары экранов под ним скрыты.
+   Без своего z-index: таб-бар (--layer-bar) выше контента экрана, но ниже шторок и диалогов (--layer-overlay).
+   Края экрана под навбаром — как в Screen: над панелью — её цвет, затухание — пока под навбаром есть контент */
+.y-proto__shell[data-panel-bottom] > .y-bottom-nav { --screen-edge-bg: var(--color-bg-elevated); }
+.y-proto__shell { position: absolute; left: 0; right: 0; bottom: 0; }
+.y-proto__frame:not([data-shell]) .y-proto__shell,
+.y-proto__frame[data-shell] .y-proto__layer .y-screen > .y-bottom-nav { visibility: hidden; }
+.y-proto__shell .y-scroll-edge { transition: opacity var(--motion-fade); }
+.y-proto__shell:not([data-edge-bottom]) .y-scroll-edge { opacity: 0; }
+/* встаёт в состояние экрана сразу — после push, «Назад» и с нуля; анимируется только смена вкладки на месте */
+.y-proto__shell[data-jump] *,
+.y-proto__shell[data-jump] *::after { transition: none !important; } /* stylelint-disable-line declaration-no-important -- перебивает переходы компонентов на один кадр синхронизации */
+
 /* Переходы: курсор и подсветка по запросу */
 .y-proto [data-proto-link] { cursor: pointer; }
 .y-proto__frame[data-hotspots] [data-proto-link] { outline: 2px dashed var(--color-accent); outline-offset: -2px; background-image: linear-gradient(color-mix(in srgb, var(--color-accent) 12%, transparent), color-mix(in srgb, var(--color-accent) 12%, transparent)); }

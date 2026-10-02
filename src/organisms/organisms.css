@@ -59,21 +59,29 @@
 /* ─── Нижняя навигация ─── */
 .y-bottom-nav, .y-bottom-bar { position: relative; z-index: var(--layer-bar); background: var(--screen-edge-bg, var(--color-bg-canvas)); display: flex; align-items: center; gap: 7px; padding: 0 var(--screen-gutter) var(--space-20); } /* stylelint-disable-line unit-disallowed-list -- зазор 7 между таб-баром и «+» из Figma */
 .y-bottom-nav { container-type: inline-size; }
-/* FAB: таб-бар сжимается, «+» выезжает справа (--motion-nav) */
+/* FAB (#220, видео владельца): слот всегда 56; закрыт — прячется за таб-бар отрицательным отступом (56 + зазор 7), и таб-бар
+   занимает всю ширину. Отступ — на пружине quick (--motion-nav) в обе стороны, поэтому таб-бар перелетает и при сжатии, и при
+   расширении (≈ 7 pt). Кнопка выезжает справа целиком из-за края экрана (translateX 56 + поле 20 → 0) на той же пружине,
+   без масштаба; проявляется за fade, гаснет за exit (уход быстрее появления) */
 .y-bottom-nav__fab {
-  flex: none; width: 0; margin-left: -7px; display: grid; justify-items: end; opacity: 0; transform: scale(0.4); /* stylelint-disable-line unit-disallowed-list -- FAB прячется за зазор 7 */
-  transition: width var(--motion-nav), margin var(--motion-nav), opacity var(--motion-fade), transform var(--motion-nav);
+  --fab-hidden-shift: calc(100% + var(--screen-gutter));
+  flex: none; width: var(--size-control-xl); margin-left: calc(-1 * (var(--size-control-xl) + 7px)); display: grid; /* stylelint-disable-line unit-disallowed-list -- зазор 7 между таб-баром и «+» из Figma */
+  opacity: 0; transform: translateX(var(--fab-hidden-shift));
+  transition: margin var(--motion-nav), transform var(--motion-nav), opacity var(--motion-fade);
 }
-.y-bottom-nav__fab.is-open { width: var(--size-control-xl); margin-left: 0; opacity: 1; transform: none; }
-/* Уход FAB быстрее появления: кнопка гаснет и сжимается за exit, таб-бар расширяется на той же пружине quick */
-.y-bottom-nav__fab:not(.is-open) { visibility: hidden; transition: width var(--motion-nav), margin var(--motion-nav), opacity var(--motion-exit), transform var(--motion-exit), visibility 0s var(--motion-fast); }
+.y-bottom-nav__fab.is-open { margin-left: 0; opacity: 1; transform: none; }
+/* Уход: кнопка уезжает вправо на той же пружине и гаснет за exit; невидимая — не ловит нажатия */
+.y-bottom-nav__fab:not(.is-open) { visibility: hidden; transition: margin var(--motion-nav), transform var(--motion-nav), opacity var(--motion-exit), visibility 0s var(--motion-fast); }
 
-/* Tab bar: пилюля выбранной вкладки переезжает между вкладками */
+/* Tab bar: пилюля выбранной вкладки переезжает между вкладками.
+   Положение и ширина пилюли — от индекса вкладки в CSS (`--tab-index`), а не замером: ровно по ячейке без округления до пикселя
+   и без отставания, когда таб-бар сжимается под FAB (#220). Отступ 4 со всех сторон, радиус 32 → капсула 48, концентрична таб-бару 56 */
 .y-tab-bar {
-  position: relative; flex: 1; display: flex; gap: 3px; padding: var(--space-4); height: var(--size-control-xl); /* stylelint-disable-line unit-disallowed-list -- зазор вкладок 3 из Figma */
+  --tab-bar-gap: 3px; --tab-count: 5; /* stylelint-disable-line unit-disallowed-list -- зазор вкладок 3 из Figma */
+  position: relative; flex: 1; display: flex; gap: var(--tab-bar-gap); padding: var(--space-4); height: var(--size-control-xl);
   background: var(--tab-bar-bg); border-radius: var(--radius-bar); box-shadow: var(--shadow-floating);
 }
-@container (max-width: 300px) { .y-tab-bar { gap: 0; } } /* 320 с «+»: каждая вкладка ≥ 40 */
+@container (max-width: 300px) { .y-tab-bar { --tab-bar-gap: 0px; } } /* 320 с «+»: каждая вкладка ≥ 40 */ /* stylelint-disable-line unit-disallowed-list, length-zero-no-unit -- нулевой зазор в calc() пилюли */
 .y-tab-bar__tab {
   position: relative; z-index: var(--layer-raised); flex: 1; display: grid; place-items: center; border: 0; border-radius: var(--radius-xl); background: transparent;
   color: var(--color-text-secondary); cursor: pointer; transition: color var(--motion-select); -webkit-tap-highlight-color: transparent;
@@ -81,9 +89,17 @@
 /* Нажатие вкладки: сжимается иконка, а не ячейка — пилюля под ней остаётся ровной */
 .y-tab-bar__tab > * { transition: transform var(--motion-press); }
 .y-tab-bar__tab[aria-current='page'] { color: var(--color-text-primary); } /* флоу: неактивные иконки серые */
-.y-tab-bar__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
+.y-tab-bar__pill {
+  position: absolute; top: var(--space-4); bottom: var(--space-4); left: var(--space-4);
+  width: calc((100% - 2 * var(--space-4) - (var(--tab-count) - 1) * var(--tab-bar-gap)) / var(--tab-count));
+  transform: translateX(calc(var(--tab-index, 0) * (100% + var(--tab-bar-gap))));
+  border-radius: var(--radius-xl); background: var(--color-bg-subtle); transition: transform var(--motion-nav); pointer-events: none;
+}
 /* флоу: кружок 20 с обводкой 1.3 и буквой Roboto Slab 14 серым; у активной вкладки — основным цветом */
 .y-tab-bar__avatar { width: 20px; height: 20px; border: var(--border-width-icon) solid currentColor; border-radius: 50%; display: grid; place-items: center; font: 500 14px/20px var(--font-display); } /* Figma: стиль Initial, Roboto Slab 500 */ /* stylelint-disable-line unit-disallowed-list -- аватар 20 и буква Roboto Slab 14 в таб-баре из Figma */
+/* Буква по центру круга (#220): строка 20 в круге 17,4 (без обводки) центрировалась по высоте строки, и заглавная садилась на 0,9 ниже.
+   Строка обрезается до высоты заглавной — по центру круга встаёт сама буква. Без поддержки text-box — прежняя строка 20 */
+.y-tab-bar__initial { text-box: trim-both cap alphabetic; }
 .y-tab-bar__avatar--photo { width: var(--space-24); height: var(--space-24); border: 0; border-radius: var(--radius-sm); overflow: hidden; } /* Figma 1186:20825: фото профиля 24 без обводки */
 .y-tab-bar__avatar--photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* Тени закреплённой навигации рисуются поверх полосы затухания (ScrollEdge — absolute и иначе перекрывает тень) */

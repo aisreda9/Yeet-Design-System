@@ -1,11 +1,9 @@
-import { useSlidingPill } from '../utils/useSlidingPill';
-import type { ComponentPropsWithRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, CSSProperties, ReactNode } from 'react';
 import { Button, Icon, IconButton, ScrollEdge } from '../atoms';
 import type { IconName } from '../icons/icons';
 import { ChipGroup, InputBar, type Chip } from '../molecules';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
-import { setRef } from './refs';
 import { StatusBar } from './system';
 
 /* ─── Header ────────────────────────────────────────────────────────── */
@@ -131,18 +129,19 @@ const tabs: { id: Tab; label: string; icon?: IconName }[] = [
 
 /**
  * Плавающий таб-бар: 5 вкладок-иконок, активная — подложка `--color-bg-subtle`; она переезжает к новой вкладке на пружине quick (`--motion-nav`).
+ * Положение подложки задаёт CSS по индексу вкладки (`--tab-index`): ровно по ячейке и без отставания, пока таб-бар сжимается под FAB.
  * Вкладка «Профиль» — буква в кружке 20 или фото профиля (`avatarSrc`, Figma: avatar · Content=Photo).
  */
 export type TabBarProps = Omit<ComponentPropsWithRef<'nav'>, 'children' | 'onChange'> & { active: Tab; initial?: string; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string; onChange?: (t: Tab) => void };
 
-export function TabBar({ active, initial = 'С', avatarSrc, onChange, ref, className, ...rest }: TabBarProps) {
-  const [pillRef, pill] = useSlidingPill<HTMLElement>(tabs.findIndex((t) => t.id === active));
+export function TabBar({ active, initial = 'С', avatarSrc, onChange, className, style, ...rest }: TabBarProps) {
+  const index = Math.max(0, tabs.findIndex((t) => t.id === active));
   return (
-    <nav ref={(n) => { pillRef.current = n; setRef(ref, n); }} className={cx('y-tab-bar', className)} aria-label="Основная навигация" {...rest}>
-      <span className="y-tab-bar__pill" style={pill} aria-hidden />
+    <nav className={cx('y-tab-bar', className)} aria-label="Основная навигация" style={{ ['--tab-index' as string]: index, ...style } as CSSProperties} {...rest}>
+      <span className="y-tab-bar__pill" aria-hidden />
       {tabs.map((t) => (
-        <button key={t.id} type="button" data-pill-item className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => { if (t.id !== active) haptic('select'); onChange?.(t.id); }}>
-          {t.icon ? <Icon name={t.icon} /> : avatarSrc ? <span className="y-tab-bar__avatar y-tab-bar__avatar--photo"><img src={avatarSrc} alt="" /></span> : <span className="y-tab-bar__avatar">{initial}</span>}
+        <button key={t.id} type="button" className="y-tab-bar__tab" aria-label={t.label} aria-current={t.id === active ? 'page' : undefined} onClick={() => { if (t.id !== active) haptic('select'); onChange?.(t.id); }}>
+          {t.icon ? <Icon name={t.icon} /> : avatarSrc ? <span className="y-tab-bar__avatar y-tab-bar__avatar--photo"><img src={avatarSrc} alt="" /></span> : <span className="y-tab-bar__avatar"><span className="y-tab-bar__initial">{initial}</span></span>}
         </button>
       ))}
     </nav>
@@ -152,7 +151,7 @@ export function TabBar({ active, initial = 'С', avatarSrc, onChange, ref, class
 /**
  * Нижняя навигация: TabBar (+ FAB «+» на экранах с добавлением) на подложке с затуханием сверху.
  * **Контексты:** все корневые вкладки; FAB — Гардероб и Вишлист.
- * При переходе на вкладку с FAB таб-бар сжимается и уступает место кнопке — `--motion-nav` (quick, 744 мс).
+ * При переходе на вкладку с FAB таб-бар сжимается и уступает место кнопке — `--motion-nav` (quick, 744 мс): «+» выезжает справа целиком, таб-бар перелетает в обе стороны.
  */
 export type BottomNavProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & { active: Tab; fab?: boolean; onFab?: () => void; onTabChange?: (t: Tab) => void; /** Фото профиля во вкладке «Профиль». */ avatarSrc?: string };
 
