@@ -109,7 +109,7 @@ export const InSheet: Story = {
 export const InSheetWrap: Story = {
   name: 'В шторке 321',
   parameters: { controls: { disable: true } },
-  tags: ['bare'],
+  tags: ['bare', 'visual'], // play только проверяет геометрию, состояние не меняет — скриншот нужен
   render: () =>
     onOverlay(() => (
       <Sheet title="Повод" onClose={() => {}} footer={[{ label: 'Очистить' }, { label: 'Использовать' }]}>

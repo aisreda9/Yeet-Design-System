@@ -40,6 +40,7 @@ export const Password: Story = { name: 'Пароль', args: { label: 'Паро�
 /** Фокус: кольцо 1.5 `text-accent` по строке. Без фокуса вид прежний. */
 export const Focus: Story = {
   name: 'Фокус',
+  tags: ['visual'], // play только ставит фокус — скриншот нужен (scripts/qa/run.mjs: play-истории без `visual` не снимаются)
   args: { label: 'Название', value: undefined, trailingIcon: undefined, input: { defaultValue: 'Кожаная сумка' } },
   play: async ({ canvasElement }) => { canvasElement.querySelector('input')?.focus(); },
 };
