@@ -190,3 +190,38 @@ export const Keyboard: Story = {
     });
   },
 };
+
+/** Тап по скрытому превью: оно `inert`, поэтому клик приходит в ленту — как от настоящего пальца. `shift` — сдвиг пальца до отпускания. */
+const tapAt = (el: Element, shift = 0) => {
+  const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const target = el.closest('.y-outfit-pager__track')!;
+  const at = (yy: number) => ({ bubbles: true, cancelable: true, composed: true, clientX: x, clientY: yy, pointerId: 31, pointerType: 'touch', isPrimary: true });
+  target.dispatchEvent(new PointerEvent('pointerdown', at(y)));
+  target.dispatchEvent(new PointerEvent('pointerup', at(y + shift)));
+  target.dispatchEvent(new MouseEvent('click', at(y + shift)));
+};
+
+export const PreviewTap: Story = {
+  name: 'Тап по превью',
+  tags: ['no-visual'], // play-тест поведения; вид — «Варианты» и «В флоу»
+  args: { axis: 'y', count: 3 },
+  parameters: { docs: { description: { story: 'Тап по превью листает к нему (хаптика `select`). Палец сдвинулся на `--gesture-touch-slop` и больше — это свайп, не тап: стопка стоит. В прототипе тап по превью перехватывает маршрут — открываются детали образа.' } } },
+  play: async ({ canvasElement, step }) => {
+    const live = () => canvasElement.querySelector('.y-outfit-pager__live');
+    const look = (sel: string) => canvasElement.querySelector(`.y-outfit-pager__look.${sel} .y-collage`)!;
+    await expect(live()).toHaveTextContent('Образ 2 из 3'); // Demo начинает со второго
+    await step('тап по верхнему превью → предыдущий образ', async () => {
+      tapAt(look('is-prev'));
+      await waitFor(() => expect(live()).toHaveTextContent('Образ 1 из 3'));
+    });
+    await step('тап по нижнему превью → следующий', async () => {
+      tapAt(look('is-next'));
+      await waitFor(() => expect(live()).toHaveTextContent('Образ 2 из 3'));
+    });
+    await step('сдвиг пальца дальше slop — не тап', async () => {
+      tapAt(look('is-next'), 24);
+      await new Promise((f) => setTimeout(f, 100));
+      await expect(live()).toHaveTextContent('Образ 2 из 3');
+    });
+  },
+};

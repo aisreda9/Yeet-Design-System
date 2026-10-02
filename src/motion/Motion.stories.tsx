@@ -1,16 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState, type CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon, IconButton, Stamp } from '../atoms';
-import { Carousel, ChipGroup, List, ListGroup, ListItem } from '../molecules';
-import { BottomNav, ItemCard, OutfitCollage, Overlay, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
+import { Carousel, ChipGroup, List, ListGroup, ListItem, StatRow, StatTile } from '../molecules';
+import { BottomNav, ItemCard, OutfitCollage, Overlay, PhotoArea, ProductCard, Sheet, StatusBar, WeatherCard, type CollageItem, type Tab } from '../organisms';
+import { DetailsScreen } from '../templates';
 import { gesture, motionMs } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
 import { LeavingContext, usePresence } from '../utils/usePresence';
 import { DragGrid } from './DragGrid';
 import { ReorderDemo } from './ReorderDemo';
 import { CanvasDemo, FeedbackDemo, HapticChip, HeaderScrollDemo, PageStackDemo, ProfileDemo, SelectDemo, SheetDemo } from './Mechanics';
-import { curves, sample, usePhotoCollapse, useSwipePager } from '.';
+import { curves, sample, useSwipePager } from '.';
 import './motion.css';
 
 const meta = {
@@ -167,29 +168,26 @@ export const OutfitSwap: Story = { name: 'Главная: смена образ�
 
 /* ─── Сворачивание фото ─────────────────────────────────────────────── */
 
+/**
+ * То же, что на экранах деталей: `DetailsScreen` — шторка за пальцем / колесом с прогрессом p, доводка `--motion-sheet` (#231).
+ * Демо не повторяет логику, а показывает сам шаблон: поведение в документации и на экране одно.
+ */
 function CollapseDemo() {
-  const scroll = useRef<HTMLDivElement>(null);
-  const { collapsed } = usePhotoCollapse(scroll, { threshold: 24 });
   return (
-    <div className={`y-motion-phone y-collapse ${collapsed ? 'is-collapsed' : ''}`}>
-      <StatusBar />
-      <div className="y-collapse__bar">
-        <IconButton icon="chevron-left" label="Назад" />
-        <IconButton icon="more" label="Ещё" />
-      </div>
-      <div className="y-collapse__photo" aria-hidden>
-        <OutfitCollage items={[{ kind: 'container', x: 50, y: 50, size: 180, color: 'black' }]} />
-      </div>
-      <div ref={scroll} className="y-collapse__scroll">
-        <div className="y-collapse__panel">
-          <h2 className="y-h2">Сумка</h2>
-          <p className="y-caption y-text--secondary">10 000 ₽ · Аксессуары · Чёрный · Все сезоны</p>
-          {Array.from({ length: 6 }, (_, k) => <div key={k} style={{ height: 96, borderRadius: 20, background: 'var(--card-bg)' }} />)}
-        </div>
-      </div>
-    </div>
+    <DetailsScreen media={<PhotoArea kind="container" />} title="Сумка">
+      <p className="y-body y-text--secondary">10 000 ₽ · Чёрный<br />Аксессуары · Все сезоны</p>
+      <StatRow><StatTile label="Надето раз" value={43} /><StatTile label="Д. простоя" value={12} /><StatTile label="Образы" value={7} /></StatRow>
+      <section className="y-section">
+        <h3 className="y-h3">Образы с этой вещью</h3>
+        <div className="y-stack-8">{collapseLooks.map((items, i) => <OutfitCollage key={i} items={items} />)}</div>
+      </section>
+    </DetailsScreen>
   );
 }
+const collapseLooks: CollageItem[][] = [
+  [{ kind: 'bottom', x: 28, y: 56, size: 150, color: 'black' }, { kind: 'top', x: 64, y: 36, size: 120, color: 'brown' }, { kind: 'container', x: 76, y: 70, size: 64, color: 'black' }],
+  [{ kind: 'bottom', x: 30, y: 58, size: 150, color: 'green' }, { kind: 'top', x: 66, y: 34, size: 110, color: 'white' }, { kind: 'container', x: 76, y: 74, size: 64, color: 'black' }],
+];
 export const PhotoCollapse: Story = { name: 'Сворачивание фото', render: () => <CollapseDemo /> };
 
 /* ─── Микро-анимации: нажатие ───────────────────────────────────────── */

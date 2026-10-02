@@ -377,11 +377,11 @@
   height: calc(2 * var(--pager-top) + var(--pager-size) + var(--pager-end)); touch-action: none;
 }
 /* В экране стопка тянется на свободную высоту колонки (flex-grow — сигнал для pager.tsx) и всегда в неё помещается: экран не скроллится.
-   Низ стопки (--pager-end) — от низа контента Screen (поле 24), TODO(tokens): токенов 5 и −3 нет.
+   Низ стопки (--pager-end) — от низа контента Screen (поле 24): токены --outfit-pager-end / --outfit-pager-end-tab-bar.
    «Удиви меня» без таб-бара: нижнее превью заходит на 3 в поле — 21 до низа экрана (1371:42686, низ превью y831). */
-.y-screen__content > .y-outfit-pager--y { --pager-end: -3px; flex: 1 1 0; height: auto; min-height: 0; } /* stylelint-disable-line unit-disallowed-list -- низ стопки «Удиви меня» из Figma, TODO(tokens) */
+.y-screen__content > .y-outfit-pager--y { --pager-end: var(--outfit-pager-end); flex: 1 1 0; height: auto; min-height: 0; }
 /* главная: 29 до таб-бара = поле 24 + 5 (1371:36589, низ превью y747, таб-бар y776) */
-.y-screen__content:has(~ .y-bottom-nav) > .y-outfit-pager--y { --pager-end: 5px; } /* stylelint-disable-line unit-disallowed-list -- низ стопки над таб-баром из Figma, TODO(tokens) */
+.y-screen__content:has(~ .y-bottom-nav) > .y-outfit-pager--y { --pager-end: var(--outfit-pager-end-tab-bar); }
 .y-outfit-pager--x { height: var(--pager-size); touch-action: pan-y; }
 .y-outfit-pager__viewport { position: absolute; inset: 0; }
 /* Стопка обрезана по своей области: ни превью, ни уходящие образы (is-above / is-below), ни образ под пальцем не заходят
@@ -423,8 +423,17 @@
 .y-outfit-pager__weather:has(.y-weather__alert) { --weather-lift: var(--space-16); }
 .y-outfit-pager[data-compact] .y-outfit-pager__weather { display: none; } /* низкий экран: коллаж меньше 90 % — погоду не показываем (решение владельца, 02.10) */
 .y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
-.y-outfit-pager__stamp { --slot-k: min(var(--pager-k), 1); right: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 73px * var(--slot-k)); scale: var(--slot-k); transform-origin: right top; } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа; на узком коллаже уменьшается вместе с ним (решение владельца, 02.10) */
-.y-outfit-pager__skip { --slot-k: min(var(--pager-k), 1); left: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 32px * var(--slot-k)); scale: var(--slot-k); transform-origin: left top; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma); на узком коллаже уменьшается вместе с ним */
+/* Штамп и «Не нравится» уменьшаются вместе с коллажем (решение владельца, 02.10), но не мельче 0,75 — иначе подпись штампа
+   на 320 × 568 (коллаж 165, k ≈ 0,47) ~6,6 px (#234). --slot-at — место, как при k коллажа; --slot-k — размер.
+   Штамп крупнее своего места растёт от левого нижнего угла места вверх и вправо (translate на разницу в долях своего размера):
+   вниз он закрыл бы нижнее превью, вправо и вверх — свободное поле и угол коллажа. При k ≥ 0,75 разницы нет — всё как раньше. */
+.y-outfit-pager__stamp {
+  --slot-at: min(var(--pager-k), 1); --slot-k: clamp(0.75, var(--pager-k), 1);
+  right: calc(var(--space-20) * var(--slot-at)); top: calc(var(--pager-size) - 73px * var(--slot-at)); /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа */
+  scale: var(--slot-k); transform-origin: right top;
+  translate: calc((var(--slot-k) - var(--slot-at)) * 100%) calc((var(--slot-at) - var(--slot-k)) * 100%);
+}
+.y-outfit-pager__skip { --slot-k: clamp(0.75, var(--pager-k), 1); left: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 32px * var(--slot-k)); scale: var(--slot-k); transform-origin: left top; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma); на узком коллаже уменьшается вместе с ним */
 /* звезда поворачивается на 180° с каждой сменой образа (Animations «scale»), нажатие и done — своими переходами */
 .y-outfit-pager__stamp .y-stamp__shape { rotate: var(--turn, 0deg); transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select), rotate var(--motion-swap); }
 
