@@ -375,11 +375,11 @@ public enum YeetMotion {
     public static let press = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
     /// Затухание краёв при скролле, затемнение под шторкой, подписи и тени
     public static let fade = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
-    /// Фото сворачивается в шапку при скролле
+    /// Шапка «назад»: компактный заголовок при скролле
     public static let collapse = Animation.timingCurve(0, 0, 0.58, 1, duration: 0.3)
     /// Листание образов и поводов по свайпу
     public static let page = Animation.timingCurve(0, 0, 0.58, 1, duration: 0.3)
-    /// Таб-бар уступает место FAB · Figma Smart Animate Quick
+    /// Таб-бар уступает место FAB, «+» выезжает справа · Figma Smart Animate Quick
     public static let nav = YeetSpring.quick.animation
     /// Штамп «Надеть» → отмечено · Figma Smart Animate Bouncy
     public static let stamp = YeetSpring.bouncy.animation
@@ -397,7 +397,7 @@ public enum YeetMotion {
     public static let appear = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.24)
     /// Исчезновение: быстрее появления, чтобы не мешать
     public static let exit = Animation.timingCurve(0.2, 0, 0, 1, duration: 0.15)
-    /// Шторка: появление и возврат после смахивания, без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
+    /// Шторка: появление, возврат после смахивания, доводка шторки деталей; без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58)
     public static let sheet = YeetSpring.critical.animation
 }
 

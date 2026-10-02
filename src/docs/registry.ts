@@ -32,14 +32,19 @@ export type Entry = {
   status: Status;
   /** Чего не хватает до `stable` (или чем заменить `deprecated`). */
   statusWhy?: string;
+  /** Части компонента Figma без своей истории и своего компонента в коде (#216, AUDIT-149 п. 10): узел DS 0.2 и почему нет истории. */
+  parts?: Part[];
 };
+
+/** Часть компонента: свой узел в Figma, в коде — внутри компонента строки. */
+export type Part = { figma: string; figmaId: string; figmaWhy: string; note?: string };
 
 export const registry: Entry[] = [
   { code: 'Icon', figma: 'ui-icons/*', figmaId: '942:5714', level: 'Atoms', story: 'Atoms/Icon', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'Logo', figma: 'yeet', figmaId: '1180:20027', level: 'Atoms', story: 'Atoms/Logo', note: 'Size: L 136×88 / S 61×40; Tone: Default / On Dark / Muted — цвет наследуется (currentColor), пропа tone нет', status: 'stable' },
   { code: 'Button', figma: 'button', figmaId: '942:6953', level: 'Atoms', story: 'Atoms/Button', status: 'stable' },
   { code: 'IconButton', figma: 'icon-button', figmaId: '942:7068', level: 'Atoms', story: 'Atoms/IconButton', note: 'Icon Size ↔ iconSize (20 / 24; по умолчанию 20 у S, 24 у остальных)', status: 'stable' },
-  { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp', status: 'stable' },
+  { code: 'Stamp', figma: 'stamp', figmaId: '1004:5021', level: 'Atoms', story: 'Atoms/Stamp', note: 'Tone: Primary 148 / Secondary 64 (иконка 29, −15°); анимация --motion-stamp', status: 'stable', parts: [{ figma: 'shapes / main-action', figmaId: '942:13600', figmaWhy: 'форма звезды главного действия; в коде — путь `stampStar` внутри Stamp, отдельного компонента и истории нет' }] },
   { code: 'Badge', figma: 'badge', figmaId: '942:7125', level: 'Atoms', story: 'Atoms/Badge', status: 'stable' },
   { code: 'Avatar', figma: 'avatar', figmaId: '968:3666', level: 'Atoms', story: 'Atoms/Avatar', note: 'Content: Empty / Initial / Photo', status: 'stable' },
   { code: 'Divider', figma: 'divider', figmaId: '951:3449', level: 'Atoms', story: 'Atoms/Divider', status: 'stable' },
@@ -47,13 +52,13 @@ export const registry: Entry[] = [
   { code: 'ScrollEdge', figma: 'scroll-edge', figmaId: '965:3491', level: 'Atoms', story: 'Templates/Screen', status: 'beta', statusWhy: 'своей истории нет, показан в Templates/Screen' },
   { code: 'Link', figma: 'link', figmaId: '1209:21285', level: 'Atoms', story: 'Atoms/Link', note: 'State: Default / Focus; в макетах — 1371:36904, 517:7004, 1371:43055', status: 'alpha', statusWhy: 'ещё не на экранах (Delete Account, Legal — #50–#54)' },
 
-  { code: 'Field', figma: 'input (+ input-value)', figmaId: '1182:20099', level: 'Molecules', story: 'Molecules/Field & InputGroup', note: 'Multiline 104 («Комментарий»)', status: 'stable' },
+  { code: 'Field', figma: 'input (+ input-value)', figmaId: '1182:20099', level: 'Molecules', story: 'Molecules/Field & InputGroup', note: 'Multiline 104 («Комментарий»)', status: 'stable', parts: [{ figma: 'input-value', figmaId: '942:7138', figmaWhy: 'значение / плейсхолдер внутри input 1182:20099; в коде — часть Field, отдельного компонента и истории нет', note: 'Color Blue / White из Figma в коде нет (AUDIT-149)' }] },
   { code: 'InputGroup', figma: 'input-group', figmaId: '942:7264', level: 'Molecules', story: 'Molecules/Field & InputGroup', status: 'stable' },
   { code: 'InputBar', figma: 'input-bar', figmaId: '942:7282', level: 'Molecules', story: 'Molecules/InputBar', note: 'State=Focus (обводка 1.5), Right=Photo (превью 48)', status: 'stable' },
   { code: 'SegmentControl', figma: 'segment-control', figmaId: '942:7195', level: 'Molecules', story: 'Molecules/SegmentControl', status: 'stable' },
   { code: 'ChipGroup', figma: 'chip-group + chip (1137:10333)', figmaId: '942:7246', level: 'Molecules', story: 'Molecules/ChipGroup', note: 'chip · Selected × Trailing (None / Dropdown / Remove), State=Editing', status: 'stable' },
   { code: 'ListItem', figma: 'list-item', figmaId: '960:2963', level: 'Molecules', story: 'Molecules/ListItem', note: 'Radio + Trailing: флаг / текст («₽ · RUB»); Show Description = `description`', status: 'stable' },
-  { code: 'ListGroup', figma: 'list-group', figmaId: '1342:30828', level: 'Molecules', story: 'Molecules/ListGroup', note: 'Count: Multiple / Single; Single — 52, радиус 32', status: 'stable' },
+  { code: 'ListGroup', figma: 'list-group', figmaId: '1342:30828', level: 'Molecules', story: 'Molecules/ListGroup', note: 'Count: Multiple / Single; Single — 52, радиус 32', status: 'stable', parts: [{ figma: 'list-group / row', figmaId: '1037:5335', figmaWhy: 'строка внутри list-group 1342:30828; в коде — ListItem внутри ListGroup, отдельного компонента и истории нет' }] },
   { code: 'RangeSlider', figma: 'range-slider', figmaId: '1018:5036', level: 'Molecules', story: 'Molecules/RangeSlider', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'StatTile', figma: 'stat-tile', figmaId: '1184:20692', level: 'Molecules', story: 'Molecules/StatTile', note: 'Size: M 80 (H2) / L 88 (H1)', status: 'stable' },
   { code: 'Note', figma: 'note', figmaId: '1187:20746', level: 'Molecules', story: 'Molecules/Note', note: 'описание вещи: light-grey, p20, r20', status: 'stable' },
@@ -63,7 +68,7 @@ export const registry: Entry[] = [
   { code: 'LoadingState', figma: 'loading-state', figmaId: '968:3667', level: 'Molecules', story: 'Molecules/LoadingState', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'PhotoTile', figma: 'photo-tile', figmaId: '1146:6674', level: 'Molecules', story: 'Molecules/PhotoTile', note: 'поглотил brand-card', status: 'stable' },
   { code: 'Carousel', figma: 'carousel', figmaId: '1018:5250', level: 'Molecules', story: 'Molecules/Carousel', status: 'beta', statusWhy: 'нет истории «В флоу»' },
-  { code: 'BarChart', figma: 'bar-chart', figmaId: '1018:5224', level: 'Molecules', story: 'Molecules/BarChart', status: 'stable' },
+  { code: 'BarChart', figma: 'bar-chart', figmaId: '1018:5224', level: 'Molecules', story: 'Molecules/BarChart', status: 'stable', parts: [{ figma: 'bar-chart / bar', figmaId: '1186:16573', figmaWhy: 'столбец внутри bar-chart 1018:5224; в коде — элемент BarChart (`.y-bar-chart__bar`), отдельного компонента и истории нет' }] },
   { code: 'UsageMeter', figma: 'usage-meter', figmaId: '1018:5100', level: 'Molecules', story: 'Molecules/UsageMeter', status: 'beta', statusWhy: 'нет истории «В флоу»' },
   { code: 'AccountCard', figma: 'account-card', figmaId: '1131:5166', level: 'Molecules', story: 'Molecules/AccountCard', note: 'Kind: Current / Other / Settings', status: 'stable' },
   { code: 'AvatarStack', figma: 'avatar-stack', figmaId: '1131:5183', level: 'Molecules', story: 'Molecules/AccountCard', note: 'мультиаккаунт в шапке профиля', status: 'stable' },
@@ -89,7 +94,7 @@ export const registry: Entry[] = [
   { code: 'OutfitCanvas', figma: 'экран Canvas (outfit-collage + pattern)', figmaId: null, figmaWhy: 'экран Canvas во флоу; собран из outfit-collage 1187:20745', level: 'Organisms', story: 'Organisms/OutfitCanvas', status: 'beta', statusWhy: 'нет компонента в Figma, нет истории «В флоу»' },
   { code: 'TripCard', figma: 'trip-card', figmaId: '1036:5342', level: 'Organisms', story: 'Organisms/TripCard', status: 'beta', statusWhy: 'нет истории «В флоу»' },
 
-  { code: 'Screen', figma: 'Templates (паттерны экрана)', figmaId: '1392:31304', level: 'Templates', story: 'Templates/Screen', status: 'beta', statusWhy: 'нет истории «В флоу»' },
+  { code: 'Screen', figma: 'Templates (паттерны экрана)', figmaId: '1392:31304', level: 'Templates', story: 'Templates/Screen', status: 'beta', statusWhy: 'нет истории «В флоу»', parts: [{ figma: 'system / keyboard', figmaId: '951:3442', figmaWhy: 'системная клавиатура только для макетов: в приложении её рисует ОС, компонента в коде и истории нет' }] },
   { code: 'Grid', figma: 'auto layout 2 × 173, gap 8/7', figmaId: null, figmaWhy: 'auto layout в паттернах Templates 1392:31304, не компонент', level: 'Templates', story: 'Pages/Экраны флоу', status: 'beta', statusWhy: 'auto layout, не компонент Figma' },
   { code: 'Row', figma: 'auto layout, horizontal', figmaId: null, figmaWhy: 'auto layout, не компонент', level: 'Templates', story: 'Pages/Экраны флоу', status: 'beta', statusWhy: 'auto layout, не компонент Figma' },
 
@@ -115,13 +120,6 @@ export const registry: Entry[] = [
   { code: 'Prose', figma: 'Legal (текстовый документ: H1, разделы, карточка контактов)', figmaId: null, figmaWhy: 'компонента в DS 0.2 нет, только экраны: 1371:43055, 1371:43118', level: 'Templates', story: 'Templates/Prose', status: 'beta', statusWhy: 'нет компонента в Figma; своя история — каркас со слотами, с данными — Legal в Pages' },
   { code: 'PhotoBalance', figma: 'Organisms/PhotoBalance (текст на странице 1392:31298)', figmaId: null, figmaWhy: 'алгоритм выравнивания фото вещей (balanceArt, layoutCollage), не компонент; в Figma — только описание на странице Organisms 1392:31298', level: 'Organisms', story: 'Organisms/PhotoBalance', note: 'обрезка по альфе, визуальный вес, оптический центр; работает внутри ItemCard и OutfitCollage', status: 'beta', statusWhy: 'не компонент Figma, нет истории «В флоу»' },
   { code: 'Stack', figma: 'auto layout, vertical', figmaId: null, figmaWhy: 'auto layout, не компонент', level: 'Templates', story: 'Pages/Экраны флоу', note: 'вертикальная группа со своим шагом (8 / 12 / 0), align', status: 'beta', statusWhy: 'auto layout, не компонент Figma' },
-
-  // Части компонентов Figma без своей истории (#216, AUDIT-149 п. 10): figmaId — узел DS 0.2, figmaWhy — почему нет отдельной истории
-  { code: 'Field', figma: 'input-value', figmaId: '942:7138', figmaWhy: 'значение / плейсхолдер внутри input 1182:20099; в коде — часть Field, отдельного компонента и истории нет', level: 'Molecules', story: 'Molecules/Field & InputGroup', note: 'Color Blue / White из Figma в коде нет (AUDIT-149)', status: 'stable' },
-  { code: 'ListGroup', figma: 'list-group / row', figmaId: '1037:5335', figmaWhy: 'строка внутри list-group 1342:30828; в коде — ListItem внутри ListGroup, отдельного компонента и истории нет', level: 'Molecules', story: 'Molecules/ListGroup', status: 'stable' },
-  { code: 'BarChart', figma: 'bar-chart / bar', figmaId: '1186:16573', figmaWhy: 'столбец внутри bar-chart 1018:5224; в коде — элемент BarChart (`.y-bar-chart__bar`), отдельного компонента и истории нет', level: 'Molecules', story: 'Molecules/BarChart', status: 'stable' },
-  { code: 'Screen', figma: 'system / keyboard', figmaId: '951:3442', figmaWhy: 'системная клавиатура только для макетов: в приложении её рисует ОС, компонента в коде и истории нет', level: 'Templates', story: 'Templates/Screen', status: 'beta', statusWhy: 'только для макетов, в коде не рисуется' },
-  { code: 'Stamp', figma: 'shapes / main-action', figmaId: '942:13600', figmaWhy: 'форма звезды главного действия; в коде — путь `stampStar` внутри Stamp, отдельного компонента и истории нет', level: 'Atoms', story: 'Atoms/Stamp', status: 'stable' },
 
   // Временная заглушка иллюстраций (решение владельца, #220)
   { code: 'ArtPlaceholder', figma: 'заглушка иллюстрации (приветствие, плитки фото, карточки стилиста)', figmaId: null, figmaWhy: 'временная замена иллюстраций, пока их перерисовывают (#220); в Figma не заводится', level: 'Atoms', story: 'Atoms/ArtPlaceholder', note: 'вернуть рисунки — SHOW_ILLUSTRATIONS в src/utils/illustrations.ts', status: 'beta', statusWhy: 'нет компонента в Figma' },

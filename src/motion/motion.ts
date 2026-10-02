@@ -31,7 +31,7 @@ export type MotionSpec = { name: string; token: string; curve: string; trigger: 
 
 export const motions: MotionSpec[] = [
   { name: 'Нажатие', token: '--motion-press', curve: '150 мс · standard', trigger: 'tap', what: 'scale 0.97', where: 'Все кнопки', figma: '—' },
-  { name: 'Сворачивание фото', token: '--motion-collapse', curve: '300 мс · ease-out', trigger: 'скролл / drag', what: 'Фото 353 → превью 48 в шапке, панель деталей поднимается', where: 'Детали вещи', figma: 'new things 354:17405 → 354:17449' },
+  { name: 'Сворачивание фото', token: '--motion-sheet', curve: 'за пальцем; доводка 540 мс · spring critical', trigger: 'палец / колесо по панели', what: 'Панель за пальцем до шапки, фото 353 → миниатюра 48 по ходу; отпускание — к краю без перелёта', where: 'Детали вещи и образа', figma: 'new things 354:17405 → 354:17449' },
   { name: 'Листание', token: '--motion-page', curve: '300 мс · ease-out', trigger: 'свайп', what: 'Образ уезжает на ширину экрана, чипсы поводов сдвигаются к активному', where: 'Стилист / С чем носить, Поездки', figma: 'Stylist / Trips / List 798:2215 → 798:2274 → 799:2433' },
   { name: 'Таб-бар и FAB', token: '--motion-nav', curve: '744 мс · spring quick', trigger: 'смена вкладки', what: 'Таб-бар 353 → 290, кнопка «+» выезжает справа целиком', where: 'Гардероб, Вишлист', figma: 'default → things' },
   { name: 'Штамп', token: '--motion-stamp', curve: '958 мс · spring bouncy', trigger: 'tap', what: 'Звезда 148 → 78, поворот −60°, «Надеть» → «×»', where: 'Образы на сегодня, С чем носить', figma: 'dropdown → active button' },
