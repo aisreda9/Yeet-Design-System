@@ -137,7 +137,7 @@ const stylistLooks: PagerLook[] = [
   { id: 'beige', name: 'бежевый жакет', items: [{ kind: 'outerwear', x: 36, y: 36, size: 120, color: 'beige' }, { kind: 'bottom', x: 68, y: 58, size: 110, color: 'blue' }, { kind: 'shoe', x: 34, y: 80, size: 64, color: 'white' }] },
 ];
 
-/** «Удиви меня» (Figma `1371:42686`): стопка образов с превью 150, «Сохранить» и «Не нравится» — следующий образ. */
+/** «Удиви меня» (Figma `1371:42686`): стопка образов на всё место под шапкой (превью 150 при 393 × 852), «Сохранить» и «Не нравится» — следующий образ. */
 function SurpriseScreen({ overlay }: { overlay?: ReactNode }) {
   const [index, setIndex] = useState(1);
   const [saved, setSaved] = useState(false);
@@ -145,7 +145,6 @@ function SurpriseScreen({ overlay }: { overlay?: ReactNode }) {
     <Screen header={<Header type="bar" titleChip="Удиви меня" actions={[{ icon: 'info', label: 'Как это работает' }]} />} overlay={overlay && <Overlay>{overlay}</Overlay>}>
       <OutfitPager
         looks={stylistLooks}
-        preview={150}
         index={index}
         onIndexChange={(k) => { setIndex(k); setSaved(false); }}
         stamp={<Stamp label="Сохранить" done={saved} onClick={() => setSaved((v) => !v)} />}

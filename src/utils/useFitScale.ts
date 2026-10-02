@@ -10,7 +10,8 @@ export function useFitScale(ref: RefObject<HTMLElement | null>, base: number) {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const measure = () => { const w = el.getBoundingClientRect().width; if (w) setScale(Math.round((w / base) * 1000) / 1000); };
+    // offsetWidth — без transform: уменьшенное превью и коллаж после смены образа не масштабируются дважды
+    const measure = () => { const w = el.offsetWidth; if (w) setScale(Math.round((w / base) * 1000) / 1000); };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);

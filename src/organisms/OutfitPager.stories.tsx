@@ -49,7 +49,7 @@ const meta: Meta<Args> = {
   args: { axis: 'y', preview: 96, count: 3, weather: true, stamp: true, skip: false, disabled: false },
   argTypes: {
     axis: { control: 'inline-radio', options: ['y', 'x'] },
-    preview: { control: 'inline-radio', options: [96, 150], if: { arg: 'axis', eq: 'y' } },
+    preview: { control: 'inline-radio', options: [96, 150], if: { arg: 'axis', eq: 'y' }, description: 'Превью вне экрана (здесь, в блоке 353). В `Screen` стопка заполняет высоту и превью считается само — см. «В флоу».' },
     count: { control: { type: 'range', min: 1, max: 4 } },
   },
   decorators: [unlessBare((Story) => <div style={{ width: 393, padding: '0 20px', boxSizing: 'border-box', overflow: 'hidden' }}><Story /></div>)],
@@ -58,8 +58,10 @@ const meta: Meta<Args> = {
       description: {
         component:
           'Пейджер образов: свайп по коллажу листает, дальше 30 % или бросок — следующий, на краях — резинка (`useSwipePager`). ' +
-          '**Стопка** (`axis="y"`, главная `1371:36589`, «Удиви меня» `1371:42686`): коллаж 353, соседние образы — превью 96 (или 150) в 20 над и под ним, смена на пружине `--motion-swap`; тап по превью — к нему. ' +
-          '**Лента** (`axis="x"`, «С чем носить» `1371:42779`): страницы 353 через 20, соседние за краем экрана, `--motion-page`; вертикальный жест остаётся скроллу. ' +
+          '**Стопка** (`axis="y"`, главная `1371:36589`, «Удиви меня» `1371:42686`): коллаж — квадрат во всю ширину контента (353 при 393, 280 при 320, 390 при 430), соседние образы — превью в 20 над и под ним, смена на пружине `--motion-swap`; тап по превью — к нему. ' +
+          'В `Screen` стопка занимает всё место между шапкой и таб-баром: превью = (высота − коллаж − 2 × 20 − низ) / 2, при 393 × 852 — 96 на главной и 150 в «Удиви меня», как в Figma. ' +
+          'Превью не меньше 48 и не больше коллажа; если места мало, коллаж уменьшается — стопка всегда помещается, экран не скроллится, образы обрезаны по области стопки (погода и штамп — нет). Вне экрана превью задаёт `preview`. ' +
+          '**Лента** (`axis="x"`, «С чем носить» `1371:42779`): страницы во всю ширину контента через 20, соседние за краем экрана, `--motion-page`; вертикальный жест остаётся скроллу. ' +
           'Слоты поверх текущего коллажа: `weather` (WeatherCard tilt), `stamp` (звезда поворачивается на 180° при смене), `skip` («Не нравится»). ' +
           'Клавиатура: кнопки «Предыдущий / Следующий образ» в порядке Tab (видны при фокусе), стрелки, Home, End; смена объявляется через `aria-live`. ' +
           'При «Уменьшении движения» палец ведёт 1 : 1, а доводка и смена мгновенные (токены `--motion-*` = 1ms). ' +
@@ -80,10 +82,10 @@ export const Variants: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <UsageGrid min={393}>
-      <Usage screen="Стопка · превью 96" note="главная" width={393}><div style={{ padding: '0 20px' }}><Demo axis="y" preview={96} count={3} weather stamp skip={false} disabled={false} /></div></Usage>
-      <Usage screen="Стопка · превью 150" note="«Удиви меня»" width={393}><div style={{ padding: '0 20px' }}><Demo axis="y" preview={150} count={3} weather={false} stamp skip disabled={false} /></div></Usage>
-      <Usage screen="Лента" note="«С чем носить»" width={393}><div style={{ padding: '0 20px', overflow: 'hidden' }}><Demo axis="x" preview={96} count={4} weather={false} stamp skip disabled={false} /></div></Usage>
-      <Usage screen="Первый и последний образ" note="превью только с одной стороны, кнопка на краю недоступна" width={393}><div style={{ padding: '0 20px' }}><OutfitPager looks={looks.slice(0, 2)} defaultIndex={1} stamp={<Stamp label="Надеть" />} /></div></Usage>
+      <Usage screen="Стопка · превью 96" note="главная" width={393}><div style={{ padding: '0 20px', width: '100%', boxSizing: 'border-box' }}><Demo axis="y" preview={96} count={3} weather stamp skip={false} disabled={false} /></div></Usage>
+      <Usage screen="Стопка · превью 150" note="«Удиви меня»" width={393}><div style={{ padding: '0 20px', width: '100%', boxSizing: 'border-box' }}><Demo axis="y" preview={150} count={3} weather={false} stamp skip disabled={false} /></div></Usage>
+      <Usage screen="Лента" note="«С чем носить»" width={393}><div style={{ padding: '0 20px', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}><Demo axis="x" preview={96} count={4} weather={false} stamp skip disabled={false} /></div></Usage>
+      <Usage screen="Первый и последний образ" note="превью только с одной стороны, кнопка на краю недоступна" width={393}><div style={{ padding: '0 20px', width: '100%', boxSizing: 'border-box' }}><OutfitPager looks={looks.slice(0, 2)} defaultIndex={1} stamp={<Stamp label="Надеть" />} /></div></Usage>
     </UsageGrid>
   ),
 };
@@ -109,7 +111,7 @@ function SurpriseFlow() {
   const stampFor = useDone();
   return (
     <Screen header={<Header variant="bar" titleChip="Удиви меня" onBack={() => {}} actions={[{ icon: 'info', label: 'Как это работает' }]} />}>
-      <OutfitPager looks={looks} preview={150} index={i} onIndexChange={setI} stamp={stampFor(looks[i].id, 'Сохранить')} skip={<Stamp label="Не нравится" variant="secondary" onClick={() => setI((k) => Math.min(k + 1, looks.length - 1))} />} />
+      <OutfitPager looks={looks} index={i} onIndexChange={setI} stamp={stampFor(looks[i].id, 'Сохранить')} skip={<Stamp label="Не нравится" variant="secondary" onClick={() => setI((k) => Math.min(k + 1, looks.length - 1))} />} />
     </Screen>
   );
 }
@@ -133,14 +135,24 @@ const flowDoc = (story: string) => ({ controls: { disable: true }, docs: { descr
 export const InFlow: Story = {
   name: 'В флоу: главная',
   tags: ['bare'],
-  parameters: flowDoc('Outfits / Everyday / Sunny `1371:36589`: стопка, превью 96, погода и штамп «Надеть». Rain Alert `1371:36745` — тот же экран с `WeatherCard alert`.'),
+  parameters: flowDoc('Outfits / Everyday / Sunny `1371:36589`: стопка от шапки до таб-бара (превью 96 при 393 × 852), погода и штамп «Надеть». Rain Alert `1371:36745` — тот же экран с `WeatherCard alert`. Смени размер экрана в тулбаре — превью растягиваются по высоте.'),
   render: () => <Usage screen="Outfits / Everyday / Sunny" note="1371:36589"><TodayFlow /></Usage>,
+  play: async ({ canvasElement, step }) => {
+    const box = (s: string) => canvasElement.querySelector(s)!.getBoundingClientRect();
+    await step('Коллаж во всю ширину контента, превью сверху и снизу равны и заполняют место', async () => {
+      await waitFor(() => expect(box('.is-current .y-collage').width).toBeCloseTo(box('.y-outfit-pager').width, 0));
+      const prev = box('.is-prev .y-collage'), next = box('.is-next .y-collage'), pager = box('.y-outfit-pager');
+      await expect(prev.height).toBeCloseTo(next.height, 0);
+      await expect(prev.height).toBeGreaterThanOrEqual(48);
+      await expect(prev.top).toBeCloseTo(pager.top, 0);
+    });
+  },
 };
 
 export const InFlowSurprise: Story = {
   name: 'В флоу: «Удиви меня»',
   tags: ['bare'],
-  parameters: flowDoc('Stylist / Outfit of the Day `1371:42686`: стопка с превью 150, «Сохранить» и «Не нравится».'),
+  parameters: flowDoc('Stylist / Outfit of the Day `1371:42686`: стопка на всё место под шапкой (превью 150 при 393 × 852), «Сохранить» и «Не нравится».'),
   render: () => <Usage screen="Stylist / Outfit of the Day" note="1371:42686"><SurpriseFlow /></Usage>,
 };
 
