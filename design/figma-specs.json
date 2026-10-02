@@ -766,7 +766,7 @@
     {
       "figma": "Stylist / Outfit of the Day 798:1741 · превью 150, коллаж в 20 под ним",
       "story": "organisms-outfitpager--in-flow-surprise",
-      "selector": ".y-outfit-pager--preview-150 .y-outfit-pager__look.is-current",
+      "selector": ".y-outfit-pager__look.is-current",
       "expect": {
         "width": 353,
         "top": 170
