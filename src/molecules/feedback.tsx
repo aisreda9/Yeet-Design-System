@@ -94,11 +94,14 @@ export type EmptyStateProps = Omit<ComponentPropsWithRef<'div'>, 'title' | 'chil
   description: ReactNode;
   /** Кнопка L через 32 (Figma: empty-state · Action — Primary L): «Добавить вещь» (primary, по умолчанию), вторичное действие — `tertiary`. */
   action?: { label: string; variant?: 'primary' | 'tertiary'; onClick?: () => void };
+  /** Заглушка иллюстрации над заголовком (#220): по умолчанию есть. Висит над блоком и не сдвигает тексты макета. */
+  art?: boolean;
 };
 
-export function EmptyState({ title, description, action, className, ...rest }: EmptyStateProps) {
+export function EmptyState({ title, description, action, art = true, className, ...rest }: EmptyStateProps) {
   return (
     <div className={cx('y-empty', className)} {...rest}>
+      {art && <ArtPlaceholder size={120} className="y-empty__art" />}
       <h2 className="y-h1 y-text--primary">{title}</h2>
       <p className="y-body y-text--secondary">{description}</p>
       {action && (

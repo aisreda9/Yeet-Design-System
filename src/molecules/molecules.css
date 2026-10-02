@@ -92,8 +92,10 @@ span.y-field__trailing { cursor: inherit; }
 .y-segment__pill { position: absolute; top: 0; left: 0; border-radius: var(--radius-xl); background: var(--color-bg-canvas); transition: transform var(--motion-nav), width var(--motion-nav); pointer-events: none; }
 
 /* EmptyState: заголовок H1, текст через 16, кнопка через 32 */
-.y-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; } /* stylelint-disable-line unit-disallowed-list -- ширина текста 353 из Figma */
+.y-empty { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-16); max-width: 353px; margin: 0 auto; } /* stylelint-disable-line unit-disallowed-list -- ширина текста 353 из Figma */
 .y-empty > .y-button { margin-top: var(--space-16); }
+/* Заглушка иллюстрации (#220) — над заголовком через 24, вне потока: позиции текстов совпадают с кадрами Figma */
+.y-empty__art { position: absolute; bottom: calc(100% + var(--space-24)); left: 50%; transform: translateX(-50%); }
 
 /* ChipGroup: чипс — Button S, боковой отступ 16; с иконкой справа 16 / 12 и иконка 20 */
 .y-chip-group { display: flex; gap: var(--space-4); align-items: center; }

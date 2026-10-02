@@ -20,7 +20,7 @@ export type ArtPlaceholderProps = Omit<ComponentPropsWithRef<'span'>, 'children'
  * `--color-text-secondary`. Размер — как у заменяемого рисунка; скругление — `--art-placeholder-radius`
  * (по умолчанию `--card-radius`), внутри карточки его задаёт карточка по правилу концентричности.
  * Декоративная: скринридер её не озвучивает. Вернуть рисунки — `SHOW_ILLUSTRATIONS` в `src/utils/illustrations.ts`.
- * **Контексты:** экран приветствия, плитки «Галерея» / «Камера», карточка «Для поездок» в каталоге стилиста.
+ * **Контексты:** экран приветствия, пустые состояния (120, над заголовком), плитки «Галерея» / «Камера», карточка «Для поездок» в каталоге стилиста.
  */
 export function ArtPlaceholder({ size = 64, width, height, stretch, className, style, ...rest }: ArtPlaceholderProps) {
   const w = width ?? (stretch ? undefined : size);
