@@ -206,6 +206,12 @@ export function ComponentRegistry() {
             <> · <a href={figmaUrl(e.figmaId)} target="_blank" rel="noreferrer">{e.figmaId}</a></>
           ) : e.figmaWhy && <div style={cap}>нет компонента: {e.figmaWhy}</div>}
           {e.note && <div style={cap}>{e.note}</div>}
+          {e.parts?.map((p) => (
+            <div key={p.figmaId} style={cap}>
+              часть: {p.figma} · <a href={figmaUrl(p.figmaId)} target="_blank" rel="noreferrer">{p.figmaId}</a> — {p.figmaWhy}
+              {p.note && <>. {p.note}</>}
+            </div>
+          ))}
         </span>,
         <Muted>{(e.figmaId && figmaSection(e.figmaId)) ?? '—'}</Muted>,
         <Muted>{e.story}</Muted>,
