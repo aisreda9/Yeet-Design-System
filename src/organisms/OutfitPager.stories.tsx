@@ -134,7 +134,7 @@ const flowDoc = (story: string) => ({ controls: { disable: true }, docs: { descr
 
 export const InFlow: Story = {
   name: 'В флоу: главная',
-  tags: ['bare'],
+  tags: ['bare', 'visual'], // play только проверяет геометрию, состояние не меняет — скриншот нужен
   parameters: flowDoc('Outfits / Everyday / Sunny `1371:36589`: стопка от шапки до таб-бара (превью 96 при 393 × 852), погода и штамп «Надеть». Rain Alert `1371:36745` — тот же экран с `WeatherCard alert`. Смени размер экрана в тулбаре — превью растягиваются по высоте.'),
   render: () => <Usage screen="Outfits / Everyday / Sunny" note="1371:36589"><TodayFlow /></Usage>,
   play: async ({ canvasElement, step }) => {

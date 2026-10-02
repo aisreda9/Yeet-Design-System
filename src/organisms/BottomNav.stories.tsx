@@ -106,7 +106,7 @@ export const Keyboard: Story = {
  */
 export const ConsumerClassName: Story = {
   name: 'className потребителя',
-  tags: ['!autodocs'],
+  tags: ['!autodocs', 'visual'], // play только проверяет геометрию, состояние не меняет — скриншот нужен
   parameters: { controls: { disable: true } },
   render: () => (
     <>

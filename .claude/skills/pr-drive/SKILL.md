@@ -13,9 +13,9 @@ description: Довести PR дизайн-системы YeetStyle до мер
 1. `git fetch origin main && git merge origin/main` — merge, не rebase запушенной ветки.
 2. Если трогали токены — `npm run tokens`. Если трогали генератор — `node --test scripts/tokens/dtcg.test.mjs`.
 3. `npm run typecheck && npm run lint && npm run build-storybook`.
-4. `CHROME_PATH=/opt/pw-browsers/chromium npm run qa -- --no-docker` — ошибок 0. Визуальная регрессия локально не считается.
+4. `CHROME_PATH=/opt/pw-browsers/chromium npm run qa -- --no-docker --changed` (= `qa:changed`) — ошибок 0: только истории, задетые веткой; при правке токенов, глобальных стилей, `scripts/qa/` — сам переходит на полный прогон. Визуальная регрессия локально не считается. CI гоняет всё.
 5. `npm run flow-diff` — расхождений 0.
-6. Если меняли истории с `play` — `CHROME_PATH=/opt/pw-browsers/chromium npm run test-storybook`.
+6. Если меняли истории с `play` — `CHROME_PATH=/opt/pw-browsers/chromium npm run test-storybook`. Play-история по умолчанию `no-visual` (эталона нет); нужен скриншот (play только ставит фокус или проверяет геометрию) — тег `visual` и эталон через baseline.
 7. `/code-review` по диффу ветки. Находки уровня «баг» — исправить до PR.
 
 В worktree агента нет `node_modules` → `npm ci` (симлинк на основной checkout ломает Vite: `server.fs.allow`).
@@ -48,8 +48,9 @@ description: Довести PR дизайн-системы YeetStyle до мер
 | В отчёте                                                               | Что делать                                                                                                                                                           |
 | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | только `визуальная разница` / `нет эталона` на коммите **до** baseline | ожидаемо — ждать baseline                                                                                                                                            |
-| `визуальная разница` **после** baseline                                | нестабильный кадр. Обычно play-история: пометить `tags: ['no-visual']` и удалить её эталоны (иначе «лишний эталон»)                                                  |
-| `axe: …`                                                               | найти историю: `npm run qa -- --no-docker --only=<префикс>`. Если это известное нарушение — запись в `KNOWN` (`scripts/qa/run.mjs`) со ссылкой на issue, без обходов |
+| `визуальная разница` **после** baseline                                | нестабильный кадр. Play-истории и так `no-visual`, если нет тега `visual`: снять `visual` (или пометить `no-visual` историю без play) и удалить эталоны |
+| `лишний эталон` у play-истории                                         | история стала no-visual (play без `visual`) — удалить её эталоны или `--update-baseline`; скриншот нужен — тег `visual`                                         |
+| `axe: …`                                                               | найти историю: `npm run qa -- --no-docker --only=<префикс>` (или `qa:changed`). Если это известное нарушение — запись в `KNOWN` (`scripts/qa/run.mjs`) со ссылкой на issue, без обходов |
 | `спека` / `концентричность` / `край`                                   | баг кода или устаревшая спека — исправить, спеку менять только по Figma                                                                                              |
 | сборка iOS / Android                                                   | сгенерированные имена (`npm run tokens`), см. историю #213                                                                                                           |
 
