@@ -401,8 +401,10 @@
 .y-outfit-pager__frame { position: absolute; left: var(--pager-x); top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: var(--layer-float); pointer-events: none; }
 /* stylelint-disable-next-line no-descending-specificity -- `*` у разных родителей: общих элементов с `.y-sheet--modal > … + *` нет */
 .y-outfit-pager__frame > * { position: absolute; pointer-events: auto; cursor: auto; }
-.y-outfit-pager__weather { left: var(--space-20); top: -43px; } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma) */
-.y-outfit-pager__weather:has(.y-weather__alert) { translate: 0 calc(-1 * var(--space-16)); } /* с предупреждением карточка растёт вверх на строку 16, низ на месте (today-rain 1173:16259: верх y182) */
+/* Погода над коллажем на 43 (Figma), с предупреждением — ещё на строку 16 выше, низ на месте (today-rain 1173:16259: верх y182).
+   Когда превью мало (низкий экран), карточка опускается: верх коробки не выше 20 от верха стопки — с наклоном она не заходит на шапку */
+.y-outfit-pager__weather { --weather-lift: 0px; left: var(--space-20); top: max(calc(-43px - var(--weather-lift)), calc(var(--space-20) - var(--pager-top))); } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma); 0px — длина для calc() */
+.y-outfit-pager__weather:has(.y-weather__alert) { --weather-lift: var(--space-16); }
 .y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
 .y-outfit-pager__stamp { right: var(--space-20); top: calc(var(--pager-size) - 73px); } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа, на любом размере */
 .y-outfit-pager__skip { left: var(--space-20); top: calc(var(--pager-size) - 32px); } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma): 32 выше низа */
