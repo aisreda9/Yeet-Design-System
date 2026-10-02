@@ -43,6 +43,11 @@ export type ScreenProps = {
    * фото деталей, которое сворачивается в шапку (`DetailsScreen`).
    */
   backdrop?: ReactNode;
+  /**
+   * Свёрнутое состояние закреплённой шапки (`data-collapsed`) задаёт шаблон, а не скролл: `DetailsScreen` — фото свёрнуто
+   * шторкой (#220). Без него — по скроллу, гистерезис 24 / 8.
+   */
+  collapsed?: boolean;
   /** Скролл-контейнер экрана — для хуков скролла и историй в прокрученном состоянии. */
   scrollRef?: RefObject<HTMLElement | null>;
   className?: string;
@@ -71,7 +76,7 @@ function headerVariant(header: ReactNode) {
  * верхняя — после начала скролла (под статус-баром или под прилипшими фильтрами), нижняя — пока список не докручен до конца.
  * Если под краем панель (`Sheet type="panel"`, bg-elevated) — подложка края и затухание берут цвет панели (`--screen-edge-bg`).
  */
-export function Screen({ header, pinHeader, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, scrollRef, className, children }: ScreenProps) {
+export function Screen({ header, pinHeader, bottom, overlay, floating, floatingOffset = 132, center, flush, end, background = 'canvas', photo, backdrop, collapsed: collapsedProp, scrollRef, className, children }: ScreenProps) {
   const own = useRef<HTMLElement>(null);
   const ref = scrollRef ?? own;
   const kind = headerVariant(header);
@@ -129,7 +134,7 @@ export function Screen({ header, pinHeader, bottom, overlay, floating, floatingO
     <div
       className={cx('y-screen', background !== 'canvas' && `y-screen--${background}`, className)}
       style={photo ? { ['--screen-photo' as string]: `url("${photo}")` } : undefined}
-      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={((!scrolls || pinsBar) && edges.collapsed) || undefined} data-stuck={edges.stuck || undefined}
+      data-edge-top={edges.top || undefined} data-edge-bottom={edges.bottom || undefined} data-collapsed={(collapsedProp ?? ((!scrolls || pinsBar) && edges.collapsed)) || undefined} data-stuck={edges.stuck || undefined}
       data-panel-top={edges.panelTop || undefined} data-panel-bottom={edges.panelBottom || undefined}>
       {scrolls ? (
         <div className="y-screen__top">
