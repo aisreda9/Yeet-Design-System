@@ -320,11 +320,11 @@ object YeetMotion {
     fun <T> press(): FiniteAnimationSpec<T> = tween(durationMillis = 150, easing = YeetEasing.standard)
     /** Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
     fun <T> fade(): FiniteAnimationSpec<T> = tween(durationMillis = 240, easing = YeetEasing.standard)
-    /** Фото сворачивается в шапку при скролле */
+    /** Шапка «назад»: компактный заголовок при скролле */
     fun <T> collapse(): FiniteAnimationSpec<T> = tween(durationMillis = 300, easing = YeetEasing.out)
     /** Листание образов и поводов по свайпу */
     fun <T> page(): FiniteAnimationSpec<T> = tween(durationMillis = 300, easing = YeetEasing.out)
-    /** Таб-бар уступает место FAB · Figma Smart Animate Quick */
+    /** Таб-бар уступает место FAB, «+» выезжает справа · Figma Smart Animate Quick */
     fun <T> nav(): FiniteAnimationSpec<T> = spring(dampingRatio = YeetSpring.quickDampingRatio, stiffness = YeetSpring.quickStiffness)
     /** Штамп «Надеть» → отмечено · Figma Smart Animate Bouncy */
     fun <T> stamp(): FiniteAnimationSpec<T> = spring(dampingRatio = YeetSpring.bouncyDampingRatio, stiffness = YeetSpring.bouncyStiffness)
@@ -342,7 +342,7 @@ object YeetMotion {
     fun <T> appear(): FiniteAnimationSpec<T> = tween(durationMillis = 240, easing = YeetEasing.standard)
     /** Исчезновение: быстрее появления, чтобы не мешать */
     fun <T> exit(): FiniteAnimationSpec<T> = tween(durationMillis = 150, easing = YeetEasing.standard)
-    /** Шторка: появление и возврат после смахивания, без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58) */
+    /** Шторка: появление, возврат после смахивания, доводка шторки деталей; без перелёта · Не пресет Figma: жёсткость quick (300), damping 2·√300 — ζ = 1, x = 1 − (1 + ωt)·e^−ωt; 540 мс — до 0,1 % от цели (D5, #58) */
     fun <T> sheet(): FiniteAnimationSpec<T> = spring(dampingRatio = YeetSpring.criticalDampingRatio, stiffness = YeetSpring.criticalStiffness)
 }
 
@@ -356,11 +356,11 @@ class YeetMotionScheme(val reduced: Boolean = false) {
     fun <T> press(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.press()
     /** Затухание краёв при скролле, затемнение под шторкой, подписи и тени */
     fun <T> fade(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.fade()
-    /** Фото сворачивается в шапку при скролле */
+    /** Шапка «назад»: компактный заголовок при скролле */
     fun <T> collapse(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.collapse()
     /** Листание образов и поводов по свайпу */
     fun <T> page(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.page()
-    /** Таб-бар уступает место FAB */
+    /** Таб-бар уступает место FAB, «+» выезжает справа */
     fun <T> nav(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.nav()
     /** Штамп «Надеть» → отмечено */
     fun <T> stamp(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.stamp()
@@ -378,7 +378,7 @@ class YeetMotionScheme(val reduced: Boolean = false) {
     fun <T> appear(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.appear()
     /** Исчезновение: быстрее появления, чтобы не мешать */
     fun <T> exit(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.exit()
-    /** Шторка: появление и возврат после смахивания, без перелёта */
+    /** Шторка: появление, возврат после смахивания, доводка шторки деталей; без перелёта */
     fun <T> sheet(): FiniteAnimationSpec<T> = if (reduced) snap() else YeetMotion.sheet()
     val liftScale: Float get() = if (reduced) 1f else YeetGesture.liftScale
     val targetScale: Float get() = if (reduced) 1f else YeetGesture.targetScale
