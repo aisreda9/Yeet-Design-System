@@ -343,61 +343,77 @@
 .y-slot__add { aspect-ratio: 173 / 172; display: grid; place-items: center; }
 .y-slot__row > .y-slot__add:not(:only-child) { justify-items: start; padding-left: 22px; } /* флоу: «+» в 22 от края слота, рядом с карточкой */ /* stylelint-disable-line unit-disallowed-list -- «+» в 22 от края слота (Figma) */
 
-/* ─── OutfitPager (#25) ─── */
-/* Геометрия Figma: коллаж 353; стопка — превью в 20 над и под коллажем: 96 на главной (1371:36589, scale 0.272), 150 в «Удиви меня» (1371:42686);
-   лента (1371:42779) — шаг 353 + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
+/* ─── OutfitPager (#25, #220) ─── */
+/* Коллаж — квадрат во всю ширину контента (353 при 393: поля Screen по 20), размеры ставит pager.tsx по ResizeObserver:
+   --pager-size (коллаж), --pager-preview (превью), --pager-scale = превью / коллаж, --pager-k = коллаж / 353 (смещения из Figma).
+   Стопка в Screen (1371:36589 главная, 1371:42686 «Удиви меня») занимает всё место между шапкой и таб-баром:
+   превью = (высота − коллаж − 2 × 20 − --pager-end) / 2 — при 393 × 852 ровно 96 и 150, как в Figma.
+   Лента (1371:42779) — шаг коллаж + 20, соседние за краем экрана (вьюпорт выходит на поля Screen на 20). */
 .y-outfit-pager {
-  --pager-size: 353px; --pager-top: 0px; --pager-bleed: var(--space-20); /* stylelint-disable-line unit-disallowed-list -- коллаж 353 из Figma; 0px — длина для calc() */
-  position: relative; flex: none; width: var(--pager-size); max-width: 100%; margin-inline: auto;
+  --pager-size: 353px; --pager-preview: 96px; --pager-scale: 0.272; --pager-k: 1; --pager-gap: var(--space-20); --pager-end: 0px; --pager-top: 0px; --pager-bleed: var(--screen-gutter); /* stylelint-disable-line unit-disallowed-list -- значения до первого замера (коллаж 353, превью 96 из Figma); 0px — длина для calc() */
+  --pager-x: calc((100% - var(--pager-size)) / 2); /* коллаж по центру, если стопка ужала его по высоте */
+  position: relative; flex: none; width: 100%;
   user-select: none; -webkit-user-select: none; cursor: grab;
 }
 .y-outfit-pager[data-dragging] { cursor: grabbing; }
 .y-outfit-pager--y {
-  --pager-preview: 96; --pager-scale: calc(var(--pager-preview) / 353); --pager-top: calc(var(--pager-preview) * 1px + var(--space-20)); /* stylelint-disable-line unit-disallowed-list -- перевод числа превью в px */
-  height: calc(2 * var(--pager-top) + var(--pager-size)); touch-action: none;
+  --pager-top: calc(var(--pager-preview) + var(--pager-gap));
+  height: calc(2 * var(--pager-top) + var(--pager-size) + var(--pager-end)); touch-action: none;
 }
-.y-outfit-pager--preview-150 { --pager-preview: 150; }
+/* В экране стопка тянется на свободную высоту колонки (flex-grow — сигнал для pager.tsx) и всегда в неё помещается: экран не скроллится.
+   Низ стопки (--pager-end) — от низа контента Screen (поле 24), TODO(tokens): токенов 5 и −3 нет.
+   «Удиви меня» без таб-бара: нижнее превью заходит на 3 в поле — 21 до низа экрана (1371:42686, низ превью y831). */
+.y-screen__content > .y-outfit-pager--y { --pager-end: -3px; flex: 1 1 0; height: auto; min-height: 0; } /* stylelint-disable-line unit-disallowed-list -- низ стопки «Удиви меня» из Figma, TODO(tokens) */
+/* главная: 29 до таб-бара = поле 24 + 5 (1371:36589, низ превью y747, таб-бар y776) */
+.y-screen__content:has(~ .y-bottom-nav) > .y-outfit-pager--y { --pager-end: 5px; } /* stylelint-disable-line unit-disallowed-list -- низ стопки над таб-баром из Figma, TODO(tokens) */
 .y-outfit-pager--x { height: var(--pager-size); touch-action: pan-y; }
 .y-outfit-pager__viewport { position: absolute; inset: 0; }
+/* Стопка обрезана по своей области: ни превью, ни уходящие образы (is-above / is-below), ни образ под пальцем не заходят
+   на шапку и таб-бар и не дают экрану скролл. Низ области — по нижнему превью (при --pager-end < 0 оно ниже стопки).
+   Погода и штамп — в __frame, вне обрезки */
+.y-outfit-pager--y .y-outfit-pager__viewport { bottom: min(0px, var(--pager-end)); overflow: clip; } /* stylelint-disable-line unit-disallowed-list -- 0px — длина для min() */
 .y-outfit-pager--x .y-outfit-pager__viewport { inset: 0 calc(-1 * var(--pager-bleed)); overflow: hidden; }
 .y-outfit-pager__track { position: absolute; inset: 0; }
-.y-outfit-pager__look { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); transform-origin: top center; }
+.y-outfit-pager__look { position: absolute; left: var(--pager-x); top: var(--pager-top); width: var(--pager-size); transform-origin: top center; }
 .y-outfit-pager__look:not(.is-current) { cursor: pointer; }
 
 /* Стопка: превью ↔ коллаж на пружине gentle (--motion-swap), палец ведёт 1 : 1 через translate */
 .y-outfit-pager--y .y-outfit-pager__look { translate: 0 var(--drag, 0px); transition: transform var(--motion-swap), opacity var(--motion-fade), translate var(--motion-swap); } /* stylelint-disable-line unit-disallowed-list -- 0px — длина по умолчанию для translate */
 .y-outfit-pager--y .is-current { z-index: 1; }
 .y-outfit-pager--y .is-prev { transform: translateY(calc(-1 * var(--pager-top))) scale(var(--pager-scale)); }
-.y-outfit-pager--y .is-next { transform: translateY(calc(var(--pager-size) + var(--space-20))) scale(var(--pager-scale)); }
-.y-outfit-pager--y .is-above { transform: translateY(calc(-1 * var(--pager-top) - 44px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вверх из Figma Animations */
-.y-outfit-pager--y .is-below { transform: translateY(calc(var(--pager-size) + 107px)) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вниз из Figma Animations */
-/* у превью радиус 20, как у outfit-thumbnail: до масштаба 20 / scale; бейдж повода на превью не читается — прячем */
+.y-outfit-pager--y .is-next { transform: translateY(calc(var(--pager-size) + var(--pager-gap))) scale(var(--pager-scale)); }
+.y-outfit-pager--y .is-above { transform: translateY(calc(-1 * var(--pager-top) - 44px * var(--pager-k))) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вверх из Figma Animations (при коллаже 353) */
+.y-outfit-pager--y .is-below { transform: translateY(calc(var(--pager-size) + 107px * var(--pager-k))) scale(calc(var(--pager-scale) * 0.75)); opacity: 0; } /* stylelint-disable-line unit-disallowed-list -- уход стопки вниз из Figma Animations (при коллаже 353) */
+/* у превью радиус 20, как у outfit-thumbnail: до масштаба 20 / scale (scale — число из pager.tsx, деления длин нет); бейдж повода на превью не читается — прячем */
 .y-outfit-pager--y .y-outfit-pager__look .y-collage { transition: border-radius var(--motion-swap); }
-.y-outfit-pager--y .y-outfit-pager__look:not(.is-current) .y-collage { border-radius: calc(var(--radius-lg) * 353 / var(--pager-preview)); }
+.y-outfit-pager--y .y-outfit-pager__look:not(.is-current) .y-collage { border-radius: calc(var(--radius-lg) / var(--pager-scale)); }
 .y-outfit-pager__look .y-collage__label { transition: opacity var(--motion-fade); }
 .y-outfit-pager__look:not(.is-current) .y-collage__label { opacity: 0; }
 
 /* Лента: трек едет на --motion-page, во время жеста — без перехода */
-.y-outfit-pager--x .y-outfit-pager__track { left: var(--pager-bleed); right: var(--pager-bleed); translate: calc(var(--index, 0) * -1 * (var(--pager-size) + var(--space-20)) + var(--drag, 0px)) 0; transition: translate var(--motion-page); } /* stylelint-disable-line unit-disallowed-list -- 0px — длина по умолчанию для translate */
+.y-outfit-pager--x .y-outfit-pager__track { left: var(--pager-bleed); right: var(--pager-bleed); translate: calc(var(--index, 0) * -1 * (var(--pager-size) + var(--pager-gap)) + var(--drag, 0px)) 0; transition: translate var(--motion-page); } /* stylelint-disable-line unit-disallowed-list -- 0px — длина по умолчанию для translate */
 .y-outfit-pager--x[data-dragging] .y-outfit-pager__track { transition: none; }
-.y-outfit-pager--x .y-outfit-pager__look { left: calc(var(--k, 0) * (var(--pager-size) + var(--space-20))); }
+.y-outfit-pager--x .y-outfit-pager__look { left: calc(var(--k, 0) * (var(--pager-size) + var(--pager-gap))); }
 /* Стопка во время жеста: translate без перехода. Здесь, а не у стопки, — после правил ленты (no-descending-specificity) */
 .y-outfit-pager--y[data-dragging] .y-outfit-pager__look { transition: transform var(--motion-swap), opacity var(--motion-fade), translate 0s; }
 
 /* Слоты поверх текущего коллажа: погода над левым верхним углом, штамп «Надеть» у правого нижнего, «Не нравится» — у левого */
-.y-outfit-pager__frame { position: absolute; left: 0; top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: var(--layer-float); pointer-events: none; }
+.y-outfit-pager__frame { position: absolute; left: var(--pager-x); top: var(--pager-top); width: var(--pager-size); height: var(--pager-size); z-index: var(--layer-float); pointer-events: none; }
 /* stylelint-disable-next-line no-descending-specificity -- `*` у разных родителей: общих элементов с `.y-sheet--modal > … + *` нет */
 .y-outfit-pager__frame > * { position: absolute; pointer-events: auto; cursor: auto; }
-.y-outfit-pager__weather { left: var(--space-20); top: -43px; } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma) */
-.y-outfit-pager__weather:has(.y-weather__alert) { translate: 0 calc(-1 * var(--space-16)); } /* с предупреждением карточка растёт вверх на строку 16, низ на месте (today-rain 1173:16259: верх y182) */
+/* Погода над коллажем на 43 (Figma), с предупреждением — ещё на строку 16 выше, низ на месте (today-rain 1173:16259: верх y182).
+   Когда превью мало (низкий экран), карточка опускается: верх коробки не выше 20 от верха стопки — с наклоном она не заходит на шапку */
+.y-outfit-pager__weather { --weather-lift: 0px; left: var(--space-20); top: max(calc(-43px - var(--weather-lift)), calc(var(--space-20) - var(--pager-top))); } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma); 0px — длина для calc() */
+.y-outfit-pager__weather:has(.y-weather__alert) { --weather-lift: var(--space-16); }
+.y-outfit-pager[data-compact] .y-outfit-pager__weather { display: none; } /* низкий экран: коллаж меньше 90 % — погоду не показываем (решение владельца, 02.10) */
 .y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
-.y-outfit-pager__stamp { right: var(--space-20); top: 280px; } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа (Figma) */
-.y-outfit-pager__skip { left: var(--space-20); top: 321px; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа (Figma) */
+.y-outfit-pager__stamp { --slot-k: min(var(--pager-k), 1); right: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 73px * var(--slot-k)); scale: var(--slot-k); transform-origin: right top; } /* stylelint-disable-line unit-disallowed-list -- штамп на y280 коллажа 353 (Figma): заходит на 73 выше низа; на узком коллаже уменьшается вместе с ним (решение владельца, 02.10) */
+.y-outfit-pager__skip { --slot-k: min(var(--pager-k), 1); left: calc(var(--space-20) * var(--slot-k)); top: calc(var(--pager-size) - 32px * var(--slot-k)); scale: var(--slot-k); transform-origin: left top; } /* stylelint-disable-line unit-disallowed-list -- «Не нравится» на y321 коллажа 353 (Figma); на узком коллаже уменьшается вместе с ним */
 /* звезда поворачивается на 180° с каждой сменой образа (Animations «scale»), нажатие и done — своими переходами */
 .y-outfit-pager__stamp .y-stamp__shape { rotate: var(--turn, 0deg); transition: transform var(--motion-stamp), scale var(--motion-press), color var(--motion-select), rotate var(--motion-swap); }
 
 /* Кнопки для клавиатуры и скринридера: в порядке Tab, видны только при фокусе с клавиатуры */
-.y-outfit-pager__nav { position: absolute; right: 0; top: var(--pager-top); z-index: var(--layer-bar); display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); opacity: 0; pointer-events: none; transition: opacity var(--motion-fade); }
+.y-outfit-pager__nav { position: absolute; right: var(--pager-x); top: var(--pager-top); z-index: var(--layer-bar); display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); opacity: 0; pointer-events: none; transition: opacity var(--motion-fade); }
 .y-outfit-pager--x .y-outfit-pager__nav { flex-direction: row; }
 .y-outfit-pager__nav:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 .y-outfit-pager__nav [aria-disabled='true'] { opacity: 0.4; cursor: default; }

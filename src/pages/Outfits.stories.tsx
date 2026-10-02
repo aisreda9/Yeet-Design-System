@@ -18,7 +18,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Образы дня: предыдущий, текущий и следующий — стопка `OutfitPager`, превью 96 сверху и снизу. */
+/** Образы дня: предыдущий, текущий и следующий — стопка `OutfitPager` от шапки до таб-бара (превью 96 при 393 × 852). */
 const todayLooks: PagerLook[] = [
   { id: 'yellow', name: 'жёлтый топ', items: [{ kind: 'top', x: 40, y: 52, size: 160, color: 'yellow' }, { kind: 'bottom', x: 66, y: 42, size: 150, color: 'green' }] },
   { id: 'green', name: 'зелёный деним', items: [{ kind: 'top', x: 68, y: 34, size: 120, color: 'green' }, { kind: 'bottom', x: 30, y: 60, size: 150, color: 'green' }, { kind: 'accessories', x: 34, y: 22, size: 64 }, { kind: 'shoe', x: 72, y: 74, size: 80, color: 'brown' }] },
