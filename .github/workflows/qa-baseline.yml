@@ -5,11 +5,16 @@ name: QA baseline
 #
 # Механика та же, что в qa.yml: `npm run qa` на ubuntu-latest (там есть Docker) сам перезапускается в образе IMAGE
 # из scripts/qa/lib.mjs (docker run, репозиторий смонтирован в /work, браузер — из образа). Поэтому эталоны
-# побайтно совпадают с тем, что сравнивает CI. Браузеры на хост не ставим: скриншоты снимаются только внутри образа.
+# побайтно совпадают с тем, что сравнивает CI. Браузеры на хост ставим только для play-тестов (как job play в qa.yml).
 #
-# ВАЖНО: push токеном GITHUB_TOKEN не запускает другие workflow (защита GitHub от рекурсии). Поэтому после коммита
-# эталонов workflow сам запускает QA Storybook на ветке через workflow_dispatch — это исключение из защиты
-# (#147 п. 2). PAT и секреты не заводим нарочно.
+# Прогон заодно проверяет всё, что проверяет qa.yml (токены, typecheck, контраст, QA с краями 320/430, flow-diff --strict,
+# покрытие, play-тесты). Если всё зелёное, после коммита workflow ставит на итоговый SHA check-runs «qa» и
+# «Play-тесты историй» — те же имена, что у jobs qa.yml, — и второй прогон QA Storybook не нужен (#225).
+# Хоть одна проверка красная — зелёного ничего не ставит и падает (эталоны при этом всё равно коммитятся).
+# Запасной путь, если check-run создать не удалось или пересняты не все истории (`stories`): запуск QA Storybook через
+# workflow_dispatch — исключение из защиты GitHub от рекурсии (#147 п. 2).
+# Push токеном GITHUB_TOKEN создаёт pull_request-прогон QA Storybook только в состоянии action_required (ждёт одобрения):
+# после check-runs workflow его отменяет. PAT и секреты не заводим нарочно.
 
 on:
   workflow_dispatch:
@@ -26,7 +31,8 @@ on:
 
 permissions:
   contents: write
-  actions: write # запуск QA Storybook (workflow_dispatch) после коммита эталонов
+  checks: write # зелёные check-runs «qa» и «Play-тесты историй» на коммит эталонов
+  actions: write # запасной запуск QA Storybook (workflow_dispatch) и отмена дубля в action_required
 
 concurrency:
   # Два прогона на одну ветку писали бы друг другу поверх — второй ждёт первого
@@ -36,7 +42,7 @@ concurrency:
 jobs:
   baseline:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     env:
       # Входы — только через env, не подстановкой ${{ }} в скрипт (инъекция в shell)
       STORIES: ${{ inputs.stories }}
@@ -73,25 +79,105 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+
+      # ── Те же проверки, что в jobs qa и play файла qa.yml ──────────────────────────────────────────────────────
+      # continue-on-error: прогон доходит до конца (эталоны коммитятся и при других ошибках), а итог «всё зелёное»
+      # собирается из outcome шагов в шаге «Итог проверок». Меняешь проверки в qa.yml — поменяй и здесь.
+      # До build-storybook: он сам перегенерирует токены и скроет ручную правку
+      - name: Сгенерированные токены совпадают с tokens/tokens.json (npm run tokens)
+        id: tokens
+        continue-on-error: true
+        run: |
+          node --test scripts/tokens/dtcg.test.mjs
+          node scripts/build-tokens.mjs
+          if [ -n "$(git status --porcelain -- src/tokens tokens native)" ]; then
+            git status --porcelain -- src/tokens tokens native
+            echo '::error::Сгенерированные файлы не совпадают с генератором: `npm run tokens` и закоммитить результат.'
+            exit 1
+          fi
+      - name: Typecheck
+        id: typecheck
+        continue-on-error: true
+        run: npm run typecheck
       - run: npm run build-storybook
+      - name: Контраст (npm run contrast)
+        id: contrast
+        continue-on-error: true
+        run: npm run contrast
       - name: Пересъёмка эталонов (npm run qa -- --update-baseline в закреплённом образе)
         id: qa
         run: |
           set +e
-          args=(--update-baseline --no-devices)
+          # Без --no-devices: края на 320 и 430 проверяются, как в qa.yml, иначе зелёный «qa» был бы нечестным
+          args=(--update-baseline)
           [ -n "$STORIES" ] && args+=("--only=$STORIES")
           npm run qa -- "${args[@]}"
           code=$?
           set -e
           echo "code=$code" >> "$GITHUB_OUTPUT"
-          # 0 — чисто; 1 — эталоны сняты, но другие проверки QA нашли ошибки (отчёт дописан до конца) — коммитим
-          # и предупреждаем; иное (2 — не тот образ / нет storybook-static / Docker; падение без отчёта) — стоп.
+          # С --update-baseline run.mjs не пишет ошибок «визуальная разница», «нет эталона», «лишний эталон» (эталон
+          # переписывается или удаляется), поэтому код 0 = «после пересъёмки ошибок 0»: обычный `npm run qa` на новом
+          # коммите тоже даст 0. 1 — эталоны сняты, но другие проверки QA нашли ошибки (отчёт дописан до конца) —
+          # коммитим, но зелёного не ставим; иное (2 — не тот образ / нет storybook-static / Docker; падение без отчёта) — стоп.
           if [ "$code" -eq 1 ] && [ -f qa/out/report.md ]; then
-            echo '::warning::QA нашёл ошибки помимо эталонов — см. qa/out/report.md в summary и артефакте. Эталоны всё равно закоммичены.'
+            echo '::error::QA нашёл ошибки помимо эталонов — см. qa/out/report.md в summary и артефакте. Эталоны всё равно закоммичены, зелёных check-runs не будет.'
           elif [ "$code" -ne 0 ]; then
             echo "::error::npm run qa завершился с кодом $code — эталоны не закоммичены."
             exit "$code"
           fi
+      # Браузер Playwright на хосте (не в образе): нужен flow-diff и play-тестам, как в qa.yml
+      - name: Версия Playwright
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Кэш браузеров Playwright
+        id: pw-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Сверка экранов с флоу Figma (npm run flow-diff -- --strict)
+        id: flowdiff
+        continue-on-error: true
+        run: npm run flow-diff -- --strict
+      - name: Покрытие экранов и пути story реестра
+        id: coverage
+        continue-on-error: true
+        run: node scripts/qa/coverage.mjs
+      - name: Play-тесты (npm run test-storybook)
+        id: play
+        continue-on-error: true
+        # shell bash в Actions — с pipefail: код выхода vitest не теряется в tee
+        run: npm run test-storybook -- --reporter=default --reporter=github-actions 2>&1 | tee "$RUNNER_TEMP/play.log"
+      - name: Итог проверок
+        id: verdict
+        env:
+          TOKENS: ${{ steps.tokens.outcome }}
+          TYPECHECK: ${{ steps.typecheck.outcome }}
+          CONTRAST: ${{ steps.contrast.outcome }}
+          QA_CODE: ${{ steps.qa.outputs.code }}
+          FLOWDIFF: ${{ steps.flowdiff.outcome }}
+          COVERAGE: ${{ steps.coverage.outcome }}
+          PLAY: ${{ steps.play.outcome }}
+        run: |
+          red=()
+          [ "$TOKENS" = success ] || red+=('токены')
+          [ "$TYPECHECK" = success ] || red+=('typecheck')
+          [ "$CONTRAST" = success ] || red+=('контраст')
+          [ "$QA_CODE" = 0 ] || red+=("npm run qa (код $QA_CODE)")
+          [ "$FLOWDIFF" = success ] || red+=('flow-diff')
+          [ "$COVERAGE" = success ] || red+=('покрытие')
+          [ "$PLAY" = success ] || red+=('play-тесты')
+          if [ ${#red[@]} -eq 0 ]; then
+            echo 'green=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'green=false' >> "$GITHUB_OUTPUT"
+            echo "RED=$(IFS=,; echo "${red[*]}")" >> "$GITHUB_ENV"
+          fi
+
       - name: Коммит и push в ветку
         run: |
           git add -A -- qa/baseline
@@ -111,7 +197,6 @@ jobs:
                 printf '%s\n' "$files" | sed 's/^/- `/; s/$/`/'
                 echo
               done
-              echo '> QA Storybook на новом коммите запущен автоматически (workflow_dispatch).'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           [ -z "$changes" ] && exit 0
@@ -123,13 +208,72 @@ jobs:
             exit 1
           fi
           echo "pushed=true" >> "$GITHUB_ENV"
-      - name: Запуск QA Storybook на ветке
-        if: env.pushed == 'true'
+
+      # Всё зелёное и пересняты все истории → check-runs с именами jobs qa.yml на итоговый SHA (коммит бота или, если
+      # эталоны не менялись, проверенный HEAD ветки). Обязательные проверки PR видят их, второй прогон QA не нужен.
+      - name: Зелёные check-runs «qa» и «Play-тесты историй»
+        id: checks
+        if: steps.verdict.outputs.green == 'true' && env.STORIES == ''
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run qa.yml --ref "$BRANCH"
+        run: |
+          sha="$(git rev-parse HEAD)"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          qa_errors="$(grep -m1 -E '^\*\*Ошибок:' qa/out/report.md || echo '**Ошибок: 0**')"
+          qa_stats="$(grep -m1 -E '^Историй:' qa/out/report.md || true)"
+          play_line="$(sed 's/\x1b\[[0-9;]*m//g' "$RUNNER_TEMP/play.log" | grep -E '^ *Tests ' | tail -1 | sed 's/^ *//' || true)"
+          post() { # имя check-run, заголовок, summary
+            gh api -X POST "repos/$GITHUB_REPOSITORY/check-runs" \
+              -f name="$1" -f head_sha="$sha" -f status=completed -f conclusion=success \
+              -f details_url="$run_url" -f "output[title]=$2" -f "output[summary]=$3" --jq .html_url
+          }
+          post 'qa' 'QA пройден в прогоне QA baseline' "$(printf '%s\n\n%s\n\n%s\n\nПрогон QA baseline: %s\n\nЭталоны пересняты в закреплённом образе; токены, typecheck, контраст, flow-diff --strict, покрытие — зелёные.' \
+            "Проверено на \`$sha\`." "$qa_stats" "$qa_errors" "$run_url")"
+          post 'Play-тесты историй' 'Play-тесты пройдены в прогоне QA baseline' "$(printf '%s\n\n%s\n\nПрогон QA baseline: %s' \
+            "Проверено на \`$sha\`." "${play_line:-npm run test-storybook: успешно}" "$run_url")"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "> Check-runs «qa» и «Play-тесты историй» поставлены на \`$sha\` — повторный прогон QA Storybook не нужен." >> "$GITHUB_STEP_SUMMARY"
+      # Дубль: pull_request-прогон QA Storybook на коммите бота (push токеном GITHUB_TOKEN) висит в action_required и
+      # ждёт ручного одобрения. Результат уже есть в check-runs — отменяем его. Без гарантий: не нашли — не страшно.
+      - name: Отмена прогона QA Storybook в action_required на коммите бота
+        if: steps.checks.outcome == 'success' && env.pushed == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.checks.outputs.sha }}
+        run: |
+          for _ in 1 2 3 4 5 6; do
+            ids="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/qa.yml/runs?head_sha=$SHA&event=pull_request" \
+              --jq '.workflow_runs[] | select(.status == "action_required" or .conclusion == "action_required" or .status == "waiting") | .id')"
+            if [ -n "$ids" ]; then
+              # Прогон, ждущий одобрения, API отдаёт как completed + conclusion action_required: отменить его нельзя,
+              # поэтому — отмена, а если не вышло, удаление (actions: write)
+              for id in $ids; do
+                if gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$id/cancel" >/dev/null 2>&1; then echo "Отменён прогон $id"
+                elif gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/runs/$id" >/dev/null; then echo "Удалён прогон $id"
+                fi
+              done
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Прогона в action_required не нашлось — отменять нечего.'
+      # Запасной путь: check-runs не поставлены (ошибка API) или пересняты не все истории — запускаем QA Storybook как раньше
+      - name: Запуск QA Storybook на ветке (запасной путь)
+        if: env.pushed == 'true' && steps.verdict.outputs.green == 'true' && steps.checks.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run qa.yml --ref "$BRANCH"
+          echo '> Check-runs не поставлены (или пересняты не все истории) — QA Storybook на новом коммите запущен через workflow_dispatch.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Красные проверки — job падает
+        if: steps.verdict.outputs.green != 'true'
+        run: |
+          echo "::error::Красные проверки: $RED. Зелёных check-runs нет; после исправления — обычный коммит в PR (QA Storybook запустится сам)."
+          exit 1
       - if: always()
-        run: cat qa/out/report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+        run: cat qa/out/report.md qa/out/flow-diff.md qa/out/coverage.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
       - if: always()
         uses: actions/upload-artifact@v7
         with:
