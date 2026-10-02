@@ -215,6 +215,7 @@ export const TodayOccasion: Story = {
     await userEvent.click(within(occasion).getByRole('button', { name: 'Добавить' }));
     const name = await within(occasion).findByRole('textbox', { name: 'Название' });
     await expect(name).toHaveValue('');
+    await waitFor(() => expect(name).toHaveFocus()); // поле сразу в фокусе (Figma 1174:15483, #234)
     await userEvent.type(name, 'Кастом{Enter}');
     await tap(root, await within(occasion).findByRole('button', { name: 'Кастом' }));
     await gone(c, 'dialog');
@@ -235,6 +236,7 @@ export const OutfitsCustomOccasion: Story = {
     await userEvent.click(within(occasion).getByRole('button', { name: 'Добавить' }));
     const name = await within(occasion).findByRole('textbox', { name: 'Название' });
     await expect(name).toHaveValue('');
+    await waitFor(() => expect(name).toHaveFocus()); // поле сразу в фокусе (Figma 1174:15483, #234)
     await userEvent.type(name, 'Кастом{Enter}');
     await expect(c.queryByText('Этого экрана пока нет в макетах')).toBeNull();
     await expect(within(occasion).getByRole('button', { name: 'Удалить: Кастом' })).toBeVisible();
@@ -559,5 +561,69 @@ export const StylistBack: Story = {
     await at(root, 'Stylist');
     await back(root);
     await at(root, 'StylistHome');
+  },
+};
+
+/* ─── Play: финальная сверка #234 ─────────────────────────────────────── */
+
+/** Тап пальцем без сдвига в точку `el`: превью стопки `inert`, поэтому события получает лента под ним — как у живого пальца. */
+const tapThrough = async (root: HTMLElement, el: Element) => {
+  const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const target = el.closest('.y-outfit-pager__track')!;
+  const opts = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 21, pointerType: 'touch', isPrimary: true };
+  target.dispatchEvent(new PointerEvent('pointerdown', opts));
+  target.dispatchEvent(new PointerEvent('pointerup', opts));
+  target.dispatchEvent(new MouseEvent('click', opts));
+  await idle(root);
+};
+
+/**
+ * Главная → тап по превью соседнего образа → детали образа (PROTOTYPE-FIGMA §Sunny, `1173:16192`), стопка не листается.
+ * Детали: «Надеть» → штамп выполнен (Variant 02 `1174:19564`) и тост; «Назад» на главную — тост поднимается над таб-баром;
+ * снова в детали — «Отменить» в тосте возвращает штамп.
+ */
+export const TodayPreviewAndWear: Story = {
+  name: 'Цепочка: превью образа, «Надеть» и тост',
+  args: { start: 'Today' satisfies ScreenId, panel: false },
+  play: async ({ canvasElement: root, step }) => {
+    const current = () => q(root, '.y-outfit-pager__look.is-current').getAttribute('aria-label');
+    await at(root, 'Today');
+    const before = current();
+
+    await step('тап по нижнему превью → Outfit Details, стопка на месте', async () => {
+      await tapThrough(root, q(root, '.y-outfit-pager__look.is-next .y-collage'));
+      await at(root, 'OutfitDetails');
+      await back(root);
+      await at(root, 'Today');
+      await expect(current()).toBe(before);
+    });
+
+    await step('тап по верхнему превью → Outfit Details; «Надеть» → штамп выполнен, тост над низом экрана', async () => {
+      await tapThrough(root, q(root, '.y-outfit-pager__look.is-prev .y-collage'));
+      await at(root, 'OutfitDetails');
+      const stamp = topLayer(root).getByRole('button', { name: 'Надеть' });
+      await tap(root, stamp);
+      await expect(stamp).toHaveAttribute('aria-pressed', 'true');
+      await expect(stamp).toHaveClass('y-stamp--done-S');
+      await within(toastEl(root)!).findByText('Образ отмечен как надетый');
+      await expect(root.querySelector<HTMLElement>('.y-proto__toast')!.style.bottom).toBe('36px');
+    });
+
+    await step('«Назад» на главную — тост над таб-баром', async () => {
+      await back(root);
+      await at(root, 'Today');
+      await waitFor(() => expect(root.querySelector<HTMLElement>('.y-proto__toast')!.style.bottom).toBe('132px'));
+    });
+
+    await step('«Отменить» возвращает штамп', async () => {
+      await tap(root, q(root, '.y-outfit-pager__look.is-current .y-collage'));
+      await at(root, 'OutfitDetails');
+      const stamp = topLayer(root).getByRole('button', { name: 'Надеть' });
+      await tap(root, stamp);
+      await expect(stamp).toHaveAttribute('aria-pressed', 'true');
+      await tap(root, within(toastEl(root)!).getByRole('button', { name: 'Отменить' }));
+      await waitFor(() => expect(stamp).toHaveAttribute('aria-pressed', 'false'));
+      await expect(stamp).toHaveAccessibleName('Надеть');
+    });
   },
 };

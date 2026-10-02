@@ -34,7 +34,7 @@ if (import.meta.env?.DEV) {
  */
 
 type Layer = { key: number; id: ScreenId; overlay: boolean };
-type ToastState = { key: number; text: string; undo?: (nav: Nav) => void | Promise<void>; offset: number };
+type ToastState = { key: number; text: string; undo?: (nav: Nav) => void | Promise<void> };
 type Shell = { active: Tab; fab: boolean; avatarSrc?: string };
 const TABS = Object.keys(TAB_ROOTS) as Tab[];
 /** Навбар экрана в слое (у шторки и диалога он скрыт — берётся экран под ними). */
@@ -43,6 +43,8 @@ const NAV = '.y-screen > .y-bottom-nav';
 const INTERACTIVE = 'button, a[href], input, textarea, select, [role=slider], [role=switch], [role=checkbox]';
 /** Контролы внутри карточек и экранов, у которых своё действие: тап по ним не ведёт по флоу. */
 const NATIVE = 'input:not([readonly]), textarea:not([readonly]), select, [role=slider], [role=switch], [role=checkbox], .y-product-card__like, .y-item-card__remove, .y-photo-area__close, .y-photo-area__add, .y-chip__remove, .y-snackbar button, .y-stamp, .y-input-bar__clear';
+/** Превью соседних образов в стопке (OutfitPager): `inert`, поэтому клик по ним приходит в ленту или стопку. */
+const PAGER_PREVIEW = '.y-outfit-pager__look:is(.is-prev, .is-next)';
 const cssVar = (name: string, fallback: string) => (typeof document === 'undefined' ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
 const anims = (el?: Element | null) => el?.getAnimations?.() ?? [];
 
@@ -61,6 +63,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const busy = useRef(false);
   const suppress = useRef(false);
   const [toast, setToast] = useState<ToastState | null>(null);
+  /** Отступ тоста — от верхнего слоя сейчас, а не в момент показа: после «Назад» на экран с навбаром тост встаёт над ним (#234). */
+  const toastRef = useRef<HTMLDivElement>(null);
   const [hotspots, setHotspots] = useState(false);
   const [shell, setShell] = useState<Shell | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -92,6 +96,11 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     if (keep.current === id) keep.current = null;
     else removed.current.delete(id);
     return { key: ++seq.current, id, overlay: screens[id].overlay };
+  };
+  /** Отступ тоста от низа верхнего слоя: навбар и FAB — 132, нижняя панель — 100, без низа — 36. */
+  const toastBottom = () => {
+    const t = el(top());
+    return t?.querySelector('.y-bottom-nav, .y-dock') ? 132 : t?.querySelector('.y-bottom-bar') ? 100 : 36;
   };
   const screenCount = () => layersRef.current.filter((l) => !l.overlay).length;
 
@@ -227,9 +236,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         commit(layersRef.current.filter((l) => l.key !== cur.key));
       },
       toast(text, opts) {
-        const t = el(top());
-        const offset = t?.querySelector('.y-bottom-nav, .y-dock') ? 132 : t?.querySelector('.y-bottom-bar') ? 100 : 36;
-        setToast({ key: ++seq.current, text, undo: opts?.undo, offset });
+        setToast({ key: ++seq.current, text, undo: opts?.undo });
       },
       take() {
         const p = picked.current;
@@ -299,8 +306,26 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     return null;
   };
 
+  /** Где опустился палец: тап без сдвига отличается от свайпа (превью стопки). */
+  const downAt = useRef<{ x: number; y: number } | null>(null);
+  /**
+   * Тап по превью стопки (`inert` — клик приходит в ленту `.y-outfit-pager`) переадресуется самому превью под пальцем,
+   * чтобы сработал маршрут (главная → детали образа, #234). Свайп (палец сдвинулся дальше slop) — нет: это листание.
+   */
+  const throughPreview = (t: HTMLElement, e: MouseEvent): HTMLElement => {
+    const pager = t.closest<HTMLElement>('.y-outfit-pager');
+    if (!pager || t.closest('.y-outfit-pager__look.is-current, .y-outfit-pager__frame, .y-outfit-pager__nav')) return t;
+    const d = downAt.current;
+    if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > gesture.slop) return t;
+    for (const look of pager.querySelectorAll<HTMLElement>(PAGER_PREVIEW)) {
+      const r = (look.querySelector('.y-collage') ?? look).getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) return look;
+    }
+    return t;
+  };
+
   const onClickCapture = (e: React.MouseEvent) => {
-    const t = e.target as HTMLElement;
+    const t = throughPreview(e.target as HTMLElement, e.nativeEvent);
     if (suppress.current) { e.preventDefault(); e.stopPropagation(); suppress.current = false; return; }
     if (t.closest('a[href^="#"]')) e.preventDefault();
     const cur = top();
@@ -330,6 +355,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     const t = e.target as HTMLElement, box = frame.current!.getBoundingClientRect(), cur = top();
+    downAt.current = { x: e.clientX, y: e.clientY };
     cancelPress();
     // долгое нажатие
     const hit = resolve(t, 'long');
@@ -473,6 +499,12 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layers]);
 
+  /* Тост над низом верхнего экрана: пересчёт при каждой смене слоёв (push, «Назад», свайп, шторка) */
+  useLayoutEffect(() => {
+    if (toastRef.current) toastRef.current.style.bottom = `${toastBottom()}px`;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layers, toast]);
+
   /* Убранные вещи остаются скрытыми, пока слой их экрана в стеке */
   useLayoutEffect(() => hideRemoved(), [layers]);
 
@@ -500,6 +532,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
             host.querySelectorAll<HTMLElement>(r.sel).forEach((n) => {
               if (!textOk(r, n)) return;
               if (!n.hasAttribute('data-proto-link')) n.setAttribute('data-proto-link', r.on === 'long' ? 'long' : '');
+              // скрытое внутри экрана (превью стопки — `inert`): только подсветка, не кнопка — фокуса у него нет, aria-hidden остаётся
+              if (n.closest('[inert]:not([data-proto-layer])')) return;
               if (!n.matches(INTERACTIVE) && !n.hasAttribute('tabindex')) {
                 n.tabIndex = 0;
                 // карточка со своими контролами (лайк, «Выйти», поле) — с клавиатуры по Enter, но не кнопка: кнопка в кнопке — nested-interactive
@@ -522,7 +556,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
     };
     mark();
     const mo = new MutationObserver(mark);
-    mo.observe(root, { childList: true, subtree: true });
+    // `inert` — превью стопки стало текущим образом: теперь его коллаж — кнопка «Открыть образ»
+    mo.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['inert'] });
     return () => { mo.disconnect(); cancelAnimationFrame(raf); };
   }, [layers]);
 
@@ -575,7 +610,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
           </div>
         )}
         {toast && (
-          <div key={toast.key} className="y-proto__toast" style={{ bottom: toast.offset }}>
+          <div key={toast.key} ref={toastRef} className="y-proto__toast">
             <Snackbar autoHide onClose={() => setToast((t) => (t?.key === toast.key ? null : t))} onUndo={toast.undo ? () => void run((n) => toast.undo!(n), frame.current!) : undefined}>{toast.text}</Snackbar>
           </div>
         )}

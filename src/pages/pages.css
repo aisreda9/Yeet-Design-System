@@ -33,9 +33,6 @@
 /* Onboarding / First Outfit / Preview (1173:21962): подзаголовок → коллаж 28, на 4 больше шапки по умолчанию (аудит #216, строка 7) */
 .y-first-outfit-canvas { margin-top: var(--space-4); }
 
-/* Wishlist / Item Details: «Образы с этой вещью» — заголовок → коллаж 20, а не 16 */
-.y-item-looks { gap: var(--space-20); }
-
 /* Search / Text / No Results Filtered: блок ниже центра — текст на y460 */
 .y-search-empty { margin-top: 66px; } /* stylelint-disable-line unit-disallowed-list -- положение пустого поиска из Figma */
 .y-search-empty .y-empty > p { max-width: 224px; } /* stylelint-disable-line unit-disallowed-list -- 1141:3067: подзаголовок в две ровные строки, перенос после «попробуй» */
@@ -59,8 +56,8 @@
 .y-sheet--panel.y-profile-panel { gap: var(--space-32); }
 .y-profile-panel > .y-sheet__handle { margin-bottom: calc(var(--space-12) * -1); } /* хэндл → сводка 20 */
 .y-profile-panel > .y-section { margin-top: 0; } /* разделы с коллажем — тоже через 32, без добавки 4 от `* + .y-section` */
-/* «Другие цифры»: высокие плитки 171 лентой уходят под таб-бар (1149:3669) */
-.y-profile-figures .y-stat { min-height: 200px; } /* stylelint-disable-line unit-disallowed-list -- высота плитки из Figma, токена нет */
+/* «Другие цифры»: высокие плитки 171×220 лентой уходят под таб-бар (1149:3669) */
+.y-profile-figures .y-stat { min-height: 220px; } /* stylelint-disable-line unit-disallowed-list -- высота плитки из Figma, токена нет */
 
 /* «С чем носить» (1371:42779): поводы на 101 ниже ленты — под штампами «Сохранить» и «Не нравится», которые выходят за коллаж */
 .y-occasions { margin-top: 81px; } /* stylelint-disable-line unit-disallowed-list -- положение поводов из Figma */

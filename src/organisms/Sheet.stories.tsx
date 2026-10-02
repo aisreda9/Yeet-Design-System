@@ -210,3 +210,11 @@ export const Long: Story = {
     });
   },
 };
+
+/** Вид длинной шторки для визуальной регрессии: тот же контент, что у «Длинная шторка», открыта, в покое — без play (#234, #235). */
+export const LongView: Story = {
+  name: 'Длинная шторка · вид',
+  tags: ['bare'],
+  parameters: { controls: { disable: true }, docs: { description: { story: 'Статичный кадр «Длинной шторки» для эталона: play-истории эталонами не снимаются (#235).' } } },
+  render: () => <LongDemo />,
+};

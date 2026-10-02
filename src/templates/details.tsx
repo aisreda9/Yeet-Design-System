@@ -38,6 +38,9 @@ const spring = tokens.motion.spring[tokens.motion.transition.sheet.spring as key
 const WHEEL_IDLE = 120;
 /** Поля и ползунки — свои жесты: панель за них не тянется. */
 const OWN_GESTURE = 'input, textarea, select, [role=slider], [contenteditable]';
+/** Инерция контента после жеста: замедление за 1 мс (0,998 — `UIScrollView.DecelerationRate.normal`) и скорость остановки, pt/мс. */
+const COAST_DECAY = 0.998;
+const COAST_MIN = 0.02;
 
 /**
  * Детали вещи и образа (Figma: Wardrobe / Item Details `1371:41024 → 1371:41076`, Outfit Details `1371:41156 → 1371:41329`,
@@ -50,7 +53,9 @@ const OWN_GESTURE = 'input, textarea, select, [role=slider], [contenteditable]';
  *   в миниатюру, пилюля `titleChip` гаснет за первую половину хода. Только transform / opacity, раскладка не меняется.
  *
  * **Жест.** Палец (pointer) на панели или фото ведёт её 1 : 1 по вертикали, колесо — так же. Пока p < 1, жест двигает панель,
- * а не прокручивает её контент; при p = 1 прокручивается контент, а потянуть вниз от его начала — снова двигает панель.
+ * а не прокручивает её контент; при p = 1 прокручивается контент. Жест вниз при p = 1 сначала докручивает контент к началу,
+ * а дальше тем же движением тянет панель вниз (#234); мышью так же и вверх — прокрутки перетаскиванием у мыши нет.
+ * Отпустили в контенте — он докатывается по инерции (замедление 0,998 / мс, как у прокрутки iOS). Пока тянут, текст не выделяется.
  * Отпускание: бросок быстрее `--gesture-swipe-velocity` (500 pt/с) — в сторону броска, иначе к ближайшему краю (p ≥ 0,5 → 1);
  * колесо доводится в сторону последней прокрутки. Доводка — пружина `--motion-sheet` без перелёта со скоростью пальца
  * (считается в JS: CSS-переход не принимает стартовую скорость). Пока палец на экране, переходов нет.
@@ -72,7 +77,8 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     if (!media || !spacer || !root || !main || !panel) return;
 
     let p = 0, travel = 1, frame = 0, anim = 0, wheelTimer = 0, wheelDir = 0, shown = false, interacted = false, dragged = false;
-    let drag: { id: number; x0: number; y0: number; p0: number; active: boolean } | null = null;
+    let drag: { id: number; x0: number; y0: number; p0: number; s0: number; mouse: boolean; active: boolean } | null = null;
+    let coastFrame = 0;
     const speed = velocityTracker();
 
     // Цель морфа и ход панели — от раскладки (transform на неё не влияет): фото во всю ширину → квадрат 48 по центру шапки
@@ -90,6 +96,22 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     const schedule = () => { if (!frame) frame = requestAnimationFrame(write); };
     const show = (c: boolean) => { if (c !== shown) { shown = c; setCollapsed(c); } };
     const stop = () => { cancelAnimationFrame(anim); anim = 0; };
+    const stopCoast = () => { cancelAnimationFrame(coastFrame); coastFrame = 0; };
+    /** Контент после жеста докатывается по инерции; `v` — скорость пальца в pt/мс, > 0 — вниз (контент — к началу). */
+    const coast = (v: number) => {
+      stopCoast();
+      if (reducedMotion() || Math.abs(v) < COAST_MIN) return;
+      let last = performance.now();
+      const step = (now: number) => {
+        const dt = Math.min(64, Math.max(0, now - last));
+        last = now;
+        main.scrollTop -= v * dt;
+        v *= COAST_DECAY ** dt;
+        const end = main.scrollTop <= 0 || main.scrollTop >= main.scrollHeight - main.clientHeight;
+        coastFrame = Math.abs(v) < COAST_MIN || end ? 0 : requestAnimationFrame(step);
+      };
+      coastFrame = requestAnimationFrame(step);
+    };
     /** За пальцем / колесом: состояние — по ближайшему краю. */
     const follow = (v: number) => { p = Math.min(1, Math.max(0, v)); schedule(); show(p >= 0.5); };
 
@@ -136,6 +158,7 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     const wheel = (e: WheelEvent) => {
       const t = e.target as Element;
       if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || !(main.contains(t) || media.contains(t))) return;
+      stopCoast();
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? main.clientHeight : 1);
       // p < 1 — колесо двигает панель; p = 1 — прокручивает контент, а вверх от его начала — снова панель
       if (!dy || (dy > 0 && p >= 1) || (dy < 0 && (p <= 0 || main.scrollTop > 0))) return;
@@ -154,8 +177,9 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       if (drag || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const t = e.target as Element;
       if (!((main.contains(t) && panel.contains(t)) || media.contains(t)) || t.closest(OWN_GESTURE)) return;
-      if (main.scrollTop > 0) return; // контент прокручен — сначала докручивается к началу
-      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, p0: p, active: false };
+      stopCoast(); // палец поймал докатывающийся контент
+      // контент может быть прокручен (рывок вверх дальше полного хода): жест вниз сначала докрутит его к началу
+      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, p0: p, s0: 0, mouse: e.pointerType === 'mouse', active: false };
       speed.reset();
       speed.add(e.clientX, e.clientY, e.timeStamp);
     };
@@ -166,19 +190,25 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
       if (!d.active) {
         if (Math.hypot(dx, dy) < gesture.slop) return;
-        // горизонтальный жест — лента чипсов; вверх при p = 1 — прокрутка контента
-        if (Math.abs(dx) > Math.abs(dy) || (p >= 1 && dy < 0)) { drag = null; return; }
+        // горизонтальный жест — лента чипсов; вверх при p = 1 пальцем — нативная прокрутка контента (у мыши её нет — ведём сами)
+        if (Math.abs(dx) > Math.abs(dy) || (p >= 1 && dy < 0 && !d.mouse)) { drag = null; return; }
         stop(); // подхватили на доводке — с текущего места
         d.active = true;
         d.p0 = p;
+        d.s0 = main.scrollTop;
+        window.getSelection()?.removeAllRanges(); // мышь успела начать выделение до порога жеста
         d.y0 += Math.sign(dy) * gesture.slop; // без скачка на величину slop
         root.dataset.dragging = '';
         try { root.setPointerCapture(e.pointerId); } catch { /* синтетический указатель (play-тест) — захват не нужен */ }
       }
-      // ход пальца сверх полного хода панели прокручивает контент — тем же движением
-      const s = d.p0 * travel - (e.clientY - d.y0);
+      // s — путь от покоя: ход панели + прокрутка контента. Сверх полного хода палец прокручивает контент, а вниз сначала
+      // докручивает его к началу и дальше тянет панель — тем же движением
+      const s = d.p0 * travel + d.s0 - (e.clientY - d.y0);
       follow(s / travel);
       main.scrollTop = Math.max(0, s - travel);
+      // упёрлись в конец контента: лишний ход не копится, обратный жест сразу двигает контент
+      const over = s - travel - main.scrollTop;
+      if (over > 1) d.s0 -= over;
     };
     const up = (e: PointerEvent) => {
       const d = drag;
@@ -188,8 +218,8 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       dragged = true;
       delete root.dataset.dragging;
       speed.add(e.clientX, e.clientY, e.timeStamp);
-      if (p >= 1 && main.scrollTop > 0) return; // ушли в контент — панель уже наверху
       const v = e.type === 'pointercancel' ? 0 : speed.get().y; // pt/мс, > 0 — вниз
+      if (p >= 1 && main.scrollTop > 0) { coast(v); return; } // ушли в контент — панель уже наверху, контент докатывается
       const target = v > gesture.swipeVelocity ? 0 : v < -gesture.swipeVelocity ? 1 : p >= 0.5 ? 1 : 0;
       settle(target, -v / travel);
     };
@@ -202,6 +232,8 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     };
     // после жеста отпускание пальца не должно стать нажатием
     const click = (e: MouseEvent) => { if (dragged) { dragged = false; e.preventDefault(); e.stopPropagation(); } };
+    // мышью панель тянут, а не выделяют текст: выделение не начинается, пока идёт жест
+    const selectstart = (e: Event) => { if (drag?.active) e.preventDefault(); };
 
     measure();
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
@@ -216,9 +248,11 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     root.addEventListener('pointercancel', up);
     root.addEventListener('touchmove', touchmove, { passive: false });
     root.addEventListener('click', click, true);
+    root.addEventListener('selectstart', selectstart);
     return () => {
       ro?.disconnect();
       stop();
+      stopCoast();
       cancelAnimationFrame(frame);
       window.clearTimeout(wheelTimer);
       main.removeEventListener('scroll', scroll);
@@ -230,6 +264,7 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       root.removeEventListener('pointercancel', up);
       root.removeEventListener('touchmove', touchmove);
       root.removeEventListener('click', click, true);
+      root.removeEventListener('selectstart', selectstart);
     };
   }, []);
 
