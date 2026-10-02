@@ -1,9 +1,10 @@
-import { useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ComponentPropsWithRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import { IconButton } from '../atoms';
 import { cx } from '../utils/cx';
 import { haptic } from '../utils/haptic';
 import { useSwipePager } from '../motion';
 import { OutfitCollage, type AutoCollageItem, type CollageItem } from './cards';
+import { setRef } from './refs';
 
 export type PagerLook = {
   /** Стабильный ключ образа: по нему превью «переезжает» в коллаж, а не перерисовывается. */
@@ -17,10 +18,13 @@ export type PagerLook = {
 
 export type OutfitPagerProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
   looks: PagerLook[];
-  /** `y` — стопка образов (главная, «Удиви меня»): превью 96 сверху и снизу. `x` — лента («С чем носить»): соседние за краем. */
+  /** `y` — стопка образов (главная, «Удиви меня»): превью сверху и снизу заполняют место до шапки и таб-бара. `x` — лента («С чем носить»): соседние за краем. */
   axis?: 'x' | 'y';
-  /** Размер превью соседних образов в стопке: 96 — главная (`1371:36589`), 150 — «Удиви меня» (`1371:42686`). */
-  preview?: 96 | 150;
+  /**
+   * Превью стопки, когда пейджеру нечего заполнять (стоит не в `Screen`, а в обычном блоке): 96 — как на главной, 150 — как в «Удиви меня».
+   * В `Screen` превью считается от свободной высоты и проп не нужен.
+   */
+  preview?: number;
   /** Текущий образ (контролируемый режим). */
   index?: number;
   /** Начальный образ, если `index` не задан. */
@@ -39,8 +43,51 @@ export type OutfitPagerProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & 
   'aria-label'?: string;
 };
 
-/** Геометрия из Figma: коллаж 353, превью 96 (стопка) или шаг 353 + 20 (лента). */
-const SIZE = 353;
+/** Ширина макета Figma: коллаж 353 при экране 393. Смещения из Figma (уход стопки, штамп) масштабируются на размер / 353. */
+const BASE = 353;
+/** Превью стопки не меньше 48: видно, что образ есть. */
+const MIN_PREVIEW = 48;
+
+type Fit = { size: number; preview: number };
+
+/**
+ * Геометрия стопки по месту: коллаж — квадрат во всю ширину контента, превью = (высота − коллаж − 2 × зазор − низ) / 2,
+ * не больше коллажа. Если превью выходит меньше 48, оно остаётся 48, а коллаж уменьшается до оставшейся высоты:
+ * стопка всегда помещается между шапкой и таб-баром, экран не скроллится.
+ */
+function fitStack(width: number, height: number, gap: number, end: number): Fit {
+  const preview = (height - width - 2 * gap - end) / 2;
+  if (preview >= MIN_PREVIEW) return { size: width, preview: Math.min(preview, width) };
+  return { size: Math.max(height - 2 * (MIN_PREVIEW + gap) - end, MIN_PREVIEW), preview: MIN_PREVIEW };
+}
+
+/**
+ * Размер коллажа и превью от контейнера. Лента и стопка вне экрана: коллаж = ширина, превью = `preview`.
+ * Стопка, которая растягивается в колонке (`flex-grow` > 0 — так её ставит `Screen`), заполняет высоту: `fitStack`.
+ */
+function useFit(ref: { current: HTMLElement | null }, axis: 'x' | 'y', preview: number): Fit {
+  const [fit, setFit] = useState<Fit>({ size: BASE, preview });
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const cs = getComputedStyle(el);
+      const width = el.clientWidth; // до transform: размер раскладки, а не на экране
+      if (!width) return;
+      const fills = axis === 'y' && Number(cs.flexGrow) > 0;
+      const next = fills
+        ? fitStack(width, el.clientHeight, parseFloat(cs.getPropertyValue('--pager-gap')) || 0, parseFloat(cs.getPropertyValue('--pager-end')) || 0)
+        : { size: width, preview };
+      setFit((cur) => (cur.size === next.size && cur.preview === next.preview ? cur : next));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, axis, preview]);
+  return fit;
+}
 
 const place = (k: number, i: number) => (k === i ? 'is-current' : k === i - 1 ? 'is-prev' : k === i + 1 ? 'is-next' : k < i ? 'is-above' : 'is-below');
 
@@ -48,14 +95,18 @@ const place = (k: number, i: number) => (k === i ? 'is-current' : k === i - 1 ? 
  * Пейджер образов. Жест — `useSwipePager` (порог 30 % или бросок, резинка на краях, хаптика), доводка — переходом CSS
  * на `--motion-swap` (стопка) / `--motion-page` (лента), поэтому при «Уменьшении движения» смена мгновенная.
  *
- * - Стопка (`y`, Figma `1371:36589`, Animations «scale» `354:17678 → 354:17767`): текущий коллаж 353, соседние — превью 96
- *   (scale 0.272) в 20 над и под ним; в «Удиви меня» (`1371:42686`) превью 150. Погода и штамп поверх, штамп поворачивается на 180° с каждой сменой.
- * - Лента (`x`, Figma `1371:42779`, Animations `798:2215 → 799:2433`): страницы 353 через 20, соседние за краем экрана.
+ * - Стопка (`y`, Figma `1371:36589`, Animations «scale» `354:17678 → 354:17767`): текущий коллаж — квадрат во всю ширину контента
+ *   (353 при 393), соседние — превью в 20 над и под ним. В `Screen` стопка занимает всё место между шапкой и таб-баром,
+ *   превью растягиваются (`fitStack`): при 393 × 852 — 96 на главной и 150 в «Удиви меня» (`1371:42686`), как в Figma.
+ *   Погода и штамп поверх, штамп поворачивается на 180° с каждой сменой.
+ * - Лента (`x`, Figma `1371:42779`, Animations `798:2215 → 799:2433`): страницы во всю ширину контента через 20, соседние за краем экрана.
  * - Клавиатура: кнопки «Предыдущий / Следующий образ» в порядке Tab, видны только при фокусе с клавиатуры; с них же листают
  *   стрелки по оси, Home и End.
  *   Скрытые образы — `aria-hidden` и `inert`, текущий объявляется через `aria-live`.
  */
-export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled, defaultIndex = 0, onIndexChange, weather, stamp, skip, disabled, className, style: styleProp, 'aria-label': ariaLabel = 'Образы', ...rest }: OutfitPagerProps) {
+export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled, defaultIndex = 0, onIndexChange, weather, stamp, skip, disabled, className, style: styleProp, 'aria-label': ariaLabel = 'Образы', ref, ...rest }: OutfitPagerProps) {
+  const box = useRef<HTMLDivElement | null>(null);
+  const fit = useFit(box, axis, preview);
   const [own, setOwn] = useState(defaultIndex);
   const count = looks.length;
   const index = Math.min(Math.max(controlled ?? own, 0), Math.max(count - 1, 0));
@@ -65,7 +116,7 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
     onIndexChange?.(next);
   };
   // стопка: смена — хаптика skip (как у штампа «Не нравится»); лента: select, как тап по чипсу повода
-  const { drag, dragging, bind } = useSwipePager({ axis, count, index, onChange: go, size: SIZE, changeHaptic: axis === 'y' ? 'skip' : 'select', disabled });
+  const { drag, dragging, bind } = useSwipePager({ axis, count, index, onChange: go, size: fit.size, changeHaptic: axis === 'y' ? 'skip' : 'select', disabled });
 
   const prevKey = axis === 'y' ? 'ArrowUp' : 'ArrowLeft';
   const nextKey = axis === 'y' ? 'ArrowDown' : 'ArrowRight';
@@ -77,14 +128,18 @@ export function OutfitPager({ looks, axis = 'y', preview = 96, index: controlled
     go(to);
   };
   const stop = { onPointerDown: (e: { stopPropagation: () => void }) => e.stopPropagation() }; // слоты жест не ловят
-  const style = { '--drag': `${drag ?? 0}px`, '--index': index, '--turn': `${index * 180}deg` } as CSSProperties;
+  const style = {
+    '--drag': `${drag ?? 0}px`, '--index': index, '--turn': `${index * 180}deg`,
+    '--pager-size': `${fit.size}px`, '--pager-preview': `${fit.preview}px`, '--pager-scale': fit.preview / fit.size, '--pager-k': fit.size / BASE,
+  } as CSSProperties;
   const current = looks[index];
 
   return (
     // Карусель: стрелки листают образы с фокуса на группе (паттерн ARIA carousel), свайп — pointer
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
-      className={cx('y-outfit-pager', `y-outfit-pager--${axis}`, axis === 'y' && preview === 150 && 'y-outfit-pager--preview-150', className)}
+      ref={(n) => { box.current = n; setRef(ref, n); }}
+      className={cx('y-outfit-pager', `y-outfit-pager--${axis}`, className)}
       {...rest}
       data-dragging={dragging || undefined}
       style={{ ...styleProp, ...style }}

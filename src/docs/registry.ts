@@ -105,7 +105,7 @@ export const registry: Entry[] = [
   { code: 'Sticky', figma: 'Pattern / Search Results (шапка с фильтрами)', figmaId: '984:4979', level: 'Templates', story: 'Pages/Экраны флоу', note: 'figmaId — кадр паттерна, не компонент', status: 'beta', statusWhy: 'кадр паттерна, нет истории «В флоу»' },
 
   // Волна 2 · organisms (#25)
-  { code: 'OutfitPager', figma: 'outfit-pager', figmaId: '1353:17046', level: 'Organisms', story: 'Organisms/OutfitPager', note: 'axis y / x, превью 96 / 150, слоты weather, stamp, skip', status: 'stable' },
+  { code: 'OutfitPager', figma: 'outfit-pager', figmaId: '1353:17046', level: 'Organisms', story: 'Organisms/OutfitPager', note: 'axis y / x; коллаж во всю ширину контента, стопка заполняет высоту экрана (превью 96 / 150 при 393 × 852); слоты weather, stamp, skip', status: 'stable' },
   { code: 'ItemSlots', figma: 'item-slots + item-slots / slot (1355:17122)', figmaId: '1355:17124', level: 'Organisms', story: 'Organisms/ItemSlots', note: 'ItemSlots + ItemSlot: ряд со снапом, «+» в конце', status: 'stable' },
   { code: 'CropFrame', figma: 'crop-frame', figmaId: '1356:29832', level: 'Organisms', story: 'Organisms/CropFrame', note: 'затемнение, уголки, перемещение, углы, щипок', status: 'stable' },
   { code: 'StylistAvatar', figma: 'аватар стилиста 64 (флоу Stylist)', figmaId: null, figmaWhy: 'иллюстрация в макетах 1371:38928 (слой 699:2534), 1371:39070; не компонент', level: 'Organisms', story: 'Organisms/ChatBubble', note: 'ChatBubble avatar={true}', status: 'alpha', statusWhy: 'нет компонента в Figma; на экраны придёт с #50–#54' },
