@@ -107,7 +107,7 @@ function audit(TAP_MIN) {
     const bg = s.backgroundColor.match(/[\d.]+/g);
     return s.backgroundImage !== 'none' || (bg && (bg.length < 4 || +bg[3] > 0.05));
   };
-  const frames = '.y-screen, .y-motion-phone';
+  const frames = '.y-screen, .y-motion-phone, .y-proto__frame';
   const clipper = (el, frame) => {
     for (let a = el.parentElement; a && a !== frame; a = a.parentElement) {
       const o = getComputedStyle(a);
@@ -160,7 +160,7 @@ function audit(TAP_MIN) {
           const gaps = [r.left - ar.left, ar.right - r.right, r.top - ar.top, ar.bottom - r.bottom];
           const cuts = [ar.left - halo.l, halo.r - ar.right, ar.top - halo.t, halo.b - ar.bottom];
           // сторона контейнера совпадает с краем экрана устройства — тень и так уходит за экран
-          const dev = el.closest('.y-screen')?.getBoundingClientRect();
+          const dev = el.closest('.y-screen, .y-proto__frame')?.getBoundingClientRect();
           if (dev) [ar.left - dev.left, dev.right - ar.right, ar.top - dev.top, dev.bottom - ar.bottom].forEach((d, i) => { if (Math.abs(d) <= 1) cuts[i] = 0; });
           // поверхность, прижатая к краю (панель у низа экрана), — тень с этой стороны не видна по замыслу
           if (cuts.every((c, i) => c <= 2 || gaps[i] < 1)) break;
