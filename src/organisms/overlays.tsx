@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ComponentPropsWithRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Button, IconButton, type ButtonStyle } from '../atoms';
 import { cx } from '../utils/cx';
-import { gesture, motionMs, rubberBand, velocityTracker } from '../utils/gesture';
+import { gesture, motionMs, reducedMotion, rubberBand, velocityTracker } from '../utils/gesture';
 import { haptic } from '../utils/haptic';
 import { useFocusScope } from '../utils/useFocusScope';
 import { LeavingContext, usePresence } from '../utils/usePresence';
@@ -371,6 +371,14 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     dragged.current = true;
     const v = speed.current.get().y;
     const dismiss = e.type !== 'pointercancel' && (d.offset > d.h * gesture.swipeDistance || (v > gesture.swipeVelocity && d.offset > 0));
+    if (dismiss && reducedMotion()) {
+      // «Уменьшение движения»: шторка гаснет там, где её отпустили (transform и --y-dim остаются), анимируется только opacity;
+      // положение снимаем после ухода — на случай, если родитель оставил слой открытым
+      setDragging(false);
+      close();
+      window.setTimeout(release, motionMs('--overlay-exit'));
+      return;
+    }
     release(); // закрытие продолжится из текущего положения (exit), возврат — на пружине quick
     if (dismiss) close();
   };
