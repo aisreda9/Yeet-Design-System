@@ -6,6 +6,8 @@
  *   npm run qa -- --only=organisms-header            — только истории с этим префиксом
  *   npm run qa:changed  (npm run qa -- --changed)    — только истории, задетые веткой относительно origin/main (scripts/qa/changed.mjs);
  *                                                      --changed=<ref> — относительно другой ветки. Локальное ускорение, CI — полный прогон
+ *   npm run qa -- --shard=2/4                        — только 2-я четверть историй (CI: matrix в qa.yml); отчёт — qa/out/shard-2/,
+ *                                                      сводный — `node scripts/qa/merge.mjs` (лишние эталоны, KNOWN, пропуски шардов)
  *   npm run qa -- --no-docker                        — без образа: всё, кроме сравнения скриншотов
  *   npm run qa -- --tap-min=40                       — порог зоны нажатия для предупреждения (по умолчанию 44)
  *   npm run qa -- --diff-px=20                       — допуск визуальной разницы в пикселях (по умолчанию 0)
@@ -27,12 +29,19 @@ import { dirname, join } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { changedStories } from './changed.mjs';
+import { parseShard, renderReport, shardStories, summaryLines } from './report.mjs';
 import { IMAGE, hasDocker, imageMatchesPlaywright, inImage, rerunInImage, root, staticDir, startStorybook, storyIndex } from './lib.mjs';
 
-const outDir = join(root, 'qa/out');
 const baseDir = join(root, 'qa/baseline');
 const argv = process.argv.slice(2);
 const args = Object.fromEntries(argv.map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
+/** --shard=K/N: истории делятся по id (report.mjs), каждый шард пишет свой qa/out/shard-K/, merge.mjs сводит. */
+let shard;
+try { shard = parseShard(args.shard); } catch (e) { console.error(e.message); process.exit(2); }
+// пересъёмка удаляет лишние эталоны только при полном наборе историй — шарду это не решить; qa-baseline.yml снимает одним прогоном
+if (shard && args['update-baseline']) { console.error('--update-baseline со --shard не поддерживается: эталоны снимаются одним прогоном (qa-baseline.yml).'); process.exit(2); }
+const outDir = join(root, shard ? `qa/out/shard-${shard.index}` : 'qa/out');
+const outRel = shard ? `qa/out/shard-${shard.index}` : 'qa/out';
 const THEMES = ['light', 'dark'];
 // Окружение закреплено, поэтому повторный снимок совпадает с эталоном побайтно: любой пиксель, отличающийся сильнее
 // threshold 0.1 (сглаживание pixelmatch не считает), — регрессия. Относительный порог 0.1 % пропускал сдвиг иконки на 2 px
@@ -74,8 +83,9 @@ else if (args.changed) {
   }
   if (!selected?.size && !pick.full) { console.log('--changed: затронутых историй нет — QA не нужен.'); process.exit(0); }
 }
-/** Прогон не по всем историям: «лишний эталон» и устаревшие исключения KNOWN не проверяются. */
-const partial = Boolean(args.only || selected);
+/** Прогон не по всем историям: «лишний эталон» и устаревшие исключения KNOWN не проверяются (у шардов это делает merge.mjs). */
+const filtered = Boolean(args.only || selected);
+const partial = filtered || Boolean(shard);
 
 /* ─── Окружение: скриншоты — только в закреплённом образе ────────────── */
 if (!inImage() && !args['no-docker']) {
@@ -90,7 +100,8 @@ if (args['update-baseline'] && !visual) { console.error('Эталоны сним
 /* ─── Сервер и браузер (scripts/qa/lib.mjs) ─────────────────────────── */
 const { origin, browser, close } = await startStorybook();
 
-const stories = storyIndex().filter((e) => (!args.only || e.id.startsWith(args.only)) && (!selected || selected.has(e.id)));
+const picked = storyIndex().filter((e) => (!args.only || e.id.startsWith(args.only)) && (!selected || selected.has(e.id)));
+const stories = shardStories(picked, shard);
 const specs = JSON.parse(readFileSync(join(root, 'design/figma-specs.json'), 'utf8'));
 const axeSource = readFileSync(join(root, 'node_modules/axe-core/axe.min.js'), 'utf8');
 
@@ -377,7 +388,7 @@ for (const story of stories) {
       if (n === null) { add('error', 'визуальная разница', story.id, theme, `размер ${a.width}×${a.height} → ${b.width}×${b.height}`); diffs++; continue; }
       if (n > DIFF_MAX_PX) {
         writeFileSync(join(outDir, 'diff', file), PNG.sync.write(diff));
-        add('error', 'визуальная разница', story.id, theme, `${n} px (${(100 * n / (a.width * a.height)).toFixed(3)} %) — qa/out/diff/${file}`);
+        add('error', 'визуальная разница', story.id, theme, `${n} px (${(100 * n / (a.width * a.height)).toFixed(3)} %) — ${outRel}/diff/${file}`);
         diffs++;
       }
     }
@@ -426,33 +437,21 @@ const visualLine = visual
   : `визуальная регрессия: **не проверялась** (нет закреплённого образа${process.env.CI ? '' : ', локальный прогон'})`;
 if (!visual && process.env.CI) errors.push({ level: 'error', check: 'визуальная регрессия не проверена', story: '—', theme: '', detail: `в CI нужен Docker для ${IMAGE.split('@')[0]}` });
 const specOk = specResults.filter((s) => s.ok).length;
-const byCheck = (arr) => Object.entries(arr.reduce((m, i) => ((m[i.check] = (m[i.check] ?? 0) + 1), m), {})).sort((a, b) => b[1] - a[1]);
 
-const md = [
-  `# QA Storybook`,
-  ``,
-  `Историй: **${stories.length}**${selected ? ' (--changed: только задетые веткой)' : ''} × ${THEMES.length} темы · скриншотов: ${screens} · спеки Figma: **${specOk}/${specResults.length}** · ${visualLine} · зона нажатия ≥ ${TAP_MIN}`,
-  ``,
-  `**Ошибок: ${errors.length}** · известных: ${knownList.length} · предупреждений: ${warns.length}`,
-  ``,
-  ...(errors.length ? [`## Ошибки`, ``, `| Проверка | История | Тема | Детали |`, `|---|---|---|---|`, ...errors.map((i) => `| ${i.check} | \`${i.story}\` | ${i.theme} | ${i.detail.replace(/\|/g, '\\|')} |`), ``] : []),
-  ...(knownList.length ? [`## Известные нарушения (не валят CI)`, ``, `| Проверка | История | Тема | Детали |`, `|---|---|---|---|`, ...knownList.map((i) => `| ${i.check} | \`${i.story}\` | ${i.theme} | ${i.detail.replace(/\|/g, '\\|')} |`), ``] : []),
-  `## Предупреждения по типам`,
-  ``,
-  ...byCheck(warns).map(([k, n]) => `- ${k}: ${n}`),
-  ``,
-  `<details><summary>Все предупреждения</summary>`,
-  ``,
-  `| Проверка | История | Тема | Детали |`, `|---|---|---|---|`,
-  ...warns.map((i) => `| ${i.check} | \`${i.story}\` | ${i.theme} | ${i.detail.replace(/\|/g, '\\|')} |`),
-  ``,
-  `</details>`,
-].join('\n');
-writeFileSync(join(outDir, 'report.md'), md);
-writeFileSync(join(outDir, 'report.json'), JSON.stringify({ stories: stories.length, specs: specResults, issues: list }, null, 2));
+const report = {
+  stories: stories.length, storiesNote: `${selected ? ' (--changed: только задетые веткой)' : ''}${shard ? ` (шард ${shard.index}/${shard.total} из ${picked.length})` : ''}`,
+  themes: THEMES.length, screens, specOk, specTotal: specResults.length, visualLine, tapMin: TAP_MIN, errors, known: knownList, warns,
+};
+writeFileSync(join(outDir, 'report.md'), renderReport({ ...report, title: shard ? `QA Storybook · шард ${shard.index}/${shard.total}` : undefined }));
+writeFileSync(join(outDir, 'report.json'), JSON.stringify({
+  stories: stories.length, specs: specResults, issues: list,
+  // для merge.mjs: сводный отчёт, проверки по всему набору (лишние эталоны, устаревшие KNOWN), пропуски и дубли историй
+  ...(shard && {
+    shard, ids: stories.map((s) => s.id), all: picked.map((s) => s.id), filtered,
+    visual, update: Boolean(args['update-baseline']), counts: { screens, compared, diffs, rewritten },
+    shotFiles: [...shotFiles].sort(), knownKeys: Object.keys(KNOWN), errors, tapMin: TAP_MIN, image: IMAGE,
+  }),
+}, null, 2));
 
-console.log(`Историй ${stories.length} · спеки ${specOk}/${specResults.length} · ${visualLine.replace(/\*\*/g, '')} · ошибок ${errors.length} · известных ${knownList.length} · предупреждений ${warns.length}`);
-for (const [k, n] of byCheck(errors)) console.log(`  ✗ ${k}: ${n}`);
-for (const [k, n] of byCheck(warns)) console.log(`  · ${k}: ${n}`);
-console.log(`Отчёт: qa/out/report.md`);
+for (const line of summaryLines({ ...report, file: `${outRel}/report.md` })) console.log(line);
 process.exit(errors.length ? 1 : 0);
