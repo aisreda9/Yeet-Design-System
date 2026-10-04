@@ -127,7 +127,7 @@ export function Screen({ header, pinHeader, bottom, overlay, floating, floatingO
     return () => { ro.disconnect(); cancelAnimationFrame(frame.current); };
   }, [update, ref]);
   // убранные overlay и floating доигрывают уход (--motion-exit), а не исчезают мгновенно
-  const layer = usePresence(overlay);
+  const layer = usePresence(overlay, '--overlay-exit'); // шторка: при «Уменьшении движения» растворяется 240 мс
   const toast = usePresence(floating);
 
   return (

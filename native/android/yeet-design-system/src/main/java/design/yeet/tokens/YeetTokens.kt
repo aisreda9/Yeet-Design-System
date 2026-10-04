@@ -386,6 +386,16 @@ object YeetGesture {
     val autoscrollEdge = 64.dp
     /** Скорость автоскролла в самом краю зоны; к границе зоны падает до 0 */
     const val autoscrollSpeed = 12f
+    /** Оборот индикатора загрузки (кнопка, LoadingState), linear по кругу */
+    const val spinMillis = 1200L
+    /** Пульсация прозрачности вместо вращения при «Уменьшении движения» */
+    const val pulseMillis = 1600L
+    /** Проход блика по площадке фото при удалении фона */
+    const val shimmerMillis = 1600L
+    /** Задержка появления подписи загрузки: на быстрых операциях она не мигает */
+    const val loadingDelayMillis = 120L
+    /** Погода на главной проявляется после коллажа */
+    const val weatherDelayMillis = 160L
 }
 
 /** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */

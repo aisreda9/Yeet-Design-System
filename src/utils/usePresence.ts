@@ -1,4 +1,5 @@
 import { createContext, useEffect, useReducer, useRef, type ReactNode } from 'react';
+import { FRAME_SLACK_MS } from '../motion/timing';
 import { motionMs } from './gesture';
 
 /**
@@ -16,7 +17,7 @@ export function usePresence(node: ReactNode, token = '--motion-exit') {
   useEffect(() => {
     if (present || !last.current) return;
     // запас на кадр; transitionend не ждём — его не будет, если элемент уже в конечном положении (закрыт жестом)
-    const t = window.setTimeout(() => { last.current = undefined; rerender(); }, motionMs(token) + 34);
+    const t = window.setTimeout(() => { last.current = undefined; rerender(); }, motionMs(token) + FRAME_SLACK_MS);
     return () => window.clearTimeout(t);
   }, [present, token]);
   return { node: present ? node : last.current, leaving: !present && !!last.current } as const;
