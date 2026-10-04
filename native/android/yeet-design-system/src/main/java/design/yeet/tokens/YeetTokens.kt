@@ -128,6 +128,59 @@ val YeetDarkColors = YeetColorScheme(
     shadow = Color(0x80000000),
 )
 
+// Повышенный контраст (#117): Android 14+ — UiModeManager.getContrast(); в модуле native/android — YeetTheme(highContrast = …).
+val YeetLightContrastColors = YeetColorScheme(
+    bgCanvas = Color(0xFFFFFFFF),
+    bgElevated = Color(0xFFFFFFFF),
+    bgSubtle = Color(0xFFF7F7F7),
+    bgInverse = Color(0xFF000000),
+    bgOverlay = Color(0x66000000),
+    textPrimary = Color(0xFF000000),
+    textSecondary = Color(0xFF545454),
+    textInverse = Color(0xFFFFFFFF),
+    textOnAccent = Color(0xFFFFFFFF),
+    textInverseSecondary = Color(0xFFA7B3BF),
+    textOnDanger = Color(0xFFFFFFFF),
+    textOnPhoto = Color(0xFFFFFFFF),
+    textAccent = Color(0xFF0100F4),
+    textDanger = Color(0xFFA22115),
+    accent = Color(0xFF0100F4),
+    accentSoft = Color(0xFFF1F4FF),
+    danger = Color(0xFFCC291B),
+    dangerSoft = Color(0x1AFF4230),
+    borderSubtle = Color(0x6E000000),
+    divider = Color(0x6E000000),
+    patternDot = Color(0x3B000000),
+    handle = Color(0x2B000000),
+    shadow = Color(0x1F000000),
+)
+
+val YeetDarkContrastColors = YeetColorScheme(
+    bgCanvas = Color(0xFF0F0F11),
+    bgElevated = Color(0xFF1A1A1E),
+    bgSubtle = Color(0xFF26262B),
+    bgInverse = Color(0xFFF5F5F7),
+    bgOverlay = Color(0x99000000),
+    textPrimary = Color(0xFFF5F5F7),
+    textSecondary = Color(0xFFB2B2B5),
+    textInverse = Color(0xFF0F0F11),
+    textOnAccent = Color(0xFFFFFFFF),
+    textInverseSecondary = Color(0xFF4C535D),
+    textOnDanger = Color(0xFFFFFFFF),
+    textOnPhoto = Color(0xFFFFFFFF),
+    textAccent = Color(0xFFAAAAFF),
+    textDanger = Color(0xFFFF9489),
+    accent = Color(0xFF5858FF),
+    accentSoft = Color(0x334B4BFF),
+    danger = Color(0xFFCC291B),
+    dangerSoft = Color(0x2EFF6B5C),
+    borderSubtle = Color(0x5CF5F5F7),
+    divider = Color(0x5CF5F5F7),
+    patternDot = Color(0x3BF5F5F7),
+    handle = Color(0x24F5F5F7),
+    shadow = Color(0x80000000),
+)
+
 // Компонентные токены (web: --button-*, --card-*, --sheet-*, --tab-bar-*, --input-*)
 val YeetColorScheme.buttonPrimaryBg: Color get() = accent
 val YeetColorScheme.buttonPrimaryFg: Color get() = textOnAccent
@@ -521,6 +574,8 @@ val YeetColorScheme.focusRingColor: Color get() = textAccent
 object YeetFocusRing {
     /** Толщина outline */
     val width = 2.dp
+    /** Толщина outline при повышенном контрасте (YeetTheme.isHighContrast) */
+    val widthHighContrast = 3.dp
     /** Отступ снаружи: кнопки, чипсы, ссылки */
     val offset = 2.dp
     /** Кольцо внутри: элемент у края экрана или внутри карточки */

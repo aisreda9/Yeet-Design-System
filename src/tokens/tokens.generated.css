@@ -272,3 +272,28 @@
 [data-theme] {
   --focus-ring-color: var(--color-text-accent); /* Цвет кольца */
 }
+
+/* Повышенный контраст (#117): системная настройка «Увеличить контраст». Текст ≥ 7 : 1, обводки и разделители ≥ 3 : 1, фокус толще. */
+@media (prefers-contrast: more) {
+  :root,
+  [data-theme='light'] {
+    --color-text-secondary: #545454; /* ui-colors/grey */
+    --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
+    --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
+    --color-text-danger: #a22115; /* ui-colors/red-text */
+    --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
+    --color-border-subtle: rgb(0 0 0 / 0.43); /* ui-colors/black-10% */
+    --color-divider: rgb(0 0 0 / 0.43); /* ui-colors/divider */
+    --focus-ring-width: 3px;
+  }
+  [data-theme='dark'] {
+    --color-text-secondary: #b2b2b5; /* ui-colors/grey */
+    --color-text-inverse-secondary: #4c535d; /* ui-colors/inverse-secondary */
+    --color-text-accent: #aaaaff; /* ui-colors/blue-text */
+    --color-text-danger: #ff9489; /* ui-colors/red-text */
+    --color-accent: #5858ff; /* ui-colors/blue */
+    --color-border-subtle: rgb(245 245 247 / 0.36); /* ui-colors/black-10% */
+    --color-divider: rgb(245 245 247 / 0.36); /* ui-colors/divider */
+    --focus-ring-width: 3px;
+  }
+}

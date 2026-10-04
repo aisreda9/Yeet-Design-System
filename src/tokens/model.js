@@ -35,9 +35,14 @@ export function toModel(t) {
     primitive: map(t.primitive, (v) => color(v.$value)),
     item: map(t.item, (v, k) => ({ value: color(v.$value), name: ext(v).name, on: color(t['on-item'][k].$value) })),
     avatar: { $description: t.avatar.$description, palette: ext(t.avatar).palette },
-    color: Object.fromEntries(entries(t.color).map(([, g]) => [g.$description, map(g, (v) => ({
-      light: color(v.$value), dark: color(ext(v).modes?.dark ?? v.$value), role: v.$description, figma: ext(v).figma,
-    }))])),
+    color: Object.fromEntries(entries(t.color).map(([, g]) => [g.$description, map(g, (v) => {
+      const modes = ext(v).modes ?? {}, dark = modes.dark ?? v.$value;
+      return {
+        light: color(v.$value), dark: color(dark), role: v.$description, figma: ext(v).figma,
+        // Повышенный контраст (#117): своё значение или значение темы
+        contrast: { light: color(modes['contrast-light'] ?? v.$value), dark: color(modes['contrast-dark'] ?? dark) },
+      };
+    })])),
     component: map(t.component, (v) => (v.$type === 'color' ? color(v.$value) : v.$value)),
     space: entries(t.space).map(([, v]) => v.$value.value),
     radius: map(t.radius, (v) => ({ value: v.$value.value, use: v.$description })),

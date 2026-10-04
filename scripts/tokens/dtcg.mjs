@@ -153,7 +153,18 @@ export function validate(tree) {
   // Модификатор темы: modes.<тема> — только из modifiers.theme.contexts
   const mods = ext(tree).modifiers ?? {};
   const themes = mods.theme?.contexts ?? [];
-  for (const t of tokens) for (const mode of Object.keys(ext(t).modes ?? {})) if (!themes.includes(mode)) err(t.id, `modes.${mode}: нет такой темы в modifiers.theme.contexts`);
+  // Модификатор контраста: modes.contrast-<тема>, fallback — на существующую тему
+  const contrast = mods.contrast?.contexts ?? [];
+  for (const [c, theme] of Object.entries(mods.contrast?.fallback ?? {})) {
+    if (!contrast.includes(c)) err('$extensions.modifiers.contrast', `fallback ${c}: нет в contexts`);
+    if (!themes.includes(theme)) err('$extensions.modifiers.contrast', `fallback ${c} → ${theme}: нет такой темы`);
+  }
+  for (const t of tokens) for (const [mode, mv] of Object.entries(ext(t).modes ?? {})) {
+    if (!themes.includes(mode) && !contrast.includes(mode)) { err(t.id, `modes.${mode}: нет такой темы в modifiers.theme.contexts`); continue; }
+    // Значение контраста разворачивается Style Dictionary без темы: ссылка на токен с темами дала бы его светлое значение
+    if (contrast.includes(mode) && isRef(mv) && Object.keys(ext(byId.get(refPath(mv))).modes ?? {}).length)
+      err(t.id, `modes.${mode}: ссылка {${refPath(mv)}} на токен с темами — нужен примитив или литерал`);
+  }
   return errors;
 }
 
@@ -181,6 +192,14 @@ export function resolver(tree) {
 }
 /** Значение токена в теме: `modes[mode]`, иначе `$value`. */
 export const valueIn = (t, mode) => (mode && ext(t).modes?.[mode] !== undefined ? ext(t).modes[mode] : t.value);
+
+/** Режимы повышенного контраста и их fallback-тема: { "contrast-light": "light", "contrast-dark": "dark" }. */
+export const contrastModes = (tree) => ext(tree).modifiers?.contrast?.fallback ?? {};
+/** Токены, у которых задан хотя бы один режим контраста, — в порядке файла. */
+export const contrastTokens = (tree) => {
+  const modes = Object.keys(contrastModes(tree));
+  return flatten(tree).filter((t) => modes.some((m) => ext(t).modes?.[m] !== undefined));
+};
 
 /**
  * Модификаторы → обычные токены для Style Dictionary: у каждого токена с `modes.<тема>` появляется двойник

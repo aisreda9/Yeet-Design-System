@@ -19,3 +19,39 @@
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
 }
+
+/*
+ * Принудительные цвета (Windows «Контрастные темы», forced-colors: active, #117).
+ * Браузер заменяет цвета системными и убирает фоны и тени, поэтому всё, что держит форму заливкой или тенью
+ * (кнопки, чипсы, поля, сегменты, таб-бар, радио, штамп), получает рамку системным цветом, выбранное — Highlight,
+ * фокус — Highlight (кольцо поля было box-shadow, его в этом режиме нет).
+ * !important — только здесь: правило из слоя атомов должно перекрыть фон и рамки молекул и организмов (слои ниже по порядку).
+ */
+@media (forced-colors: active) {
+  :is(.y-button, .y-icon-button, .y-tab-bar, .y-segment, .y-input-group, .y-input-bar__field, .y-radio) {
+    outline: var(--border-width-thin) solid ButtonText !important;
+    outline-offset: calc(-1 * var(--border-width-thin)) !important;
+  }
+  :is(.y-input-group, .y-input-bar__field) { outline-color: FieldText !important; }
+  .y-field + .y-field::before { background: CanvasText !important; } /* разделитель строк — заливка 1 px */
+  :is(.y-button, .y-icon-button):disabled { color: GrayText !important; outline-color: GrayText !important; }
+  /* Выбранное: чипс (aria-pressed), сегмент и радио (aria-checked), вкладка (aria-current) — заливкой Highlight */
+  :is(.y-button[aria-pressed='true'], .y-chip__toggle[aria-pressed='true'], .y-segment > [aria-checked='true'], .y-radio--on, .y-tab-bar__tab[aria-current='page']) {
+    forced-color-adjust: none; background: Highlight !important; color: HighlightText !important;
+  }
+  /* Штамп — звезда из SVG currentColor: форма ButtonText, подпись ButtonFace; выполнено — Highlight */
+  .y-stamp { forced-color-adjust: none; }
+  .y-stamp .y-stamp__shape { color: ButtonText !important; }
+  .y-stamp :is(.y-stamp__label, .y-stamp__done) { color: ButtonFace !important; }
+  .y-stamp--done .y-stamp__shape { color: Highlight !important; }
+  .y-stamp--done .y-stamp__done { color: HighlightText !important; }
+  /* Фокус — системным Highlight, у полей — кольцо outline вместо box-shadow */
+  :is(.y-focus-ring, .y-button, .y-icon-button, .y-link, .y-stamp, .y-input-bar__photo, .y-chip__toggle, .y-chip__remove, button.y-list-item, .y-field__trailing, .y-input-bar__clear):focus-visible {
+    outline: var(--focus-ring-width) solid Highlight !important;
+    outline-offset: var(--focus-ring-offset) !important;
+  }
+  :is(.y-field[role='button']:focus-visible, .y-field:has(.y-field__input:focus-visible), .y-input-bar__field:focus-within) {
+    outline: var(--focus-ring-width) solid Highlight !important;
+    outline-offset: calc(-1 * var(--focus-ring-width)) !important;
+  }
+}

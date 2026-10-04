@@ -7,7 +7,14 @@ type Src = typeof source;
 /** "#RRGGBB", "#RRGGBB@alpha", "transparent" или ссылка "{primitive.x}" / "{color.x}" / "{radius.x}". */
 export type TokenValue = string;
 
-export type SemanticColor = { light: TokenValue; dark: TokenValue; role: string; figma: string };
+export type SemanticColor = {
+  light: TokenValue;
+  dark: TokenValue;
+  role: string;
+  figma: string;
+  /** Повышенный контраст (prefers-contrast: more / Increase Contrast): своё значение или значение темы. */
+  contrast: { light: TokenValue; dark: TokenValue };
+};
 export type SemanticName = { [G in Keys<Src['color']>]: Keys<Src['color'][G]> }[Keys<Src['color']>];
 export type ItemKey = Keys<Src['item']>;
 export type HapticKey = Keys<Src['motion']['haptic']>;

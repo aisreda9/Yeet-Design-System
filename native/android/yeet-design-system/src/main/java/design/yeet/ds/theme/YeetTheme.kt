@@ -20,7 +20,9 @@ import androidx.compose.ui.unit.Dp
 import design.yeet.ds.R
 import design.yeet.tokens.YeetColorScheme
 import design.yeet.tokens.YeetDarkColors
+import design.yeet.tokens.YeetDarkContrastColors
 import design.yeet.tokens.YeetLightColors
+import design.yeet.tokens.YeetLightContrastColors
 import design.yeet.tokens.YeetMotionScheme
 import design.yeet.tokens.YeetRadius
 import design.yeet.tokens.YeetShadow
@@ -60,6 +62,9 @@ val LocalYeetHaptics = staticCompositionLocalOf { YeetHaptics.None }
 /** Тёмная ли тема сейчас. */
 val LocalYeetDarkTheme = staticCompositionLocalOf { false }
 
+/** Включён ли повышенный контраст (цвета YeetLightContrastColors / YeetDarkContrastColors, фокус YeetFocusRing.widthHighContrast). */
+val LocalYeetHighContrast = staticCompositionLocalOf { false }
+
 /**
  * Тема Yeet: цвета light / dark, типографика Roboto Slab + Inter из res/font,
  * отступы, скругления, тень, движение и хаптика. Material3 внутри — только как база
@@ -68,6 +73,8 @@ val LocalYeetDarkTheme = staticCompositionLocalOf { false }
  * @param reduceMotion «Уменьшить движение»: по умолчанию читается из системной настройки
  *   «Убрать анимацию» (animator duration scale = 0).
  * @param hapticsEnabled выключает хаптику компонентов целиком (системная настройка уважается всегда).
+ * @param highContrast повышенный контраст (#117): по умолчанию — системный уровень контраста Android 14+
+ *   (UiModeManager.getContrast() ≥ 0.5); на API < 34 системной настройки нет — `false`.
  */
 @Composable
 fun YeetTheme(
@@ -75,9 +82,13 @@ fun YeetTheme(
     typography: YeetTypography = rememberYeetTypography(),
     reduceMotion: Boolean = rememberReduceMotion(),
     hapticsEnabled: Boolean = true,
+    highContrast: Boolean = rememberHighContrast(),
     content: @Composable () -> Unit,
 ) {
-    val colors = if (darkTheme) YeetDarkColors else YeetLightColors
+    val colors = when {
+        highContrast -> if (darkTheme) YeetDarkContrastColors else YeetLightContrastColors
+        else -> if (darkTheme) YeetDarkColors else YeetLightColors
+    }
     val view = LocalView.current
     val haptics = remember(view, hapticsEnabled) { if (hapticsEnabled) YeetHaptics(view) else YeetHaptics.None }
     val motion = remember(reduceMotion) { YeetMotionScheme(reduced = reduceMotion) }
@@ -93,6 +104,7 @@ fun YeetTheme(
         LocalYeetMotion provides motion,
         LocalYeetHaptics provides haptics,
         LocalYeetDarkTheme provides darkTheme,
+        LocalYeetHighContrast provides highContrast,
     ) {
         MaterialTheme(colorScheme = material, typography = materialTypography) {
             CompositionLocalProvider(LocalContentColor provides colors.textPrimary, content = content)
@@ -118,6 +130,8 @@ object YeetTheme {
         @Composable @ReadOnlyComposable get() = LocalYeetHaptics.current
     val isDark: Boolean
         @Composable @ReadOnlyComposable get() = LocalYeetDarkTheme.current
+    val isHighContrast: Boolean
+        @Composable @ReadOnlyComposable get() = LocalYeetHighContrast.current
 }
 
 /** Roboto Slab (заголовки) + Inter (текст) из res/font — переменные шрифты tokens/fonts. */
