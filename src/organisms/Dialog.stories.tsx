@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-export const SingleAction: Story = { name: 'Одна кнопка', args: { variant: 'default', title: 'Готово!', description: 'Мы отправили ссылку для сброса пароля на sima@space.com', cancel: undefined, confirm: 'Ок!' } };
+export const SingleAction: Story = { name: 'Одна кнопка', args: { variant: 'default', title: 'Готово!', description: 'Мы отправили код для сброса пароля на sima@space.com', cancel: undefined, confirm: 'Ок!' } };
 
 export const InFlow: Story = {
   parameters: { controls: { disable: true } },
@@ -31,7 +31,7 @@ export const InFlow: Story = {
     <UsageGrid min={393}>
       <Usage screen="Outfit Creation / Exit">{onOverlay(() => <Dialog title="Точно хочешь выйти?" description="Можно сохранить образ и вернуться к нему позже" cancel="Выйти" confirm="Сохранить" />)}</Usage>
       <Usage screen="Settings / Delete Account" note="со статистикой">{onOverlay(() => <Dialog variant="danger" title="Аккаунт будет удалён" description="Ты потеряешь:" cancel="Отменить" confirm="Удалить"><StatRow><StatTile size="L" label="Вещи" value={43} /><StatTile size="L" label="Образы" value={12} /><StatTile size="L" label="Вишлист" value={12} /></StatRow></Dialog>)}</Usage>
-      <Usage screen="Auth / Password Recovery / Dialog / Sent" note="одна кнопка">{onOverlay(() => <Dialog title="Готово!" description="Мы отправили ссылку для сброса пароля на sima@space.com" confirm="Ок!" />)}</Usage>
+      <Usage screen="Auth / Password Recovery / Dialog / Sent" note="одна кнопка">{onOverlay(() => <Dialog title="Готово!" description="Мы отправили код для сброса пароля на sima@space.com" confirm="Ок!" />)}</Usage>
     </UsageGrid>
   ),
 };
