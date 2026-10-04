@@ -104,6 +104,26 @@
 /* Панель последним блоком на flush-экране доходит до низа экрана */
 .y-screen__content--flush:has(> .y-sheet--panel:last-child) { padding-bottom: 0; }
 .y-screen__content:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset-inset); }
+/* Высота нижней панели BottomBar (кнопка L + 20 снизу, organisms.css .y-bottom-bar): панели экрана уходят под неё до низа экрана,
+   как в Figma (панель до 852, BottomBar поверх). Без BottomBar — 0 */
+.y-screen:has(> .y-bottom-bar) { --screen-bottom-bar: calc(var(--size-control-l) + var(--space-20)); }
+/* Панель-док (Screen dock, #114; Figma Canvas 1371:42129): контент над ней стоит (холст y138, панель y511 = холст + 20),
+   док до низа экрана, BottomBar — поверх него (подложка цвета панели, data-panel-bottom). Хэндл, заголовок и фильтры
+   закреплены, прокручивается последний блок панели: вертикальный pan, overscroll contain; ряды сетки по содержимому — карточки
+   не сжимаются под высоту дока. Тело выходит в края панели (поля — паддингом) и на 4 вверх — кольцо фокуса не режется;
+   снизу 20 + BottomBar внутри прокрутки — последний ряд выходит из-под BottomBar */
+/* Низкий экран (568, 667): док не ниже 30 % экрана — видны заголовок, фильтры и начало сетки, а контент над ним
+   (холст) уходит в прокрутку экрана; BottomBar поверх дока — сверх этого. На 852 и выше док по месту (341 ≥ 256 + 72 на 393)
+   и экран не прокручивается */
+.y-screen__content--docked { flex: 0 1 auto; min-height: 0; padding-bottom: var(--space-20); }
+.y-screen__dock { flex: 1 1 0; min-height: calc(30% + var(--screen-bottom-bar, 0%)); display: flex; flex-direction: column; }
+.y-screen > .y-screen__dock + .y-bottom-bar { margin-top: calc(var(--screen-bottom-bar) * -1); }
+.y-screen__dock > .y-sheet--panel { flex: 1 1 auto; min-height: 0; padding-bottom: 0; }
+.y-screen__dock > .y-sheet--panel > :last-child {
+  flex: 1 1 auto; min-height: 0; align-content: start; grid-auto-rows: max-content; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none;
+  margin: calc(var(--space-4) * -1) calc(var(--screen-gutter) * -1) 0; padding: var(--space-4) var(--screen-gutter) calc(var(--space-20) + var(--screen-bottom-bar, 0%));
+}
+.y-screen__dock > .y-sheet--panel > :last-child::-webkit-scrollbar { display: none; }
 /* Поля экрана для блока внутри экрана без отступов (flush): фото над панелью */
 .y-gutter { padding: 0 var(--screen-gutter); }
 
@@ -133,10 +153,11 @@
 .y-details .y-header__center:has(> .y-header__on-scroll) > :not(.y-header__on-scroll) { position: absolute; }
 /* Место фото в потоке — постоянное: панель едет по нему transform-ом, раскладка не меняется */
 .y-details__spacer { aspect-ratio: 1; margin: 0 var(--screen-gutter); }
-/* Панель не короче экрана и уходит под нижнюю панель до низа экрана (Figma: панель y138 → 852).
+/* Панель не короче области контента и уходит под BottomBar до низа экрана (Figma: панель y138 → 852). Запас — ровно высота
+   BottomBar, без магического числа (#114): без неё короткий контент не прокручивается.
    translateY на ход × p; margin-bottom −ход — конец прокрутки там, где конец сдвинутой панели */
 .y-details .y-sheet--panel {
-  min-height: calc(100% + 120px); /* stylelint-disable-line unit-disallowed-list -- запас под нижнюю панель */
+  min-height: calc(100% + var(--screen-bottom-bar, 0%));
   margin-bottom: calc(var(--details-travel, 0px) * -1); /* stylelint-disable-line unit-disallowed-list -- ноль до замера */
   transform: translateY(calc(var(--details-travel, 0px) * -1 * var(--details-p))); /* stylelint-disable-line unit-disallowed-list -- ноль до замера */
 }
@@ -159,7 +180,7 @@
 .y-prose__card { padding: var(--space-20); border-radius: var(--card-radius); background: var(--card-bg); }
 /* Панель выбора вещей (ItemSlots) последним блоком на flush-экране — до низа экрана и под BottomBar, как шторка в Figma (1371:41906) */
 .y-screen__content--flush:has(> .y-item-slots:last-child) { padding-bottom: 0; }
-.y-screen__content--flush > .y-item-slots:last-child { flex: 1 0 auto; min-height: calc(100% + 120px); } /* stylelint-disable-line unit-disallowed-list -- запас под нижнюю панель, как у .y-details .y-sheet--panel */
+.y-screen__content--flush > .y-item-slots:last-child { flex: 1 0 auto; min-height: calc(100% + var(--screen-bottom-bar, 0%)); } /* под BottomBar до низа экрана, как .y-details .y-sheet--panel (#114) */
 
 /* Шапка в скролле (#170), экран по центру / у низа: контент под шапкой, а не вместе с ней.
    В конце файла: селекторы `… > *` специфичнее прочих (no-descending-specificity) */
