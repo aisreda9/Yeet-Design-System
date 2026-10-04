@@ -243,12 +243,12 @@ export type OverlayProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
  * иначе на первый интерактивный элемент, кроме полей и ползунков (на телефоне поле подняло бы клавиатуру), иначе на саму шторку. Tab и Shift+Tab ходят по кругу внутри слоя, фон (соседи слоя: шапка,
  * контент `Screen`, низ) получает `inert`. После закрытия фокус возвращается туда, откуда слой открыли.
  *
- * **Открытие.** `open` / `onOpenChange` — слой сам доигрывает уход (`is-leaving`, `--motion-exit`) и убирается из DOM:
+ * **Открытие.** `open` / `onOpenChange` — слой сам доигрывает уход (`is-leaving`, `--overlay-exit`: `--motion-exit`, при «Уменьшении движения» — растворение 240 мс) и убирается из DOM:
  * `<Overlay open={open} onOpenChange={setOpen}>`. Без `open` слой показан всегда, а уход доигрывает `Screen`
  * (или `onClose` — вызывается после анимации ухода).
  */
 export function Overlay({ open, ...props }: OverlayProps) {
-  const presence = usePresence(open === false ? undefined : true);
+  const presence = usePresence(open === false ? undefined : true, '--overlay-exit');
   if (open === undefined) return <OverlayLayer {...props} />;
   return presence.node ? <OverlayLayer {...props} controlled leaving={presence.leaving} /> : null;
 }
@@ -280,7 +280,7 @@ function OverlayLayer({ children, onClose, onOpenChange, controlled, leaving: le
     if (!onClose) return;
     setClosing(true);
     // родитель убирает слой; если оставил (закрытие отклонено) — шторка возвращается
-    window.setTimeout(() => { onClose(); setClosing(false); }, motionMs('--motion-exit'));
+    window.setTimeout(() => { onClose(); setClosing(false); }, motionMs('--overlay-exit')); // exit; при «Уменьшении движения» — растворение 240 мс
   }, [controlled, onClose, onOpenChange]);
 
   // Модальность: фокус внутрь, фон inert, Tab по кругу; при уходе — фон обратно и фокус туда, откуда открыли
