@@ -1,0 +1,892 @@
+{
+  "$description": "План перестановки рядов и кадров секции Pages/Экраны флоу · Light (1168:12824) на DS 0.2 (942:5666, файл 1LAkot5WySMWhwiiFJqJ0e) в порядок пути пользователя (#174). Источник порядка — src/docs/flow-order.ts (тот же, что storySort в Storybook). Выполняет сборщик Figma под замком в #6; план — только порядок, без дампа.",
+  "generatedFrom": [
+    "src/docs/flow-order.ts",
+    "design/figma-flows.json (flow2: слаг → кадр Light)",
+    "storybook-static/index.json (имя истории → слаг)"
+  ],
+  "file": "1LAkot5WySMWhwiiFJqJ0e",
+  "page": "942:5666",
+  "section": "1168:12824",
+  "layout": {
+    "rule": "Ряд = группа (файл src/pages/<group>.stories.tsx), ряды сверху вниз по row; кадры в ряду слева направо по col. Шаг по x и y, отступы от краёв секции и подписи рядов — как сейчас в секции (снять get_metadata 1168:12824 перед перестановкой); высота ряда = максимум высоты кадров ряда (Profile / Overview / Analytics 3164, Stylist / Catalog 1363). Оверлеи (шторки, диалоги, тосты) — в ряду на своей позиции col, по верхнему краю ряда.",
+    "x": "x(col) = left + (col - 1) * (393 + gapX)",
+    "y": "y(row) = top + сумма (высота ряда k + gapY) для k < row",
+    "nodeIdNull": "Кадра нет в design/figma-flows.json flow2 — найти в секции по имени (имя кадра = name) или по тегу figma:<id> истории; если кадра в секции нет — пропустить, следующие кадры ряда сдвигаются влево.",
+    "renameRows": "Подписи рядов (если есть) — label; порядок рядов в FIGMA-RULES §0 («Creation · Onboarding · …») обновить на Onboarding · Outfits · Wardrobe · Creation · Search · Stylist · Profile · Settings."
+  },
+  "stats": {
+    "rows": 8,
+    "frames": 135,
+    "withNodeId": 84,
+    "withoutNodeId": 51
+  },
+  "rows": [
+    {
+      "row": 1,
+      "group": "Onboarding",
+      "label": "Онбординг и вход",
+      "frames": [
+        {
+          "col": 1,
+          "name": "App / Splash",
+          "story": "splash",
+          "nodeId": "1173:18160"
+        },
+        {
+          "col": 2,
+          "name": "Onboarding / Welcome",
+          "story": "onboarding-welcome",
+          "nodeId": "1158:4483"
+        },
+        {
+          "col": 3,
+          "name": "Auth / Sign In",
+          "story": "sign-in",
+          "nodeId": "1173:20639"
+        },
+        {
+          "col": 4,
+          "name": "Auth / Password Recovery",
+          "story": "password-recovery",
+          "nodeId": "1173:21481"
+        },
+        {
+          "col": 5,
+          "name": "Auth / Password Recovery / Dialog / Sent",
+          "story": "password-recovery-sent",
+          "nodeId": "1254:14303"
+        },
+        {
+          "col": 6,
+          "name": "Onboarding / Name / Focused",
+          "story": "onboarding-name",
+          "nodeId": "1173:21671"
+        },
+        {
+          "col": 7,
+          "name": "Onboarding / First Item Prompt",
+          "story": "first-item-prompt",
+          "nodeId": "1173:21880"
+        },
+        {
+          "col": 8,
+          "name": "Onboarding / First Item / Sheet / Add Photo",
+          "story": "first-item-add-photo",
+          "nodeId": null
+        },
+        {
+          "col": 9,
+          "name": "Onboarding / First Outfit / Preview",
+          "story": "first-outfit",
+          "nodeId": "1173:21962"
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "group": "Outfits",
+      "label": "Главная (Сегодня)",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Outfits / Everyday / Sunny",
+          "story": "today",
+          "nodeId": "1173:16144"
+        },
+        {
+          "col": 2,
+          "name": "Outfits / Everyday / Rain Alert",
+          "story": "today-rain",
+          "nodeId": "1173:16259"
+        },
+        {
+          "col": 3,
+          "name": "Outfits / Everyday / Occasion Selector Open",
+          "story": "today-occasions",
+          "nodeId": null
+        },
+        {
+          "col": 4,
+          "name": "Outfits / Everyday / Sheet / Custom Occasion Name Empty",
+          "story": "today-custom-occasion-empty",
+          "nodeId": null
+        },
+        {
+          "col": 5,
+          "name": "Outfits / Everyday / Sheet / Custom Occasion Name Entered",
+          "story": "today-custom-occasion-entered",
+          "nodeId": null
+        },
+        {
+          "col": 6,
+          "name": "Outfits / Everyday / Wear Action Active",
+          "story": "today-worn",
+          "nodeId": null
+        },
+        {
+          "col": 7,
+          "name": "Outfits / Recommendations / Empty Wardrobe",
+          "story": "recommendations-empty",
+          "nodeId": "1173:19455"
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "group": "Wardrobe",
+      "label": "Гардероб: вещи, образы, вишлист, архив и корзина",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Wardrobe / Items / Empty",
+          "story": "wardrobe-empty",
+          "nodeId": "1141:2088"
+        },
+        {
+          "col": 2,
+          "name": "Wardrobe / Items / Populated",
+          "story": "wardrobe",
+          "nodeId": "1141:1697"
+        },
+        {
+          "col": 3,
+          "name": "Wardrobe / Items / Populated / Scrolled",
+          "story": "wardrobe-scrolled",
+          "nodeId": null
+        },
+        {
+          "col": 4,
+          "name": "Wardrobe / Items / Sheet / Category Root",
+          "story": "category-root-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 5,
+          "name": "Wardrobe / Items / Sheet / Category",
+          "story": "filter-sheet",
+          "nodeId": "1144:3290"
+        },
+        {
+          "col": 6,
+          "name": "Wardrobe / Items / Sheet / Season Filter",
+          "story": "season-filter-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 7,
+          "name": "Wardrobe / Items / Sheet / Tags Filter",
+          "story": "tags-filter-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 8,
+          "name": "Wardrobe / Items / No Filter Results",
+          "story": "items-no-filter-results",
+          "nodeId": "1141:2212"
+        },
+        {
+          "col": 9,
+          "name": "Wardrobe / Items / Sheet / Item Actions",
+          "story": "item-actions",
+          "nodeId": "1144:3017"
+        },
+        {
+          "col": 10,
+          "name": "Wardrobe / Item / Toast",
+          "story": "toast",
+          "nodeId": "1176:11844"
+        },
+        {
+          "col": 11,
+          "name": "Wardrobe / Item Search / Query Focused",
+          "story": "item-search-focused",
+          "nodeId": "1173:15144"
+        },
+        {
+          "col": 12,
+          "name": "Wardrobe / Item Search / Results",
+          "story": "item-search-results",
+          "nodeId": "1173:15337"
+        },
+        {
+          "col": 13,
+          "name": "Wardrobe / Item Search / No Results",
+          "story": "item-search-empty",
+          "nodeId": "1173:15414"
+        },
+        {
+          "col": 14,
+          "name": "Wardrobe / Item Details",
+          "story": "wardrobe-item-details",
+          "nodeId": "1143:2840"
+        },
+        {
+          "col": 15,
+          "name": "Wardrobe / Item Details / Scrolled",
+          "story": "wardrobe-item-details-scrolled",
+          "nodeId": "1174:19290"
+        },
+        {
+          "col": 16,
+          "name": "Wardrobe / Edit Item / Sheet / Category Expanded",
+          "story": "edit-item-category-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 17,
+          "name": "Wardrobe / Edit Item / Sheet / Color",
+          "story": "edit-item-color-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 18,
+          "name": "Wardrobe / Edit Item / Sheet / Season",
+          "story": "edit-item-season-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 19,
+          "name": "Wardrobe / Outfits / Empty",
+          "story": "outfits-empty",
+          "nodeId": "1141:2432"
+        },
+        {
+          "col": 20,
+          "name": "Wardrobe / Outfits / Populated",
+          "story": "outfits-populated",
+          "nodeId": "1142:2412"
+        },
+        {
+          "col": 21,
+          "name": "Wardrobe / Outfits / Sheet / Occasion Filter",
+          "story": "occasion-filter-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 22,
+          "name": "Wardrobe / Outfits / Sheet / Custom Occasion Name Empty",
+          "story": "outfits-custom-occasion-empty",
+          "nodeId": null
+        },
+        {
+          "col": 23,
+          "name": "Wardrobe / Outfits / Sheet / Custom Occasion Name Entered",
+          "story": "outfits-custom-occasion-entered",
+          "nodeId": null
+        },
+        {
+          "col": 24,
+          "name": "Wardrobe / Outfits / No Filter Results",
+          "story": "outfits-no-filter-results",
+          "nodeId": "1174:19706"
+        },
+        {
+          "col": 25,
+          "name": "Wardrobe / Outfit / Sheet / Actions",
+          "story": "outfit-actions",
+          "nodeId": null
+        },
+        {
+          "col": 26,
+          "name": "Wardrobe / Outfit / Sheet / Permanent Delete Actions",
+          "story": "outfit-permanent-delete",
+          "nodeId": null
+        },
+        {
+          "col": 27,
+          "name": "Wardrobe / Outfit Details",
+          "story": "outfit-details",
+          "nodeId": "1143:3032"
+        },
+        {
+          "col": 28,
+          "name": "Wardrobe / Outfit Details / Scrolled",
+          "story": "outfit-details-scrolled",
+          "nodeId": "1174:19422"
+        },
+        {
+          "col": 29,
+          "name": "Wardrobe / Outfit Details / Variant 02",
+          "story": "outfit-details-worn",
+          "nodeId": null
+        },
+        {
+          "col": 30,
+          "name": "Wishlist / Items / Empty",
+          "story": "wishlist-empty",
+          "nodeId": "1141:2566"
+        },
+        {
+          "col": 31,
+          "name": "Wishlist / Items / Populated",
+          "story": "wishlist",
+          "nodeId": "1142:2719"
+        },
+        {
+          "col": 32,
+          "name": "Wishlist / Items / Scrolled",
+          "story": "wishlist-scrolled",
+          "nodeId": null
+        },
+        {
+          "col": 33,
+          "name": "Wishlist / Add / Sheet / Content Type",
+          "story": "wishlist-content-type-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 34,
+          "name": "Wishlist / New Item / Empty",
+          "story": "wishlist-new-item",
+          "nodeId": "1173:18306"
+        },
+        {
+          "col": 35,
+          "name": "Wishlist / New Item / Completed",
+          "story": "wishlist-new-item-completed",
+          "nodeId": "1173:18555"
+        },
+        {
+          "col": 36,
+          "name": "Wishlist / Item / Sheet / Actions",
+          "story": "wishlist-item-actions",
+          "nodeId": null
+        },
+        {
+          "col": 37,
+          "name": "Wishlist / Item / Toast / Moved to Wardrobe",
+          "story": "toast-moved-to-wardrobe",
+          "nodeId": null
+        },
+        {
+          "col": 38,
+          "name": "Wishlist / Item Details",
+          "story": "item-details",
+          "nodeId": "1174:16922"
+        },
+        {
+          "col": 39,
+          "name": "Wishlist / Item Details / Scrolled",
+          "story": "item-details-scrolled",
+          "nodeId": "1174:17064"
+        },
+        {
+          "col": 40,
+          "name": "Wishlist / Outfits / Populated",
+          "story": "wishlist-outfits",
+          "nodeId": "1142:2970"
+        },
+        {
+          "col": 41,
+          "name": "Wishlist / Outfit Details / Default",
+          "story": "wishlist-outfit-details",
+          "nodeId": "1174:17192"
+        },
+        {
+          "col": 42,
+          "name": "Archive / Items / Empty",
+          "story": "archive-empty",
+          "nodeId": "1142:3181"
+        },
+        {
+          "col": 43,
+          "name": "Archive / Items / Populated",
+          "story": "archive",
+          "nodeId": "1142:3268"
+        },
+        {
+          "col": 44,
+          "name": "Archive / Item / Sheet / Actions",
+          "story": "archive-item-actions",
+          "nodeId": null
+        },
+        {
+          "col": 45,
+          "name": "Archive / Item / Toast / Moved to Trash",
+          "story": "toast-moved-to-trash",
+          "nodeId": null
+        },
+        {
+          "col": 46,
+          "name": "Trash / Items / Empty",
+          "story": "trash-empty",
+          "nodeId": "1142:3342"
+        },
+        {
+          "col": 47,
+          "name": "Trash / Items / Populated",
+          "story": "trash-populated",
+          "nodeId": "1142:3407"
+        },
+        {
+          "col": 48,
+          "name": "Trash / Item / Sheet / Actions",
+          "story": "trash-item-actions",
+          "nodeId": null
+        },
+        {
+          "col": 49,
+          "name": "Trash / Item / Toast / Deleted Permanently",
+          "story": "toast-deleted-permanently",
+          "nodeId": null
+        },
+        {
+          "col": 50,
+          "name": "Trash / Items / Dialog / Clear",
+          "story": "clear-trash",
+          "nodeId": "1147:7271"
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "group": "Creation",
+      "label": "Новая вещь и создание образа",
+      "frames": [
+        {
+          "col": 1,
+          "name": "New Item / Details / No Photo Variant 01",
+          "story": "new-item-no-photo-v-1",
+          "nodeId": "1174:17332"
+        },
+        {
+          "col": 2,
+          "name": "New Item / Details / No Photo Variant 02",
+          "story": "new-item-no-photo-v-2",
+          "nodeId": "1174:19818"
+        },
+        {
+          "col": 3,
+          "name": "New Item / Photo / Sheet / Add",
+          "story": "new-item-photo-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 4,
+          "name": "New Item / Photo / Removing Background Variant 01",
+          "story": "new-item-loading-v-1",
+          "nodeId": "1174:17689"
+        },
+        {
+          "col": 5,
+          "name": "New Item / Removing Background",
+          "story": "new-item",
+          "nodeId": "1174:20167"
+        },
+        {
+          "col": 6,
+          "name": "New Item / Details / Photo Added Variant 01",
+          "story": "new-item-photo-v-1",
+          "nodeId": "1174:18042"
+        },
+        {
+          "col": 7,
+          "name": "New Item / Details / Photo Added Variant 02",
+          "story": "new-item-photo-v-2",
+          "nodeId": "1174:20520"
+        },
+        {
+          "col": 8,
+          "name": "New Item / Details / Name Focused Variant 01",
+          "story": "new-item-focused-v-1",
+          "nodeId": "1174:18405"
+        },
+        {
+          "col": 9,
+          "name": "New Item / Details / Name Focused Variant 02",
+          "story": "new-item-focused-v-2",
+          "nodeId": "1174:20883"
+        },
+        {
+          "col": 10,
+          "name": "New Item / Details / Sheet / Category Root",
+          "story": "new-item-category-root",
+          "nodeId": null
+        },
+        {
+          "col": 11,
+          "name": "New Item / Details / Sheet / Category Expanded",
+          "story": "new-item-category-expanded",
+          "nodeId": null
+        },
+        {
+          "col": 12,
+          "name": "New Item / Details / Completed Variant 01",
+          "story": "new-item-completed-v-1",
+          "nodeId": "1174:18824"
+        },
+        {
+          "col": 13,
+          "name": "New Item / Details / Completed Variant 02",
+          "story": "new-item-completed-v-2",
+          "nodeId": "1174:21302"
+        },
+        {
+          "col": 14,
+          "name": "Outfit Creation / Item Selection / Items Selected",
+          "story": "outfit-items-empty",
+          "nodeId": null
+        },
+        {
+          "col": 15,
+          "name": "Outfit Creation / Item Selection / Ready to Continue",
+          "story": "outfit-items",
+          "nodeId": "1173:22216"
+        },
+        {
+          "col": 16,
+          "name": "Outfit Creation / Items / Sheet / Category with Selection",
+          "story": "outfit-items-category-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 17,
+          "name": "Outfit Creation / Shuffle / Dialog / Unsaved Changes",
+          "story": "shuffle-dialog",
+          "nodeId": null
+        },
+        {
+          "col": 18,
+          "name": "Outfit Creation / Canvas / Gesture Hint",
+          "story": "canvas-hint",
+          "nodeId": "1174:21691"
+        },
+        {
+          "col": 19,
+          "name": "Outfit Creation / Canvas / Default",
+          "story": "canvas-default",
+          "nodeId": "1174:21939"
+        },
+        {
+          "col": 20,
+          "name": "Outfit Creation / Item Filter / Sheet / Bottoms",
+          "story": "item-filter-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 21,
+          "name": "Outfit Creation / Canvas / Filtered",
+          "story": "canvas",
+          "nodeId": "1174:22173"
+        },
+        {
+          "col": 22,
+          "name": "Outfit Creation / Clear / Dialog / Confirmation",
+          "story": "clear-dialog",
+          "nodeId": null
+        },
+        {
+          "col": 23,
+          "name": "Outfit Creation / Exit / Dialog / Unsaved Changes",
+          "story": "exit-dialog",
+          "nodeId": null
+        },
+        {
+          "col": 24,
+          "name": "Outfit Creation / Criteria / Default",
+          "story": "outfit-criteria",
+          "nodeId": "1174:22446"
+        }
+      ]
+    },
+    {
+      "row": 5,
+      "group": "Search",
+      "label": "Поиск",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Search / Discover",
+          "story": "search-discover",
+          "nodeId": "1141:2700"
+        },
+        {
+          "col": 2,
+          "name": "Search / Text / Query Focused",
+          "story": "search-focused",
+          "nodeId": "1173:14557"
+        },
+        {
+          "col": 3,
+          "name": "Search / Text / Results",
+          "story": "search-results",
+          "nodeId": "1141:2876"
+        },
+        {
+          "col": 4,
+          "name": "Search / Results / Sheet / Sorting",
+          "story": "sorting-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 5,
+          "name": "Search / Results / Sheet / Price Filter",
+          "story": "price-filter",
+          "nodeId": "1144:3684"
+        },
+        {
+          "col": 6,
+          "name": "Search / Text / No Results Filtered",
+          "story": "search-empty",
+          "nodeId": "1141:3067"
+        },
+        {
+          "col": 7,
+          "name": "Search / Result Item / Toast / Moved to Wishlist",
+          "story": "toast-moved-to-wishlist",
+          "nodeId": null
+        },
+        {
+          "col": 8,
+          "name": "Search / Photo / Sheet / Add",
+          "story": "photo-add-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 9,
+          "name": "Search / Photo / Crop",
+          "story": "photo-crop",
+          "nodeId": "1176:19019"
+        },
+        {
+          "col": 10,
+          "name": "Search / Photo / Query Focused",
+          "story": "photo-focused",
+          "nodeId": "1173:14911"
+        },
+        {
+          "col": 11,
+          "name": "Search / Photo / Results",
+          "story": "photo-results",
+          "nodeId": "1173:14753"
+        },
+        {
+          "col": 12,
+          "name": "Search / Photo / Sheet / Replace",
+          "story": "photo-replace-sheet",
+          "nodeId": null
+        }
+      ]
+    },
+    {
+      "row": 6,
+      "group": "Stylist",
+      "label": "Стилист и поездки",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Stylist / Catalog",
+          "story": "stylist-home",
+          "nodeId": "1173:18217"
+        },
+        {
+          "col": 2,
+          "name": "Stylist / Assistant / Input Focused",
+          "story": "stylist-focused",
+          "nodeId": "1176:19708"
+        },
+        {
+          "col": 3,
+          "name": "Stylist / Home / Greeting Entered",
+          "story": "stylist-greeting",
+          "nodeId": "1176:19877"
+        },
+        {
+          "col": 4,
+          "name": "Stylist / Home / Message Ready",
+          "story": "stylist",
+          "nodeId": "1176:20046"
+        },
+        {
+          "col": 5,
+          "name": "Stylist / Outfit of the Day / Default",
+          "story": "outfit-of-the-day",
+          "nodeId": null
+        },
+        {
+          "col": 6,
+          "name": "Stylist / Outfit of the Day / Dialog / About Surprise Me",
+          "story": "about-surprise-dialog",
+          "nodeId": null
+        },
+        {
+          "col": 7,
+          "name": "Stylist / Outfit of the Day / No More Outfits",
+          "story": "outfit-of-the-day-empty",
+          "nodeId": "1176:20445"
+        },
+        {
+          "col": 8,
+          "name": "Stylist / Constructor / Empty",
+          "story": "constructor-empty",
+          "nodeId": null
+        },
+        {
+          "col": 9,
+          "name": "Stylist / What to Wear / Outfits",
+          "story": "what-to-wear",
+          "nodeId": null
+        },
+        {
+          "col": 10,
+          "name": "Stylist / Trips / List",
+          "story": "trips",
+          "nodeId": "1168:4579"
+        },
+        {
+          "col": 11,
+          "name": "Stylist / Trip Details / Outfits Tab",
+          "story": "trip-details",
+          "nodeId": "1177:13116"
+        },
+        {
+          "col": 12,
+          "name": "Stylist / Trip Details / Items Tab",
+          "story": "trip-items",
+          "nodeId": "1168:4679"
+        }
+      ]
+    },
+    {
+      "row": 7,
+      "group": "Profile",
+      "label": "Профиль",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Profile / Overview / Single Account",
+          "story": "profile-single",
+          "nodeId": "1254:14334"
+        },
+        {
+          "col": 2,
+          "name": "Profile / Overview / Analytics",
+          "story": "profile-analytics",
+          "nodeId": "1149:3669"
+        },
+        {
+          "col": 3,
+          "name": "Profile / Overview / Analytics / Scrolled",
+          "story": "profile-analytics-scrolled",
+          "nodeId": null
+        },
+        {
+          "col": 4,
+          "name": "Profile / Analytics / Sheet / Period",
+          "story": "period-sheet",
+          "nodeId": "1147:3417"
+        },
+        {
+          "col": 5,
+          "name": "Profile / Accounts / Sheet / Single",
+          "story": "accounts-single",
+          "nodeId": "1147:7208"
+        },
+        {
+          "col": 6,
+          "name": "Profile / Accounts / Sheet / List",
+          "story": "accounts-multi",
+          "nodeId": "1147:7151"
+        },
+        {
+          "col": 7,
+          "name": "Profile / Edit / No Avatar",
+          "story": "profile-edit",
+          "nodeId": "1168:4851"
+        },
+        {
+          "col": 8,
+          "name": "Profile / Avatar / Sheet / Add",
+          "story": "avatar-add-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 9,
+          "name": "Profile / Edit / Avatar Added",
+          "story": "profile-edit-avatar",
+          "nodeId": "1176:19604"
+        },
+        {
+          "col": 10,
+          "name": "Profile / Avatar / Sheet / Replace",
+          "story": "avatar-replace-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 11,
+          "name": "Profile / Edit / Sheet / Birth Year",
+          "story": "birth-year-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 12,
+          "name": "Profile / Edit / Sheet / Gender",
+          "story": "profile-gender-sheet",
+          "nodeId": null
+        },
+        {
+          "col": 13,
+          "name": "Profile / Edit / Sheet / Style",
+          "story": "profile-style-sheet",
+          "nodeId": null
+        }
+      ]
+    },
+    {
+      "row": 8,
+      "group": "Settings",
+      "label": "Настройки и юридическое",
+      "frames": [
+        {
+          "col": 1,
+          "name": "Settings / Main",
+          "story": "settings",
+          "nodeId": "1149:4140"
+        },
+        {
+          "col": 2,
+          "name": "Settings / Country / Sheet / Default",
+          "story": "country-sheet",
+          "nodeId": "1147:3725"
+        },
+        {
+          "col": 3,
+          "name": "Settings / Country / Sheet / Search Focused",
+          "story": "country-search-focused",
+          "nodeId": null
+        },
+        {
+          "col": 4,
+          "name": "Settings / Currency / Sheet / Default",
+          "story": "currency-sheet",
+          "nodeId": "1174:16325"
+        },
+        {
+          "col": 5,
+          "name": "Settings / Sign Out / Dialog / Confirmation",
+          "story": "sign-out-dialog",
+          "nodeId": null
+        },
+        {
+          "col": 6,
+          "name": "Settings / Delete Account / Dialog / Confirmation",
+          "story": "delete-account",
+          "nodeId": "1176:11793"
+        },
+        {
+          "col": 7,
+          "name": "Legal / Privacy Policy / May 2026",
+          "story": "legal-privacy",
+          "nodeId": "1204:20720"
+        },
+        {
+          "col": 8,
+          "name": "Legal / Terms of Use / May 2026",
+          "story": "legal-terms",
+          "nodeId": "1204:20805"
+        }
+      ]
+    }
+  ]
+}
