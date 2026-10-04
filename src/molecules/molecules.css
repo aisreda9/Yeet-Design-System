@@ -236,7 +236,7 @@ div.y-list-item { cursor: default; }
 /* Рисунок шире рамки 63 (галерея — 128) и центрирован по ней; в плитке уже рисунка (320: ~120 в шторке 288) — сжимается по ширине плитки, а не вылезает (#217) */
 .y-photo-tile__art > img { position: absolute; left: 50%; translate: -50% 0; max-width: calc(100cqi + 2 * var(--space-20)); height: auto; /* 100cqi — контент плитки, + поля 20: вся ширина плитки */ pointer-events: none; }
 /* Заглушка арта (#220): концентрично плитке — радиус 20 − поле 20 → минимум 4 (12-Spacing, «Концентричность») */
-.y-photo-tile__art > .y-art-placeholder { --art-placeholder-radius: var(--radius-xs); }
+.y-photo-tile__art > .y-art-placeholder { border-radius: var(--radius-xs); }
 
 /* Carousel: лента выходит за поля экрана (bleed) */
 .y-carousel { flex: none; display: flex; flex-direction: column; gap: var(--space-16); /* флоу: заголовок → карточки 16 */ margin: 0 calc(var(--screen-gutter) * -1); }

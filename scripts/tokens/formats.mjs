@@ -1,6 +1,6 @@
 // Форматы Style Dictionary для Yeet: CSS-переменные (Storybook), Swift (SwiftUI), Kotlin (Jetpack Compose).
 // Значения берутся уже преобразованными трансформами платформы (scripts/tokens/transforms.mjs),
-// структура (группы, бренды, метаданные) — из исходного DTCG-дерева.
+// структура (группы, метаданные) — из исходного DTCG-дерева.
 import { EXT, isRef, refPath } from './dtcg.mjs';
 import { camel, kotlinName, pascal, swiftName } from './transforms.mjs';
 
@@ -35,7 +35,6 @@ function deep(v, id) {
 const member = (t) => camel(t.path.slice(1).join('-'));
 
 const colorGroups = (v) => v.keys(v.source.color).map((g) => ({ title: v.groupNode(`color.${g}`).$description, tokens: v.list(`color.${g}`) }));
-const brands = (v) => v.keys(v.source.brand).map((id) => ({ id, ...v.x(v.groupNode(`brand.${id}`)).brand, tokens: v.list(`brand.${id}`) }));
 /** Подпись пружины: пресет Figma (`figma`) или пояснение (`note`), если пружина своя. */
 const springNote = (v, t, prefix = 'Figma') => (v.x(t).figma ? `${prefix} ${v.x(t).figma}` : v.x(t).note);
 const fontMeta = (v) => v.list('font').map((t) => ({ key: v.key(t), family: v.orig(t)[0], ...v.x(t), source: t.$description }));
@@ -80,15 +79,8 @@ export function css({ dictionary }, source) {
     for (const t of v.list('shadow')) L.push(`  --${t.name}: ${v.inMode(t, theme).$value};`);
     L.push('}', '');
   }
-  // Бренд-варианты: переопределяют семантические цвета поверх темы (data-brand на <html> или на обёртке)
-  for (const b of brands(v))
-    for (const theme of ['light', 'dark']) {
-      L.push(`/* Бренд «${b.name}»: ${theme} */`, theme === 'light' ? `[data-brand='${b.id}']:not([data-theme='dark']) {` : `[data-brand='${b.id}'][data-theme='dark'] {`);
-      for (const t of b.tokens) L.push(`  --color-${v.key(t)}: ${v.inMode(t, theme).$value};`);
-      L.push('}', '');
-    }
-  // Компонентные токены пересчитываются там, где меняется тема или бренд, а не только на :root
-  L.push(':root,\n[data-theme],\n[data-brand] {');
+  // Компонентные токены пересчитываются там, где меняется тема, а не только на :root
+  L.push(':root,\n[data-theme] {');
   for (const t of v.list('component')) {
     const o = v.orig(t), after = v.x(v.groupNode(t.path.join('.'))).after; // из исходника: SD раскрывает ссылки в $extensions
     const val = isRef(o) ? `var(--${v.get(refPath(o)).name})` : t.$value;
@@ -100,7 +92,7 @@ export function css({ dictionary }, source) {
     const o = v.orig(t);
     L.push(`.y-${v.key(t)} { font: var(--font-weight-${v.key(t)}) ${o.fontSize.value}px/${Math.round(o.fontSize.value * o.lineHeight)}px var(--${v.get(refPath(o.fontFamily)).name}); letter-spacing: ${o.letterSpacing.value}px; margin: 0; }`);
   }
-  // Токены 2.0: только новые переменные. Ссылки на семантические цвета — в блоке, который пересчитывается с темой и брендом.
+  // Токены 2.0: только новые переменные. Ссылки на семантические цвета — в блоке, который пересчитывается с темой.
   const extra = EXTRA_GROUPS.flatMap((g) => deep(v, g));
   L.push('', '/* Токены 2.0: прозрачность, слои, размеры контролов, фокус, толщина линий, составная типографика, брейкпоинты */', ':root {');
   for (const t of extra) if (t.$type !== 'color') { const o = v.orig(t); L.push(`  --${t.name}: ${isRef(o) ? `var(--${v.get(refPath(o)).name})` : t.$value}; /* ${t.$description} */`); }
@@ -108,7 +100,7 @@ export function css({ dictionary }, source) {
     const o = v.orig(t);
     L.push(`  --typography-${v.key(t)}: var(--font-weight-${v.key(t)}) ${o.fontSize.value}px/${Math.round(o.fontSize.value * o.lineHeight)}px var(--${v.get(refPath(o.fontFamily)).name});`, `  --typography-${v.key(t)}-letter-spacing: ${o.letterSpacing.value}px;`);
   }
-  L.push('}', '', ':root,\n[data-theme],\n[data-brand] {');
+  L.push('}', '', ':root,\n[data-theme] {');
   for (const t of extra) if (t.$type === 'color') L.push(`  --${t.name}: var(--${v.get(refPath(v.orig(t))).name}); /* ${t.$description} */`);
   L.push('}');
   return L.join('\n') + '\n';
@@ -270,13 +262,6 @@ export function kotlin({ dictionary }, source) {
     for (const t of colors) L.push(`    ${t.name} = ${v.inMode(t, theme).$value},`);
     L.push(')', '');
   }
-  // Бренды: переопределяют часть семантических цветов поверх темы (как data-brand в CSS)
-  L.push('/** Бренд-варианты: переопределяют семантические цвета поверх светлой / тёмной темы (web: data-brand). */', 'enum class YeetBrand(val title: String, val light: YeetColorScheme, val dark: YeetColorScheme) {');
-  for (const b of brands(v)) {
-    const over = (theme) => b.tokens.map((t) => `${t.name} = ${v.inMode(t, theme).$value}`).join(', ');
-    L.push(`    /** ${b.about} */`, `    ${pascal(b.id)}(`, `        title = "${b.name}",`, `        light = YeetLightColors.copy(${over('light')}),`, `        dark = YeetDarkColors.copy(${over('dark')}),`, '    ),');
-  }
-  L.push('}', '');
   // Компонентный слой: решения конкретного компонента из семантики
   L.push('// Компонентные токены (web: --button-*, --card-*, --sheet-*, --tab-bar-*, --input-*)');
   const components = v.list('component');

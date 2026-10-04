@@ -83,7 +83,7 @@ const kotlin = {
 
 /* ─── Имена ───────────────────────────────────────────────────────────── */
 
-/** CSS-переменная (без "--") по пути токена. Двойники тем `mode.<тема>.*` и бренды получают имя с префиксом контекста. */
+/** CSS-переменная (без "--") по пути токена. Двойники тем `mode.<тема>.*` получают имя с префиксом контекста. */
 export function cssName(path) {
   if (path[0] === 'mode') return `${path[1]}:${cssName(path.slice(2))}`;
   const [g, ...rest] = path, k = path.at(-1);
@@ -92,7 +92,6 @@ export function cssName(path) {
     case 'item': return `yeet-item-${k}`;
     case 'on-item': return `yeet-on-item-${k}`;
     case 'color': return `color-${k}`;
-    case 'brand': return `${rest[0]}:color-${k}`;
     case 'component': return k;
     case 'layout': return k;
     case 'motion': return { duration: `motion-${k}`, easing: `ease-${k}`, spring: `spring-${k}`, transition: `motion-${k}`, gesture: `gesture-${k}`, haptic: `haptic-${k}` }[rest[0]];

@@ -1,4 +1,4 @@
-// Токены в удобной для кода форме: tokens/tokens.json (DTCG) → { primitive, item, color, brand, motion, … }.
+// Токены в удобной для кода форме: tokens/tokens.json (DTCG) → { primitive, item, color, motion, … }.
 // Один модуль для браузера (Storybook, утилиты) и Node-скриптов (контраст, DESIGN.md): без node:*, JSON — через import.
 // Цвета — "#RRGGBB" или "#RRGGBB@alpha", ссылки — короткие "{primitive.x}" / "{color.x}" / "{radius.x}".
 // Типы — model.d.ts. Значения токенов правятся только в tokens/tokens.json.
@@ -38,12 +38,6 @@ export function toModel(t) {
     color: Object.fromEntries(entries(t.color).map(([, g]) => [g.$description, map(g, (v) => ({
       light: color(v.$value), dark: color(ext(v).modes?.dark ?? v.$value), role: v.$description, figma: ext(v).figma,
     }))])),
-    brand: map(t.brand, (b) => ({
-      name: ext(b).brand.name,
-      about: ext(b).brand.about,
-      light: map(b, (v) => color(v.$value)),
-      dark: map(b, (v) => color(ext(v).modes?.dark ?? v.$value)),
-    })),
     component: map(t.component, (v) => (v.$type === 'color' ? color(v.$value) : v.$value)),
     space: entries(t.space).map(([, v]) => v.$value.value),
     radius: map(t.radius, (v) => ({ value: v.$value.value, use: v.$description })),

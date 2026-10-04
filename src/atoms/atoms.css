@@ -174,11 +174,11 @@
 /* stylelint-enable unit-disallowed-list */
 
 /* ArtPlaceholder — временная заглушка иллюстрации (#220): фон bg-subtle, иконка-картинка серым по центру.
-   Скругление по правилу концентричности задаёт контейнер; отдельно стоящая заглушка — как карточка.
-   TODO(tokens): компонентного токена радиуса заглушки нет — локальная переменная --art-placeholder-radius */
+   Отдельно стоящая заглушка скруглена как карточка (--card-radius = radius.lg 20); внутри контейнера радиус
+   по правилу концентричности задаёт контейнер своим селектором (плитка фото → --radius-xs, molecules.css). */
 .y-art-placeholder {
   display: inline-flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box;
   background: var(--color-bg-subtle); color: var(--color-text-secondary);
-  border-radius: var(--art-placeholder-radius, var(--card-radius));
+  border-radius: var(--card-radius);
 }
 .y-art-placeholder--stretch { display: flex; flex: 1 1 auto; align-self: stretch; }

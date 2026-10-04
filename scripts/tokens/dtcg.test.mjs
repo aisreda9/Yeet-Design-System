@@ -56,13 +56,6 @@ test('цикл ссылок — ошибка', () => {
   expectError(t, /циклическая ссылка/);
 });
 
-test('бренд не может вводить новый семантический цвет', () => {
-  const t = fresh();
-  const id = Object.keys(t.brand).find((k) => !k.startsWith('$'));
-  t.brand[id]['bg-new'] = { $value: t.brand[id].accent.$value };
-  expectError(t, /бренд переопределяет несуществующий семантический цвет bg-new/);
-});
-
 test('неизвестная тема в modes — ошибка', () => {
   const t = fresh();
   t.color.surface['bg-canvas'].$extensions['com.yeet'].modes.sepia = '{primitive.neutral-0}';

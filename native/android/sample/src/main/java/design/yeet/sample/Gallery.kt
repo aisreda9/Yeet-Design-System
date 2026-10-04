@@ -97,7 +97,6 @@ import design.yeet.ds.organisms.Tab
 import design.yeet.ds.organisms.TabBar
 import design.yeet.ds.organisms.WeatherCard
 import design.yeet.ds.theme.YeetTheme
-import design.yeet.tokens.YeetBrand
 import design.yeet.tokens.YeetGesture
 import design.yeet.tokens.YeetItemColor
 import kotlinx.coroutines.delay
@@ -109,13 +108,11 @@ private val accounts = listOf(
 
 private enum class Modal { None, Sheet, Filter, Dialog, Destructive, Danger, Accounts }
 
-/** Витрина: все компоненты библиотеки в светлой / тёмной теме и брендах. */
+/** Витрина: все компоненты библиотеки в светлой / тёмной теме. */
 @Composable
 fun Gallery(
     mode: ThemeMode,
     onModeChange: (ThemeMode) -> Unit,
-    brand: YeetBrand?,
-    onBrandChange: (YeetBrand?) -> Unit,
 ) {
     val c = YeetTheme.colors
     val density = LocalDensity.current
@@ -143,7 +140,7 @@ fun Gallery(
             ),
             verticalArrangement = Arrangement.spacedBy(32.dp),
         ) {
-            item { Section("Тема") { ThemeSection(mode, onModeChange, brand, onBrandChange) } }
+            item { Section("Тема") { ThemeSection(mode, onModeChange) } }
             item { Section("Цвета и типографика") { TokensSection() } }
             item { Section("Icon") { IconsSection() } }
             item { Section("Button · IconButton") { ButtonsSection() } }
@@ -306,16 +303,12 @@ private fun FlowButtons(vararg buttons: Pair<String, () -> Unit>) {
 }
 
 @Composable
-private fun ThemeSection(mode: ThemeMode, onModeChange: (ThemeMode) -> Unit, brand: YeetBrand?, onBrandChange: (YeetBrand?) -> Unit) {
+private fun ThemeSection(mode: ThemeMode, onModeChange: (ThemeMode) -> Unit) {
     SegmentControl(
         segments = ThemeMode.entries.map { Segment(it.name, it.title) },
         value = mode.name,
         onChange = { v -> onModeChange(ThemeMode.valueOf(v)) },
         size = ControlSize.M,
-    )
-    ChipGroup(
-        chips = listOf(Chip("Yeet", selected = brand == null)) + YeetBrand.entries.map { Chip(it.title, selected = brand == it) },
-        onToggle = { label -> onBrandChange(YeetBrand.entries.firstOrNull { it.title == label }) },
     )
 }
 

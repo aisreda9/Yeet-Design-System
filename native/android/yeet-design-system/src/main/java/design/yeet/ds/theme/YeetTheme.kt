@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import design.yeet.ds.R
-import design.yeet.tokens.YeetBrand
 import design.yeet.tokens.YeetColorScheme
 import design.yeet.tokens.YeetDarkColors
 import design.yeet.tokens.YeetLightColors
@@ -62,11 +61,10 @@ val LocalYeetHaptics = staticCompositionLocalOf { YeetHaptics.None }
 val LocalYeetDarkTheme = staticCompositionLocalOf { false }
 
 /**
- * Тема Yeet: цвета light / dark (+ бренд), типографика Roboto Slab + Inter из res/font,
+ * Тема Yeet: цвета light / dark, типографика Roboto Slab + Inter из res/font,
  * отступы, скругления, тень, движение и хаптика. Material3 внутри — только как база
  * (его ColorScheme и Typography собраны из токенов Yeet, чтобы стандартные M3-компоненты не выбивались).
  *
- * @param brand бренд-вариант (web: data-brand) — переопределяет семантические цвета.
  * @param reduceMotion «Уменьшить движение»: по умолчанию читается из системной настройки
  *   «Убрать анимацию» (animator duration scale = 0).
  * @param hapticsEnabled выключает хаптику компонентов целиком (системная настройка уважается всегда).
@@ -74,17 +72,12 @@ val LocalYeetDarkTheme = staticCompositionLocalOf { false }
 @Composable
 fun YeetTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    brand: YeetBrand? = null,
     typography: YeetTypography = rememberYeetTypography(),
     reduceMotion: Boolean = rememberReduceMotion(),
     hapticsEnabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val colors = when {
-        brand != null -> if (darkTheme) brand.dark else brand.light
-        darkTheme -> YeetDarkColors
-        else -> YeetLightColors
-    }
+    val colors = if (darkTheme) YeetDarkColors else YeetLightColors
     val view = LocalView.current
     val haptics = remember(view, hapticsEnabled) { if (hapticsEnabled) YeetHaptics(view) else YeetHaptics.None }
     val motion = remember(reduceMotion) { YeetMotionScheme(reduced = reduceMotion) }

@@ -1,5 +1,5 @@
 // CHANGELOG токенов: дифф того, что получают потребители, между двумя ревизиями (тегами).
-// Сравнивается сгенерированный src/tokens/tokens.generated.css — CSS-переменные по темам и брендам и классы
+// Сравнивается сгенерированный src/tokens/tokens.generated.css — CSS-переменные по темам (в старых ревизиях — и по брендам) и классы
 // типографики. Swift и Kotlin генерируются из той же модели под теми же именами, поэтому дифф CSS — это контракт.
 // Смена формата tokens/tokens.json без изменения результата (например, переход на DTCG) здесь не видна — так и нужно.
 //
@@ -38,7 +38,11 @@ function readAt(ref) {
   }
 }
 
-/** Селектор блока → область: '' (база и светлая тема), 'dark', 'brand lime', 'brand lime dark', 'reduced-motion'. */
+/**
+ * Селектор блока → область: '' (база и светлая тема), 'dark', 'reduced-motion'.
+ * 'brand <id>' / 'brand <id> dark' — только для старых ревизий (палитры удалены, ADR 0002):
+ * без этого их блоки `[data-brand=…]` смешались бы с базовой темой при сравнении с историей.
+ */
 function scopeOf(selector, media) {
   if (media) return media.includes('reduced-motion') ? 'reduced-motion' : media.trim();
   const brand = selector.match(/\[data-brand='([^']+)'\]/)?.[1];

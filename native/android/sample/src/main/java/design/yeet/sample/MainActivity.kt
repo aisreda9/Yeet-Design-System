@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import design.yeet.ds.theme.YeetTheme
-import design.yeet.tokens.YeetBrand
 
 /** Режим темы в витрине: как в системе, светлая, тёмная. */
 enum class ThemeMode(val title: String) { System("Система"), Light("Светлая"), Dark("Тёмная") }
@@ -21,18 +20,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var mode by rememberSaveable { mutableStateOf(ThemeMode.System) }
-            var brand by rememberSaveable { mutableStateOf<YeetBrand?>(null) }
             val dark = when (mode) {
                 ThemeMode.System -> isSystemInDarkTheme()
                 ThemeMode.Light -> false
                 ThemeMode.Dark -> true
             }
-            YeetTheme(darkTheme = dark, brand = brand) {
+            YeetTheme(darkTheme = dark) {
                 Gallery(
                     mode = mode,
                     onModeChange = { mode = it },
-                    brand = brand,
-                    onBrandChange = { brand = it },
                 )
             }
         }

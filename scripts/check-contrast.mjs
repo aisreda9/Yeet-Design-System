@@ -1,8 +1,6 @@
-// Проверка контраста WCAG 2.x по tokens/tokens.json: базовая тема и бренд-палитры × светлая / тёмная.
+// Проверка контраста WCAG 2.x по tokens/tokens.json: светлая и тёмная темы.
 //
-//   npm run contrast                    — код выхода 1, если провалена пара базовой темы
-//   npm run contrast -- --brands=error  — провалы бренд-палитр тоже ошибка (по умолчанию предупреждение:
-//                                         бренды — эксперимент, решение 28.09, issue #13)
+//   npm run contrast                    — код выхода 1, если провалена пара
 //   npm run contrast -- --all           — показать все пары, а не только провалы и итог
 //
 // Пары не перечисляются руками, а собираются из токенов:
@@ -12,7 +10,6 @@
 // Полупрозрачный фон кладётся на каждую поверхность, где компонент может стоять; берётся худший случай.
 const { tokens: t } = await import('../src/tokens/model.js'); // tokens/tokens.json (DTCG) → удобная форма
 const args = new Set(process.argv.slice(2));
-const brandsAreErrors = args.has('--brands=error');
 
 const TEXT = 4.5;
 const UI = 3;
@@ -139,13 +136,9 @@ for (const d of DECOR) {
   pairs.at(-1).max = d.max;
 }
 
-/* ─── Наборы: база и бренды ─────────────────────────────────────────── */
+/* ─── Наборы: светлая и тёмная тема ─────────────────────────────────── */
 const sets = [];
-for (const theme of ['light', 'dark']) sets.push({ label: `base · ${theme}`, brand: false, get: (k) => base[k]?.[theme] });
-for (const [id, b] of Object.entries(t.brand ?? {})) {
-  // бренд переопределяет часть ключей; остальное — из базы
-  for (const theme of ['light', 'dark']) sets.push({ label: `${id} · ${theme}`, brand: true, get: (k) => b[theme]?.[k] ?? base[k]?.[theme] });
-}
+for (const theme of ['light', 'dark']) sets.push({ label: `base · ${theme}`, get: (k) => base[k]?.[theme] });
 
 /** Значение ключа как список непрозрачных вариантов (полупрозрачное — поверх каждой поверхности). */
 function solid(set, key, under) {
@@ -170,7 +163,7 @@ for (const s of sets) {
     const name = `${p.fg.replace('component.', '')} / ${p.bg.replace('component.', '')}${worst.on ? ` над ${worst.on}` : ''}`;
     const ok = worst.r >= p.min && (p.max === undefined || worst.r <= p.max);
     const known = KNOWN[`${s.label}|${name}`];
-    const level = ok ? 'ok' : known ? 'known' : s.brand && !brandsAreErrors ? 'warn' : 'error';
+    const level = ok ? 'ok' : known ? 'known' : 'error';
     rows.push({ set: s.label, kind: p.kind, pair: name, min: p.min, max: p.max, ratio: worst.r, level, known });
   }
 }
@@ -184,7 +177,7 @@ for (const [k, v] of Object.entries(t.item)) {
 }
 
 /* ─── Вывод ─────────────────────────────────────────────────────────── */
-const LABEL = { ok: 'ok', known: 'известно', warn: 'предупр.', error: 'FAIL' };
+const LABEL = { ok: 'ok', known: 'известно', error: 'FAIL' };
 const shown = args.has('--all') ? rows : rows.filter((r) => r.level !== 'ok');
 if (shown.length) {
   const w = { set: Math.max(...shown.map((r) => r.set.length), 5), pair: Math.max(...shown.map((r) => r.pair.length), 4), kind: Math.max(...shown.map((r) => r.kind.length), 3) };
@@ -203,6 +196,5 @@ const count = (l) => rows.filter((r) => r.level === l).length;
 const stale = Object.keys(KNOWN).filter((k) => !rows.some((r) => `${r.set}|${r.pair}` === k && r.level === 'known'));
 for (const k of stale) console.error(`✗ Известное исключение больше не нужно или не найдено — уберите из KNOWN: ${k}`);
 
-console.log(`Контраст: ${rows.length} пар (${pairs.length} на набор × ${sets.length} наборов + аватары) · ошибок ${count('error')} · известных ${count('known')} · предупреждений по брендам ${count('warn')}`);
-if (count('warn')) console.log('Бренд-палитры — эксперимент: их провалы не валят проверку (--brands=error, чтобы валили).');
+console.log(`Контраст: ${rows.length} пар (${pairs.length} на набор × ${sets.length} наборов + аватары) · ошибок ${count('error')} · известных ${count('known')}`);
 process.exit(count('error') || stale.length ? 1 : 0);
