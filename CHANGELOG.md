@@ -1,5 +1,39 @@
 # yeet-design-system
 
+## 0.6.0
+
+### Несовместимые изменения
+
+Версия 0.x: по semver несовместимые изменения выходят в minor. Что заменить:
+
+- Бренд-палитры удалены (решение владельца, ADR 0002 отменена) — остаётся один бренд, синий. Убрать `data-brand` с `<html>` / контейнера и `YeetTheme(brand = …)` в Android: цвета станут базовыми. Из `src/tokens/model` удалены `tokens.brand` и тип `BrandKey`, из Android — `enum class YeetBrand`.
+- `ArtPlaceholder`: локальной переменной `--art-placeholder-radius` больше нет — радиус заглушки задаётся селектором контейнера (по умолчанию `--card-radius`).
+
+### Minor Changes
+
+- 61fdb4b: Один бренд — синий (решение владельца, ADR 0002 отменена): бренд-палитры удалены целиком. CSS больше не содержит блоков `[data-brand='lime' | 'butter' | 'cherry' | 'sage' | 'lilac']` (140 переопределений `--color-*`), Android — `enum class YeetBrand` и параметра `brand` у `YeetTheme`; из `src/tokens/model` убраны `tokens.brand` и тип `BrandKey`. В Storybook нет тулбара «Бренд» и страницы «Foundations / Бренд-палитры». `npm run contrast` проверяет светлую и тёмную темы, флага `--brands=error` нет. Миграция: убрать `data-brand` / `YeetTheme(brand = …)` — цвета станут базовыми синими.
+
+  `ArtPlaceholder`: скругление — прямо `--card-radius` (radius.lg 20), локальной переменной `--art-placeholder-radius` больше нет; контейнер задаёт радиус заглушки селектором (плитка фото — `--radius-xs`).
+
+- 9fd11a5: Токены и жесты (#237): компонентные токены `component.outfit-pager-end` (−3, `--outfit-pager-end`) и `outfit-pager-end-tab-bar` (5) — низ стопки образов без таб-бара и над ним; `motion.gesture.autoscroll-edge` (64) и `autoscroll-speed` (12 px/кадр) — автоскролл при перестановке вещей (`useGridReorder`). Генераторы Swift и Kotlin выводят компонентные размеры без ссылки. `OutfitPager`: тап по превью соседнего образа листает к нему (сдвиг меньше `--gesture-touch-slop`); штамп и «Не нравится» на низких экранах — не меньше 75 % (на 320 подпись читается). Демо `Motion.PhotoCollapse` показывает сам `DetailsScreen`; внутренний хук `usePhotoCollapse` и классы `.y-collapse*` удалены.
+
+### Patch Changes
+
+- 9fd11a5: Финальная сверка 0.5 с Figma и прототипом (#236): общий отступ `.y-section` заголовок → коллаж 16 (Wishlist Item Details), плитки «Другие цифры» в профиле 220; `DetailsScreen` — после рывка дальше полного хода жест вниз сначала докручивает контент, затем тянет шторку, текст при жесте не выделяется; штамп «Надеть» в деталях образа переходит в «выполнено», «Отменить» возвращает; новое чипс-поле `ChipGroup` получает фокус. Прототип: тап по превью соседнего образа открывает детали, тост не закрывает таб-бар после «Назад».
+
+### Токены
+
+_v0.5.0 → v0.6.0_
+
+**Удалены (140):** все переопределения `--color-*` бренд-палитр lime, butter, cherry, sage, lilac (14 цветов × светлая и тёмная тема). Базовые цвета не изменились.
+
+**Добавлены (4):**
+
+- `--outfit-pager-end` = `-3px`
+- `--outfit-pager-end-tab-bar` = `5px`
+- `--gesture-autoscroll-edge` = `64px`
+- `--gesture-autoscroll-speed` = `12`
+
 ## 0.5.0
 
 ### Несовместимые изменения
