@@ -1,7 +1,7 @@
 // Форматы Style Dictionary для Yeet: CSS-переменные (Storybook), Swift (SwiftUI), Kotlin (Jetpack Compose).
 // Значения берутся уже преобразованными трансформами платформы (scripts/tokens/transforms.mjs),
 // структура (группы, метаданные) — из исходного DTCG-дерева.
-import { EXT, isRef, refPath } from './dtcg.mjs';
+import { contrastModes, contrastTokens, EXT, isRef, refPath } from './dtcg.mjs';
 import { camel, kotlinName, pascal, swiftName } from './transforms.mjs';
 
 export const HEADER = 'Сгенерировано scripts/build-tokens.mjs из tokens/tokens.json — не редактировать вручную.';
@@ -21,7 +21,13 @@ function view(dictionary, source) {
   const refKey = (v) => refPath(v).split('.').at(-1);
   const key = (t) => t.path.at(-1);
   const groupNode = (id) => id.split('.').reduce((n, k) => n[k], source);
-  return { get, list, x, inMode, orig, refKey, key, keys, groupNode, source };
+  /** Повышенный контраст (#117): двойник режима контраста темы ("contrast-light" для light), иначе сама тема. */
+  const hcMode = Object.fromEntries(Object.entries(contrastModes(source)).map(([m, theme]) => [theme, m]));
+  const inContrast = (t, theme) => by.get(`mode.${hcMode[theme]}.${t.path.join('.')}`) ?? inMode(t, theme);
+  const contrastIds = contrastTokens(source).map((t) => t.id);
+  const hasContrast = (t) => contrastIds.includes(t.path.join('.'));
+  const contrastList = () => contrastIds.map(get);
+  return { get, list, x, inMode, orig, refKey, key, keys, groupNode, source, inContrast, hasContrast, contrastList };
 }
 
 /** Категории токенов 2.0 (фаза 2): выводятся отдельным блоком в конце каждого файла, существующий вывод не меняется. */
@@ -103,6 +109,18 @@ export function css({ dictionary }, source) {
   L.push('}', '', ':root,\n[data-theme] {');
   for (const t of extra) if (t.$type === 'color') L.push(`  --${t.name}: var(--${v.get(refPath(v.orig(t))).name}); /* ${t.$description} */`);
   L.push('}');
+  // Повышенный контраст — только переопределения, в конце файла: после всех блоков, которые они перекрывают.
+  // В тёмном блоке — те же переменные (без своего значения — тёмное), чтобы светлый :root не протекал в тёмную тему.
+  const hc = v.contrastList();
+  if (hc.length) {
+    L.push('', '/* Повышенный контраст (#117): системная настройка «Увеличить контраст». Текст ≥ 7 : 1, обводки и разделители ≥ 3 : 1, фокус толще. */', '@media (prefers-contrast: more) {');
+    for (const theme of ['light', 'dark']) {
+      L.push(theme === 'light' ? "  :root,\n  [data-theme='light'] {" : "  [data-theme='dark'] {");
+      for (const t of hc) { const d = v.inContrast(t, theme); L.push(`    --${t.name}: ${t.$type === 'color' ? colorOut(d) : d.$value};${v.x(t).figma ? ` /* ${v.x(t).figma} */` : ''}`); }
+      L.push('  }');
+    }
+    L.push('}');
+  }
   return L.join('\n') + '\n';
 }
 
@@ -120,13 +138,17 @@ export function swift({ dictionary, options }, source) {
   const v = view(dictionary, source);
   const fonts = fontMeta(v);
   const fontFiles = fonts.map((f) => f.file);
-  const L = [`// ${HEADER}`, '// SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически (UIColor с dynamicProvider, без asset-каталога).'];
+  const L = [`// ${HEADER}`, '// SwiftUI. Цвета меняются со светлой / тёмной темой и «Увеличением контраста» системы автоматически (UIColor с dynamicProvider, без asset-каталога).'];
   L.push(bundle === 'module'
     ? '// Шрифты лежат в ресурсах пакета YeetDesignSystem и регистрируются при первом использовании (YeetFonts.register()).'
     : `// Шрифты: добавьте в приложение tokens/fonts/${fontFiles.join(', ')} — они регистрируются из Bundle.main при первом использовании (или перечислите их в Info.plist → UIAppFonts).`);
   L.push('', 'import CoreText', 'import SwiftUI', 'import UIKit', '');
   L.push('private extension UIColor {', '    convenience init(hex: UInt32, alpha: CGFloat = 1) {', '        self.init(red: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: alpha)', '    }', '}', '');
   L.push('private func dynamic(_ light: UIColor, _ dark: UIColor) -> Color {', '    Color(UIColor { $0.userInterfaceStyle == .dark ? dark : light })', '}', '');
+  L.push('/// Цвет с вариантами «Увеличения контраста» (Increase Contrast; в SwiftUI — `colorSchemeContrast == .increased`): трейт accessibilityContrast == .high.',
+    'private func dynamic(_ light: UIColor, _ dark: UIColor, contrast contrastLight: UIColor, _ contrastDark: UIColor) -> Color {',
+    '    Color(UIColor { trait in', '        let high = trait.accessibilityContrast == .high',
+    '        return trait.userInterfaceStyle == .dark ? (high ? contrastDark : dark) : (high ? contrastLight : light)', '    })', '}', '');
 
   L.push('/// Примитивы палитры. В компонентах не используются — только через семантические `YeetColor`.', 'public enum YeetPrimitive {');
   for (const t of v.list('primitive')) L.push(`    public static let ${t.name} = Color(UIColor(hex: ${t.$value}))`);
@@ -136,7 +158,7 @@ export function swift({ dictionary, options }, source) {
   for (const g of colorGroups(v)) {
     L.push(`    // ${g.title}`);
     for (const t of g.tokens)
-      L.push(`    /// ${t.$description} · Figma ${v.x(t).figma}`, `    public static let ${t.name} = dynamic(UIColor(hex: ${t.$value}), UIColor(hex: ${v.inMode(t, 'dark').$value}))`);
+      L.push(`    /// ${t.$description} · Figma ${v.x(t).figma}`, `    public static let ${t.name} = dynamic(UIColor(hex: ${t.$value}), UIColor(hex: ${v.inMode(t, 'dark').$value})${v.hasContrast(t) ? `, contrast: UIColor(hex: ${v.inContrast(t, 'light').$value}), UIColor(hex: ${v.inContrast(t, 'dark').$value})` : ''})`);
   }
   const items = v.list('item');
   L.push('}', '', '/// Цвет вещи — атрибут одежды, не интерфейс.', 'public enum YeetItemColor: String, CaseIterable, Identifiable {');
@@ -238,6 +260,13 @@ export function swift({ dictionary, options }, source) {
         : t.$type === 'number' ? `Double = ${t.$value}`
         : `CGFloat = ${isRef(o) ? v.get(refPath(o)).$value : t.$value}`;
       L.push(`    /// ${t.$description}`, `    public static let ${name}: ${decl}`);
+      if (v.hasContrast(t) && t.$type !== 'color') {
+        const hl = v.inContrast(t, 'light').$value;
+        if (hl !== v.inContrast(t, 'dark').$value) throw new Error(`${t.path.join('.')}: контраст light / dark различается — нужен вывод по теме`);
+        const type = t.$type === 'number' ? 'Double' : 'CGFloat';
+        L.push(`    /// ${t.$description} при «Увеличении контраста»`, `    public static let ${name}IncreasedContrast: ${type} = ${hl}`,
+          `    /// ${t.$description} по \`@Environment(\\.colorSchemeContrast)\``, `    public static func ${name}(_ contrast: ColorSchemeContrast) -> ${type} { contrast == .increased ? ${name}IncreasedContrast : ${name} }`);
+      }
     }
     L.push('}');
   }
@@ -260,6 +289,12 @@ export function kotlin({ dictionary }, source) {
   for (const theme of ['light', 'dark']) {
     L.push(`val Yeet${theme === 'light' ? 'Light' : 'Dark'}Colors = YeetColorScheme(`);
     for (const t of colors) L.push(`    ${t.name} = ${v.inMode(t, theme).$value},`);
+    L.push(')', '');
+  }
+  L.push('// Повышенный контраст (#117): Android 14+ — UiModeManager.getContrast(); в модуле native/android — YeetTheme(highContrast = …).');
+  for (const theme of ['light', 'dark']) {
+    L.push(`val Yeet${theme === 'light' ? 'Light' : 'Dark'}ContrastColors = YeetColorScheme(`);
+    for (const t of colors) L.push(`    ${t.name} = ${v.inContrast(t, theme).$value},`);
     L.push(')', '');
   }
   // Компонентный слой: решения конкретного компонента из семантики
@@ -356,6 +391,11 @@ export function kotlin({ dictionary }, source) {
       if (t.$type === 'color') continue;
       const o = v.orig(t), name = kotlinName(member(t));
       L.push(`    /** ${t.$description} */`, t.$type === 'number' ? `    const val ${name} = ${t.$value}f` : `    val ${name} = ${isRef(o) ? v.get(refPath(o)).$value : t.$value}`);
+      if (v.hasContrast(t)) {
+        const hl = v.inContrast(t, 'light').$value;
+        if (hl !== v.inContrast(t, 'dark').$value) throw new Error(`${t.path.join('.')}: контраст light / dark различается — нужен вывод по теме`);
+        L.push(`    /** ${t.$description} при повышенном контрасте (YeetTheme.isHighContrast) */`, t.$type === 'number' ? `    const val ${name}HighContrast = ${hl}f` : `    val ${name}HighContrast = ${hl}`);
+      }
     }
     L.push('}');
   }

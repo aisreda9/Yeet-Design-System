@@ -124,6 +124,11 @@
   --gesture-snackbar-action: 6000ms; /* Время показа snackbar с действием */
   --gesture-autoscroll-edge: 64px; /* Зона у края скролла, где перетаскиваемая вещь прокручивает экран (перестановка в сетке) */
   --gesture-autoscroll-speed: 12; /* Скорость автоскролла в самом краю зоны; к границе зоны падает до 0 */
+  --gesture-spin: 1200ms; /* Оборот индикатора загрузки (кнопка, LoadingState), linear по кругу */
+  --gesture-pulse: 1600ms; /* Пульсация прозрачности вместо вращения при «Уменьшении движения» */
+  --gesture-shimmer: 1600ms; /* Проход блика по площадке фото при удалении фона */
+  --gesture-loading-delay: 120ms; /* Задержка появления подписи загрузки: на быстрых операциях она не мигает */
+  --gesture-weather-delay: 160ms; /* Погода на главной проявляется после коллажа */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -266,4 +271,29 @@
 :root,
 [data-theme] {
   --focus-ring-color: var(--color-text-accent); /* Цвет кольца */
+}
+
+/* Повышенный контраст (#117): системная настройка «Увеличить контраст». Текст ≥ 7 : 1, обводки и разделители ≥ 3 : 1, фокус толще. */
+@media (prefers-contrast: more) {
+  :root,
+  [data-theme='light'] {
+    --color-text-secondary: #545454; /* ui-colors/grey */
+    --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
+    --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
+    --color-text-danger: #a22115; /* ui-colors/red-text */
+    --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
+    --color-border-subtle: rgb(0 0 0 / 0.43); /* ui-colors/black-10% */
+    --color-divider: rgb(0 0 0 / 0.43); /* ui-colors/divider */
+    --focus-ring-width: 3px;
+  }
+  [data-theme='dark'] {
+    --color-text-secondary: #b2b2b5; /* ui-colors/grey */
+    --color-text-inverse-secondary: #4c535d; /* ui-colors/inverse-secondary */
+    --color-text-accent: #aaaaff; /* ui-colors/blue-text */
+    --color-text-danger: #ff9489; /* ui-colors/red-text */
+    --color-accent: #5858ff; /* ui-colors/blue */
+    --color-border-subtle: rgb(245 245 247 / 0.36); /* ui-colors/black-10% */
+    --color-divider: rgb(245 245 247 / 0.36); /* ui-colors/divider */
+    --focus-ring-width: 3px;
+  }
 }

@@ -4,3 +4,4 @@ export { useSwipePager, type SwipePager, type SwipePagerOptions } from './usePag
 export { useReducedMotion } from './useReducedMotion';
 export { useScrollToActive } from './useScrollToActive';
 export { useGridReorder, type GridReorder, type GridReorderOptions } from './useGridReorder';
+export { FRAME_SLACK_MS, LONG_PRESS_CLICK_GUARD_MS } from './timing';

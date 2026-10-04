@@ -81,3 +81,27 @@ test('компонентный fontWeight попадает в CSS, Swift и Kotl
   assert.match(await read('tokens/ios/YeetTokens.swift'), /public static let headerCompactWeight: CGFloat = 600\n/);
   assert.match(await read('tokens/android/YeetTokens.kt'), /val headerCompactWeight = FontWeight\(600\)\n/);
 });
+
+test('режим контраста: ссылка на токен с темами — ошибка (#117)', () => {
+  const t = fresh();
+  t.color.content['text-secondary'].$extensions['com.yeet'].modes['contrast-dark'] = '{color.content.text-primary}';
+  expectError(t, /text-secondary: modes\.contrast-dark: ссылка \{color\.content\.text-primary\} на токен с темами/);
+});
+
+test('режим контраста: fallback только на существующую тему (#117)', () => {
+  const t = fresh();
+  t.$extensions['com.yeet'].modifiers.contrast.fallback['contrast-light'] = 'sepia';
+  expectError(t, /fallback contrast-light → sepia: нет такой темы/);
+});
+
+test('режим контраста попадает в CSS, Swift и Kotlin (#117)', async () => {
+  const read = (p) => readFile(new URL(p, root), 'utf8');
+  const css = await read('src/tokens/tokens.generated.css');
+  const at = css.indexOf('@media (prefers-contrast: more)');
+  assert.ok(at > css.lastIndexOf('\n:root'), 'блок контраста — после всех блоков :root, которые он перекрывает');
+  const media = css.slice(at);
+  assert.match(media, /\[data-theme='dark'\] \{\n(?:.*\n)*? {4}--color-text-secondary: #b2b2b5;/);
+  assert.match(media, /--focus-ring-width: 3px;/);
+  assert.match(await read('tokens/ios/YeetTokens.swift'), /textSecondary = dynamic\(.*, contrast: UIColor\(hex: 0x545454, alpha: 1\), UIColor\(hex: 0xB2B2B5, alpha: 1\)\)/);
+  assert.match(await read('tokens/android/YeetTokens.kt'), /val YeetDarkContrastColors = YeetColorScheme\(\n(?:.*\n)*? {4}textSecondary = Color\(0xFFB2B2B5\),/);
+});

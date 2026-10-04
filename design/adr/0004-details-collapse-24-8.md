@@ -1,6 +1,6 @@
 # 0004. Сворачивание шапки: порог 24, возврат на 8
 
-- **Статус:** принято
+- **Статус:** заменено [0008](./0008-details-sheet-progress.md) для `DetailsScreen`; порог 24 / 8 остаётся у остальных экранов `Screen`
 - **Дата:** 2026-09-29
 - **Где обсуждали:** #24 (motion), #29 → PR #46 (DetailsScreen)
 - **Затрагивает:** templates (`Screen`, `DetailsScreen`), motion (`--motion-collapse`)

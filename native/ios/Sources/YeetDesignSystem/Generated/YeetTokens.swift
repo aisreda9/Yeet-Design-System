@@ -1,5 +1,5 @@
 // Сгенерировано scripts/build-tokens.mjs из tokens/tokens.json — не редактировать вручную.
-// SwiftUI. Цвета меняются со светлой / тёмной темой системы автоматически (UIColor с dynamicProvider, без asset-каталога).
+// SwiftUI. Цвета меняются со светлой / тёмной темой и «Увеличением контраста» системы автоматически (UIColor с dynamicProvider, без asset-каталога).
 // Шрифты лежат в ресурсах пакета YeetDesignSystem и регистрируются при первом использовании (YeetFonts.register()).
 
 import CoreText
@@ -14,6 +14,14 @@ private extension UIColor {
 
 private func dynamic(_ light: UIColor, _ dark: UIColor) -> Color {
     Color(UIColor { $0.userInterfaceStyle == .dark ? dark : light })
+}
+
+/// Цвет с вариантами «Увеличения контраста» (Increase Contrast; в SwiftUI — `colorSchemeContrast == .increased`): трейт accessibilityContrast == .high.
+private func dynamic(_ light: UIColor, _ dark: UIColor, contrast contrastLight: UIColor, _ contrastDark: UIColor) -> Color {
+    Color(UIColor { trait in
+        let high = trait.accessibilityContrast == .high
+        return trait.userInterfaceStyle == .dark ? (high ? contrastDark : dark) : (high ? contrastLight : light)
+    })
 }
 
 /// Примитивы палитры. В компонентах не используются — только через семантические `YeetColor`.
@@ -52,24 +60,24 @@ public enum YeetColor {
     /// Основной текст и иконки · Figma ui-colors/black
     public static let textPrimary = dynamic(UIColor(hex: 0x000000, alpha: 1), UIColor(hex: 0xF5F5F7, alpha: 1))
     /// Вторичный текст, лейблы, подписи · Figma ui-colors/grey
-    public static let textSecondary = dynamic(UIColor(hex: 0x6E6E6E, alpha: 1), UIColor(hex: 0x8E8E93, alpha: 1))
+    public static let textSecondary = dynamic(UIColor(hex: 0x6E6E6E, alpha: 1), UIColor(hex: 0x8E8E93, alpha: 1), contrast: UIColor(hex: 0x545454, alpha: 1), UIColor(hex: 0xB2B2B5, alpha: 1))
     /// Текст на inverse-поверхности · Figma ui-colors/text-inverse
     public static let textInverse = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0x0F0F11, alpha: 1))
     /// Текст и иконки на accent / danger · Figma ui-colors/on-accent
     public static let textOnAccent = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Вторичный текст на inverse-поверхности: подпись в карточке погоды · Figma ui-colors/inverse-secondary
-    public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1))
+    public static let textInverseSecondary = dynamic(UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x5B6470, alpha: 1), contrast: UIColor(hex: 0xA7B3BF, alpha: 1), UIColor(hex: 0x4C535D, alpha: 1))
     /// Текст на danger (бейдж скидки) — белый в любом бренде · Figma ui-colors/on-accent
     public static let textOnDanger = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white
     public static let textOnPhoto = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
-    public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1))
+    public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1), contrast: UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0xAAAAFF, alpha: 1))
     /// Ошибки, деструктивные действия · Figma ui-colors/red-text
-    public static let textDanger = dynamic(UIColor(hex: 0xCC291B, alpha: 1), UIColor(hex: 0xFF6B5C, alpha: 1))
+    public static let textDanger = dynamic(UIColor(hex: 0xCC291B, alpha: 1), UIColor(hex: 0xFF6B5C, alpha: 1), contrast: UIColor(hex: 0xA22115, alpha: 1), UIColor(hex: 0xFF9489, alpha: 1))
     // Акцент, обратная связь, линии
     /// Главное действие, выбранное, фокус · Figma ui-colors/blue
-    public static let accent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 1))
+    public static let accent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 1), contrast: UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x5858FF, alpha: 1))
     /// Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, а не прозрачный: на сером фоне не темнеет · Figma ui-colors/blue-10%
     public static let accentSoft = dynamic(UIColor(hex: 0xF1F4FF, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 0.2))
     /// Удаление, ошибка, бейдж скидки · Figma ui-colors/red
@@ -77,9 +85,9 @@ public enum YeetColor {
     /// Фон Destructive-кнопки · Figma ui-colors/red-10%
     public static let dangerSoft = dynamic(UIColor(hex: 0xFF4230, alpha: 0.1), UIColor(hex: 0xFF6B5C, alpha: 0.18))
     /// Обводки свотчей, гистограмма, фон неактивных точек · Figma ui-colors/black-10%
-    public static let borderSubtle = dynamic(UIColor(hex: 0x000000, alpha: 0.1), UIColor(hex: 0xF5F5F7, alpha: 0.12))
+    public static let borderSubtle = dynamic(UIColor(hex: 0x000000, alpha: 0.1), UIColor(hex: 0xF5F5F7, alpha: 0.12), contrast: UIColor(hex: 0x000000, alpha: 0.43), UIColor(hex: 0xF5F5F7, alpha: 0.36))
     /// Разделители строк в input-group и list-group · Figma ui-colors/divider
-    public static let divider = dynamic(UIColor(hex: 0x000000, alpha: 0.05), UIColor(hex: 0xF5F5F7, alpha: 0.08))
+    public static let divider = dynamic(UIColor(hex: 0x000000, alpha: 0.05), UIColor(hex: 0xF5F5F7, alpha: 0.08), contrast: UIColor(hex: 0x000000, alpha: 0.43), UIColor(hex: 0xF5F5F7, alpha: 0.36))
     /// Точки фона коллажа и холста (2 px, шаг 10) · Figma ui-colors/pattern-dot
     public static let patternDot = dynamic(UIColor(hex: 0x000000, alpha: 0.23), UIColor(hex: 0xF5F5F7, alpha: 0.23))
     /// Хэндл шторки: декоративный, ≈ 1,5:1 к bg-elevated (D8, #58) · Figma ui-colors/handle
@@ -437,6 +445,16 @@ public enum YeetGesture {
     public static let autoscrollEdge: CGFloat = 64
     /// Скорость автоскролла в самом краю зоны; к границе зоны падает до 0
     public static let autoscrollSpeed: CGFloat = 12
+    /// Оборот индикатора загрузки (кнопка, LoadingState), linear по кругу
+    public static let spin: TimeInterval = 1.2
+    /// Пульсация прозрачности вместо вращения при «Уменьшении движения»
+    public static let pulse: TimeInterval = 1.6
+    /// Проход блика по площадке фото при удалении фона
+    public static let shimmer: TimeInterval = 1.6
+    /// Задержка появления подписи загрузки: на быстрых операциях она не мигает
+    public static let loadingDelay: TimeInterval = 0.12
+    /// Погода на главной проявляется после коллажа
+    public static let weatherDelay: TimeInterval = 0.16
 }
 
 /// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.
@@ -521,6 +539,10 @@ public enum YeetFocusRing {
     public static let color: Color = YeetColor.textAccent
     /// Толщина outline
     public static let width: CGFloat = 2
+    /// Толщина outline при «Увеличении контраста»
+    public static let widthIncreasedContrast: CGFloat = 3
+    /// Толщина outline по `@Environment(\.colorSchemeContrast)`
+    public static func width(_ contrast: ColorSchemeContrast) -> CGFloat { contrast == .increased ? widthIncreasedContrast : width }
     /// Отступ снаружи: кнопки, чипсы, ссылки
     public static let offset: CGFloat = 2
     /// Кольцо внутри: элемент у края экрана или внутри карточки

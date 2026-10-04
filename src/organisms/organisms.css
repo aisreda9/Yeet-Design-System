@@ -197,6 +197,21 @@
 .y-overlay.is-leaving::before { opacity: 0; transition: opacity var(--motion-exit); }
 .y-overlay.is-leaving .y-sheet { transform: translateY(calc(100% + var(--space-16))); transition: transform var(--motion-exit); }
 .y-overlay [data-focus-quiet]:focus-visible { outline: none; } /* фокус при открытии не с клавиатуры — без кольца, до первой клавиши */
+/* Сколько слой доигрывает уход — по нему таймеры Overlay / Screen / прототипа убирают его из DOM (motionMs('--overlay-exit')). */
+:root { --overlay-exit: var(--motion-exit); }
+/* №9 (#130): при «Уменьшении движения» шторка и диалог не выезжают, а растворяются 240 мс без сдвига — и появление, и уход
+   (как на iOS). --motion-* здесь обнулены токенами, поэтому — на шкале: --motion-base + --ease-standard. Смахивание пальцем — 1 : 1, как было. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --overlay-exit: var(--motion-base) var(--ease-standard); }
+  .y-overlay::before,
+  .y-overlay.is-leaving::before { transition: opacity var(--overlay-exit); }
+  .y-overlay .y-sheet,
+  .y-overlay .y-sheet[role='alertdialog'] { transition: opacity var(--overlay-exit); }
+  .y-overlay.is-leaving .y-sheet { opacity: 0; transform: none; transition: opacity var(--overlay-exit); }
+  @starting-style {
+    .y-overlay .y-sheet { opacity: 0; transform: none; }
+  }
+}
 
 /* ─── Cards ─── */
 /* Нажатие карточки: сжатие меньше, чем у кнопки — объект крупнее */
@@ -260,7 +275,7 @@
 .y-photo-area:is(.is-loading, :has(> .y-loading))::before {
   content: ''; position: absolute; inset: 0; pointer-events: none; translate: -100% 0;
   background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--color-bg-elevated) 70%, transparent) 50%, transparent 80%);
-  animation: y-shimmer 1.6s var(--ease-standard) infinite;
+  animation: y-shimmer var(--gesture-shimmer) var(--ease-standard) infinite;
 }
 .y-photo-area > .y-loading { position: relative; z-index: var(--layer-raised); }
 @keyframes y-shimmer { to { translate: 100% 0; } }
@@ -282,7 +297,7 @@
 .y-weather__alert { display: block; color: var(--color-text-inverse); }
 .y-weather--tilt { transform: rotate(-10deg); transform-origin: left top; }
 /* Появление погоды на главной: чуть позже коллажа, снизу на 8 pt; translate отдельно от transform — наклон сохраняется */
-.y-today__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
+.y-today__weather > .y-weather { animation: y-weather-in var(--motion-appear) var(--gesture-weather-delay) backwards; }
 @keyframes y-weather-in { from { opacity: 0; translate: 0 var(--space-8); } }
 
 /* Чат: ответ пользователя — светлый акцент, хвост справа снизу */
@@ -422,7 +437,7 @@
 .y-outfit-pager__weather { --weather-lift: 0px; left: var(--space-20); top: max(calc(-43px - var(--weather-lift)), calc(var(--space-20) - var(--pager-top))); } /* stylelint-disable-line unit-disallowed-list -- погода над коллажем на 43 (Figma); 0px — длина для calc() */
 .y-outfit-pager__weather:has(.y-weather__alert) { --weather-lift: var(--space-16); }
 .y-outfit-pager[data-compact] .y-outfit-pager__weather { display: none; } /* низкий экран: коллаж меньше 90 % — погоду не показываем (решение владельца, 02.10) */
-.y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) 160ms backwards; }
+.y-outfit-pager__weather > .y-weather { animation: y-weather-in var(--motion-appear) var(--gesture-weather-delay) backwards; }
 /* Штамп и «Не нравится» уменьшаются вместе с коллажем (решение владельца, 02.10), но не мельче 0,75 — иначе подпись штампа
    на 320 × 568 (коллаж 165, k ≈ 0,47) ~6,6 px (#234). --slot-at — место, как при k коллажа; --slot-k — размер.
    Штамп крупнее своего места растёт от левого нижнего угла места вверх и вправо (translate на разницу в долях своего размера):

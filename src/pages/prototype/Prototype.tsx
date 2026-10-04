@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom';
 import { Snackbar } from '../../molecules';
 import { BottomNav, type Tab } from '../../organisms';
 import { cx } from '../../utils/cx';
+import { FRAME_SLACK_MS, LONG_PRESS_CLICK_GUARD_MS } from '../../motion/timing';
 import { gesture, motionMs, velocityTracker } from '../../utils/gesture';
 import { auto, globalRoutes, HOME, label, LOOSE_DIALOGS, routes, START, type Go, type Nav, type Route } from './routes';
 import { screens, TAB_ROOTS, type ScreenId } from './screens';
@@ -232,7 +233,8 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         const cur = top();
         if (!cur.overlay) return;
         el(cur)?.querySelector('.y-overlay')?.classList.add('is-leaving');
-        await new Promise((r) => window.setTimeout(r, motionMs('--motion-exit') + 34));
+        // уход слоя (--overlay-exit: exit 150 мс, при «Уменьшении движения» — растворение 240 мс) + запас на кадр
+        await new Promise((r) => window.setTimeout(r, motionMs('--overlay-exit') + FRAME_SLACK_MS));
         commit(layersRef.current.filter((l) => l.key !== cur.key));
       },
       toast(text, opts) {
@@ -365,7 +367,7 @@ export function Prototype({ start = START, panel = true }: { start?: ScreenId; p
         if (hit.target.closest('[data-reorder]') && press.current) { press.current.armed = () => void run(hit.route.go, hit.target); return; }
         press.current = null;
         suppress.current = true;
-        window.setTimeout(() => { suppress.current = false; }, 400);
+        window.setTimeout(() => { suppress.current = false; }, LONG_PRESS_CLICK_GUARD_MS); // click на отпускании не нажимает то, что под шторкой
         void run(hit.route.go, hit.target);
       }, gesture.longPress);
       press.current = { id: e.pointerId, x: e.clientX, y: e.clientY, timer, t };

@@ -1,4 +1,4 @@
-// Проверка контраста WCAG 2.x по tokens/tokens.json: светлая и тёмная темы.
+// Проверка контраста WCAG 2.x по tokens/tokens.json: светлая и тёмная темы и их режим повышенного контраста (#117).
 //
 //   npm run contrast                    — код выхода 1, если провалена пара
 //   npm run contrast -- --all           — показать все пары, а не только провалы и итог
@@ -8,11 +8,21 @@
 //   · не-текст 3:1 (WCAG 1.4.11) — фокус-кольцо, индикаторы выбранного (accent), ошибки (danger) × поверхности.
 //   · декоративный не-текст — в коридоре (хэндл шторки ≈ 1,5:1, D8): заметно, но не громко.
 // Полупрозрачный фон кладётся на каждую поверхность, где компонент может стоять; берётся худший случай.
+//
+// Наборы `contrast · light/dark` (prefers-contrast: more, iOS Increase Contrast, Android 14+ contrast) — строже:
+//   · текст на нейтральных поверхностях (bg-*, прозрачная кнопка) — 7:1 (WCAG AAA 1.4.6);
+//   · текст на цветных заливках (accent, danger, *-soft) — 4.5:1: 7:1 здесь недостижим вместе с индикатором 3:1 —
+//     белый на синем ≥ 7:1 требует яркости синего ≤ 0.10, а синий индикатор на тёмной карточке ≥ 3:1 — ≥ 0.16;
+//   · обводки и разделители (border-subtle, divider) — 3:1 к поверхностям (WCAG 1.4.11), в базовой теме они декоративные.
 const { tokens: t } = await import('../src/tokens/model.js'); // tokens/tokens.json (DTCG) → удобная форма
 const args = new Set(process.argv.slice(2));
 
 const TEXT = 4.5;
 const UI = 3;
+/** Текст на нейтральной поверхности в режиме повышенного контраста (AAA). */
+const TEXT_HC = 7;
+/** Линии, которые в режиме повышенного контраста должны читаться как граница. */
+const LINES_HC = ['border-subtle', 'divider'];
 
 /** Поверхности, на которых стоят компоненты и текст. */
 const SURFACES = ['bg-canvas', 'bg-elevated', 'bg-subtle'];
@@ -100,16 +110,25 @@ function ratio(a, b) {
 }
 
 /* ─── Пары ──────────────────────────────────────────────────────────── */
-/** @type {{fg:string, bg:string, min:number, kind:string}[]} fg/bg — ключи color.* или component.* */
+/**
+ * @type {{fg:string, bg:string, min:number, hc:number, kind:string, max?:number, only?:'contrast'}[]}
+ * fg/bg — ключи color.* или component.*; min — норма базовой темы, hc — норма режима повышенного контраста.
+ */
 const pairs = [];
 const seen = new Set();
-const push = (fg, bg, min, kind) => {
-  const k = `${fg}|${bg}|${min}`;
-  if (!seen.has(k)) { seen.add(k); pairs.push({ fg, bg, min, kind }); }
+/** Нейтральная подложка: поверхность bg-*, компонентный фон-ссылка на неё или прозрачный (стоит на поверхности). */
+const neutral = (bg) => {
+  const v = bg.startsWith('component.') ? comp[bg.slice(10)] : `{color.${bg}}`;
+  return v === 'transparent' || /^\{color\.bg-(?!overlay)[\w-]+\}$/.test(v);
 };
+const push = (fg, bg, min, kind, only) => {
+  const k = `${fg}|${bg}|${min}`;
+  const hc = min === TEXT && neutral(bg) ? TEXT_HC : min;
+  if (!seen.has(k)) { seen.add(k); pairs.push({ fg, bg, min, hc, kind, ...(only ? { only } : {}) }); }
+};
+const comp = t.component ?? {};
 
 // 1. Компонентные токены: button-primary-fg × button-primary-bg …
-const comp = t.component ?? {};
 for (const key of Object.keys(comp)) {
   const m = /^(.*)-fg$/.exec(key);
   if (!m) continue;
@@ -135,10 +154,16 @@ for (const d of DECOR) {
   push(d.fg, d.bg, d.min, d.what);
   pairs.at(-1).max = d.max;
 }
+// 4. Линии — только в режиме повышенного контраста
+for (const k of LINES_HC) {
+  if (!base[k]) throw new Error(`Нет цвета ${k}`);
+  for (const bg of SURFACES) push(k, bg, UI, 'линия', 'contrast');
+}
 
-/* ─── Наборы: светлая и тёмная тема ─────────────────────────────────── */
+/* ─── Наборы: светлая и тёмная тема, повышенный контраст ────────────── */
 const sets = [];
 for (const theme of ['light', 'dark']) sets.push({ label: `base · ${theme}`, get: (k) => base[k]?.[theme] });
+for (const theme of ['light', 'dark']) sets.push({ label: `contrast · ${theme}`, get: (k) => base[k]?.contrast[theme], hc: true });
 
 /** Значение ключа как список непрозрачных вариантов (полупрозрачное — поверх каждой поверхности). */
 function solid(set, key, under) {
@@ -153,6 +178,8 @@ function solid(set, key, under) {
 const rows = [];
 for (const s of sets) {
   for (const p of pairs) {
+    if (p.only === 'contrast' && !s.hc) continue;
+    const min = s.hc ? p.hc : p.min;
     // худший случай по всем подложкам полупрозрачного фона
     let worst = null;
     for (const bg of solid(s, p.bg)) {
@@ -161,10 +188,10 @@ for (const s of sets) {
       if (!worst || r < worst.r) worst = { r, on: bg.on };
     }
     const name = `${p.fg.replace('component.', '')} / ${p.bg.replace('component.', '')}${worst.on ? ` над ${worst.on}` : ''}`;
-    const ok = worst.r >= p.min && (p.max === undefined || worst.r <= p.max);
+    const ok = worst.r >= min && (p.max === undefined || worst.r <= p.max);
     const known = KNOWN[`${s.label}|${name}`];
     const level = ok ? 'ok' : known ? 'known' : 'error';
-    rows.push({ set: s.label, kind: p.kind, pair: name, min: p.min, max: p.max, ratio: worst.r, level, known });
+    rows.push({ set: s.label, kind: p.kind, pair: name, min, max: p.max, ratio: worst.r, level, known });
   }
 }
 
@@ -196,5 +223,6 @@ const count = (l) => rows.filter((r) => r.level === l).length;
 const stale = Object.keys(KNOWN).filter((k) => !rows.some((r) => `${r.set}|${r.pair}` === k && r.level === 'known'));
 for (const k of stale) console.error(`✗ Известное исключение больше не нужно или не найдено — уберите из KNOWN: ${k}`);
 
-console.log(`Контраст: ${rows.length} пар (${pairs.length} на набор × ${sets.length} наборов + аватары) · ошибок ${count('error')} · известных ${count('known')}`);
+const perSet = sets.map((s) => `${s.label} ${rows.filter((r) => r.set === s.label).length}`).join(', ');
+console.log(`Контраст: ${rows.length} пар (${perSet} + аватары) · ошибок ${count('error')} · известных ${count('known')}`);
 process.exit(count('error') || stale.length ? 1 : 0);
