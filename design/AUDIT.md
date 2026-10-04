@@ -199,7 +199,24 @@ Web-пакет npm — только если появится веб-потре�
 
 ### Фаза 5 · Недостающие компоненты (по мере флоу)
 
-Приоритет по экранам: **Switch, Checkbox, ErrorState/Offline, Skeleton, ProgressBar, Toast-очередь** → TextArea, ActionSheet, PageDots, DatePicker (поездки) → ImageViewer, Tooltip, Pull-to-refresh.
+Приоритет — по факту макетов: на 29.09 нужных компонентов в макетах нет. Появятся кадры — заводить issue [atoms] / [molecules] с node-id.
+Сверка 29.09 (#115): Animations `354:17404`, 144 кадра `design/figma-frames.json`, Настройки `513:4818`, Поездки `798:1913`, Удаление фона `349:9106`, Фильтр `414:1842`, Онбординг `388:1632`, Год рождения `586:1743`.
+
+| Компонент | Что в макетах вместо него |
+|---|---|
+| Switch | в Настройках строки со стрелкой, переключателей нет |
+| Checkbox | круглая галочка на `ItemCard selected`, радио в `ListItem` |
+| ErrorState / Offline | кадров с ошибкой сети нет |
+| Skeleton, ProgressBar | спиннер и подпись «Удаляем фон» (`LoadingState`) |
+| Toast-очередь | 5 одиночных тостов, двух сразу нет (`Snackbar`) |
+| TextArea | `Field multiline` |
+| ActionSheet | пресет `Sheet` + `ListItem action` (9 шторок) |
+| PageDots | онбординг без слайдов; листание образов без точек |
+| DatePicker | даты текстом «8–13 сент · 5 ночей» (`Header` → `titleChipSub`) |
+| ImageViewer | `CropFrame` |
+| Tooltip, Pull-to-refresh | нет |
+
+Не проверено: тёмная тема, прототипные связи, копии «· DS» во Flow 2.0.
 Каждый — в Figma и в коде одновременно, со статусом в реестре.
 
 ### Фаза 6 · Процесс и документация (параллельно)
