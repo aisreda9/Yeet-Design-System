@@ -9,7 +9,7 @@ npm run qa:changed                        # только истории, зад�
 npm run qa -- --update-baseline           # принять текущие скриншоты как эталон (qa/baseline, коммитится в git)
 npm run qa -- --no-docker                 # без Docker: всё, кроме сравнения скриншотов
 npm run qa -- --tap-min=40                # порог зоны нажатия для предупреждения (по умолчанию 44)
-npm run contrast                          # контраст токенов; --all — все пары, --brands=error — бренды как ошибка
+npm run contrast                          # контраст токенов; --all — все пары
 npm run flow-diff                         # экраны против флоу Figma: qa/out/flow-diff.md
 npm run figma-sync                        # переменные Figma «Yeet DS 2.0» (снимок design/figma-variables.json) против токенов
 npm run test-storybook                    # play-тесты: каждая история — тест в headless Chromium (vitest)
@@ -132,14 +132,13 @@ push в PR ──► QA Storybook (pull_request): jobs «qa» и «Play-тест
 
 ### Контраст (`npm run contrast`)
 
-Пары не перечисляются руками, а собираются из `tokens/tokens.json` для базовой темы и каждого бренда × светлая / тёмная:
+Пары не перечисляются руками, а собираются из `tokens/tokens.json` для светлой и тёмной темы:
 
 - **текст 4,5 : 1** — каждая пара `component.*-fg` × `*-bg`, каждый `text-*` на `bg-canvas` / `bg-elevated` / `bg-subtle`
   (у `text-inverse*`, `text-on-*` — своя подложка), `text-accent` на `accent-soft`;
 - **не-текст 3 : 1** (WCAG 1.4.11) — фокус-кольцо и индикатор выбранного на всех поверхностях. Фокус проверяется по токену
   `focus-ring`, а пока его нет — по `accent` (скрипт пишет об этом);
 - полупрозрачный фон кладётся на каждую поверхность, берётся худший случай;
-- **бренды — эксперимент** (решение 28.09): их провалы — предупреждение, `--brands=error` делает их ошибкой;
 - известные нарушения базовой темы — `KNOWN` в скрипте со ссылкой на issue; когда пара начинает проходить, скрипт требует убрать запись.
 
 В CI то же самое делает `.github/workflows/qa.yml` на каждый push и PR: отчёт появляется в Summary запуска, скриншоты лежат в артефакте `qa-report`.

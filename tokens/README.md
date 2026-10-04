@@ -5,7 +5,7 @@
 
 | Вывод | Формат |
 |---|---|
-| `src/tokens/tokens.generated.css` | CSS-переменные, темы `[data-theme]`, бренды `[data-brand]` |
+| `src/tokens/tokens.generated.css` | CSS-переменные, темы `[data-theme]` |
 | `tokens/ios/YeetTokens.swift`, `native/ios/…/Generated/YeetTokens.swift` | SwiftUI |
 | `tokens/android/YeetTokens.kt`, `native/android/…/YeetTokens.kt` | Jetpack Compose |
 
@@ -26,16 +26,16 @@
 - Размеры и время — `{ "value": 16, "unit": "px" }`, `{ "value": 150, "unit": "ms" }`.
 - Ссылка — полный путь: `{color.content.text-accent}`, `{radius.lg}`.
 - **Темы:** `$value` — светлая, `$extensions["com.yeet"].modes.dark` — тёмная (если нет — как светлая).
-- **Бренды:** группа `brand.<id>` переопределяет семантические цвета `color.*` по имени; название и описание — `$extensions["com.yeet"].brand`.
+- **Бренд один** — синий `color.emphasis.accent`; остальные палитры удалены ([ADR 0002](../design/adr/0002-brand-palettes-experiment.md)).
 - Метаданные проекта (роль в Figma, название цвета вещи, iOS/Android-детали) — только в `$extensions["com.yeet"]`.
 
 ## Проверка
 
-`scripts/tokens/dtcg.mjs` проверяет схему до сборки: неизвестный `$type`, значение не по типу, битая ссылка, ссылка на токен другого типа, цикл, неизвестная тема, бренд с несуществующим цветом — сборка падает со списком ошибок. Тесты валидатора: `node --test scripts/tokens/dtcg.test.mjs` (в CI — `qa.yml`).
+`scripts/tokens/dtcg.mjs` проверяет схему до сборки: неизвестный `$type`, значение не по типу, битая ссылка, ссылка на токен другого типа, цикл, неизвестная тема — сборка падает со списком ошибок. Тесты валидатора: `node --test scripts/tokens/dtcg.test.mjs` (в CI — `qa.yml`).
 
 ## Код сборки
 
 - `scripts/build-tokens.mjs` — конфигурация Style Dictionary.
 - `scripts/tokens/transforms.mjs` — трансформы: пружина → CSS `linear()`, px → pt / dp / sp, цвета под платформы, имена с экранированием ключевых слов Swift / Kotlin.
 - `scripts/tokens/formats.mjs` — форматы CSS / Swift / Kotlin.
-- `src/tokens/model.js` — чтение токенов из кода (Storybook, утилиты, скрипты контраста и DESIGN.md) в плоской форме: `tokens.color`, `tokens.brand`, `tokens.motion.gesture`… Типы — `model.d.ts`.
+- `src/tokens/model.js` — чтение токенов из кода (Storybook, утилиты, скрипты контраста и DESIGN.md) в плоской форме: `tokens.color`, `tokens.motion.gesture`… Типы — `model.d.ts`.

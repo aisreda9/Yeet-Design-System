@@ -160,7 +160,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 `--spring-*` → `YeetSpring.*`, `--gesture-*` → `YeetGesture.*`, `--shadow-floating` → `.yeetFloatingShadow()`, хаптика → `YeetHaptic.*`.
 
 Пока не перенесены (есть в React): `RangeSlider`, `Carousel`, `BarChart`, `UsageMeter`, `Hint`, `LoadingState`, `PhotoTile`,
-`PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`, бренд-темы (`data-brand`),
+`PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`,
 сворачивание большого заголовка шапки при скролле (сворачивание фото в `YeetDetailsScreen` есть).
 
 ## Шторки и диалоги

@@ -17,7 +17,7 @@ npm run build-storybook    # статическая сборка в storybook-st
 ```
 
 Что посмотреть первым: **Старт / Прототип** — всё приложение кликабельно (переходы, шторки, жесты), **Pages / Экраны флоу** — те же экраны по одному.
-Тема, размер экрана (320–430) и бренд-палитра переключаются в верхней панели.
+Тема и размер экрана (320–430) переключаются в верхней панели.
 
 ## 2. Подключить
 
@@ -36,7 +36,7 @@ import 'src/styles.css';
 </Screen>
 ```
 
-- Тема: `document.documentElement.dataset.theme = 'dark'`, бренд-палитра — `dataset.brand`.
+- Тема: `document.documentElement.dataset.theme = 'dark'`.
 - В стилях — только семантические и компонентные токены (`--color-*`, `--button-*`), без hex и примитивов.
 - Слой импортирует только слои ниже себя: атом → молекула → организм → шаблон → экран.
 
@@ -61,7 +61,7 @@ cd native/android && ./gradlew :yeet-design-system:publishToMavenLocal   # desig
 | Файл | Что внутри | Зачем |
 |---|---|---|
 | <a href="./downloads/tokens/tokens.json" download>tokens.json</a> | Единый источник: цвета Light / Dark, отступы, радиусы, шрифты, тени, анимации, жесты, хаптика | Любой генератор, свои платформы |
-| <a href="./downloads/tokens/tokens.css" download>tokens.css</a> | CSS-переменные обеих тем и брендов | Web |
+| <a href="./downloads/tokens/tokens.css" download>tokens.css</a> | CSS-переменные обеих тем | Web |
 | <a href="./downloads/tokens/ios/YeetTokens.swift" download>YeetTokens.swift</a> | Токены SwiftUI | iOS |
 | <a href="./downloads/tokens/android/YeetTokens.kt" download>YeetTokens.kt</a> | Токены Compose | Android |
 | <a href="./downloads/icons/ui-sprite.svg" download>ui-sprite.svg</a> | Линейные иконки 24 × 24, `currentColor` | Web, макеты |
@@ -100,7 +100,7 @@ design/                              QA, аудит, решения (ADR)
 | Раздел | Зачем |
 |---|---|
 | **Старт** | Продукт, принципы, устройство системы, этот быстрый старт; **Прототип** — все экраны в кликабельном приложении; **Процессы** — Figma ↔ код, iOS и Android, Ресурсы; **Для разработчиков** — примитивы поведения и доступности |
-| **Foundations** | Токены, бренд-палитры, типографика, отступы, иконки, скролл, анимации, тексты — правила без компонентов |
+| **Foundations** | Токены, типографика, отступы, иконки, скролл, анимации, тексты — правила без компонентов |
 | **Atoms → Organisms** | Компоненты по уровням: песочница, варианты, «В флоу» |
 | **Templates** | Каркасы экранов со слотами-заглушками: `Screen`, `DetailsScreen`, `Prose` |
 | **Pages** | Экраны флоу по одному, с названиями как в Figma |
