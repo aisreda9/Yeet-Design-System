@@ -10,7 +10,6 @@ export type TokenValue = string;
 export type SemanticColor = { light: TokenValue; dark: TokenValue; role: string; figma: string };
 export type SemanticName = { [G in Keys<Src['color']>]: Keys<Src['color'][G]> }[Keys<Src['color']>];
 export type ItemKey = Keys<Src['item']>;
-export type BrandKey = Keys<Src['brand']>;
 export type HapticKey = Keys<Src['motion']['haptic']>;
 
 export type Haptic = { ios: string; android: string; androidMin?: number; androidFallback?: string; when: string; use: string };
@@ -21,7 +20,6 @@ export interface TokensModel {
   avatar: { $description: string; palette: string[] };
   /** Семантические цвета по группам; ключ группы — её название («Поверхности», …). */
   color: Record<string, Record<string, SemanticColor>>;
-  brand: Record<BrandKey, { name: string; about: string; light: Record<string, string>; dark: Record<string, string> }>;
   component: Record<Keys<Src['component']>, TokenValue>;
   space: number[];
   radius: Record<Keys<Src['radius']>, { value: number; use: string }>;

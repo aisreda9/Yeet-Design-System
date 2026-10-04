@@ -12,7 +12,7 @@ native/android/
 │       ├── java/design/yeet/ds/icons/YeetIcons.kt   ← генерируется (npm run tokens)
 │       ├── java/design/yeet/ds/{theme,icons,atoms,molecules,organisms}/…
 │       └── res/font/{inter_variable,roboto_slab_variable}.ttf  ← копируются из tokens/fonts
-└── sample/                        # витрина всех компонентов (light / dark / бренды)
+└── sample/                        # витрина всех компонентов (light / dark)
 ```
 
 - minSdk 26, compileSdk 35, Kotlin 2.0.21, AGP 8.7.3, Compose BOM 2024.12.01.
@@ -53,7 +53,7 @@ dependencies { implementation("design.yeet:yeet-design-system:0.3.0") }
 
 ```kotlin
 setContent {
-    YeetTheme {                                    // light / dark по системе; brand = YeetBrand.Lime …
+    YeetTheme {                                    // light / dark по системе
         Box(Modifier.fillMaxSize().background(YeetTheme.colors.bgCanvas)) {
             LazyColumn(contentPadding = PaddingValues(top = 120.dp, bottom = 120.dp)) { /* контент */ }
             Header(HeaderType.Large(title = "Гардероб", action = HeaderAction(IconName.More, "Ещё")))
@@ -75,7 +75,7 @@ setContent {
 
 | Что | Доступ | Источник |
 |---|---|---|
-| Цвета light / dark (+ 5 брендов) | `YeetTheme.colors.accent`, `LocalYeetColors` | `tokens.color`, `tokens.brand` |
+| Цвета light / dark | `YeetTheme.colors.accent`, `LocalYeetColors` | `tokens.color` |
 | Компонентные цвета | `YeetTheme.colors.buttonPrimaryBg`, `cardBg`… | `tokens.component` |
 | Типографика H1–H3, Body, Caption | `YeetTheme.typography.h1` | `tokens.typography`, Roboto Slab + Inter (переменные шрифты, вес через `FontVariation`) |
 | Отступы, радиусы | `YeetTheme.space.s20`, `YeetTheme.radius.xl` | `tokens.space`, `tokens.radius` |
@@ -158,7 +158,7 @@ npm run tokens
 
 `scripts/build-tokens.mjs` (+ `scripts/android.mjs`) пишет:
 
-- `tokens/android/YeetTokens.kt` и его копию `yeet-design-system/src/main/java/design/yeet/tokens/YeetTokens.kt` — цвета, бренды,
+- `tokens/android/YeetTokens.kt` и его копию `yeet-design-system/src/main/java/design/yeet/tokens/YeetTokens.kt` — цвета,
   компонентные токены, отступы, радиусы, типографика, `YeetMotion` / `YeetMotionScheme` (пружины Figma → `spring(dampingRatio, stiffness)`),
   жесты, хаптика (`YeetHaptic`, `YeetHapticEvent` с fallback для API < 30 / 34), тень;
 - `yeet-design-system/src/main/java/design/yeet/ds/icons/YeetIcons.kt` — `IconName` и пути из `src/icons/icons.ts`

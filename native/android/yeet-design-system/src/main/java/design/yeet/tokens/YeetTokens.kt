@@ -128,40 +128,6 @@ val YeetDarkColors = YeetColorScheme(
     shadow = Color(0x80000000),
 )
 
-/** Бренд-варианты: переопределяют семантические цвета поверх светлой / тёмной темы (web: data-brand). */
-enum class YeetBrand(val title: String, val light: YeetColorScheme, val dark: YeetColorScheme) {
-    /** Пример замены синего: лаймовый трикотаж, крем, тёплый чёрный, как на фэшн-референсе. Акцент светлый, поэтому текст на нём тёмный; акцентный текст — оливковый. */
-    Lime(
-        title = "Лайм",
-        light = YeetLightColors.copy(bgCanvas = Color(0xFFFBF8F1), bgElevated = Color(0xFFFFFDF8), bgSubtle = Color(0xFFF1EBDD), bgInverse = Color(0xFF1C1B17), textPrimary = Color(0xFF1C1B17), textSecondary = Color(0xFF6B665C), textInverse = Color(0xFFFBF8F1), textOnAccent = Color(0xFF1C1B17), textAccent = Color(0xFF4F5A12), accent = Color(0xFFC9DE5B), accentSoft = Color(0x59C9DE5B), borderSubtle = Color(0x1A1C1B17), divider = Color(0x0F1C1B17), patternDot = Color(0x331C1B17)),
-        dark = YeetDarkColors.copy(bgCanvas = Color(0xFF12110E), bgElevated = Color(0xFF1C1B17), bgSubtle = Color(0xFF27251F), bgInverse = Color(0xFFF4EDDC), textPrimary = Color(0xFFF4EDDC), textSecondary = Color(0xFFA8A18F), textInverse = Color(0xFF12110E), textOnAccent = Color(0xFF1C1B17), textAccent = Color(0xFFD4E86A), accent = Color(0xFFD4E86A), accentSoft = Color(0x29D4E86A), borderSubtle = Color(0x1FF4EDDC), divider = Color(0x14F4EDDC), patternDot = Color(0x33F4EDDC)),
-    ),
-    /** Сливочно-жёлтый фон с фэшн-референса, шоколадный текст и тёплый крем: акцент светлый, поэтому текст на нём шоколадный, а акцентный текст — карамельно-коричневый. */
-    Butter(
-        title = "Масло и шоколад",
-        light = YeetLightColors.copy(bgCanvas = Color(0xFFFFF9EA), bgElevated = Color(0xFFFFFDF5), bgSubtle = Color(0xFFF6ECD2), bgInverse = Color(0xFF3B2418), textPrimary = Color(0xFF2E1C12), textSecondary = Color(0xFF6E5A4A), textInverse = Color(0xFFFFF9EA), textOnAccent = Color(0xFF2E1C12), textAccent = Color(0xFF7A5200), accent = Color(0xFFF5D86B), accentSoft = Color(0x66F5D86B), borderSubtle = Color(0x1A2E1C12), divider = Color(0x0F2E1C12), patternDot = Color(0x332E1C12)),
-        dark = YeetDarkColors.copy(bgCanvas = Color(0xFF17110C), bgElevated = Color(0xFF211910), bgSubtle = Color(0xFF2D2218), bgInverse = Color(0xFFF8EBC8), textPrimary = Color(0xFFF8EBC8), textSecondary = Color(0xFFB3A28A), textInverse = Color(0xFF17110C), textOnAccent = Color(0xFF2E1C12), textAccent = Color(0xFFF5D86B), accent = Color(0xFFF5D86B), accentSoft = Color(0x29F5D86B), borderSubtle = Color(0x1FF8EBC8), divider = Color(0x14F8EBC8), patternDot = Color(0x33F8EBC8)),
-    ),
-    /** Глубокая вишня и бордо на пудрово-розовом креме: акцент тёмный, поэтому текст на нём белый. */
-    Cherry(
-        title = "Вишня",
-        light = YeetLightColors.copy(bgCanvas = Color(0xFFFFF7F6), bgElevated = Color(0xFFFFFCFB), bgSubtle = Color(0xFFF8E6E4), bgInverse = Color(0xFF2A0E13), textPrimary = Color(0xFF2A0E13), textSecondary = Color(0xFF74595C), textInverse = Color(0xFFFFF7F6), textOnAccent = Color(0xFFFFFFFF), textAccent = Color(0xFF8E1B2E), accent = Color(0xFF9B1B30), accentSoft = Color(0x1A9B1B30), borderSubtle = Color(0x1A2A0E13), divider = Color(0x0F2A0E13), patternDot = Color(0x332A0E13)),
-        dark = YeetDarkColors.copy(bgCanvas = Color(0xFF150A0C), bgElevated = Color(0xFF1F1114), bgSubtle = Color(0xFF2B191D), bgInverse = Color(0xFFF8E6E4), textPrimary = Color(0xFFF8E6E4), textSecondary = Color(0xFFB39A9D), textInverse = Color(0xFF150A0C), textOnAccent = Color(0xFFFFFFFF), textAccent = Color(0xFFF2A0AC), accent = Color(0xFFB3243C), accentSoft = Color(0x3DB3243C), borderSubtle = Color(0x1FF8E6E4), divider = Color(0x14F8E6E4), patternDot = Color(0x33F8E6E4)),
-    ),
-    /** Приглушённый шалфей, экрю и камень, угольный текст: акцент светлый, поэтому текст на нём тёмный, а акцентный текст — глубокий зелёный. */
-    Sage(
-        title = "Шалфей",
-        light = YeetLightColors.copy(bgCanvas = Color(0xFFF7F5EE), bgElevated = Color(0xFFFCFBF7), bgSubtle = Color(0xFFECE9DE), bgInverse = Color(0xFF2B2D29), textPrimary = Color(0xFF23251F), textSecondary = Color(0xFF63665C), textInverse = Color(0xFFF7F5EE), textOnAccent = Color(0xFF23251F), textAccent = Color(0xFF3F5A3E), accent = Color(0xFF9DB293), accentSoft = Color(0x4D9DB293), borderSubtle = Color(0x1A23251F), divider = Color(0x0F23251F), patternDot = Color(0x3323251F)),
-        dark = YeetDarkColors.copy(bgCanvas = Color(0xFF111310), bgElevated = Color(0xFF1A1C18), bgSubtle = Color(0xFF252822), bgInverse = Color(0xFFECE9DE), textPrimary = Color(0xFFECE9DE), textSecondary = Color(0xFFA0A396), textInverse = Color(0xFF111310), textOnAccent = Color(0xFF1A1C18), textAccent = Color(0xFFB5C9AA), accent = Color(0xFFA9BF9E), accentSoft = Color(0x29A9BF9E), borderSubtle = Color(0x1FECE9DE), divider = Color(0x14ECE9DE), patternDot = Color(0x33ECE9DE)),
-    ),
-    /** Нежная лаванда, холодные светлые поверхности и графитовый текст: акцент светлый, поэтому текст на нём графитовый, а акцентный текст — насыщенный фиолетовый. */
-    Lilac(
-        title = "Лаванда",
-        light = YeetLightColors.copy(bgCanvas = Color(0xFFF8F7FC), bgElevated = Color(0xFFFFFFFF), bgSubtle = Color(0xFFEEECF6), bgInverse = Color(0xFF26252C), textPrimary = Color(0xFF26252C), textSecondary = Color(0xFF65636F), textInverse = Color(0xFFF8F7FC), textOnAccent = Color(0xFF26252C), textAccent = Color(0xFF5B4A9A), accent = Color(0xFFC8B8F0), accentSoft = Color(0x59C8B8F0), borderSubtle = Color(0x1A26252C), divider = Color(0x0F26252C), patternDot = Color(0x3326252C)),
-        dark = YeetDarkColors.copy(bgCanvas = Color(0xFF100F14), bgElevated = Color(0xFF1A1920), bgSubtle = Color(0xFF25232C), bgInverse = Color(0xFFEEECF6), textPrimary = Color(0xFFEEECF6), textSecondary = Color(0xFFA19FAD), textInverse = Color(0xFF100F14), textOnAccent = Color(0xFF26252C), textAccent = Color(0xFFC8B8F0), accent = Color(0xFFC8B8F0), accentSoft = Color(0x2EC8B8F0), borderSubtle = Color(0x1FEEECF6), divider = Color(0x14EEECF6), patternDot = Color(0x33EEECF6)),
-    ),
-}
-
 // Компонентные токены (web: --button-*, --card-*, --sheet-*, --tab-bar-*, --input-*)
 val YeetColorScheme.buttonPrimaryBg: Color get() = accent
 val YeetColorScheme.buttonPrimaryFg: Color get() = textOnAccent

@@ -46,7 +46,7 @@ Animations `354:17404` не видна в `get_metadata` без `nodeId` — о�
 | Семантика    | `--color-*`, `--space-*`, `--radius-*`, `--shadow-*`, `--motion-*`, `--font-*` | компоненты       |
 | Компонентные | `--button-*`, `--sheet-*`, `--tab-bar-*`, …                                    | свой компонент   |
 
-Тема — `data-theme="dark"`, бренд — `data-brand` (эксперимент, только web — [ADR 0002](./adr/0002-brand-palettes-experiment.md)). Компоненты о теме не знают.
+Тема — `data-theme="dark"`. Бренд один — синий `--color-accent`, других палитр нет ([ADR 0002](./adr/0002-brand-palettes-experiment.md), отменено). Компоненты о теме не знают.
 
 **Перевод переменных Figma → код** — таблица в Storybook «Старт / Процессы / Figma ↔ код» (`src/docs/20-Figma.mdx`), точное соответствие — `$extensions["com.yeet"].figma` у токена.
 Значения нет в токенах — не хардкодить: задача для роли «Токены». Осознанная замена цвета ради контраста ([ADR 0006](./adr/0006-contrast-tokens.md)) — `colorAlias` в `scripts/qa/flow-diff.mjs`.

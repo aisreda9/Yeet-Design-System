@@ -150,19 +150,10 @@ export function validate(tree) {
       seen.add(next); cur = byId.get(next);
     }
   }
-  // Модификаторы: бренд переопределяет только существующие семантические цвета
+  // Модификатор темы: modes.<тема> — только из modifiers.theme.contexts
   const mods = ext(tree).modifiers ?? {};
   const themes = mods.theme?.contexts ?? [];
   for (const t of tokens) for (const mode of Object.keys(ext(t).modes ?? {})) if (!themes.includes(mode)) err(t.id, `modes.${mode}: нет такой темы в modifiers.theme.contexts`);
-  if (mods.brand) {
-    const semantic = new Set(tokens.filter((t) => t.path[0] === 'color').map((t) => t.path.at(-1)));
-    const group = tree[mods.brand.group] ?? {};
-    for (const [id, b] of Object.entries(group)) {
-      if (id.startsWith('$')) continue;
-      if (!ext(b).brand?.name) err(`${mods.brand.group}.${id}`, 'нет $extensions["com.yeet"].brand.name');
-      for (const k of Object.keys(b)) if (!k.startsWith('$') && !semantic.has(k)) err(`${mods.brand.group}.${id}.${k}`, `бренд переопределяет несуществующий семантический цвет ${k}`);
-    }
-  }
   return errors;
 }
 
