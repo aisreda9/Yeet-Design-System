@@ -38,6 +38,8 @@ const spring = tokens.motion.spring[tokens.motion.transition.sheet.spring as key
 const WHEEL_IDLE = 120;
 /** Поля и ползунки — свои жесты: панель за них не тянется. */
 const OWN_GESTURE = 'input, textarea, select, [role=slider], [contenteditable]';
+/** Поля ввода текста: фокус в них сворачивает фото (Figma Name Focused `1371:40849`) — поднимается клавиатура. */
+const TEXT_ENTRY = 'textarea, [contenteditable]:not([contenteditable=false]), input:not([type=checkbox], [type=radio], [type=range], [type=button], [type=submit], [type=reset], [type=color], [type=file], [type=image], [type=hidden])';
 /** Инерция контента после жеста: замедление за 1 мс (0,998 — `UIScrollView.DecelerationRate.normal`) и скорость остановки, pt/мс. */
 const COAST_DECAY = 0.998;
 const COAST_MIN = 0.02;
@@ -63,6 +65,12 @@ const COAST_MIN = 0.02;
  * **Клавиатура.** Прокрутка контента с клавиатуры или переход фокуса вглубь панели сворачивают фото; ↑ / PageUp / Home
  * у начала контента — разворачивают. Прокрутка снаружи (`scrollRef`, истории «Scrolled») до первого жеста — сразу свёрнутое
  * состояние. При «Уменьшении движения» доводка мгновенная, за пальцем — 1 : 1. Штамп и нижняя панель (`BottomBar`) — на месте.
+ *
+ * **Фокус в поле** (Figma Name Focused `1371:42491`, `1371:40849`): фокус в поле ввода текста панели («Название») сворачивает фото
+ * той же доводкой `--motion-sheet` — панель встаёт на y138, над клавиатурой видны поля. Фокус до первого жеста (`autoFocus`,
+ * `focus()` из кода) — сразу свёрнутое состояние, как прокрутка снаружи. Потеря фокуса панель не разворачивает: в Figma
+ * обратного кадра нет, а прыжок фото под пальцем при переходе между полями или закрытии клавиатуры хуже; развернуть —
+ * жестом вниз или ↑ / Home у начала контента.
  */
 export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ icon: 'more', label: 'Ещё' }], onBack, bottom, stamp, overlay, scrollRef, children }: DetailsScreenProps) {
   const mediaRef = useRef<HTMLDivElement>(null);
@@ -116,10 +124,10 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     const follow = (v: number) => { p = Math.min(1, Math.max(0, v)); schedule(); show(p >= 0.5); };
 
     /** Доводка к краю пружиной `--motion-sheet`; `v0` — скорость p в 1/мс. Перелёт за край срезается: шторка без перелёта. */
-    const settle = (target: 0 | 1, v0 = 0) => {
+    const settle = (target: 0 | 1, v0 = 0, then?: () => void) => {
       stop();
       show(target === 1);
-      if (reducedMotion() || (p === target && !v0)) { p = target; schedule(); return; }
+      if (reducedMotion() || (p === target && !v0)) { p = target; schedule(); then?.(); return; }
       const { mass: m, stiffness: k, damping: c } = spring;
       let x = p - target, v = v0 * 1000, last = performance.now();
       const step = (now: number) => {
@@ -137,6 +145,7 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
         if (done) p = target;
         schedule();
         anim = done ? 0 : requestAnimationFrame(step);
+        if (done) then?.();
       };
       anim = requestAnimationFrame(step);
     };
@@ -149,11 +158,24 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       else { stop(); p = 1; schedule(); show(true); } // состояние «Scrolled» при открытии — сразу, без доводки
     };
     const keydown = (e: KeyboardEvent) => {
-      interacted = true;
+      interacted = true; // слушатель у экрана: Tab из шапки в поле — тоже ввод пользователя
       if (e.target !== main || p < 1 || main.scrollTop > 0 || !['ArrowUp', 'PageUp', 'Home'].includes(e.key)) return;
       e.preventDefault();
       settle(0);
     };
+
+    // Фокус в поле ввода панели — сворачивает фото; уход фокуса не разворачивает (см. «Фокус в поле»)
+    const collapseFor = (t: EventTarget | null) => {
+      if (drag?.active || p >= 1 || !(t instanceof Element) || !panel.contains(t) || !t.matches(TEXT_ENTRY)) return;
+      // браузер уже докрутил поле в видимую область: пока p < 1, контент не прокручивается — сначала сворачиваем,
+      // а прокрутку сверх хода панели (глубокое поле на низком экране) возвращаем после
+      const rest = Math.max(0, main.scrollTop - travel);
+      main.scrollTop = 0;
+      const reveal = () => { if (rest) main.scrollTop = rest; };
+      if (interacted) settle(1, 0, reveal);
+      else { stop(); p = 1; schedule(); show(true); reveal(); }
+    };
+    const focusin = (e: FocusEvent) => collapseFor(e.target);
 
     const wheel = (e: WheelEvent) => {
       const t = e.target as Element;
@@ -240,7 +262,9 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
     ro?.observe(root);
     ro?.observe(spacer);
     main.addEventListener('scroll', scroll);
-    main.addEventListener('keydown', keydown);
+    root.addEventListener('keydown', keydown);
+    panel.addEventListener('focusin', focusin);
+    collapseFor(document.activeElement); // autoFocus поля сработал до подписки
     root.addEventListener('wheel', wheel, { passive: false });
     root.addEventListener('pointerdown', down);
     root.addEventListener('pointermove', move);
@@ -256,7 +280,8 @@ export function DetailsScreen({ media, thumb, title, titleChip, actions = [{ ico
       cancelAnimationFrame(frame);
       window.clearTimeout(wheelTimer);
       main.removeEventListener('scroll', scroll);
-      main.removeEventListener('keydown', keydown);
+      root.removeEventListener('keydown', keydown);
+      panel.removeEventListener('focusin', focusin);
       root.removeEventListener('wheel', wheel);
       root.removeEventListener('pointerdown', down);
       root.removeEventListener('pointermove', move);

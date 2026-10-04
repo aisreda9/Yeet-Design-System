@@ -75,7 +75,19 @@ const panelTop = (screen: HTMLElement) => Math.round(screen.querySelector('.y-sh
 export const Gesture: Story = {
   name: 'Шторка: жест',
   tags: ['no-visual'], // play-тест поведения: конечный кадр зависит от тайминга доводки; вид проверяют «Слоты» и экраны деталей
-  args: Slots.args,
+  // контент длиннее свёрнутой панели — есть что прокручивать (панель не длиннее экрана, запаса 120 нет, #114)
+  args: {
+    ...Slots.args,
+    children: (
+      <>
+        <Slot label="children · группа полей" height={112} />
+        <Slot label="children · группа полей" height={168} />
+        <Slot label="children · раздел" height={96} />
+        <Slot label="children · раздел" height={96} />
+        <Slot label="children · раздел" height={96} />
+      </>
+    ),
+  },
   parameters: { docs: { description: { story: 'Play-тест: панель протянута на 60 % хода и отпущена — свернулась (панель на y138, фото — миниатюра 48); на 30 % — вернулась. Рывок вверх на 450 (дальше хода — прокрутка контента) и вниз на 450 — развернулась. Без броска: палец стоит перед отпусканием.' } } },
   play: async ({ canvasElement, step }) => {
     const screen = canvasElement.querySelector<HTMLElement>('.y-details')!;

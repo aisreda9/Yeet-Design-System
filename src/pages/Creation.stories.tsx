@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type ReactNode } from 'react';
+import { expect, waitFor, within } from 'storybook/test';
 import { ChipGroup, Field, InputGroup, LoadingState, SegmentControl, Snackbar } from '../molecules';
 import { BottomBar, type CanvasItem, Dialog, type Garment, Header, ItemCard, ItemSlot, ItemSlots, OutfitCanvas, Overlay, PhotoArea, Sheet } from '../organisms';
 import { DetailsScreen, Grid, Screen } from '../templates';
@@ -64,14 +65,22 @@ function CanvasScreen({ filtered, hint: withHint = filtered, overlay }: { filter
   const toggle = (w: (typeof wardrobe)[number]) =>
     setItems((cur) => (cur.some((c) => c.id === w.id) ? cur.filter((c) => c.id !== w.id) : [...cur, { ...w, ...spots[w.id] }]));
   return (
-    <Screen header={<Header type="bar" center={steps('canvas', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />} bottom={filtered ? <BottomBar label="Далее" /> : undefined} overlay={overlay && <Overlay>{overlay}</Overlay>} flush>
+    // холст стоит, «Гардероб» — панель-док до низа: хэндл, заголовок и фильтры закреплены, прокручивается только сетка (#114)
+    <Screen
+      header={<Header type="bar" center={steps('canvas', 'M')} actions={[{ icon: 'arrows-shuffle', label: 'Перемешать' }]} />}
+      bottom={filtered ? <BottomBar label="Далее" /> : undefined}
+      overlay={overlay && <Overlay>{overlay}</Overlay>}
+      flush
+      dock={
+        <Sheet type="panel" title="Гардероб">
+          <ChipGroup chips={filtered ? [{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }] : [{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }]} />
+          <Grid>{wardrobe.map((w) => <ItemCard key={w.id} kind={w.kind} color={w.color} selected={items.some((c) => c.id === w.id)} onClick={() => toggle(w)} />)}</Grid>
+        </Sheet>
+      }
+    >
       <div className="y-gutter">
         <OutfitCanvas items={items} onChange={setItems} selectedId={selected} onSelect={setSelected} hint={hint ? <Snackbar onClose={() => setHint(false)}>Перемещай и масштабируй вещи</Snackbar> : undefined} />
       </div>
-      <Sheet type="panel" title="Гардероб">
-        <ChipGroup chips={filtered ? [{ label: 'Категория · 2', selected: true, dropdown: true }, { label: 'Зима', selected: true, dropdown: true }] : [{ label: 'Категория', dropdown: true }, { label: 'Сезон', dropdown: true }]} />
-        <Grid>{wardrobe.map((w) => <ItemCard key={w.id} kind={w.kind} color={w.color} selected={items.some((c) => c.id === w.id)} onClick={() => toggle(w)} />)}</Grid>
-      </Sheet>
     </Screen>
   );
 }
@@ -107,8 +116,8 @@ export const OutfitCriteria: Story = {
 type NewItemState = 'no-photo' | 'photo' | 'loading' | 'focused' | 'completed';
 
 function NewItemScreen({ state, variant, overlay }: { state: NewItemState; variant: 1 | 2; overlay?: ReactNode }) {
-  const collapsed = state === 'focused' || state === 'completed';
-  const ref = useScrolled(collapsed ? SCROLLED : 0);
+  // Completed — состояние «Scrolled» (фото свёрнуто прокруткой); Name Focused сворачивает настоящий фокус в поле (play ниже)
+  const ref = useScrolled(state === 'completed' ? SCROLLED : 0);
   const media =
     state === 'no-photo' ? <PhotoArea onAdd={() => {}} /> :
     state === 'loading' ? <PhotoArea><LoadingState label="Удаляем фон" /></PhotoArea> :
@@ -145,8 +154,20 @@ export const NewItemNoPhotoV1: Story = { name: 'New Item / Details / No Photo Va
 export const NewItemNoPhotoV2: Story = { name: 'New Item / Details / No Photo Variant 02', render: () => <NewItemScreen state="no-photo" variant={2} /> };
 export const NewItemPhotoV1: Story = { name: 'New Item / Details / Photo Added Variant 01', render: () => <NewItemScreen state="photo" variant={1} /> };
 export const NewItemPhotoV2: Story = { name: 'New Item / Details / Photo Added Variant 02', render: () => <NewItemScreen state="photo" variant={2} /> };
-export const NewItemFocusedV1: Story = { name: 'New Item / Details / Name Focused Variant 01', render: () => <NewItemScreen state="focused" variant={1} /> };
-export const NewItemFocusedV2: Story = { name: 'New Item / Details / Name Focused Variant 02', render: () => <NewItemScreen state="focused" variant={2} /> };
+/** Name Focused (#113 п. 4): фокус в «Названии» сворачивает фото — панель на y138, миниатюра 48 в шапке. Фокус настоящий, не прокрутка. */
+const focusName: Story['play'] = async ({ canvasElement, step }) => {
+  const screen = canvasElement.querySelector<HTMLElement>('.y-details')!;
+  const name = within(canvasElement).getByRole('textbox', { name: 'Название' });
+  await step('Фокус в «Название» → фото свернулось', async () => {
+    name.focus();
+    await waitFor(() => expect(screen.style.getPropertyValue('--details-p')).toBe('1'), { timeout: 2000 });
+    await expect(screen).toHaveAttribute('data-collapsed');
+    await expect(name).toHaveFocus();
+    await expect(Math.round(screen.querySelector('.y-sheet--panel')!.getBoundingClientRect().top - screen.getBoundingClientRect().top)).toBe(138);
+  });
+};
+export const NewItemFocusedV1: Story = { name: 'New Item / Details / Name Focused Variant 01', tags: ['visual'], render: () => <NewItemScreen state="focused" variant={1} />, play: focusName }; // play ставит фокус — скриншот нужен
+export const NewItemFocusedV2: Story = { name: 'New Item / Details / Name Focused Variant 02', tags: ['visual'], render: () => <NewItemScreen state="focused" variant={2} />, play: focusName };
 export const NewItemCompletedV1: Story = { name: 'New Item / Details / Completed Variant 01', render: () => <NewItemScreen state="completed" variant={1} /> };
 export const NewItemCompletedV2: Story = { name: 'New Item / Details / Completed Variant 02', render: () => <NewItemScreen state="completed" variant={2} /> };
 export const NewItemLoadingV1: Story = { name: 'New Item / Photo / Removing Background Variant 01', render: () => <NewItemScreen state="loading" variant={1} /> };
