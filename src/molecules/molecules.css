@@ -213,11 +213,11 @@ div.y-list-item { cursor: default; }
 .y-snackbar button { background: none; border: 0; color: inherit; padding: 0; cursor: pointer; display: inline-flex; }
 
 /* LoadingState */
-.y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--typography-body); animation: y-loading-in var(--motion-appear) 120ms backwards; } /* подпись — через 120 мс, без мигания на быстрых операциях */
-.y-loading .y-icon { width: 24px; height: 24px; /* stylelint-disable-line unit-disallowed-list -- иконка 24 */ color: var(--color-text-primary); animation: y-spin 1.2s linear infinite; }
+.y-loading { display: inline-flex; flex-direction: column; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--typography-body); animation: y-loading-in var(--motion-appear) var(--gesture-loading-delay) backwards; } /* подпись — через 120 мс, без мигания на быстрых операциях */
+.y-loading .y-icon { width: 24px; height: 24px; /* stylelint-disable-line unit-disallowed-list -- иконка 24 */ color: var(--color-text-primary); animation: y-spin var(--gesture-spin) linear infinite; }
 @keyframes y-spin { to { transform: rotate(360deg); } }
 /* Меньше движения: вместо вращения — медленная пульсация прозрачности (загрузка всё равно видна) */
-@media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
+@media (prefers-reduced-motion: reduce) { .y-loading .y-icon { animation: y-pulse var(--gesture-pulse) ease-in-out infinite alternate; } }
 @keyframes y-pulse { to { opacity: 0.4; } }
 @keyframes y-loading-in { from { opacity: 0; } }
 

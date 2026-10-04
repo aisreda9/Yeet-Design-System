@@ -21,7 +21,7 @@
     "assets": "node scripts/build-assets.mjs",
     "team": "node scripts/team/status.mjs",
     "docs-tokens": "node scripts/docs/design-md.mjs",
-    "lint": "eslint . --max-warnings 0 && stylelint \"**/*.css\" --max-warnings 0",
+    "lint": "eslint . --max-warnings 0 && stylelint \"**/*.css\" --max-warnings 0 && node scripts/flow-order.mjs --check",
     "lint:js": "eslint . --max-warnings 0",
     "lint:css": "stylelint \"**/*.css\" --max-warnings 0",
     "format:check": "node scripts/format-check.mjs",

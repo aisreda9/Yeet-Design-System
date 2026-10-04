@@ -38,9 +38,9 @@
 /* loading: содержимое прозрачное (ширина та же), по центру — спиннер цветом текста стиля; нажатие не сжимает */
 :is(.y-button, .y-icon-button).y-button--loading { color: transparent; cursor: progress; }
 :is(.y-button, .y-icon-button).y-button--loading:active { transform: none; }
-.y-button__spinner { position: absolute; inset: 0; margin: auto; color: var(--y-fg); animation: y-spin 1.2s linear infinite; }
+.y-button__spinner { position: absolute; inset: 0; margin: auto; color: var(--y-fg); animation: y-spin var(--gesture-spin) linear infinite; }
 @keyframes y-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .y-button__spinner { animation: y-pulse 1.6s ease-in-out infinite alternate; } }
+@media (prefers-reduced-motion: reduce) { .y-button__spinner { animation: y-pulse var(--gesture-pulse) ease-in-out infinite alternate; } }
 @keyframes y-pulse { to { opacity: 0.4; } }
 
 .y-icon-button--XL { width: var(--size-control-xl); height: var(--size-control-xl); }

@@ -445,6 +445,16 @@ public enum YeetGesture {
     public static let autoscrollEdge: CGFloat = 64
     /// Скорость автоскролла в самом краю зоны; к границе зоны падает до 0
     public static let autoscrollSpeed: CGFloat = 12
+    /// Оборот индикатора загрузки (кнопка, LoadingState), linear по кругу
+    public static let spin: TimeInterval = 1.2
+    /// Пульсация прозрачности вместо вращения при «Уменьшении движения»
+    public static let pulse: TimeInterval = 1.6
+    /// Проход блика по площадке фото при удалении фона
+    public static let shimmer: TimeInterval = 1.6
+    /// Задержка появления подписи загрузки: на быстрых операциях она не мигает
+    public static let loadingDelay: TimeInterval = 0.12
+    /// Погода на главной проявляется после коллажа
+    public static let weatherDelay: TimeInterval = 0.16
 }
 
 /// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.
