@@ -14,12 +14,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Имена jobs («qa», «Play-тесты историй») — это имена check-runs, которые qa-baseline.yml ставит на коммит эталонов
-# вместо повторного прогона. Переименовал job или добавил проверку — поправь и qa-baseline.yml.
+# Обязательные check-runs правила ветки main — «qa» и «Play-тесты историй». Job «qa» — итог: сводит отчёты шардов
+# (scripts/qa/merge.mjs) и падает, если упал хоть один шард или job «QA: сборка и проверки без скриншотов».
+# Шарды и checks — вспомогательные check-runs, в правила ветки их не добавлять (число шардов может меняться).
+# qa-baseline.yml ставит на коммит эталонов check-runs «qa» и «Play-тесты историй» вместо повторного прогона:
+# переименовал эти jobs или добавил проверку — поправь и qa-baseline.yml.
 jobs:
-  qa:
+  checks:
+    name: 'QA: сборка и проверки без скриншотов'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -58,10 +62,8 @@ jobs:
       - run: npm run contrast
       - name: Переменные Figma «Yeet DS 2.0» против токенов (npm run figma-sync)
         run: npm run figma-sync
-      - name: QA (тени, края, спеки Figma, доступность, скриншоты)
-        run: npm run qa
       - name: Сверка экранов с флоу Figma (тексты, позиции, шрифты, цвета)
-        # И после падения QA, но не когда сборка не дошла до конца — иначе ошибка сборки тонет в ERR_MODULE_NOT_FOUND
+        # И после падения прошлых шагов, но не когда сборка не дошла до конца — иначе ошибка сборки тонет в ERR_MODULE_NOT_FOUND
         if: always() && steps.build.outcome == 'success'
         run: npm run flow-diff -- --strict
       - name: Покрытие экранов (кадры Figma ↔ истории) и пути story реестра
@@ -69,7 +71,91 @@ jobs:
         if: always() && steps.build.outcome == 'success'
         run: node scripts/qa/coverage.mjs
       - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: qa-checks
+          path: |
+            qa/out/flow-diff.md
+            qa/out/coverage.md
+          if-no-files-found: ignore
+          retention-days: 7
+
+  shard:
+    # Истории делятся по id (scripts/qa/report.mjs: сортировка, i mod N). Число шардов — в matrix и в --shard ниже.
+    name: QA шард ${{ matrix.shard }}/4
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false # упавший шард не отменяет остальные: в сводном отчёте видны все ошибки сразу
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Сборка ~15 с — дешевле отдельного job с артефактом; что все шарды видят один набор историй, проверяет merge.mjs
+      - run: npm run build-storybook
+      # run.mjs сам перезапускается в закреплённом образе Playwright (Docker на раннере есть): браузер на хост не нужен
+      - name: QA (тени, края, спеки Figma, доступность, скриншоты) — шард ${{ matrix.shard }}/4
+        run: npm run qa -- --shard=${{ matrix.shard }}/4
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: qa-shard-${{ matrix.shard }}
+          # qa/out целиком (в нём только shard-K/): в артефакте папка shard-K, и merge-multiple ниже раскладывает шарды по папкам
+          path: qa/out
+          if-no-files-found: ignore
+          retention-days: 7
+
+  qa:
+    # «qa» — обязательная проверка main и имя check-run, который ставит qa-baseline.yml. Не переименовывать.
+    name: qa
+    needs: [checks, shard]
+    # Всегда, кроме отмены: пропущенный job правило ветки засчитывает как успешный, поэтому итог сам смотрит на needs
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7 # qa/baseline — для проверки «лишний эталон» по всем шардам
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      # → qa/out/shard-K/report.json; merge-multiple — чтобы и единственный найденный артефакт лёг в свою папку
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: qa-shard-*
+          path: qa/out
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        continue-on-error: true # нет артефакта — checks упал до flow-diff; это и так красный итог ниже
+        with:
+          name: qa-checks
+          path: qa/out
+      # Только node, без npm ci: сводит отчёты, проверяет пропуски и дубли историй, лишние эталоны, устаревшие KNOWN
+      - name: Сводный отчёт QA из шардов (scripts/qa/merge.mjs)
+        id: merge
+        run: node scripts/qa/merge.mjs
+      - name: Итог — все шарды и проверки зелёные
+        if: always()
+        env:
+          CHECKS: ${{ needs.checks.result }}
+          SHARDS: ${{ needs.shard.result }}
+          MERGE: ${{ steps.merge.outcome }}
+        run: |
+          red=()
+          [ "$CHECKS" = success ] || red+=("сборка и проверки без скриншотов: $CHECKS")
+          [ "$SHARDS" = success ] || red+=("шарды QA: $SHARDS")
+          [ "$MERGE" = success ] || red+=("сводный отчёт: $MERGE")
+          if [ ${#red[@]} -gt 0 ]; then
+            echo "::error::Красное — $(IFS=';'; echo "${red[*]}"). Подробности — summary и логи jobs «QA шард K/4», «QA: сборка и проверки без скриншотов»."
+            exit 1
+          fi
+      - if: always()
         run: cat qa/out/report.md qa/out/flow-diff.md qa/out/coverage.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+      # Один артефакт: сводный report.md / report.json, flow-diff.md, coverage.md и shard-K/ (отчёт шарда, screens/, diff/)
       - if: always()
         uses: actions/upload-artifact@v7
         with:

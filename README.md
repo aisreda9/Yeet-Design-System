@@ -53,6 +53,10 @@ npm run build-storybook  # статическая сборка в storybook-stat
 Workflow `.github/workflows/storybook.yml` собирает Storybook и публикует на GitHub Pages при пуше в `main`.
 `main` защищена: изменения только через PR с зелёной проверкой `qa`.
 
+## CI
+
+`.github/workflows/qa.yml` на каждый PR и push в `main`: четыре шарда QA (`npm run qa -- --shard=K/4` — скриншоты в закреплённом образе, тени, края, спеки, axe), job без скриншотов (токены, typecheck, контраст, figma-sync, flow-diff, покрытие) и итоговый **`qa`** — сводный отчёт `scripts/qa/merge.mjs` в Summary и артефакте `qa-report`; красный, если красный хоть один шард. Отдельно — `Play-тесты историй`. Подробно — [`design/QA.md`](./design/QA.md) «CI: шарды QA». Эталоны без Docker — `qa-baseline.yml` (там же).
+
 ## Командная работа
 
 Несколько сессий Claude и ботов работают параллельно, каждая в своей ветке. Правила — [`TEAM.md`](./TEAM.md), зоны — `.github/team.json`.

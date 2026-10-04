@@ -44,7 +44,7 @@ export type FormFieldProps = Omit<ComponentPropsWithRef<'div'>, 'children'> & {
  * Сама не рисует поле: внутри — `Field` в `InputGroup`, `InputBar`, `textarea` и т. п.
  *
  * ```tsx
- * <FormField label="Почта" description="Пришлём код для входа" error={bad && 'Проверьте адрес'}>
+ * <FormField label="Почта" description="Пришлём код для входа" error={bad && 'Проверь адрес'}>
  *   {(control) => <InputGroup><Field label="Почта" error={bad} input={{ ...control, type: 'email' }} /></InputGroup>}
  * </FormField>
  * ```
