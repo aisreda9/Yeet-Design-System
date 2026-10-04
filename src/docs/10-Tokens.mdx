@@ -37,6 +37,28 @@ Swift и Kotlin (см. «Старт / Процессы / iOS и Android»). В F
 
 Числа контраста — таблица в `DESIGN.md` (генерируется) и `npm run contrast`; решения — ADR 0006 (`design/adr/`).
 
+## Повышенный контраст
+Когда в системе включено «Увеличить контраст», тема берёт режим `contrast` из `tokens.json`
+(`$extensions["com.yeet"].modes["contrast-light" | "contrast-dark"]`, без своего значения — значение темы). Меняется только второй слой:
+
+| Токен | Light → контраст | Dark → контраст | Норма |
+|---|---|---|---|
+| `--color-text-secondary` | `#6E6E6E` → `#545454` | `#8E8E93` → `#B2B2B5` | текст ≥ 7 : 1 |
+| `--color-text-accent` | — | `#8A8AFF` → `#AAAAFF` | текст ≥ 7 : 1 |
+| `--color-text-danger` | `#CC291B` → `#A22115` | `#FF6B5C` → `#FF9489` | текст ≥ 7 : 1 |
+| `--color-text-inverse-secondary` | — | `#5B6470` → `#4C535D` | текст ≥ 7 : 1 |
+| `--color-accent` | — | `#4B4BFF` → `#5858FF` | индикатор ≥ 3 : 1, белый на нём ≥ 4,5 : 1 |
+| `--color-border-subtle`, `--color-divider` | 10 % / 5 % → 43 % чёрного | 12 % / 8 % → 36 % `#F5F5F7` | линия ≥ 3 : 1 |
+| `--focus-ring-width` | 2 → 3 px | 2 → 3 px | |
+
+- **Web** — `@media (prefers-contrast: more)` в `tokens.generated.css`; обычный вид не меняется.
+- **iOS** — Increase Contrast (`colorSchemeContrast == .increased`): `YeetColor.*` переключаются сами (трейт `accessibilityContrast`), толщина фокуса — `YeetFocusRing.width(contrast)`.
+- **Android 14+** — системная «Контрастность» (`UiModeManager.getContrast()` ≥ 0,5): `YeetTheme(highContrast = …)`, по умолчанию из системы; до API 34 настройки нет.
+- Текст на цветных заливках (синяя и красная кнопки, `*-soft`) — 4,5 : 1, а не 7 : 1: белый на синем ≥ 7 : 1 и синий индикатор ≥ 3 : 1 на тёмной карточке одновременно недостижимы.
+- **Windows «Контрастные темы»** (`forced-colors: active`) — браузер сам ставит системные цвета; `src/utils/a11y.css` возвращает рамки кнопкам, полям, чипсам, сегментам, таб-бару и штампу, выбранному — `Highlight`, фокусу — `Highlight`.
+
+Проверка — `npm run contrast`, наборы `contrast · light` и `contrast · dark`. В Storybook — эмуляция в DevTools: Rendering → `prefers-contrast: more` / `forced-colors: active`.
+
 ## Цвета вещей
 Отдельная палитра для атрибута «цвет вещи»: фильтры, свотчи, точка в поле. Одинакова в обеих темах — это реальные цвета одежды.
 **Не использовать для интерфейса.** На тёмном фоне свотчи всегда с обводкой `black-10%`, иначе `item-colors/black` сливается с фоном.

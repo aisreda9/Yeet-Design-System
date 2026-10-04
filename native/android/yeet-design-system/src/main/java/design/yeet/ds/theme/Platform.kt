@@ -1,12 +1,15 @@
 package design.yeet.ds.theme
 
+import android.app.UiModeManager
 import android.content.Context
 import android.database.ContentObserver
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
@@ -74,3 +77,40 @@ fun rememberReduceMotion(): Boolean {
 
 private fun animatorScale(context: Context): Float =
     Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
+
+/**
+ * Повышенный контраст (#117): системный уровень контраста Android 14+ (Настройки → Экран → «Контрастность»),
+ * `UiModeManager.getContrast()` от -1 до 1; «средний» (0.5) и «высокий» (1) включают контрастные цвета токенов.
+ * До API 34 системной настройки контраста нет — всегда `false` (тема передаёт `highContrast` явно, если нужно).
+ * Значение отслеживается на лету.
+ */
+@Composable
+fun rememberHighContrast(): Boolean {
+    val context = LocalContext.current
+    val inspection = LocalInspectionMode.current
+    var high by remember(context) { mutableStateOf(!inspection && contrastLevel(context) >= HIGH_CONTRAST_LEVEL) }
+    DisposableEffect(context, inspection) {
+        if (inspection || Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return@DisposableEffect onDispose { }
+        val stop = watchContrast(context) { high = it >= HIGH_CONTRAST_LEVEL }
+        onDispose { stop() }
+    }
+    return high
+}
+
+private const val HIGH_CONTRAST_LEVEL = 0.5f
+
+private fun contrastLevel(context: Context): Float =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) systemContrast(context) else 0f
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+private fun systemContrast(context: Context): Float =
+    context.getSystemService(UiModeManager::class.java)?.contrast ?: 0f
+
+/** Подписка на смену уровня контраста; возвращает отписку. */
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+private fun watchContrast(context: Context, onChange: (Float) -> Unit): () -> Unit {
+    val ui = context.getSystemService(UiModeManager::class.java) ?: return {}
+    val listener = UiModeManager.ContrastChangeListener { onChange(it) }
+    ui.addContrastChangeListener(context.mainExecutor, listener)
+    return { ui.removeContrastChangeListener(listener) }
+}

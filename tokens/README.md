@@ -26,6 +26,7 @@
 - Размеры и время — `{ "value": 16, "unit": "px" }`, `{ "value": 150, "unit": "ms" }`.
 - Ссылка — полный путь: `{color.content.text-accent}`, `{radius.lg}`.
 - **Темы:** `$value` — светлая, `$extensions["com.yeet"].modes.dark` — тёмная (если нет — как светлая).
+- **Повышенный контраст** (#117, модификатор `contrast` в корневом `$extensions`): `modes["contrast-light"]` и `modes["contrast-dark"]`; если нет — значение своей темы. Значение — литерал или ссылка на токен без тем (примитив): иначе нативная сборка взяла бы светлое значение ссылки (валидатор проверяет). Вывод: web — `@media (prefers-contrast: more)` в конце `tokens.generated.css`, iOS — `YeetColor` с `accessibilityContrast == .high` и `YeetFocusRing.width(_:)`, Android — `YeetLightContrastColors` / `YeetDarkContrastColors` и `*HighContrast`. Нормы набора — `npm run contrast` (`contrast · light/dark`): текст на поверхностях ≥ 7 : 1, на цветных заливках ≥ 4,5 : 1, обводки и разделители ≥ 3 : 1.
 - **Бренд один** — синий `color.emphasis.accent`; остальные палитры удалены ([ADR 0002](../design/adr/0002-brand-palettes-experiment.md)).
 - Метаданные проекта (роль в Figma, название цвета вещи, iOS/Android-детали) — только в `$extensions["com.yeet"]`.
 
