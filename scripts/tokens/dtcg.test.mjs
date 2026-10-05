@@ -105,3 +105,28 @@ test('режим контраста попадает в CSS, Swift и Kotlin (#1
   assert.match(await read('tokens/ios/YeetTokens.swift'), /textSecondary = dynamic\(.*, contrast: UIColor\(hex: 0x545454, alpha: 1\), UIColor\(hex: 0xB2B2B5, alpha: 1\)\)/);
   assert.match(await read('tokens/android/YeetTokens.kt'), /val YeetDarkContrastColors = YeetColorScheme\(\n(?:.*\n)*? {4}textSecondary = Color\(0xFFB2B2B5\),/);
 });
+
+test('хаптика: platforms и нативные поля согласованы (#130)', () => {
+  let t = fresh();
+  t.motion.haptic.lift.$value = { ios: 'impact:medium' };
+  expectError(t, /motion\.haptic\.lift: поле ios при platforms без ios/);
+  t = fresh();
+  delete t.motion.haptic.select.$value.android;
+  expectError(t, /motion\.haptic\.select: нет поля android/);
+  t = fresh();
+  t.motion.haptic.lift.$extensions['com.yeet'].platforms = ['web', 'watch'];
+  expectError(t, /motion\.haptic\.lift: platforms — непустой массив/);
+});
+
+test('хаптика только для веба не попадает в Swift и Kotlin (#130)', async () => {
+  const read = (p) => readFile(new URL(p, root), 'utf8');
+  const swift = await read('tokens/ios/YeetTokens.swift');
+  const kotlin = await read('tokens/android/YeetTokens.kt');
+  for (const k of ['lift', 'drop', 'target', 'delete', 'success', 'error']) {
+    if (k !== 'error') assert.doesNotMatch(swift, new RegExp(`static func ${k}\\(\\)`));
+    assert.doesNotMatch(kotlin, new RegExp(`val ${k}: Int|\\b${k[0].toUpperCase()}${k.slice(1)}\\("`));
+  }
+  assert.match(swift, /static func error\(\)/); // error — веб и iOS (YeetField)
+  assert.match(swift, /static func stamp\(\)/);
+  assert.match(kotlin, /Stamp\("notification:success"\)/);
+});

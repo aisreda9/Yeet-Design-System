@@ -451,30 +451,18 @@ object YeetGesture {
     const val weatherDelayMillis = 160L
 }
 
-/** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */
+/** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.stamp); в Compose — LocalView.current. */
 object YeetHaptic {
     /** Смена выбора: чипс, сегмент, вкладка, радио, шаг слайдера цены. Каждый шаг — один тик, не чаще 1 раза в 50 мс */
     val select: Int get() = HapticFeedbackConstants.CLOCK_TICK
     /** Переключатель, лайк, галочка вещи в режиме выбора. И при включении, и при выключении */
     val toggle: Int get() = HapticFeedbackConstants.CONTEXT_CLICK
-    /** Подъём: долгое нажатие сработало, вещь на холсте взята. В момент подъёма, одновременно с scale 1.04 */
-    val lift: Int get() = HapticFeedbackConstants.LONG_PRESS
-    /** Перетаскиваемая вещь зашла на новую цель или корзину. Только при входе в цель, не при движении внутри */
-    val target: Int get() = HapticFeedbackConstants.CLOCK_TICK
-    /** Бросок в цель: вещь встала на место. На отпускании пальца */
-    val drop: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
     /** Жест перешёл порог: свайп перелистнёт, sheet закроется, pull-to-refresh, масштаб упёрся в 40 / 300 %. Один раз при пересечении порога; обратно — без вибрации */
     val threshold: Int get() = if (Build.VERSION.SDK_INT >= 34) HapticFeedbackConstants.GESTURE_THRESHOLD_ACTIVATE else HapticFeedbackConstants.CLOCK_TICK
     /** Штамп «Надеть» — образ отмечен. В пик пружины bouncy (~120 мс после нажатия) */
     val stamp: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
     /** «Не нравится» (малый штамп), смена образа свайпом. На нажатии штампа или при перелистывании образа */
     val skip: Int get() = HapticFeedbackConstants.CONTEXT_CLICK
-    /** Вещь брошена в корзину, подтверждено удаление. На отпускании над корзиной */
-    val delete: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
-    /** Ошибка: неверный пароль, не загрузилось фото. Вместе с появлением текста ошибки */
-    val error: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
-    /** Долгая операция завершилась по действию пользователя: вещь распознана, образ сохранён. Не для фоновых событий */
-    val success: Int get() = if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
 }
 
 fun View.yeetHaptic(type: Int): Boolean = performHapticFeedback(type)
@@ -485,24 +473,12 @@ enum class YeetHapticEvent(val ios: String) {
     Select("selection"),
     /** Переключатель, лайк, галочка вещи в режиме выбора */
     Toggle("impact:light"),
-    /** Подъём: долгое нажатие сработало, вещь на холсте взята */
-    Lift("impact:medium"),
-    /** Перетаскиваемая вещь зашла на новую цель или корзину */
-    Target("selection"),
-    /** Бросок в цель: вещь встала на место */
-    Drop("impact:light"),
     /** Жест перешёл порог: свайп перелистнёт, sheet закроется, pull-to-refresh, масштаб упёрся в 40 / 300 % */
     Threshold("impact:rigid"),
     /** Штамп «Надеть» — образ отмечен */
     Stamp("notification:success"),
     /** «Не нравится» (малый штамп), смена образа свайпом */
     Skip("impact:soft"),
-    /** Вещь брошена в корзину, подтверждено удаление */
-    Delete("notification:warning"),
-    /** Ошибка: неверный пароль, не загрузилось фото */
-    Error("notification:error"),
-    /** Долгая операция завершилась по действию пользователя: вещь распознана, образ сохранён */
-    Success("notification:success"),
     ;
 
     /** HapticFeedbackConstants с запасным вариантом для старых API (androidMin / androidFallback). */
@@ -510,15 +486,9 @@ enum class YeetHapticEvent(val ios: String) {
         get() = when (this) {
             Select -> YeetHaptic.select
             Toggle -> YeetHaptic.toggle
-            Lift -> YeetHaptic.lift
-            Target -> YeetHaptic.target
-            Drop -> YeetHaptic.drop
             Threshold -> YeetHaptic.threshold
             Stamp -> YeetHaptic.stamp
             Skip -> YeetHaptic.skip
-            Delete -> YeetHaptic.delete
-            Error -> YeetHaptic.error
-            Success -> YeetHaptic.success
         }
 }
 

@@ -104,7 +104,7 @@ TODO: скрипт сверки свойств Figma ↔ пропсов (`get_de
 - Уход быстрее появления (`--motion-exit` < `--motion-appear`). Выбор — только цвет / фон (`--motion-select`).
 - Анимируем `transform` и `opacity`. `prefers-reduced-motion` делает всё мгновенным — не обходить своими `animation`. Исключение (решение владельца, #130 № 9): шторка и диалог появляются и уходят растворением 240 мс без сдвига — в web на `--motion-base` + `--ease-standard` (они не обнуляются, в отличие от `--motion-*`); web-потребитель — `Overlay` в `organisms.css` после #58.
 - Сворачивание шапки — порог 24, возврат на 8 ([ADR 0004](./adr/0004-details-collapse-24-8.md)).
-- Хаптика (`motion.haptic`, натив): одно событие — одна вибрация, `select` не чаще раза в 50 мс, `threshold` — только при пересечении вперёд.
+- Хаптика (`motion.haptic`, натив: iOS 6 событий — select, toggle, threshold, stamp, skip, error; Android 5 — без error; lift, drop, target, delete, success — только веб, #130): одно событие — одна вибрация, `select` не чаще раза в 50 мс, `threshold` — только при пересечении вперёд.
 - Новая кривая или длительность — решение дизайна, а не хардкод.
 
 ## 6. Запись в Figma

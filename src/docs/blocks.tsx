@@ -294,7 +294,7 @@ export function MechanicsTable() {
 /** «11 · 17 · 16» — число атомов, молекул и организмов из реестра. */
 export const levelCounts = () => (['Atoms', 'Molecules', 'Organisms'] as const).map((l) => byLevel(l).length).join(' · ');
 
-/** Хаптика из tokens.json → motion.haptic: событие, iOS, Android. */
+/** Хаптика из tokens.json → motion.haptic: событие, iOS, Android; нет на платформе (#130) — «нет»; только веб — «только веб». */
 export function HapticTable() {
   const ios = (v: string) => {
     const [kind, style] = v.split(':');
@@ -304,13 +304,13 @@ export function HapticTable() {
     <DocTable
       head={['Событие', 'Когда', 'iOS', 'Android', 'Токен']}
       rows={Object.entries(tokenSource.motion.haptic).map(([k, h]) => {
-        const hh = h as typeof h & { androidMin?: number; androidFallback?: string };
+        const webOnly = !h.ios && !h.android;
         return [
           <span style={{ fontWeight: 500 }}>{k}</span>,
           <span>{h.when}<div style={cap}>{h.use}</div></span>,
-          <Code>{ios(h.ios)}</Code>,
-          <span><Code>{h.android}</Code>{hh.androidMin && <div style={cap}>API {hh.androidMin}+, ниже — {hh.androidFallback}</div>}</span>,
-          <Muted>YeetHaptic.{k}</Muted>,
+          h.ios ? <Code>{ios(h.ios)}</Code> : <Muted>{webOnly ? 'только веб' : 'нет'}</Muted>,
+          h.android ? <span><Code>{h.android}</Code>{h.androidMin && <div style={cap}>API {h.androidMin}+, ниже — {h.androidFallback}</div>}</span> : <Muted>{webOnly ? 'только веб' : 'нет'}</Muted>,
+          <Muted>{webOnly ? `haptic('${k}')` : `YeetHaptic.${k}`}</Muted>,
         ];
       })}
     />
