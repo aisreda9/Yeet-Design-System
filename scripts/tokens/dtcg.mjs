@@ -7,6 +7,8 @@ export const EXT = 'com.yeet';
 export const DTCG_TYPES = ['color', 'dimension', 'fontFamily', 'fontWeight', 'duration', 'cubicBezier', 'number', 'strokeStyle', 'border', 'transition', 'shadow', 'gradient', 'typography'];
 /** Собственные типы проекта — описаны в корневом `$extensions["com.yeet"].customTypes`. */
 export const CUSTOM_TYPES = ['spring', 'haptic'];
+/** Платформы хаптики: без `$extensions["com.yeet"].platforms` событие есть везде. */
+export const HAPTIC_PLATFORMS = ['web', 'ios', 'android'];
 const TOKEN_PROPS = new Set(['$value', '$type', '$description', '$extensions', '$deprecated']);
 const GROUP_PROPS = new Set(['$type', '$description', '$extensions', '$deprecated']);
 const ROOT_PROPS = new Set([...GROUP_PROPS, '$schema']);
@@ -66,10 +68,12 @@ function checkValue(type, v, refs) {
     case 'strokeStyle': return typeof v === 'string' || isObj(v) ? [] : ['стиль линии'];
     case 'gradient': return Array.isArray(v) ? v.flatMap((s) => checkValue('color', s.color, refs)) : ['градиент — массив остановок'];
     case 'haptic': {
-      if (!isObj(v)) return ['хаптика — объект { ios, android, androidMin?, androidFallback? }'];
+      // ios / android обязательны, если платформа в $extensions["com.yeet"].platforms (проверка в validate)
+      if (!isObj(v)) return ['хаптика — объект { ios?, android?, androidMin?, androidFallback? }'];
       const p = [];
-      if (!/^(selection|impact:(light|medium|heavy|soft|rigid)|notification:(success|warning|error))$/.test(v.ios)) p.push(`ios "${v.ios}" — selection | impact:<style> | notification:<type>`);
-      if (!/^[A-Z_]+$/.test(v.android)) p.push(`android "${v.android}" — константа HapticFeedbackConstants`);
+      if ('ios' in v && !/^(selection|impact:(light|medium|heavy|soft|rigid)|notification:(success|warning|error))$/.test(v.ios)) p.push(`ios "${v.ios}" — selection | impact:<style> | notification:<type>`);
+      if ('android' in v && !/^[A-Z_]+$/.test(v.android)) p.push(`android "${v.android}" — константа HapticFeedbackConstants`);
+      if ('androidMin' in v && !('android' in v)) p.push('androidMin без android');
       if ('androidMin' in v !== 'androidFallback' in v) p.push('androidMin и androidFallback задаются вместе');
       for (const k of Object.keys(v)) if (!['ios', 'android', 'androidMin', 'androidFallback'].includes(k)) p.push(`лишнее поле ${k}`);
       return p;
@@ -125,6 +129,20 @@ export function validate(tree) {
       const mr = [];
       for (const p of checkValue(t.type, mv, mr)) err(t.id, `modes.${mode}: ${p}`);
       refs.push(...mr.map(([to, type]) => ({ from: `${t.id} (modes.${mode})`, to, type })));
+    }
+    // platforms: хаптика только на части платформ (#130) — нативные поля есть ровно у своих платформ
+    const platforms = ext(t).platforms;
+    if (platforms !== undefined) {
+      if (t.type !== 'haptic') err(t.id, 'platforms — только у haptic');
+      else if (!Array.isArray(platforms) || !platforms.length || platforms.some((x) => !HAPTIC_PLATFORMS.includes(x)) || new Set(platforms).size !== platforms.length)
+        err(t.id, `platforms — непустой массив без повторов из ${HAPTIC_PLATFORMS.join(', ')}`);
+    }
+    if (t.type === 'haptic' && isObj(t.value)) {
+      const on = platforms ?? HAPTIC_PLATFORMS;
+      for (const k of ['ios', 'android']) {
+        if (on.includes(k) && !(k in t.value)) err(t.id, `нет поля ${k} (платформа ${k} в platforms)`);
+        if (!on.includes(k) && k in t.value) err(t.id, `поле ${k} при platforms без ${k}`);
+      }
     }
     // after: размер отсчитывается от другого размера (web — calc(after + $value))
     const after = ext(t).after;

@@ -42,6 +42,8 @@ const member = (t) => camel(t.path.slice(1).join('-'));
 
 const colorGroups = (v) => v.keys(v.source.color).map((g) => ({ title: v.groupNode(`color.${g}`).$description, tokens: v.list(`color.${g}`) }));
 /** Подпись пружины: пресет Figma (`figma`) или пояснение (`note`), если пружина своя. */
+/** События хаптики платформы: без `platforms` — на всех; только веб (#130) в Swift / Kotlin не попадают. */
+const hapticsFor = (v, platform) => v.list('motion.haptic').filter((t) => (v.x(t).platforms ?? [platform]).includes(platform));
 const springNote = (v, t, prefix = 'Figma') => (v.x(t).figma ? `${prefix} ${v.x(t).figma}` : v.x(t).note);
 const fontMeta = (v) => v.list('font').map((t) => ({ key: v.key(t), family: v.orig(t)[0], ...v.x(t), source: t.$description }));
 
@@ -241,7 +243,7 @@ export function swift({ dictionary, options }, source) {
   for (const t of v.list('motion.gesture'))
     L.push(`    /// ${t.$description}`, t.$type === 'duration' ? `    public static let ${t.name}: TimeInterval = ${t.$value}` : `    public static let ${t.name}: CGFloat = ${t.$value}`);
   L.push('}', '', '/// Хаптика: вызывать при смене состояния, не на каждое касание. Безопасно из любого потока: генератор отклика создаётся на главном.', 'public enum YeetHaptic {');
-  for (const t of v.list('motion.haptic')) {
+  for (const t of hapticsFor(v, 'ios')) {
     const [kind, style] = t.$value.ios.split(':');
     const call = kind === 'selection' ? 'UISelectionFeedbackGenerator().selectionChanged()' : kind === 'impact' ? `UIImpactFeedbackGenerator(style: .${style}).impactOccurred()` : `UINotificationFeedbackGenerator().notificationOccurred(.${style})`;
     L.push(`    /// ${t.$description}. ${v.x(t).use}`, `    public static func ${t.name}() { DispatchQueue.main.async { ${call} } }`);
@@ -365,9 +367,9 @@ export function kotlin({ dictionary }, source) {
     const unit = v.x(t).unit;
     L.push(`    /** ${t.$description}${unit === 'px/s' ? ' (dp/с)' : ''} */`, t.$type === 'duration' ? `    const val ${t.name}Millis = ${t.$value}L` : t.$type === 'dimension' ? `    val ${t.name} = ${t.$value}` : `    const val ${t.name} = ${t.$value}f`);
   }
-  L.push('}', '', '/** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.drop); в Compose — LocalView.current. */', 'object YeetHaptic {');
+  L.push('}', '', '/** Хаптика: вызывать при смене состояния, не на каждое касание. view.yeetHaptic(YeetHaptic.stamp); в Compose — LocalView.current. */', 'object YeetHaptic {');
   const hc = (n) => `HapticFeedbackConstants.${n}`;
-  const haptics = v.list('motion.haptic');
+  const haptics = hapticsFor(v, 'android');
   for (const t of haptics) {
     const h = t.$value;
     L.push(`    /** ${t.$description}. ${v.x(t).use} */`, h.androidMin ? `    val ${t.name}: Int get() = if (Build.VERSION.SDK_INT >= ${h.androidMin}) ${hc(h.android)} else ${hc(h.androidFallback)}` : `    val ${t.name}: Int get() = ${hc(h.android)}`);

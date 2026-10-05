@@ -22,6 +22,7 @@
 ```
 
 - `$type` задаётся у токена или у группы (наследуется). Типы — из DTCG (`color`, `dimension`, `duration`, `cubicBezier`, `number`, `fontFamily`, `typography`, `shadow`, `transition`, …) и два своих: `spring`, `haptic` (описаны в корневом `$extensions["com.yeet"].customTypes`).
+- Хаптика — `$extensions["com.yeet"].platforms` (`web` | `ios` | `android`, без поля — все): поля `ios` / `android` в `$value` есть ровно у своих платформ. В iOS и Android 5 событий (`select`, `toggle`, `threshold`, `stamp`, `skip`); `lift`, `drop`, `target`, `delete`, `success`, `error` — `platforms: ["web"]`, `$value: {}`, в Swift / Kotlin не генерируются (#130).
 - Цвет — `{ "colorSpace": "srgb", "components": [r, g, b], "alpha"?: a, "hex": "#RRGGBB" }`; прозрачный — `alpha: 0`.
 - Размеры и время — `{ "value": 16, "unit": "px" }`, `{ "value": 150, "unit": "ms" }`.
 - Ссылка — полный путь: `{color.content.text-accent}`, `{radius.lg}`.

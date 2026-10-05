@@ -19,7 +19,8 @@ export type SemanticName = { [G in Keys<Src['color']>]: Keys<Src['color'][G]> }[
 export type ItemKey = Keys<Src['item']>;
 export type HapticKey = Keys<Src['motion']['haptic']>;
 
-export type Haptic = { ios: string; android: string; androidMin?: number; androidFallback?: string; when: string; use: string };
+/** ios / android нет у событий только для веба (`platforms: ["web"]`, #130). */
+export type Haptic = { ios?: string; android?: string; androidMin?: number; androidFallback?: string; platforms: ('web' | 'ios' | 'android')[]; when: string; use: string };
 
 export interface TokensModel {
   primitive: Record<Keys<Src['primitive']>, string>;

@@ -67,7 +67,7 @@ export function toModel(t) {
       transition: map(m.transition, (v) => (v.$type === 'spring'
         ? { spring: refKey(v.$value), use: v.$description }
         : { duration: refKey(v.$value.duration), easing: refKey(v.$value.timingFunction), use: v.$description })),
-      haptic: map(m.haptic, (v) => ({ ...v.$value, when: v.$description, use: ext(v).use })),
+      haptic: map(m.haptic, (v) => ({ ...v.$value, platforms: ext(v).platforms ?? ['web', 'ios', 'android'], when: v.$description, use: ext(v).use })),
       gesture: map(m.gesture, (v) => ({
         value: typeof v.$value === 'number' ? v.$value : v.$value.value,
         unit: ext(v).unit ?? (v.$type === 'duration' ? 'ms' : v.$type === 'dimension' ? 'px' : ''),

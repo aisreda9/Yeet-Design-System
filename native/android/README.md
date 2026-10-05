@@ -81,7 +81,7 @@ setContent {
 | Отступы, радиусы | `YeetTheme.space.s20`, `YeetTheme.radius.xl` | `tokens.space`, `tokens.radius` |
 | Тень shadow/floating | `Modifier.yeetFloatingShadow(shape)` | `tokens.shadow` (setShadowLayer, API 28+; на 26–27 без тени) |
 | Движение | `YeetTheme.motion.nav()` → `spring(dampingRatio, stiffness)`; `press()` → `tween` | `tokens.motion` |
-| Хаптика | `YeetTheme.haptics.perform(YeetHapticEvent.Select)` | `tokens.motion.haptic` (с `androidMin` / `androidFallback`) |
+| Хаптика | `YeetTheme.haptics.perform(YeetHapticEvent.Select)` | `tokens.motion.haptic` (с `androidMin` / `androidFallback`): 5 событий — `Select`, `Toggle`, `Threshold`, `Stamp`, `Skip`; lift, drop, target, delete, success, error — только веб (#130) |
 
 Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography`, собранные из токенов, — стандартные M3-компоненты не выбиваются.
 
@@ -101,7 +101,7 @@ Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography
 - **Уменьшить движение:** `rememberReduceMotion()` следит за `Settings.Global.ANIMATOR_DURATION_SCALE`
   («Убрать анимацию»); при 0 все переходы — `snap()`, спиннер стоит, подъём без увеличения.
 - **Жесты дублируются:** листание `OutfitPager` и `ItemSlot`, рамка `CropFrame` — действиями TalkBack (`customActions`) и клавиатурой.
-- **Хаптика** уважает системный «Виброотклик»; `select` — не чаще раза в 50 мс; выключается `YeetTheme(hapticsEnabled = false)`.
+- **Хаптика** уважает системный «Виброотклик»; `select` — не чаще раза в 50 мс, остальные не прореживаются; выключается `YeetTheme(hapticsEnabled = false)`.
 
 ## React ↔ Compose
 
@@ -160,7 +160,7 @@ npm run tokens
 
 - `tokens/android/YeetTokens.kt` и его копию `yeet-design-system/src/main/java/design/yeet/tokens/YeetTokens.kt` — цвета,
   компонентные токены, отступы, радиусы, типографика, `YeetMotion` / `YeetMotionScheme` (пружины Figma → `spring(dampingRatio, stiffness)`),
-  жесты, хаптика (`YeetHaptic`, `YeetHapticEvent` с fallback для API < 30 / 34), тень;
+  жесты, хаптика (`YeetHaptic`, `YeetHapticEvent` из 5 событий, с fallback для API < 30 / 34), тень;
 - `yeet-design-system/src/main/java/design/yeet/ds/icons/YeetIcons.kt` — `IconName` и пути из `src/icons/icons.ts`
   (окружности → дуги, `translate` → группы, `stroke-dasharray` раскладывается на отрезки) + словесный знак и звезда штампа из `src/icons/brand.ts`;
 - `yeet-design-system/src/main/res/font/*.ttf` — из `tokens/fonts`.

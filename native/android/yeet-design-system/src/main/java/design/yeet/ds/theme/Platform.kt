@@ -23,7 +23,8 @@ import design.yeet.tokens.YeetHapticEvent
 
 /**
  * Хаптика дизайн-системы (tokens.motion.haptic → HapticFeedbackConstants).
- * Константы, которых нет на старых API (CONFIRM / REJECT — 30, GESTURE_THRESHOLD_ACTIVATE — 34),
+ * В нативе 5 событий (select, toggle, threshold, stamp, skip); lift, drop, target, delete, success, error — только веб (#130).
+ * Константы, которых нет на старых API (CONFIRM — 30, GESTURE_THRESHOLD_ACTIVATE — 34),
  * заменяются на androidFallback из токенов — см. [YeetHapticEvent.feedbackConstant].
  * `performHapticFeedback` сам уважает системную настройку «Виброотклик».
  */
@@ -34,8 +35,8 @@ class YeetHaptics internal constructor(private val view: View?) {
     /** Вызывать при смене состояния, не на каждое касание. */
     fun perform(event: YeetHapticEvent): Boolean {
         val v = view ?: return false
-        if (event == YeetHapticEvent.Select || event == YeetHapticEvent.Target) {
-            // токены: «каждый шаг — один тик, не чаще 1 раза в 50 мс»
+        if (event == YeetHapticEvent.Select) {
+            // токены: «каждый шаг — один тик, не чаще 1 раза в 50 мс»; остальные события редкие — не прореживаются
             val now = SystemClock.uptimeMillis()
             if (now - lastTick < SELECT_THROTTLE_MS) return false
             lastTick = now

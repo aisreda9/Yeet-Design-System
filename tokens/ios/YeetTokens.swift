@@ -463,24 +463,12 @@ public enum YeetHaptic {
     public static func select() { DispatchQueue.main.async { UISelectionFeedbackGenerator().selectionChanged() } }
     /// Переключатель, лайк, галочка вещи в режиме выбора. И при включении, и при выключении
     public static func toggle() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .light).impactOccurred() } }
-    /// Подъём: долгое нажатие сработало, вещь на холсте взята. В момент подъёма, одновременно с scale 1.04
-    public static func lift() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .medium).impactOccurred() } }
-    /// Перетаскиваемая вещь зашла на новую цель или корзину. Только при входе в цель, не при движении внутри
-    public static func target() { DispatchQueue.main.async { UISelectionFeedbackGenerator().selectionChanged() } }
-    /// Бросок в цель: вещь встала на место. На отпускании пальца
-    public static func drop() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .light).impactOccurred() } }
     /// Жест перешёл порог: свайп перелистнёт, sheet закроется, pull-to-refresh, масштаб упёрся в 40 / 300 %. Один раз при пересечении порога; обратно — без вибрации
     public static func threshold() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .rigid).impactOccurred() } }
     /// Штамп «Надеть» — образ отмечен. В пик пружины bouncy (~120 мс после нажатия)
     public static func stamp() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.success) } }
     /// «Не нравится» (малый штамп), смена образа свайпом. На нажатии штампа или при перелистывании образа
     public static func skip() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .soft).impactOccurred() } }
-    /// Вещь брошена в корзину, подтверждено удаление. На отпускании над корзиной
-    public static func delete() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.warning) } }
-    /// Ошибка: неверный пароль, не загрузилось фото. Вместе с появлением текста ошибки
-    public static func error() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.error) } }
-    /// Долгая операция завершилась по действию пользователя: вещь распознана, образ сохранён. Не для фоновых событий
-    public static func success() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.success) } }
 }
 
 public enum YeetShadow {
