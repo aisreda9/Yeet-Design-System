@@ -469,6 +469,8 @@ public enum YeetHaptic {
     public static func stamp() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.success) } }
     /// «Не нравится» (малый штамп), смена образа свайпом. На нажатии штампа или при перелистывании образа
     public static func skip() { DispatchQueue.main.async { UIImpactFeedbackGenerator(style: .soft).impactOccurred() } }
+    /// Ошибка: неверный пароль, не загрузилось фото. Вместе с появлением текста ошибки
+    public static func error() { DispatchQueue.main.async { UINotificationFeedbackGenerator().notificationOccurred(.error) } }
 }
 
 public enum YeetShadow {

@@ -80,6 +80,9 @@ public struct YeetField: View {
         .overlay(alignment: .top) {
             if groupSize != nil { YeetRowDivider() }
         }
+        .onChange(of: error) { hasError in
+            if hasError { YeetHaptic.error() }
+        }
     }
 
     private var row: some View {

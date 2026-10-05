@@ -47,7 +47,7 @@ import { HapticTable, MechanicsTable, MotionTable } from './blocks';
 
 Каждая механика экранов: что движется, на каком токене и пружине, сколько длится, какая хаптика и что остаётся
 при «Уменьшении движения». Источник — `src/motion/motion.ts → mechanics`; в коде компоненты зовут
-`haptic('<событие>')` из `src/utils/haptic.ts` (в вебе — событие `yeet:haptic` для демо, в нативе — `YeetHaptic`, 5 событий; см. «Хаптика»).
+`haptic('<событие>')` из `src/utils/haptic.ts` (в вебе — событие `yeet:haptic` для демо, в нативе — `YeetHaptic`: в iOS 6 событий, в Android 5; см. «Хаптика»).
 
 <MechanicsTable />
 
@@ -239,13 +239,13 @@ Esc — отменить. Каждое перемещение объявляет
 
 Источник — `tokens.json → motion.haptic`; в коде `haptic('<событие>')` (веб), `YeetHaptic.<событие>()` (iOS) и `YeetTheme.haptics.perform(YeetHapticEvent.<Событие>)` (Android).
 
-В iOS и Android 5 событий: `select`, `toggle`, `threshold`, `stamp`, `skip`. `lift`, `drop`, `target`, `delete`, `success`, `error` — **только веб** (`platforms: ["web"]` в токене): в нативе нет жестов, к которым они привязаны, в Swift и Kotlin они не генерируются (решение владельца, #130).
+В Android 5 событий: `select`, `toggle`, `threshold`, `stamp`, `skip`; в iOS — те же 5 и `error` (поле ввода с ошибкой, `YeetField`; `platforms: ["web", "ios"]`). `lift`, `drop`, `target`, `delete`, `success` — **только веб** (`platforms: ["web"]` в токене): в нативе нет жестов, к которым они привязаны, в Swift и Kotlin они не генерируются (решение владельца, #130).
 
 1. **Вибрирует смена состояния, а не касание.** Обычная кнопка, карточка, строка списка — без хаптики: ответа анимацией достаточно.
 2. **Одно событие — один импульс,** в момент визуального пика: подъём — вместе с scale 1.04, штамп — в пик пружины, порог — когда он пройден. Обратное движение без вибрации.
 3. **Не чаще 1 раза в 50 мс** — для тиков: в вебе `select` и `target` (`src/utils/haptic.ts`), на Android `select` (`YeetHaptics`). Слайдер и перетаскивание по сетке тикают на каждом шаге, но не сливаются в дребезг; остальные события не прореживаются. В iOS прореживания нет — компоненты вызывают `select` только при смене выбора.
 4. **Сила по смыслу:** selection — выбор, light — лёгкое подтверждение, medium — «взял в руку», success / warning / error — итог действия.
 5. **Уважай систему.** iOS сам выключает хаптику, если она выключена в настройках; на Android `performHapticFeedback` учитывает настройку «Вибрация при касании». Своих переключателей не нужно.
-6. **Веб (Storybook)** — `navigator.vibrate` в Android Chrome и событие `yeet:haptic` для демо; в нативе — `YeetHaptic` (только 5 событий выше).
+6. **Веб (Storybook)** — `navigator.vibrate` в Android Chrome и событие `yeet:haptic` для демо; в нативе — `YeetHaptic` (только события выше: iOS 6, Android 5).
 
 <HapticTable />

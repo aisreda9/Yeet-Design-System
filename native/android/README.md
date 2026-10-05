@@ -81,7 +81,7 @@ setContent {
 | Отступы, радиусы | `YeetTheme.space.s20`, `YeetTheme.radius.xl` | `tokens.space`, `tokens.radius` |
 | Тень shadow/floating | `Modifier.yeetFloatingShadow(shape)` | `tokens.shadow` (setShadowLayer, API 28+; на 26–27 без тени) |
 | Движение | `YeetTheme.motion.nav()` → `spring(dampingRatio, stiffness)`; `press()` → `tween` | `tokens.motion` |
-| Хаптика | `YeetTheme.haptics.perform(YeetHapticEvent.Select)` | `tokens.motion.haptic` (с `androidMin` / `androidFallback`): 5 событий — `Select`, `Toggle`, `Threshold`, `Stamp`, `Skip`; lift, drop, target, delete, success, error — только веб (#130) |
+| Хаптика | `YeetTheme.haptics.perform(YeetHapticEvent.Select)` | `tokens.motion.haptic` (с `androidMin` / `androidFallback`): 5 событий — `Select`, `Toggle`, `Threshold`, `Stamp`, `Skip`; lift, drop, target, delete, success — только веб, error — веб и iOS (#130) |
 
 Material3 внутри `YeetTheme` получает `ColorScheme` и `Typography`, собранные из токенов, — стандартные M3-компоненты не выбиваются.
 

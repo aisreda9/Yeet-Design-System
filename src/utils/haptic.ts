@@ -13,7 +13,8 @@ const ticks: ReadonlySet<HapticEvent> = new Set<HapticEvent>(['select', 'target'
 let last = 0;
 
 /**
- * Хаптика события. В продукте — нативная (`YeetHaptic.<событие>`); в вебе — короткий `navigator.vibrate`
+ * Хаптика события. В продукте — нативная (`YeetHaptic.<событие>`); lift, drop, target, delete, success — только веб
+ * (`platforms: ["web"]`, #130), нативного аналога нет; error — веб и iOS. В вебе — короткий `navigator.vibrate`
  * и событие `yeet:haptic` на window: его слушают демо в Storybook, чтобы показать, что и когда вибрирует.
  * `select` и `target` — не чаще 1 раза в 50 мс (tokens.json → motion.haptic.select), иначе слайдер и перетаскивание
  * сливаются в дребезг. Остальные события редкие и значимые (штамп, бросок, порог) — не глушатся.

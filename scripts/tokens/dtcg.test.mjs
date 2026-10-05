@@ -123,9 +123,10 @@ test('хаптика только для веба не попадает в Swift
   const swift = await read('tokens/ios/YeetTokens.swift');
   const kotlin = await read('tokens/android/YeetTokens.kt');
   for (const k of ['lift', 'drop', 'target', 'delete', 'success', 'error']) {
-    assert.doesNotMatch(swift, new RegExp(`static func ${k}\\(\\)`));
+    if (k !== 'error') assert.doesNotMatch(swift, new RegExp(`static func ${k}\\(\\)`));
     assert.doesNotMatch(kotlin, new RegExp(`val ${k}: Int|\\b${k[0].toUpperCase()}${k.slice(1)}\\("`));
   }
+  assert.match(swift, /static func error\(\)/); // error — веб и iOS (YeetField)
   assert.match(swift, /static func stamp\(\)/);
   assert.match(kotlin, /Stamp\("notification:success"\)/);
 });

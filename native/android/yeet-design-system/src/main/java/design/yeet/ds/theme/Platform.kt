@@ -23,7 +23,7 @@ import design.yeet.tokens.YeetHapticEvent
 
 /**
  * Хаптика дизайн-системы (tokens.motion.haptic → HapticFeedbackConstants).
- * В нативе 5 событий (select, toggle, threshold, stamp, skip); lift, drop, target, delete, success, error — только веб (#130).
+ * В Android 5 событий (select, toggle, threshold, stamp, skip); lift, drop, target, delete, success — только веб, error — веб и iOS (#130).
  * Константы, которых нет на старых API (CONFIRM — 30, GESTURE_THRESHOLD_ACTIVATE — 34),
  * заменяются на androidFallback из токенов — см. [YeetHapticEvent.feedbackConstant].
  * `performHapticFeedback` сам уважает системную настройку «Виброотклик».

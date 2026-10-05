@@ -99,7 +99,7 @@ stamp.animation(YeetMotion.stamp, value: done)           // пружина Figma
 YeetSpring.quick.animation                                // .interpolatingSpring(mass:stiffness:damping:)
 YeetSpring.quick.spring                                   // iOS 17: SwiftUI.Spring(mass:stiffness:damping:)
 YeetHaptic.select()                                       // tokens.motion.haptic → UIFeedbackGenerator; без прореживания
-                                                          // 5 событий: select, toggle, threshold, stamp, skip; остальные — только веб (#130)
+                                                          // 6 событий: select, toggle, threshold, stamp, skip, error (YeetField); остальные — только веб (#130)
 ```
 
 ## Соответствие React ↔ Swift
