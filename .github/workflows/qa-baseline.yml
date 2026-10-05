@@ -249,6 +249,19 @@ jobs:
             "Проверено на \`$sha\`." "${play_line:-npm run test-storybook: успешно}" "$run_url")"
           post 'lint' 'Линтеры пройдены в прогоне QA baseline' "$(printf '%s\n\nnpm run lint (eslint, stylelint, flow-order): успешно.\n\nПрогон QA baseline: %s' \
             "Проверено на \`$sha\`." "$run_url")"
+          # Коммит бота меняет только qa/baseline: итог нативных сборок переносим с кода (родителя), только если он зелёный
+          if [ "${pushed:-}" = true ]; then
+            parent="$(git rev-parse HEAD~1)"
+            for n in 'iOS-сборка' 'Android-сборка'; do
+              c="$(gh api "repos/$GITHUB_REPOSITORY/commits/$parent/check-runs?check_name=$(jq -rn --arg n "$n" '$n|@uri')" \
+                --jq '[.check_runs[] | select(.status == "completed")][0].conclusion // ""')"
+              if [ "$c" = success ]; then
+                post "$n" "$n: перенесено с кода" "$(printf 'Коммит эталонов меняет только qa/baseline. Итог «%s» на коде `%s`: success.\n\nПрогон QA baseline: %s' "$n" "$parent" "$run_url")"
+              else
+                echo "::warning::«$n» на $parent: ${c:-нет итога} — не переносим; дождитесь сборки и перезапустите QA baseline"
+              fi
+            done
+          fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "> Check-runs «qa», «Play-тесты историй» и «lint» поставлены на \`$sha\` — повторный прогон QA Storybook не нужен." >> "$GITHUB_STEP_SUMMARY"
       # Дубль: pull_request-прогон QA Storybook на коммите бота (push токеном GITHUB_TOKEN) висит в action_required и
