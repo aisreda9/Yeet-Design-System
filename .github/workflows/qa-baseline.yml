@@ -10,8 +10,8 @@ name: QA baseline
 # полном наборе историй пересъёмка удаляет лишние эталоны (run.mjs не принимает --update-baseline со --shard).
 #
 # Прогон заодно проверяет всё, что проверяет qa.yml (токены, typecheck, контраст, QA с краями 320/430, flow-diff --strict,
-# покрытие, play-тесты). Если всё зелёное, после коммита workflow ставит на итоговый SHA check-runs «qa» и
-# «Play-тесты историй» — те же имена, что у jobs qa.yml, — и второй прогон QA Storybook не нужен (#225).
+# покрытие, play-тесты, lint). Если всё зелёное, после коммита workflow ставит на итоговый SHA check-runs «qa»,
+# «Play-тесты историй» и «lint» — те же имена, что у jobs qa.yml и lint.yml, — и второй прогон не нужен (#225, #147).
 # Хоть одна проверка красная — зелёного ничего не ставит и падает (эталоны при этом всё равно коммитятся).
 # Запасной путь, если check-run создать не удалось или пересняты не все истории (`stories`): запуск QA Storybook через
 # workflow_dispatch — исключение из защиты GitHub от рекурсии (#147 п. 2).
@@ -101,6 +101,11 @@ jobs:
         id: typecheck
         continue-on-error: true
         run: npm run typecheck
+      # Те же правила, что в lint.yml: на коммит бота workflow ставит check-run «lint» (обязательная проверка main, #147)
+      - name: Линтеры (npm run lint)
+        id: lint
+        continue-on-error: true
+        run: npm run lint
       - run: npm run build-storybook
       - name: Контраст (npm run contrast)
         id: contrast
@@ -163,6 +168,7 @@ jobs:
         env:
           TOKENS: ${{ steps.tokens.outcome }}
           TYPECHECK: ${{ steps.typecheck.outcome }}
+          LINT: ${{ steps.lint.outcome }}
           CONTRAST: ${{ steps.contrast.outcome }}
           FIGMASYNC: ${{ steps.figmasync.outcome }}
           QA_CODE: ${{ steps.qa.outputs.code }}
@@ -173,6 +179,7 @@ jobs:
           red=()
           [ "$TOKENS" = success ] || red+=('токены')
           [ "$TYPECHECK" = success ] || red+=('typecheck')
+          [ "$LINT" = success ] || red+=('lint')
           [ "$CONTRAST" = success ] || red+=('контраст')
           [ "$FIGMASYNC" = success ] || red+=('figma-sync')
           [ "$QA_CODE" = 0 ] || red+=("npm run qa (код $QA_CODE)")
@@ -219,7 +226,7 @@ jobs:
 
       # Всё зелёное и пересняты все истории → check-runs с именами jobs qa.yml на итоговый SHA (коммит бота или, если
       # эталоны не менялись, проверенный HEAD ветки). Обязательные проверки PR видят их, второй прогон QA не нужен.
-      - name: Зелёные check-runs «qa» и «Play-тесты историй»
+      - name: Зелёные check-runs «qa», «Play-тесты историй» и «lint»
         id: checks
         if: steps.verdict.outputs.green == 'true' && env.STORIES == ''
         continue-on-error: true
@@ -240,8 +247,10 @@ jobs:
             "Проверено на \`$sha\`." "$qa_stats" "$qa_errors" "$run_url")"
           post 'Play-тесты историй' 'Play-тесты пройдены в прогоне QA baseline' "$(printf '%s\n\n%s\n\nПрогон QA baseline: %s' \
             "Проверено на \`$sha\`." "${play_line:-npm run test-storybook: успешно}" "$run_url")"
+          post 'lint' 'Линтеры пройдены в прогоне QA baseline' "$(printf '%s\n\nnpm run lint (eslint, stylelint, flow-order): успешно.\n\nПрогон QA baseline: %s' \
+            "Проверено на \`$sha\`." "$run_url")"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          echo "> Check-runs «qa» и «Play-тесты историй» поставлены на \`$sha\` — повторный прогон QA Storybook не нужен." >> "$GITHUB_STEP_SUMMARY"
+          echo "> Check-runs «qa», «Play-тесты историй» и «lint» поставлены на \`$sha\` — повторный прогон QA Storybook не нужен." >> "$GITHUB_STEP_SUMMARY"
       # Дубль: pull_request-прогон QA Storybook на коммите бота (push токеном GITHUB_TOKEN) висит в action_required и
       # ждёт ручного одобрения. Результат уже есть в check-runs — отменяем его. Без гарантий: не нашли — не страшно.
       - name: Отмена прогона QA Storybook в action_required на коммите бота
