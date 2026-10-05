@@ -1,5 +1,47 @@
 # yeet-design-system
 
+## 0.7.0
+
+### Minor Changes
+
+- a960233: Режим повышенного контраста (#117): токены `modes["contrast-light" | "contrast-dark"]` для `text-secondary`, `text-accent`, `text-danger`, `text-inverse-secondary`, `accent`, `border-subtle`, `divider` и `focus-ring.width` (текст на поверхностях ≥ 7 : 1, линии ≥ 3 : 1, фокус 3 px). Web — `@media (prefers-contrast: more)` и рамки системными цветами в `forced-colors: active`; iOS — `YeetColor` переключается по Increase Contrast, `YeetFocusRing.width(_:)`; Android — `YeetLightContrastColors` / `YeetDarkContrastColors`, `YeetTheme(highContrast)` (системная контрастность Android 14+), `YeetTheme.isHighContrast`. Обычный вид не меняется.
+- 750cd4a: Движение (#130, № 9–11): при «Уменьшении движения» (`prefers-reduced-motion: reduce`) шторка и диалог больше не появляются и не исчезают мгновенно — растворяются 240 мс без сдвига (`--motion-base` + `--ease-standard`), как уже описано в «Foundations / Анимации». Длительность ухода слоя — новая переменная `--overlay-exit` в `organisms.css` (обычно `--motion-exit`, при уменьшении движения — 240 мс): по ней `Overlay`, `Screen` и прототип убирают слой из DOM, не обрезая растворение. Новые токены `motion.gesture`: `spin` (1200 мс, оборот индикатора загрузки), `pulse` (1600 мс, пульсация при уменьшении движения), `shimmer` (1600 мс, блик площадки фото), `loading-delay` (120 мс, задержка подписи загрузки), `weather-delay` (160 мс, погода после коллажа) — CSS `--gesture-*`, Swift `YeetGesture`, Kotlin `YeetGesture.*Millis`; литералы `1.2s`, `1.6s`, `120ms`, `160ms` в `atoms.css`, `molecules.css`, `organisms.css` заменены ими, значения не изменились. В `src/motion/timing.ts` — константы `FRAME_SLACK_MS` (34, запас на два кадра) и `LONG_PRESS_CLICK_GUARD_MS` (окно гашения клика после долгого нажатия, = `--gesture-long-press`) вместо чисел в прототипе и `usePresence`.
+- 7abe7e2: `Screen`: новый проп `dock` — панель-док (#114, Figma Outfit Creation / Canvas): `Sheet type="panel"` под контентом до низа экрана, вне скролла экрана. Контент над ней стоит, прокручивается только последний блок панели (сетка вещей), хэндл, заголовок и фильтры закреплены; `BottomBar` лежит поверх дока, нижнее затухание — по прокрутке дока. На низких экранах (568, 667) док не ниже 30 % экрана (плюс `BottomBar`), контент над ним уходит в прокрутку. Экран Canvas создания образа переведён на `dock`: холст больше не едет вместе с панелью.
+
+  `DetailsScreen` (#113 п. 4): фокус в поле ввода панели («Название») сворачивает фото — пружиной `--motion-sheet`, а до первого жеста (`autoFocus`, `focus()` из кода) сразу. Потеря фокуса панель не разворачивает. Панель деталей и `ItemSlots` уходят под `BottomBar` ровно на его высоту (кнопка L + 20, переменная `--screen-bottom-bar` в `templates.css`) вместо магического запаса 120 (`min-height: calc(100% + 120px)` убран): без `BottomBar` короткий контент не прокручивается впустую.
+
+### Patch Changes
+
+- Документация и Storybook (#241, #243, #246): в «Тоне» — глоссарий терминов и исключение «вы» для юридических текстов; демо-тексты Dialog и Header — восстановление пароля кодом на почту, как на экране; «Pages / Экраны флоу» идут по пути пользователя (Onboarding → Outfits → Wardrobe → Creation → Search → Stylist → Profile → Settings, список — `src/docs/flow-order.ts`, проверка в `npm run lint`); ADR 0008 — шторка деталей вместо порога. CI: QA в четырёх параллельных шардах (#242). Журнал токенов различает светлый и тёмный блоки повышенного контраста.
+
+### Токены
+
+_v0.6.0 → v0.7.0_
+
+**Добавлены (21):**
+
+- `--color-text-secondary · (prefers-contrast: more)` = `#545454`
+- `--color-text-inverse-secondary · (prefers-contrast: more)` = `#a7b3bf`
+- `--color-text-accent · (prefers-contrast: more)` = `var(--yeet-blue-500)` → `#0100f4`
+- `--color-text-danger · (prefers-contrast: more)` = `#a22115`
+- `--color-accent · (prefers-contrast: more)` = `var(--yeet-blue-500)` → `#0100f4`
+- `--color-border-subtle · (prefers-contrast: more)` = `rgb(0 0 0 / 0.43)`
+- `--color-divider · (prefers-contrast: more)` = `rgb(0 0 0 / 0.43)`
+- `--focus-ring-width · (prefers-contrast: more)` = `3px`
+- `--color-text-secondary · (prefers-contrast: more) dark` = `#b2b2b5`
+- `--color-text-inverse-secondary · (prefers-contrast: more) dark` = `#4c535d`
+- `--color-text-accent · (prefers-contrast: more) dark` = `#aaaaff`
+- `--color-text-danger · (prefers-contrast: more) dark` = `#ff9489`
+- `--color-accent · (prefers-contrast: more) dark` = `#5858ff`
+- `--color-border-subtle · (prefers-contrast: more) dark` = `rgb(245 245 247 / 0.36)`
+- `--color-divider · (prefers-contrast: more) dark` = `rgb(245 245 247 / 0.36)`
+- `--focus-ring-width · (prefers-contrast: more) dark` = `3px`
+- `--gesture-spin` = `1200ms`
+- `--gesture-pulse` = `1600ms`
+- `--gesture-shimmer` = `1600ms`
+- `--gesture-loading-delay` = `120ms`
+- `--gesture-weather-delay` = `160ms`
+
 ## 0.6.0
 
 ### Несовместимые изменения
