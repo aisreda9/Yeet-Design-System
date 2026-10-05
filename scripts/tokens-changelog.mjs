@@ -44,9 +44,10 @@ function readAt(ref) {
  * без этого их блоки `[data-brand=…]` смешались бы с базовой темой при сравнении с историей.
  */
 function scopeOf(selector, media) {
-  if (media) return media.includes('reduced-motion') ? 'reduced-motion' : media.trim();
-  const brand = selector.match(/\[data-brand='([^']+)'\]/)?.[1];
   const dark = /\[data-theme='dark'\](?!\))/.test(selector);
+  // Внутри @media светлый и тёмный блоки — разные области (иначе тёмный перезапишет светлый).
+  if (media) return media.includes('reduced-motion') ? 'reduced-motion' : `${media.trim()}${dark ? ' dark' : ''}`;
+  const brand = selector.match(/\[data-brand='([^']+)'\]/)?.[1];
   if (brand) return `brand ${brand}${dark ? ' dark' : ''}`;
   return dark ? 'dark' : '';
 }
