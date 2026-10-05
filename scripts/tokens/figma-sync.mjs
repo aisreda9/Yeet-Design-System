@@ -5,7 +5,8 @@
  * Снимок переменных — design/figma-variables.json: обновляет координатор через Figma MCP (use_figma, чтение коллекции).
  * Сравнивается по code syntax (WEB: var(--x)) каждой переменной:
  *   — у переменной есть code syntax и такое CSS-свойство есть в src/tokens/tokens.generated.css;
- *   — значение в Light и Dark совпадает (цвета — с альфой, размеры — в px); motion — только наличие (в коде пружины, в Figma длительность).
+ *   — значение в Light и Dark совпадает (цвета — с альфой, размеры — в px); motion — только наличие (в коде пружины, в Figma длительность);
+ *   — режимы Light HC / Dark HC (если есть в снимке) — с `@media (prefers-contrast: more)` поверх Light / Dark (#117).
  */
 import { readFileSync } from 'node:fs';
 
@@ -27,6 +28,21 @@ const themes = {
   Light: { ...root, ...block("[data-theme='light']") },
   Dark: { ...root, ...block("[data-theme='dark']") },
 };
+/** Блоки внутри `@media (prefers-contrast: more)`: селектор с тёмной темой → Dark HC, иначе Light HC. */
+function contrast() {
+  const out = { light: {}, dark: {} };
+  const start = css.indexOf('@media (prefers-contrast: more) {');
+  if (start < 0) return out;
+  const end = css.indexOf('\n}', start);
+  for (const [, sel, body] of css.slice(css.indexOf('{', start) + 1, end).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const t = /\[data-theme='dark'\]/.test(sel) && !/\[data-theme='light'\]/.test(sel) ? out.dark : out.light;
+    for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) t[m[1]] = m[2].trim();
+  }
+  return out;
+}
+const hc = contrast();
+themes['Light HC'] = { ...themes.Light, ...hc.light };
+themes['Dark HC'] = { ...themes.Dark, ...hc.dark };
 
 function resolve(v, scope, depth = 0) {
   if (depth > 10 || v == null) return v;
@@ -53,7 +69,6 @@ const near = (a, b) =>
 
 /** Известные расхождения: переменная → причина (issue). Решённое не красит проверку. */
 const KNOWN = {
-  'spaces/1': 'есть только в Figma, в коде шаг не используется — ревизия шкалы, #225',
   'spaces/36': 'есть только в Figma — ревизия шкалы, #225',
   'spaces/60': 'есть только в Figma — ревизия шкалы, #225',
   'spaces/64': 'есть только в Figma — ревизия шкалы, #225',
@@ -73,7 +88,7 @@ for (const v of snap.variables) {
     continue;
   }
   if (v.name.startsWith('motion/')) continue;
-  for (const mode of ['Light', 'Dark']) {
+  for (const mode of snap.modes.filter((m) => m in themes)) {
     let fv = v.values[mode];
     if (fv && typeof fv === 'object' && fv.alias) fv = byName[fv.alias]?.values[mode];
     const cv = resolve(themes[mode][prop], themes[mode]);
