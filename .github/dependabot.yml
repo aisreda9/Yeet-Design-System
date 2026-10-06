@@ -20,6 +20,9 @@ updates:
     groups:
       storybook:
         patterns: ['storybook', '@storybook/*']
+      # vitest и @vitest/* требуют одну и ту же точную версию друг друга — поднимаем только вместе (#258)
+      vitest:
+        patterns: ['vitest', '@vitest/*']
       react:
         patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
       build:
