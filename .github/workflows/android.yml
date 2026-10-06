@@ -64,7 +64,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
       - name: Библиотека + sample (debug)
         run: ./gradlew :yeet-design-system:assembleDebug :sample:assembleDebug --stacktrace
       - name: Android Lint (библиотека)
