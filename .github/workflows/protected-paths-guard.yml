@@ -1,0 +1,95 @@
+# Guard for self-modifying changes (NTCH-37).
+# Agents act on GitHub with the founder's account and auto-merge their own PRs, so a poisoned PR
+# could rewrite the bot's own rules or the checks that gate merging. This check fails when a PR
+# touches a protected path unless the Linear issue named in the PR has a founder comment that
+# approves it ("go", "yes", "да", "ок" ...) written AFTER the PR's last push.
+#
+# Safe by design: runs on pull_request_target (always the version on the default branch) and never
+# checks out or executes PR code; it only reads the file list through the API.
+# Needs the repo secret LINEAR_BOT_KEY (same value as the relay's gateway key).
+# Add the check "protected-paths" to the required checks of the branch ruleset (see README).
+name: protected-paths-guard
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  protected-paths:
+    name: protected-paths
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      PUSHED_AT: ${{ github.event.pull_request.updated_at }}
+      LINEAR_BOT_KEY: ${{ secrets.LINEAR_BOT_KEY }}
+      GATEWAY: https://xomeajszooidauknvpph.supabase.co/functions/v1/linear-bot
+    steps:
+      - name: Check protected paths
+        run: |
+          set -euo pipefail
+
+          protected() {
+            case "$1" in
+              .github/*|CLAUDE.md|*/CLAUDE.md|AGENTS.md|*/AGENTS.md|infra/linear-relay/*|.githooks/*|.claude/settings*.json) return 0 ;;
+            esac
+            return 1
+          }
+
+          touched=""
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            if protected "$f"; then touched="$touched$f"$'\n'; fi
+          done < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)')
+
+          if [ -z "$touched" ]; then
+            echo "No protected paths touched."
+            exit 0
+          fi
+          echo "Protected paths touched:"; printf '%s' "$touched" | sed 's/^/  - /'
+
+          # The issue ID comes from the PR title (the repos' convention), then the body.
+          pr_json=$(gh api "repos/$REPO/pulls/$PR")
+          issue=$(printf '%s' "$pr_json" | jq -r '.title' | grep -oE '[A-Z]{2,6}-[0-9]+' | head -1 || true)
+          if [ -z "$issue" ]; then
+            issue=$(printf '%s' "$pr_json" | jq -r '.body // ""' | grep -oE '[A-Z]{2,6}-[0-9]+' | head -1 || true)
+          fi
+          if [ -z "$issue" ]; then
+            echo "::error::This PR touches protected paths but names no Linear issue (put the ID in the PR title). Then re-run this check."
+            exit 1
+          fi
+
+          if [ -z "${LINEAR_BOT_KEY:-}" ]; then
+            echo "::error::Secret LINEAR_BOT_KEY is missing in this repo, so the founder's approval cannot be checked. See infra/linear-relay/README.md (protected paths)."
+            exit 1
+          fi
+
+          resp=$(curl -sS --max-time 60 "$GATEWAY" \
+            -H "x-bot-key: $LINEAR_BOT_KEY" -H "Content-Type: application/json" \
+            --data "$(jq -nc --arg i "$issue" '{action:"read", issue:$i}')")
+          if [ "$(printf '%s' "$resp" | jq -r '.ok // false')" != "true" ]; then
+            echo "::error::Could not read Linear issue $issue through the gateway."
+            exit 1
+          fi
+
+          # Only the founder's own Linear comments count (isFounder is set by the gateway),
+          # written after the PR's last push, and the first word must be an approval.
+          approvals=$(printf '%s' "$resp" | jq --arg since "$PUSHED_AT" '
+            [.result.comments[]
+             | select(.isFounder == true)
+             | select(.createdAt > $since)
+             | select(.body | test("^\\s*(go|yes|ok|okay|approve|approved|да|ок|одобряю)([\\s.!,;:]|$)"; "i"))
+            ] | length')
+
+          if [ "$approvals" -ge 1 ]; then
+            echo "Founder approval found on $issue after the last push ($PUSHED_AT). Passing."
+            exit 0
+          fi
+
+          echo "::error::This PR changes protected files (rules, CI, relay code) and $issue has no founder approval after the last push. Ask the founder in Linear ($issue, label Needs founder, default: do not merge). When they reply \"go\", re-run this check."
+          exit 1
