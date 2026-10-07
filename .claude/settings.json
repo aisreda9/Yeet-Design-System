@@ -9,7 +9,8 @@
       "mcp__Figma__get_motion_context",
       "mcp__Figma__search_design_system",
       "mcp__Figma__get_libraries",
-      "mcp__Figma__use_figma"
+      "mcp__Figma__use_figma",
+      "mcp__Linear"
     ],
     "ask": [
       "mcp__Figma__create_new_file",
