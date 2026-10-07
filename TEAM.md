@@ -91,12 +91,15 @@ Figma не умеет в ветки и мерж: две сессии, однов
 6. **Эталоны (`qa/baseline/*.png`, `design/figma-specs.json`, `design/figma-flows.json`).** Не пересобирать «на всякий случай»: обновляет тот, чья правка изменила вид, только для затронутых историй. Массовое обновление эталонов — отдельный PR QA после мержа остальных.
 7. **Motion остаётся одной зоной** (`src/motion/**`): пока она маленькая, дробить её на «переходы» и «жесты» не нужно.
 
-## 8. Linear — витрина для владельца
+## 8. Linear and language
 
-Владелец следит за проектом и отвечает в Linear (workspace `etch-design`, команда **Yeet**, ключ `YEET`). Правила со стороны Linear — документ «How we work in Linear».
+The owner watches and steers in Linear (workspace `etch-design`, team **Yeet**, key `YEET`, project «Yeet Design System 0.8», milestone «0.8.0 release»). Linear-side rules — the «How we work in Linear» document.
 
-1. **Источник правды — GitHub.** Синхронизирована только связка GitHub Issues ↔ команда Yeet. PR, комментарии-замки (`🔒`/`🔓`/`⏏`), метки `zone:*` и #6 «Координация» Linear не трогает. Протокол §1–7 не меняется. Если синхронизация мешает боту `team-overlap` или замку Figma (лишние метки на PR, комментарии-дубли в #6) — сразу сообщи владельцу через штаб, синхронизацию отключат.
-2. **`needs-owner`** (в Linear — Needs founder). Всё, что ждёт решения или ручных шагов владельца, оформляется issue `task` с этой меткой. В тексте: что нужно, варианты и **вариант по умолчанию**. Владелец отвечает комментарием в Linear — он приходит в issue. Перед работой по такой задаче читай комментарии issue. Решение получено — метку снять.
-3. **Вопросы владельцу — не в чат.** Обычные — issue `needs-owner`. Срочные — дополнительно штабу блоком «ДЛЯ ВЛАДЕЛЬЦА:» (CLAUDE.md).
-4. **Статус проекта в Linear** (проект «Yeet Design System 0.8», веха «0.8.0 release») — по пятницам и при каждом релизе: что вошло или войдёт в 0.8.0, что ждёт владельца, красный ли CI на `main`. Пишет лид-сессия. Нет инструментов Linear — лид оставляет текст апдейта в «Передаче» своего PR, его переносит следующая сессия с доступом к Linear.
-5. **Циклов (cycles) нет** — планирование по проекту и вехам.
+1. **GitHub is the source of truth.** Sync is **one-way: GitHub Issues → team Yeet**. PRs, lock comments (`🔒`/`🔓`/`⏏`), `zone:*` labels and #6 «Координация» are not synced. §1–7 are unchanged. If the sync interferes with the `team-overlap` bot or the Figma lock (extra labels on PRs, duplicate comments in #6), tell the owner via HQ right away — the sync will be turned off.
+2. **`needs-owner`** (in Linear — **Needs founder**). Anything waiting on the owner's decision or manual steps is a `task` issue with this label. The text says what is needed, the options and **the default you keep working on**. Synced issues get GitHub's `needs-owner` label in Linear, but the owner's «Ждёт меня» view filters on **Needs founder** — add that label in Linear too.
+3. **Owner answers live in Linear.** The owner replies in Russian in Linear comments; they do **not** come back to GitHub. Before working on such a task, read its Linear comments. Then record the decision in the GitHub issue in English, reply in Linear in English with a short Russian line, and remove `needs-owner` / Needs founder.
+4. **No questions in the chat.** Regular ones — a `needs-owner` issue. Urgent ones (money, public, deletion) — also to HQ in a «ДЛЯ ВЛАДЕЛЬЦА:» block (`CLAUDE.md`).
+5. **PRs:** the Linear ID in the PR title (`YEET-12: …`) and `Fixes YEET-12` in the body — Linear moves the status (In Review on open, Done on merge).
+6. **Project status in Linear** (on track / at risk / off track) — on Fridays and at every release: what went or goes into 0.8.0, what waits on the owner, whether CI on `main` is red. The lead session posts it. Without Linear tools, the lead leaves the update text in their PR «Handoff» and the next session with Linear access posts it.
+7. **No cycles** — planning by project and milestones.
+8. **Language.** GitHub and the repo — English only (issues, PRs, comments, commits, docs). Existing Russian text is translated gradually, open issues first; the rest of this file is translated when someone next edits a section. Linear — English with a «По-русски» block under the text; titles English only. Storybook/UI copy stays in the product language.
