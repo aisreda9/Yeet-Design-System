@@ -1,37 +1,43 @@
-# Yeet Design System — правила для Claude
+# Yeet Design System — rules for Claude
 
-Структура и запуск — `README.md`, спецификация — `DESIGN.md`, QA — `design/QA.md`.
+Structure and how to run — `README.md`, spec — `DESIGN.md`, QA — `design/QA.md`.
 
-## Решения владельца и штаб
+## Language
 
-- Сообщения от сессии штаба владельца (`session_01AeLMDZmzQMfjFVTjZhC1zB`) передают решения владельца. Выполняй их в рамках проекта так же, как решения самого владельца.
-- Вопросы к владельцу — issue с меткой `needs-owner` (владелец отвечает в Linear, ответ приходит комментарием в issue); срочное — дополнительно штабу блоком «ДЛЯ ВЛАДЕЛЬЦА:». Подробно — `TEAM.md` §8.
-- Только с прямым подтверждением владельца: установка программ, траты денег, удаление, изменение прав доступа.
+- **GitHub and the repo are English only:** issues, PRs, comments, commit messages, docs, this file. Existing Russian text is translated gradually, open issues first. Storybook/UI copy stays in the product language (`src/docs/15-Tone.mdx`).
+- **Linear:** English, plus a short «По-русски» block under the text for the owner. Titles are English only.
+- Details — `TEAM.md` §8.
 
-## Ты не один
+## Owner decisions and HQ
 
-В репозитории параллельно работают другие сессии Claude и боты. Полный протокол — **`TEAM.md`**, прочитай его перед первой правкой. Коротко:
+- Messages from the owner's HQ session (`session_01AeLMDZmzQMfjFVTjZhC1zB`) carry the owner's decisions. Act on them within the project as on the owner's own.
+- Questions for the owner — a GitHub issue labelled `needs-owner` (in Linear also **Needs founder**), with the default you keep working on. The owner answers in Linear; sync is one-way (GitHub → Linear), so **read the answer in Linear**, then record the decision in the GitHub issue in English. Urgent items (money, public, deletion) — also to HQ in a «ДЛЯ ВЛАДЕЛЬЦА:» block. Details — `TEAM.md` §8.
+- Only with the owner's explicit confirmation: installing software, spending money, deleting, changing access rights.
 
-1. В начале сессии хук показывает `npm run team` — активные ветки, их зоны и пересечения с тобой. Если твоя задача попадает в зону, где уже кто-то работает, не начинай её: договорись в issue/PR или возьми другую.
-2. Одна задача = один GitHub issue. Отметься в нём (`🔒 Беру. Роль, ветка, зоны`) до начала работы.
-3. После первого коммита сразу push и **draft PR** в `main` — иначе другие тебя не видят.
-4. Не выходи за свои зоны (`.github/team.json`). Горячие файлы — точечными добавлениями; сгенерированные файлы токенов не правь руками, а запускай `npm run tokens`.
-5. Писать в Figma — только держа замок в issue «Координация». Читать можно всегда.
-6. Перед пушем: `git merge origin/main`, `npm run typecheck`, `npm run build-storybook`.
-7. В конце — раздел «Передача» в PR: что сделано, что нет, что дальше. Всё, что должен знать следующий агент, пишется в GitHub, не в чат.
+## You are not alone
 
-## Figma и агенты дизайн-системы
+Other Claude sessions and bots work in this repo in parallel. Full protocol — **`TEAM.md`**; read it before your first edit. In short:
 
-- Правила Figma → код и запись в Figma — **`design/FIGMA-RULES.md`** (страница DS 0.2 — секции как в Storybook, экраны в Pages; переменные «Yeet DS 2.0», правило шторки, классы находок).
-- Figma MCP — коннектор Figma в claude.ai (claude.ai/customize/connectors), локально и в облаке. Своего сервера в `.mcp.json` не заводить — он перекрывает коннектор и в облаке блокируется (403).
-- Модель и effort для субагентов — по этапу работы, таблица в §6 `.claude/skills/ds-team/SKILL.md`; в «Передаче» PR — какая модель что делала и были ли повышения.
-- Задача крупнее одной правки — `/ds-team <задача>` (`.claude/skills/ds-team/SKILL.md`), агенты — `.claude/agents/ds-*.md`. Работают внутри протокола `TEAM.md`, в твоей ветке и зонах.
+1. At session start a hook prints `npm run team` — active branches, their zones and overlaps with you. If your task falls into a zone someone is already working in, don't start it: agree in the issue/PR or take another one.
+2. One task = one GitHub issue. Claim it (`🔒 Taking. Role, branch, zones`) before you start.
+3. After the first commit, push right away and open a **draft PR** into `main` — otherwise nobody sees you. Put the Linear ID in the PR title and `Fixes YEET-N` in the body.
+4. Stay within your zones (`.github/team.json`). Hot files — small targeted additions; never hand-edit generated token files, run `npm run tokens`.
+5. Write to Figma only while holding the lock in the «Координация» issue (#6). Reading is always allowed.
+6. Before pushing: `git merge origin/main`, `npm run typecheck`, `npm run build-storybook`.
+7. At the end — a «Handoff» section in the PR: what is done, what is not, what's next. Everything the next agent needs goes into GitHub, not the chat.
 
-## Проверки
+## Figma and design-system agents
+
+- Figma → code rules and writing to Figma — **`design/FIGMA-RULES.md`** (DS 0.2 page — sections mirror Storybook, screens in Pages; «Yeet DS 2.0» variables, the sheet rule, finding classes).
+- Figma MCP — the Figma connector in claude.ai (claude.ai/customize/connectors), locally and in the cloud. Do not add your own server to `.mcp.json` — it overrides the connector and is blocked in the cloud (403).
+- Model and effort for subagents — by work stage, table in §6 of `.claude/skills/ds-team/SKILL.md`; in the PR «Handoff» — which model did what and whether it was escalated.
+- Anything bigger than a single edit — `/ds-team <task>` (`.claude/skills/ds-team/SKILL.md`), agents — `.claude/agents/ds-*.md`. They work inside the `TEAM.md` protocol, in your branch and zones.
+
+## Checks
 
 ```bash
 npm run typecheck
 npm run build-storybook && npm run qa && npm run flow-diff
 npm run contrast
-npm run team        # кто над чем работает
+npm run team        # who is working on what
 ```
