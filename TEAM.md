@@ -93,7 +93,7 @@ Figma не умеет в ветки и мерж: две сессии, однов
 
 ## 8. Linear and language
 
-The owner watches and steers in Linear (workspace `etch-design`, team **Yeet**, key `YEET`, project «Yeet Design System 0.8», milestone «0.8.0 release»). Linear-side rules — the «How we work in Linear» document.
+The owner watches and steers in Linear (workspace `ntch-design` (Ntch Design, https://linear.app/ntch-design), team **Yeet**, key `YEET`, project «Yeet Design System 0.8», milestone «0.8.0 release»). Linear-side rules — the «How we work in Linear» document.
 
 1. **GitHub is the source of truth.** Sync is **one-way: GitHub Issues → team Yeet**. PRs, lock comments (`🔒`/`🔓`/`⏏`), `zone:*` labels and #6 «Координация» are not synced. §1–7 are unchanged. If the sync interferes with the `team-overlap` bot or the Figma lock (extra labels on PRs, duplicate comments in #6), tell the owner in Linear right away — the sync will be turned off.
 2. **`needs-owner`** (in Linear — **Needs founder**). Anything waiting on the owner's decision or manual steps is a `task` issue with this label. The text says what is needed, the options and **the default you keep working on**. Synced issues get GitHub's `needs-owner` label in Linear, but the owner's «Ждёт меня» view filters on **Needs founder** — add that label in Linear too.
