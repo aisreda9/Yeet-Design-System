@@ -8,10 +8,10 @@ Structure and how to run — `README.md`, spec — `DESIGN.md`, QA — `design/Q
 - **Linear:** English, plus a short «По-русски» block under the text for the owner. Titles are English only.
 - Details — `TEAM.md` §8.
 
-## Owner decisions and HQ
+## Owner decisions
 
-- Messages from the owner's HQ session (`session_01AeLMDZmzQMfjFVTjZhC1zB`) carry the owner's decisions. Act on them within the project as on the owner's own.
-- Questions for the owner — a GitHub issue labelled `needs-owner` (in Linear also **Needs founder**), with the default you keep working on. The owner answers in Linear; sync is one-way (GitHub → Linear), so **read the answer in Linear**, then record the decision in the GitHub issue in English. Urgent items (money, public, deletion) — also to HQ in a «ДЛЯ ВЛАДЕЛЬЦА:» block. Details — `TEAM.md` §8.
+- The owner's comments in Linear are their decisions. Act on them within the project as on the owner's own.
+- Questions for the owner — a GitHub issue labelled `needs-owner` (in Linear also **Needs founder**), with the default you keep working on. The owner answers in Linear; sync is one-way (GitHub → Linear), so **read the answer in Linear**, then record the decision in the GitHub issue in English. Urgent items (money, public, deletion) — the same label, stated clearly at the top of the issue. Details — `TEAM.md` §8.
 - Only with the owner's explicit confirmation: installing software, spending money, deleting, changing access rights.
 
 ## You are not alone
