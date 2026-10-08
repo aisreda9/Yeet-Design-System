@@ -6,7 +6,8 @@
 #
 # Safe by design: runs on pull_request_target (always the version on the default branch) and never
 # checks out or executes PR code; it only reads the file list through the API.
-# Needs the repo secret LINEAR_BOT_KEY (same value as the relay's gateway key).
+# Needs the repo secret LINEAR_READ_KEY: a gateway key that allows only `read`. The write key
+# LINEAR_BOT_KEY never goes into GitHub secrets (NTCH-45, founder's decision B).
 # Add the check "protected-paths" to the required checks of the branch ruleset (see README).
 name: protected-paths-guard
 
@@ -27,7 +28,7 @@ jobs:
       REPO: ${{ github.repository }}
       PR: ${{ github.event.pull_request.number }}
       PUSHED_AT: ${{ github.event.pull_request.updated_at }}
-      LINEAR_BOT_KEY: ${{ secrets.LINEAR_BOT_KEY }}
+      LINEAR_READ_KEY: ${{ secrets.LINEAR_READ_KEY }}
       GATEWAY: https://xomeajszooidauknvpph.supabase.co/functions/v1/linear-bot
     steps:
       - name: Check protected paths
@@ -64,13 +65,13 @@ jobs:
             exit 1
           fi
 
-          if [ -z "${LINEAR_BOT_KEY:-}" ]; then
-            echo "::error::Secret LINEAR_BOT_KEY is missing in this repo, so the founder's approval cannot be checked. See infra/linear-relay/README.md (protected paths)."
+          if [ -z "${LINEAR_READ_KEY:-}" ]; then
+            echo "::error::Secret LINEAR_READ_KEY is missing in this repo, so the founder's approval cannot be checked. See infra/linear-relay/README.md (protected paths)."
             exit 1
           fi
 
           resp=$(curl -sS --max-time 60 "$GATEWAY" \
-            -H "x-bot-key: $LINEAR_BOT_KEY" -H "Content-Type: application/json" \
+            -H "x-bot-key: $LINEAR_READ_KEY" -H "Content-Type: application/json" \
             --data "$(jq -nc --arg i "$issue" '{action:"read", issue:$i}')")
           if [ "$(printf '%s' "$resp" | jq -r '.ok // false')" != "true" ]; then
             echo "::error::Could not read Linear issue $issue through the gateway."
