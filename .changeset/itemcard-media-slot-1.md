@@ -1,0 +1,5 @@
+---
+"yeet-design-system": minor
+---
+
+iOS (#1, #2): `YeetItemCard` gets a `media` slot — `YeetItemCard(kind:discount:label:name:selected:onClick:onRemove:) { … }` takes any view (e.g. the app's async image loader with its own cache); the card owns the 138 frame, background, radius, badge, selection check and the VoiceOver label. `YeetItemCard` is now generic (`YeetItemCard<Media>`); the existing `init(kind:color:image:…)` stays source-compatible and puts the image into the same slot as the new `YeetItemImage`. `YeetCollageItem` gets the same slot: `init(kind:x:y:size:media:)` and `media: AnyView?`; `src` keeps working. `YeetGarment.dress` (iOS only, «Платье») with a temporary dress silhouette until ui-icons has a glyph; `dress.icon` falls back to `top`. Migration: code that names the type `YeetItemCard` explicitly (stored properties, `some`-free signatures) must write `YeetItemCard<YeetItemImage>`; exhaustive `switch` over `YeetGarment` needs a `.dress` case. Web and Android are unchanged.

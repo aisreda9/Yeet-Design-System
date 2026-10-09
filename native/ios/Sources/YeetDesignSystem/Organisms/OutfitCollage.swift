@@ -8,8 +8,11 @@ public struct YeetCollageItem {
     /// Размер в координатах макета (`base` 353); по умолчанию — `defaultSize` слоя.
     public var size: CGFloat?
     public var color: YeetItemColor?
-    /// Фото вещи без фона.
+    /// Фото вещи без фона. Слой кладёт его в слот `media` как `YeetItemImage`; если задан `media`, `src` не используется.
     public var src: Image?
+    /// Картинка вещи — любая вью (React: `children`), например асинхронная загрузка приложения.
+    /// Вписывается в квадрат `size` × `size` с центром в (`x`, `y`); для VoiceOver скрыта, как и `src`.
+    public var media: AnyView?
 
     public init(kind: YeetGarment, x: CGFloat, y: CGFloat, size: CGFloat? = nil, color: YeetItemColor? = nil, src: Image? = nil) {
         self.kind = kind
@@ -18,6 +21,16 @@ public struct YeetCollageItem {
         self.size = size
         self.color = color
         self.src = src
+    }
+
+    public init<Media: View>(kind: YeetGarment, x: CGFloat, y: CGFloat, size: CGFloat? = nil, @ViewBuilder media: () -> Media) {
+        self.init(kind: kind, x: x, y: y, size: size)
+        self.media = AnyView(media())
+    }
+
+    /// Содержимое слота: `media`, иначе `src`; `nil` — иллюстрация по `kind` и `color`.
+    var slot: AnyView? {
+        media ?? src.map { AnyView(YeetItemImage($0)) }
     }
 }
 
@@ -39,8 +52,17 @@ public struct YeetCollageLayer: View {
             let k = proxy.size.width / base
             ZStack(alignment: .topLeading) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
-                    YeetItemArt(kind: item.kind, color: item.color, size: (item.size ?? defaultSize) * k, src: item.src)
-                        .position(x: proxy.size.width * item.x / 100, y: proxy.size.height * item.y / 100)
+                    let side = (item.size ?? defaultSize) * k
+                    Group {
+                        if let slot = item.slot {
+                            slot
+                                .frame(width: side, height: side)
+                                .accessibilityHidden(true)
+                        } else {
+                            YeetItemArt(kind: item.kind, color: item.color, size: side)
+                        }
+                    }
+                    .position(x: proxy.size.width * item.x / 100, y: proxy.size.height * item.y / 100)
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
@@ -135,8 +157,15 @@ public extension YeetOutfitCollage where Footer == EmptyView {
         YeetCollageItem(kind: .shoe, x: 78, y: 80, size: 72, color: .black),
         YeetCollageItem(kind: .container, x: 20, y: 78, size: 64, color: .brown),
     ]
+    let async = [
+        YeetCollageItem(kind: .dress, x: 40, y: 45, size: 180) {
+            AsyncImage(url: nil) { image in YeetItemImage(image) } placeholder: { ProgressView() }
+        },
+        YeetCollageItem(kind: .shoe, x: 78, y: 80, size: 72, color: .black),
+    ]
     VStack(spacing: 16) {
         YeetOutfitCollage(items: items, label: "Прогулка")
+        YeetOutfitCollage(items: async, label: "Слот media")
         YeetOutfitCollage(items: items) {
             Text("Образ за 24 300 ₽").yeetText(YeetType.body)
             Spacer()
