@@ -39,7 +39,11 @@ public enum YeetHeaderType {
     /// `center` — свой центр (шаги создания образа: `YeetSegmentControl` S с иконками).
     case bar(title: String? = nil, titleChip: String? = nil, titleChipSub: String? = nil, center: AnyView? = nil, onBack: (() -> Void)? = nil, actions: [YeetHeaderAction] = [])
     case back(title: String, onBack: (() -> Void)? = nil, textAction: YeetHeaderTextAction? = nil)
-    case search(query: Binding<String>, placeholder: String = "Уточните текстом", onBack: (() -> Void)? = nil, filters: [YeetChip] = [])
+    /// `onSubmit` — клавиша «Найти» на клавиатуре; `onPhotoSearch` — кнопка «Поиск по фото» справа;
+    /// `onFilterToggle` — нажатие на фильтр, приходит `id` чипса (`value` или `label`), как `onToggle` у `YeetChipGroup`.
+    /// В React у `Header` таких колбэков пока нет (#15); без них шапка ведёт себя как раньше.
+    case search(query: Binding<String>, placeholder: String = "Уточните текстом", onBack: (() -> Void)? = nil, filters: [YeetChip] = [],
+                onSubmit: (() -> Void)? = nil, onPhotoSearch: (() -> Void)? = nil, onFilterToggle: ((String) -> Void)? = nil)
 }
 
 /// Закреплённая шапка экрана (React: `Header`): сплошная подложка `bgCanvas` и полоса затухания 24 снизу —
@@ -85,8 +89,9 @@ public struct YeetHeader: View {
             bar(title: title, titleChip: titleChip, titleChipSub: titleChipSub, center: center, onBack: onBack, actions: actions)
         case let .back(title, onBack, textAction):
             back(title: title, onBack: onBack, textAction: textAction)
-        case let .search(query, placeholder, onBack, filters):
-            search(query: query, placeholder: placeholder, onBack: onBack, filters: filters)
+        case let .search(query, placeholder, onBack, filters, onSubmit, onPhotoSearch, onFilterToggle):
+            search(query: query, placeholder: placeholder, onBack: onBack, filters: filters,
+                   onSubmit: onSubmit, onPhotoSearch: onPhotoSearch, onFilterToggle: onFilterToggle)
         }
     }
 
@@ -194,17 +199,29 @@ public struct YeetHeader: View {
     // MARK: search
 
     @ViewBuilder
-    private func search(query: Binding<String>, placeholder: String, onBack: (() -> Void)?, filters: [YeetChip]) -> some View {
+    private func search(
+        query: Binding<String>,
+        placeholder: String,
+        onBack: (() -> Void)?,
+        filters: [YeetChip],
+        onSubmit: (() -> Void)?,
+        onPhotoSearch: (() -> Void)?,
+        onFilterToggle: ((String) -> Void)?
+    ) -> some View {
         YeetInputBar(
             placeholder: placeholder,
             value: query,
             fieldIcon: .search,
             leading: YeetBarAction(icon: .chevronLeft, label: "Назад", onClick: onBack),
-            trailing: YeetBarAction(icon: .imageAdd, label: "Поиск по фото")
+            trailing: YeetBarAction(icon: .imageAdd, label: "Поиск по фото", onClick: onPhotoSearch)
         )
+        .submitting(onSubmit)
         if !filters.isEmpty {
             // флоу: фильтры на 20 ниже поля
-            YeetChipGroup(chips: filters.map { YeetChip(label: $0.label, selected: $0.selected, colorDot: $0.colorDot, dropdown: true) })
+            YeetChipGroup(
+                chips: filters.map { YeetChip(label: $0.label, value: $0.value, selected: $0.selected, colorDot: $0.colorDot, dropdown: true) },
+                onToggle: onFilterToggle
+            )
                 .padding(.top, YeetSpace.s12)
         }
     }
@@ -221,6 +238,14 @@ public struct YeetHeader: View {
             YeetHeader(type: .bar(title: "Настройки"))
             YeetHeader(type: .back(title: "Вход", textAction: YeetHeaderTextAction(label: "Пропустить")))
             YeetHeader(type: .search(query: .constant("Белая рубашка"), filters: [YeetChip(label: "Цена"), YeetChip(label: "Размер")]))
+            YeetHeader(type: .search(
+                query: .constant(""),
+                placeholder: "Найти в гардеробе",
+                filters: [YeetChip(label: "Категория", value: "category"), YeetChip(label: "Сезон", value: "season", selected: true)],
+                onSubmit: {},
+                onPhotoSearch: {},
+                onFilterToggle: { _ in }
+            ))
         }
     }
     .background(YeetColor.bgCanvas)
