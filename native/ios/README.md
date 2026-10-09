@@ -16,9 +16,10 @@ native/ios/
     ├── Foundation/                   нажатие, зона касания 44, Reduce Motion, формы, перенос строк
     ├── Atoms/                        Icon, Button, IconButton, Badge, Avatar, ColorDot, Logo, Stamp, Link
     ├── Molecules/                    ChipGroup, SegmentControl, ListItem, ListGroup, RadioList, Field, InputGroup, FormField,
-    │                                 InputBar, Snackbar, EmptyState, StatTile, AccountCard, AvatarStack
+    │                                 InputBar, Snackbar, EmptyState, StatTile, AccountCard, AvatarStack, Hint, PhotoTile
     └── Organisms/                    Sheet, Dialog, Overlay, AccountsSheet, Header, TabBar, BottomNav,
-                                      ItemCard, OutfitCollage, WeatherCard, OutfitPager, ItemSlots, CropFrame, DetailsScreen
+                                      ItemCard, OutfitCollage, OutfitThumbnail, WeatherCard, OutfitPager, ItemSlots, CropFrame,
+                                      DetailsScreen, BottomBar
 ```
 
 У каждого компонента есть `#Preview` (Xcode 15+): откройте `native/ios/Package.swift` в Xcode и выберите файл компонента.
@@ -128,7 +129,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `AvatarStack` | `YeetAvatarStack` | `accounts: [YeetAccount]`, `onOpen`, `onAdd` |
 | `Stamp` | `YeetStamp` | `label`, `tone: YeetStampTone` (= React `variant`), `icon` (.thumbDown), `done`, `doneSize: YeetStampDoneSize` (`.m` 78, `.s` 56), `action` |
 | `Chip` (тип) | `YeetChip` + `YeetChipButton` | `label`, `value`, `selected`, `removable`, `colorDot`, `dropdown` |
-| `ChipGroup` | `YeetChipGroup` | `chips`, `selection: Binding<Set<String>>?` / `defaultSelection`, `multiple`, `onToggle`, `onRemove`, `onAdd`, `wrap`, `center` |
+| `ChipGroup` | `YeetChipGroup` | `chips`, `selection: Binding<Set<String>>?` / `defaultSelection`, `multiple`, `onToggle`, `onRemove`, `onAdd`, `onEdit`, `onEditDone`, `wrap`, `center`; чипс `YeetChip(editing:placeholder:)` — Chip · State=Editing |
 | `SegmentControl` / `Segment` | `YeetSegmentControl` / `YeetSegment` | `segments`, `value: Binding<String>` или `defaultValue` + `onChange`, `size`, `fit`, `label` |
 | `RadioList` / `RadioOption` | `YeetRadioList` / `YeetRadioOption` | `options`, `selection: Binding<String?>` или `defaultValue` + `onChange`, `label` |
 | `ListItem` | `YeetListItem` | `type: YeetListItemType` (action, expandable, radio), `label`, `icon`, `expanded`, `checked`, `description`, `leading`, `trailing`, `onClick` |
@@ -139,6 +140,8 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `InputBar` | `YeetInputBar` | `placeholder`, `value: Binding<String>`, `fieldIcon`, `leading` / `trailing: YeetBarAction`, `send: YeetSendAction`, `size` |
 | `Snackbar` | `YeetSnackbar` | `onClose`, `onUndo`, `content`; переход `.transition(.yeetSnackbar)` |
 | `EmptyState` | `YeetEmptyState` | `title`, `description`, `action: YeetEmptyStateAction` |
+| `Hint` | `YeetHint` | `children` → строка первым аргументом, `icon` (`fingersPinch`), `tone: YeetHintTone` (default, onPhoto) |
+| `PhotoTile` | `YeetPhotoTile` | `source: YeetPhotoSource` (gallery, camera), `label`, `onClick`; `illustration` — нет (иллюстраций в пакете нет, всегда заглушка #220) |
 | `StatTile` / `StatRow` | `YeetStatTile` / `YeetStatRow` | `label`, `value` |
 | `AccountCard` | `YeetAccountCard` | `account`, `kind: YeetAccountCardKind` (current, other, settings), `onClick`, `onEdit`, `onSettings`, `onSignOut` |
 | `Sheet` | `YeetSheet` | `title`, `description`, `type: YeetSheetType` (modal, panel), `footer: (YeetFooterAction, YeetFooterAction)?`, `onClose`, `label`, `handle`, `content` |
@@ -148,9 +151,11 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `Header` | `YeetHeader(type:)` | `.large(title:subtitle:accent:action:)`, `.bar(title:titleChip:titleChipSub:center:onBack:actions:)`, `.back(title:onBack:textAction:)`, `.search(query:placeholder:onBack:filters:)` |
 | `TabBar` / `Tab` | `YeetTabBar` / `YeetTab` | `active: Binding<YeetTab>`, `initial` |
 | `BottomNav` | `YeetBottomNav` | `active: Binding<YeetTab>`, `fab`, `onFab` |
+| `BottomBar` | `YeetBottomBar` | `label`, `onClick`, `secondary: YeetHeaderAction?` (React `Action`), `disabled` |
 | `ItemArt` / `Garment` | `YeetItemArt` / `YeetGarment` | `kind`, `color`, `size`, `src`, `alt`; `YeetGarment.dress` — только iOS, временный силуэт (#2) |
 | `ItemCard` | `YeetItemCard` | `kind`, `color`, `image`, `discount`, `label`, `name`, `selected: Bool?`, `onClick`, `onRemove`; `children` → `@ViewBuilder media` (любая вью: асинхронная загрузка приложения), `image` = `media { YeetItemImage(image) }` |
 | `OutfitCollage` / `CollageLayer` | `YeetOutfitCollage` / `YeetCollageLayer` | `items: [YeetCollageItem]`, `label`, `footer`; `YeetCollageItem(kind:x:y:size:media:)` — слот под любую вью (`AnyView`), `src` — `YeetItemImage` в том же слоте |
+| `OutfitThumbnail` | `YeetOutfitThumbnail` | `items`, `size` (138), `onClick`; только iOS — слот `media` для готового снимка образа вместо раскладки (#3) |
 | `WeatherCard` / `WeatherIcon` | `YeetWeatherCard` / `YeetWeatherIcon` | `temperature`, `description`, `weather: YeetWeather`, `icon`, `alert`, `tilt` |
 | `OutfitPager` / `PagerLook` | `YeetOutfitPager` / `YeetPagerLook` | `looks`, `axis: Axis` (`.vertical` стопка, `.horizontal` лента), `preview` (96 / 150), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `weather`, `stamp`, `skip`, `disabled`, `label` |
 | `ItemSlots` / `ItemSlot` | `YeetItemSlots` / `YeetItemSlot` | `title`, `items` + `card: (Item) -> View` (вместо `children`), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `onAdd`, `addLabel` |
@@ -161,8 +166,8 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 `--radius-*` → `YeetRadius.*`, `.y-h1…caption` → `YeetType.*` + `.yeetText(_:)`, `--motion-*` → `YeetMotion.*`,
 `--spring-*` → `YeetSpring.*`, `--gesture-*` → `YeetGesture.*`, `--shadow-floating` → `.yeetFloatingShadow()`, хаптика → `YeetHaptic.*`.
 
-Пока не перенесены (есть в React): `RangeSlider`, `Carousel`, `BarChart`, `UsageMeter`, `Hint`, `LoadingState`, `PhotoTile`,
-`PhotoArea`, `ProductCard`, `ChatBubble`, `BottomBar`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`,
+Пока не перенесены (есть в React): `RangeSlider`, `Carousel`, `BarChart`, `UsageMeter`, `LoadingState`, `ArtPlaceholder` (внутри `PhotoTile` — своя заглушка),
+`PhotoArea`, `ProductCard`, `ChatBubble`, `StylistDock`, `OutfitCanvas`, `TripCard`, `StylistPromptCard`,
 сворачивание большого заголовка шапки при скролле (сворачивание фото в `YeetDetailsScreen` есть).
 
 ## Шторки и диалоги

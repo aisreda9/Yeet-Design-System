@@ -1,0 +1,5 @@
+---
+"yeet-design-system": minor
+---
+
+iOS (#3, #4, #5), ported from React props: `YeetOutfitThumbnail(items:size:onClick:)` — outfit thumbnail (button, dotted `cardBg`, radius 20, collage layer at 0.4 of the side), plus iOS-only `init(size:onClick:media:)` for a ready outfit snapshot. Chip · State=Editing: `YeetChip(…, editing:placeholder:)` and `YeetChipGroup(…, onEdit:onEditDone:)` — an input chip sized to its text, focused on appear, grey ⌄ (`dropdown`) or × (`removable` → `onRemove`), «Done» or focus loss → `onEditDone`. `YeetPhotoTile(source:label:onClick:)` — gallery / camera tile with the art placeholder (#220; React `illustration` not ported, no illustrations in the iOS package). `YeetBottomBar(label:disabled:secondary:onClick:)` — pinned CTA, Primary L full width + optional Secondary L icon action (`YeetHeaderAction`), fade 24 above. `YeetHint(_:icon:tone:)` — hint pill (`default`) or on-photo text (`onPhoto`). All additive; existing calls are unchanged. Web and Android are unchanged.
