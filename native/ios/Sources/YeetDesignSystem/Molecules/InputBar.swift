@@ -45,6 +45,8 @@ public struct YeetInputBar: View {
     private let trailing: YeetBarAction?
     private let send: YeetSendAction?
     private let size: YeetInputBarSize
+    /// Клавиша «Найти» в поиске (`YeetHeader(.search(onSubmit:))`); у чата отправку делает `send`.
+    private var submit: (() -> Void)?
 
     /// - Parameters:
     ///   - fieldIcon: иконка внутри поля. Для поиска — `search`, для чата — нет.
@@ -65,6 +67,13 @@ public struct YeetInputBar: View {
         self.trailing = trailing
         self.send = send
         self.size = size
+    }
+
+    /// Колбэк клавиши «Найти» — для шапки поиска внутри пакета; публичного API поля не меняет.
+    func submitting(_ action: (() -> Void)?) -> YeetInputBar {
+        var copy = self
+        copy.submit = action
+        return copy
     }
 
     private var isChat: Bool { send != nil }
@@ -100,7 +109,10 @@ public struct YeetInputBar: View {
                 .foregroundStyle(YeetColor.textPrimary)
                 .tint(YeetColor.accent)
                 .submitLabel(isChat ? .send : .search)
-                .onSubmit { send?.onClick?() }
+                .onSubmit {
+                    send?.onClick?()
+                    submit?()
+                }
                 .accessibilityLabel(Text(placeholder))
             if !value.isEmpty && !isChat {
                 Button { value = "" } label: {

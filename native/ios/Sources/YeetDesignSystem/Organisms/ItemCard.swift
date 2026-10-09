@@ -116,6 +116,7 @@ public struct YeetItemCard<Media: View>: View {
     private let discount: String?
     private let label: String?
     private let name: String?
+    private let showsName: Bool
     private let selected: Bool?
     private let onClick: (() -> Void)?
     private let onRemove: (() -> Void)?
@@ -125,6 +126,8 @@ public struct YeetItemCard<Media: View>: View {
     ///   - discount: скидка на товаре: «-10%» (Figma: Show Discount + Discount).
     ///   - label: метка-счётчик: «30 раз», «20 дней».
     ///   - name: название для VoiceOver: «Чёрная сумка». По умолчанию — категория.
+    ///   - showsName: видимая подпись под карточкой — `name` (или категория) строкой Caption `textSecondary` в 16,
+    ///     одна строка с усечением хвостом, как название в React `ProductCard`. Для VoiceOver скрыта: карточка уже читает `name`.
     ///   - selected: режим выбора (создание образа); `nil` — без галочки.
     ///   - onRemove: убрать вещь из образа: «×» 20 серым в правом верхнем углу.
     ///   - media: картинка вещи — вписывается в квадрат 138 × 138 (при ширине карточки 173) по центру.
@@ -133,13 +136,14 @@ public struct YeetItemCard<Media: View>: View {
         discount: String? = nil,
         label: String? = nil,
         name: String? = nil,
+        showsName: Bool = false,
         selected: Bool? = nil,
         onClick: (() -> Void)? = nil,
         onRemove: (() -> Void)? = nil,
         @ViewBuilder media: () -> Media
     ) {
         self.init(kind: kind, color: nil, media: media(), discount: discount, label: label, name: name,
-                  selected: selected, onClick: onClick, onRemove: onRemove)
+                  showsName: showsName, selected: selected, onClick: onClick, onRemove: onRemove)
     }
 
     private init(
@@ -149,6 +153,7 @@ public struct YeetItemCard<Media: View>: View {
         discount: String?,
         label: String?,
         name: String?,
+        showsName: Bool,
         selected: Bool?,
         onClick: (() -> Void)?,
         onRemove: (() -> Void)?
@@ -159,6 +164,7 @@ public struct YeetItemCard<Media: View>: View {
         self.discount = discount
         self.label = label
         self.name = name
+        self.showsName = showsName
         self.selected = selected
         self.onClick = onClick
         self.onRemove = onRemove
@@ -173,6 +179,24 @@ public struct YeetItemCard<Media: View>: View {
     }
 
     public var body: some View {
+        if showsName {
+            VStack(alignment: .leading, spacing: YeetSpace.s16) {
+                cardWithRemove
+                Text(name ?? kind.title)
+                    .yeetText(YeetType.caption)
+                    .foregroundStyle(YeetColor.textSecondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityHidden(true)
+            }
+        } else {
+            cardWithRemove
+        }
+    }
+
+    @ViewBuilder
+    private var cardWithRemove: some View {
         let card = Button {
             if selected != nil { YeetHaptic.toggle() }
             onClick?()
@@ -268,12 +292,13 @@ public extension YeetItemCard where Media == YeetItemImage {
         discount: String? = nil,
         label: String? = nil,
         name: String? = nil,
+        showsName: Bool = false,
         selected: Bool? = nil,
         onClick: (() -> Void)? = nil,
         onRemove: (() -> Void)? = nil
     ) {
         self.init(kind: kind, color: color, media: image.map(YeetItemImage.init), discount: discount, label: label,
-                  name: name, selected: selected, onClick: onClick, onRemove: onRemove)
+                  name: name, showsName: showsName, selected: selected, onClick: onClick, onRemove: onRemove)
     }
 }
 
@@ -315,6 +340,10 @@ private struct ItemCardMediaPreview: View {
                 }
             }
             YeetItemCard(kind: .dress, color: .black, label: "3 раза")
+            YeetItemCard(kind: .top, name: "Футболка оверсайз с длинным названием", showsName: true) {
+                RoundedRectangle(cornerRadius: YeetRadius.sm, style: .continuous).fill(YeetColor.patternDot)
+            }
+            YeetItemCard(kind: .bottom, color: .blue, showsName: true)
         }
         .padding(20)
         .background(YeetColor.bgCanvas)
