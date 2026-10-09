@@ -112,6 +112,7 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 - `children` → `@ViewBuilder content` или строка первым аргументом (`YeetButton("Войти")`, `YeetBadge("-10%")`);
 - `ReactNode`-слоты `leading` / `trailing` / `center` → `AnyView`; `footer` коллажа → `@ViewBuilder`;
 - строковые URL картинок (`src`, `image`, `photo`) → `Image` — загрузку и кеш делает приложение;
+  у `ItemCard` и `CollageItem` вместо готового `Image` можно передать вью в слот `media` (асинхронная загрузка со своим кешем);
 - `className`, `style`, HTML-атрибуты — нет (модификаторы SwiftUI); `disabled` → `.disabled(true)`.
 
 | React (web) | Swift | Параметры (= props) |
@@ -147,9 +148,9 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `Header` | `YeetHeader(type:)` | `.large(title:subtitle:accent:action:)`, `.bar(title:titleChip:titleChipSub:center:onBack:actions:)`, `.back(title:onBack:textAction:)`, `.search(query:placeholder:onBack:filters:)` |
 | `TabBar` / `Tab` | `YeetTabBar` / `YeetTab` | `active: Binding<YeetTab>`, `initial` |
 | `BottomNav` | `YeetBottomNav` | `active: Binding<YeetTab>`, `fab`, `onFab` |
-| `ItemArt` / `Garment` | `YeetItemArt` / `YeetGarment` | `kind`, `color`, `size`, `src`, `alt` |
-| `ItemCard` | `YeetItemCard` | `kind`, `color`, `image`, `discount`, `label`, `name`, `selected: Bool?`, `onClick`, `onRemove` |
-| `OutfitCollage` / `CollageLayer` | `YeetOutfitCollage` / `YeetCollageLayer` | `items: [YeetCollageItem]`, `label`, `footer` |
+| `ItemArt` / `Garment` | `YeetItemArt` / `YeetGarment` | `kind`, `color`, `size`, `src`, `alt`; `YeetGarment.dress` — только iOS, временный силуэт (#2) |
+| `ItemCard` | `YeetItemCard` | `kind`, `color`, `image`, `discount`, `label`, `name`, `selected: Bool?`, `onClick`, `onRemove`; `children` → `@ViewBuilder media` (любая вью: асинхронная загрузка приложения), `image` = `media { YeetItemImage(image) }` |
+| `OutfitCollage` / `CollageLayer` | `YeetOutfitCollage` / `YeetCollageLayer` | `items: [YeetCollageItem]`, `label`, `footer`; `YeetCollageItem(kind:x:y:size:media:)` — слот под любую вью (`AnyView`), `src` — `YeetItemImage` в том же слоте |
 | `WeatherCard` / `WeatherIcon` | `YeetWeatherCard` / `YeetWeatherIcon` | `temperature`, `description`, `weather: YeetWeather`, `icon`, `alert`, `tilt` |
 | `OutfitPager` / `PagerLook` | `YeetOutfitPager` / `YeetPagerLook` | `looks`, `axis: Axis` (`.vertical` стопка, `.horizontal` лента), `preview` (96 / 150), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `weather`, `stamp`, `skip`, `disabled`, `label` |
 | `ItemSlots` / `ItemSlot` | `YeetItemSlots` / `YeetItemSlot` | `title`, `items` + `card: (Item) -> View` (вместо `children`), `index: Binding<Int>` или `defaultIndex`, `onIndexChange`, `onAdd`, `addLabel` |
