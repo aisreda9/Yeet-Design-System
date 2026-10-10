@@ -4,17 +4,23 @@ import SwiftUI
 /// кнопка-квадрат на `cardBg` с точечным фоном, радиус 20, вещи — слоем коллажа (`defaultSize` = 0,4 стороны).
 /// Вместо раскладки можно передать готовый снимок образа в слот `media` (React-аналога у слота нет, #3):
 /// он вписывается в квадрат поверх точечного фона. Для VoiceOver — «Открыть образ», содержимое скрыто.
+/// `background` — сплошная заливка вместо `cardBg` с точками (белый холст образа у приложения, #27; в React пропа нет).
+/// Контурные заглушки вещей (`YeetItemArt`) рисуются цветом `textPrimary`: на белой заливке в тёмной теме они пропадают —
+/// для светлого холста задайте миниатюре `.environment(\.colorScheme, .light)`.
 public struct YeetOutfitThumbnail<Media: View>: View {
     private let items: [YeetCollageItem]
     private let media: Media?
     private let size: CGFloat
+    private let background: Color?
     private let onClick: (() -> Void)?
 
     /// Снимок образа (PNG / JPEG приложения или его асинхронная загрузка) вместо раскладки вещей.
-    public init(size: CGFloat = 138, onClick: (() -> Void)? = nil, @ViewBuilder media: () -> Media) {
+    /// - Parameter background: заливка под снимком вместо `cardBg` с точками; `nil` — точечный фон.
+    public init(size: CGFloat = 138, background: Color? = nil, onClick: (() -> Void)? = nil, @ViewBuilder media: () -> Media) {
         self.items = []
         self.media = media()
         self.size = size
+        self.background = background
         self.onClick = onClick
     }
 
@@ -27,8 +33,12 @@ public struct YeetOutfitThumbnail<Media: View>: View {
             onClick?()
         } label: {
             ZStack {
-                YeetComponent.cardBg
-                YeetDotPattern()
+                if let background {
+                    background
+                } else {
+                    YeetComponent.cardBg
+                    YeetDotPattern()
+                }
                 Group {
                     if let media {
                         media
@@ -50,10 +60,12 @@ public struct YeetOutfitThumbnail<Media: View>: View {
 
 public extension YeetOutfitThumbnail where Media == EmptyView {
     /// Раскладка вещей (React: `items`, `size`); `x`, `y` — центр в процентах, `size` вещи — в координатах стороны миниатюры.
-    init(items: [YeetCollageItem], size: CGFloat = 138, onClick: (() -> Void)? = nil) {
+    /// - Parameter background: заливка под коллажем вместо `cardBg` с точками; `nil` — точечный фон.
+    init(items: [YeetCollageItem], size: CGFloat = 138, background: Color? = nil, onClick: (() -> Void)? = nil) {
         self.items = items
         self.media = nil
         self.size = size
+        self.background = background
         self.onClick = onClick
     }
 }
@@ -70,6 +82,7 @@ private struct OutfitThumbnailPreview: View {
         HStack(spacing: YeetSpace.s8) {
             YeetOutfitThumbnail(items: items, size: 96)
             YeetOutfitThumbnail(items: items)
+            YeetOutfitThumbnail(items: items, size: 96, background: .white)
             YeetOutfitThumbnail {
                 AsyncImage(url: nil) { image in
                     image.resizable().scaledToFit()
