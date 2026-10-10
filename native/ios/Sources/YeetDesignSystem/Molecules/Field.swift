@@ -16,6 +16,12 @@ public struct YeetFieldInput {
     }
 }
 
+/// Свотч перед значением: цвет пакета (`colorDot:`) или произвольный (`swatch:`).
+private enum YeetFieldDot {
+    case item(YeetItemColor)
+    case color(Color)
+}
+
 /// Строка поля (React: `Field`; Figma: `input` + `input-value`). Живёт внутри `YeetInputGroup`.
 /// Три паттерна: ввод текста, «ключ — значение» с выбором в sheet, пароль с глазом.
 /// Пароль (`input.isSecure` без своего `onTrailingClick`) — глаз справа встроен: показывает и скрывает пароль,
@@ -23,7 +29,7 @@ public struct YeetFieldInput {
 public struct YeetField: View {
     private let label: String
     private let value: String?
-    private let colorDot: YeetItemColor?
+    private let dot: YeetFieldDot?
     private let trailingIcon: YeetIconName?
     private let onTrailingClick: (() -> Void)?
     private let trailingLabel: String?
@@ -51,9 +57,40 @@ public struct YeetField: View {
         error: Bool = false,
         onClick: (() -> Void)? = nil
     ) {
+        self.init(label: label, value: value, dot: colorDot.map(YeetFieldDot.item), trailingIcon: trailingIcon, onTrailingClick: onTrailingClick, trailingLabel: trailingLabel, input: input, error: error, onClick: onClick)
+    }
+
+    /// Свотч произвольного цвета (серверная палитра приложения) — тот же вид, что у `colorDot:`: круг 16 с обводкой `borderSubtle`.
+    /// В React пропа нет (паритет — отдельный issue). Отдельная метка, а не перегрузка `colorDot: Color?`: та сделала бы
+    /// неоднозначными старые вызовы `colorDot: .red` и `colorDot: nil`. Имя цвета озвучивает `value`.
+    public init(
+        label: String,
+        value: String? = nil,
+        swatch: Color?,
+        trailingIcon: YeetIconName? = nil,
+        onTrailingClick: (() -> Void)? = nil,
+        trailingLabel: String? = nil,
+        input: YeetFieldInput? = nil,
+        error: Bool = false,
+        onClick: (() -> Void)? = nil
+    ) {
+        self.init(label: label, value: value, dot: swatch.map(YeetFieldDot.color), trailingIcon: trailingIcon, onTrailingClick: onTrailingClick, trailingLabel: trailingLabel, input: input, error: error, onClick: onClick)
+    }
+
+    private init(
+        label: String,
+        value: String?,
+        dot: YeetFieldDot?,
+        trailingIcon: YeetIconName?,
+        onTrailingClick: (() -> Void)?,
+        trailingLabel: String?,
+        input: YeetFieldInput?,
+        error: Bool,
+        onClick: (() -> Void)?
+    ) {
         self.label = label
         self.value = value
-        self.colorDot = colorDot
+        self.dot = dot
         self.trailingIcon = trailingIcon
         self.onTrailingClick = onTrailingClick
         self.trailingLabel = trailingLabel
@@ -96,7 +133,16 @@ public struct YeetField: View {
                 if let value {
                     Spacer(minLength: 0)
                     HStack(spacing: YeetSpace.s12) {
-                        if let colorDot { YeetColorDot(color: colorDot, size: 16) }
+                        switch dot {
+                        case .item(let color): YeetColorDot(color: color, size: 16)
+                        case .color(let color):
+                            Circle()
+                                .fill(color)
+                                .overlay(Circle().strokeBorder(YeetColor.borderSubtle, lineWidth: 1))
+                                .frame(width: 16, height: 16)
+                                .accessibilityHidden(true)
+                        case nil: EmptyView()
+                        }
                         Text(value).foregroundStyle(contentColor)
                     }
                 }
@@ -213,6 +259,7 @@ private struct FieldPreview: View {
             YeetInputGroup(size: .l) {
                 YeetField(label: "Категория", value: "Верх", trailingIcon: .chevronUpDown, onClick: {})
                 YeetField(label: "Цвет", value: "Красный", colorDot: .red, trailingIcon: .chevronUpDown, onClick: {})
+                YeetField(label: "Цвет", value: "Тёмно-синий", swatch: Color(red: 0.12, green: 0.18, blue: 0.36), trailingIcon: .chevronUpDown, onClick: {})
                 YeetField(label: "Страна", value: "Россия")
                 YeetField(label: "Сайт магазина", trailingIcon: .externalLink, onTrailingClick: {}, trailingLabel: "Открыть сайт магазина")
             }

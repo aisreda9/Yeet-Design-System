@@ -12,6 +12,16 @@ public enum YeetListItemType: String, CaseIterable, Identifiable {
     public var id: String { rawValue }
 }
 
+/// Тон строки. В React пропа нет (паритет — отдельный issue); в Figma — строка «Удалить» в шторке действий `1144:3017`.
+public enum YeetListItemTone: String, CaseIterable, Identifiable {
+    /// Текст и иконка `textPrimary`.
+    case `default`
+    /// Необратимое действие («Удалить»): текст и иконка `textDanger`.
+    case destructive
+
+    public var id: String { rawValue }
+}
+
 /// Строка списка (React: `ListItem`): высота 24, gap 12; в `YeetListGroup` — 56 (72 с описанием), паддинги 16 / 20.
 /// Строка `action` без `onClick` — не кнопка (например, с кнопкой «Выйти» в `trailing`).
 public struct YeetListItem: View {
@@ -23,6 +33,7 @@ public struct YeetListItem: View {
     private let description: String?
     private let leading: AnyView?
     private let trailing: AnyView?
+    private let tone: YeetListItemTone
     private let onClick: (() -> Void)?
     @Environment(\.yeetInListGroup) private var inGroup
 
@@ -32,6 +43,7 @@ public struct YeetListItem: View {
     ///   - description: вторая строка Caption (почта в профиле).
     ///   - leading: элемент слева вместо иконки (аватар 40).
     ///   - trailing: элемент справа (флаг страны, счётчик).
+    ///   - tone: `.destructive` — «Удалить»: текст и иконка `textDanger`, описание остаётся серым.
     public init(
         type: YeetListItemType = .action,
         label: String,
@@ -41,6 +53,7 @@ public struct YeetListItem: View {
         description: String? = nil,
         leading: AnyView? = nil,
         trailing: AnyView? = nil,
+        tone: YeetListItemTone = .default,
         onClick: (() -> Void)? = nil
     ) {
         self.type = type
@@ -51,6 +64,7 @@ public struct YeetListItem: View {
         self.description = description
         self.leading = leading
         self.trailing = trailing
+        self.tone = tone
         self.onClick = onClick
     }
 
@@ -114,7 +128,7 @@ public struct YeetListItem: View {
         .padding(.vertical, inGroup ? YeetSpace.s16 : 0)
         .padding(.horizontal, inGroup ? YeetSpace.s20 : 0)
         .frame(minHeight: inGroup ? (description == nil ? 56 : 72) : 0)
-        .foregroundStyle(YeetColor.textPrimary)
+        .foregroundStyle(tone == .destructive ? YeetColor.textDanger : YeetColor.textPrimary)
         .contentShape(Rectangle())
     }
 
@@ -191,7 +205,7 @@ private struct ListPreview: View {
                 YeetList {
                     YeetListItem(label: "Создать образ", icon: .collage, onClick: {})
                     YeetListItem(label: "Редактировать", icon: .edit, onClick: {})
-                    YeetListItem(label: "Удалить", icon: .trash, onClick: {})
+                    YeetListItem(label: "Удалить", icon: .trash, tone: .destructive, onClick: {})
                     YeetListItem(type: .expandable, label: "Верх", expanded: open, onClick: { open.toggle() })
                     ForEach(["1994", "1995", "1996"], id: \.self) { y in
                         YeetListItem(type: .radio, label: y, checked: year == y, onClick: { year = y })

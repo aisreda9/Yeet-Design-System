@@ -132,16 +132,16 @@ YeetHaptic.select()                                       // tokens.motion.hapti
 | `ChipGroup` | `YeetChipGroup` | `chips`, `selection: Binding<Set<String>>?` / `defaultSelection`, `multiple`, `onToggle`, `onRemove`, `onAdd`, `onEdit`, `onEditDone`, `wrap`, `center`; чипс `YeetChip(editing:placeholder:)` — Chip · State=Editing |
 | `SegmentControl` / `Segment` | `YeetSegmentControl` / `YeetSegment` | `segments`, `value: Binding<String>` или `defaultValue` + `onChange`, `size`, `fit`, `label` |
 | `RadioList` / `RadioOption` | `YeetRadioList` / `YeetRadioOption` | `options`, `selection: Binding<String?>` или `defaultValue` + `onChange`, `label` |
-| `ListItem` | `YeetListItem` | `type: YeetListItemType` (action, expandable, radio), `label`, `icon`, `expanded`, `checked`, `description`, `leading`, `trailing`, `onClick` |
+| `ListItem` | `YeetListItem` | `type: YeetListItemType` (action, expandable, radio), `label`, `icon`, `expanded`, `checked`, `description`, `leading`, `trailing`, `onClick`; iOS: `tone: YeetListItemTone` (default, destructive — `textDanger` для «Удалить», в React нет, #19) |
 | `List` / `ListGroup` | `YeetList` / `YeetListGroup` | `content` |
-| `Field` | `YeetField` | `label`, `value`, `colorDot`, `trailingIcon`, `onTrailingClick`, `trailingLabel`, `input: YeetFieldInput?` (`isSecure` — глаз встроен), `error`, `onClick` |
+| `Field` | `YeetField` | `label`, `value`, `colorDot`, `trailingIcon`, `onTrailingClick`, `trailingLabel`, `input: YeetFieldInput?` (`isSecure` — глаз встроен), `error`, `onClick`; iOS: `init(…, swatch: Color?, …)` — свотч произвольного цвета вместо `colorDot` (в React нет, #20) |
 | `FormField` | `YeetFormField` | `label`, `hideLabel`, `description`, `error: String?`, `required`, `content` |
 | `InputGroup` | `YeetInputGroup` | `size: YeetInputGroupSize` (.m .l .xl), `content` |
 | `InputBar` | `YeetInputBar` | `placeholder`, `value: Binding<String>`, `fieldIcon`, `leading` / `trailing: YeetBarAction`, `send: YeetSendAction`, `size` |
 | `Snackbar` | `YeetSnackbar` | `onClose`, `onUndo`, `content`; переход `.transition(.yeetSnackbar)` |
 | `EmptyState` | `YeetEmptyState` | `title`, `description`, `action: YeetEmptyStateAction` |
 | `Hint` | `YeetHint` | `children` → строка первым аргументом, `icon` (`fingersPinch`), `tone: YeetHintTone` (default, onPhoto) |
-| `PhotoTile` | `YeetPhotoTile` | `source: YeetPhotoSource` (gallery, camera), `label`, `onClick`; `illustration` — нет (иллюстраций в пакете нет, всегда заглушка #220) |
+| `PhotoTile` | `YeetPhotoTile` | `source: YeetPhotoSource` (gallery, camera), `label`, `onClick`; `illustration` — нет (иллюстраций в пакете нет, всегда заглушка #220); в заглушке у камеры иконка `camera`, у галереи `imageAdd` (в React у обеих `imageAdd`, #23) |
 | `StatTile` / `StatRow` | `YeetStatTile` / `YeetStatRow` | `label`, `value` |
 | `AccountCard` | `YeetAccountCard` | `account`, `kind: YeetAccountCardKind` (current, other, settings), `onClick`, `onEdit`, `onSettings`, `onSignOut` |
 | `Sheet` | `YeetSheet` | `title`, `description`, `type: YeetSheetType` (modal, panel), `footer: (YeetFooterAction, YeetFooterAction)?`, `onClose`, `label`, `handle`, `content` |
