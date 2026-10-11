@@ -13,7 +13,7 @@ public struct YeetPagerLook: Identifiable {
     /// Вписывается в квадрат образа поверх фона; у превью соседей масштабируется вместе с плиткой.
     public var media: AnyView?
     /// Сплошная заливка плитки вместо `cardBg` с точками (белый холст образа у приложения, как у `YeetOutfitThumbnail`, #30).
-    /// `nil` — точечный фон. Для светлого холста в тёмной теме задайте `media` `.environment(\.colorScheme, .light)`.
+    /// С заливкой плитка получает обводку 1 pt `borderSubtle`, чтобы белое не сливалось с фоном экрана. `nil` — точечный фон. Для светлого холста в тёмной теме задайте `media` `.environment(\.colorScheme, .light)`.
     public var background: Color?
 
     public init(id: String, items: [YeetCollageItem], label: String? = nil, name: String? = nil, background: Color? = nil) {
@@ -199,6 +199,12 @@ public struct YeetOutfitPager: View {
         return tile(look, current: current)
             .frame(width: side, height: side)
             .clipShape(shape)
+            .overlay {
+                // своя заливка (белый холст) сливается с фоном экрана — обводка 1 pt, как у плитки образа в приложении
+                if look.background != nil {
+                    shape.strokeBorder(YeetColor.borderSubtle, lineWidth: 1 / max(place.scale, 0.01))
+                }
+            }
             .contentShape(shape)
             .scaleEffect(place.scale, anchor: axis == .vertical ? .top : .center)
             .offset(x: place.x, y: place.y)
