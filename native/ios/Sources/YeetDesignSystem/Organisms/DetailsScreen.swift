@@ -32,6 +32,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let subtitle: String?
     private let mediaMinFraction: CGFloat
     private let mediaMaxFraction: CGFloat
+    private let minPanelPeek: CGFloat
     private let media: Media
     private let content: Content
 
@@ -52,6 +53,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - pinned: блок между фото и панелью вне прокрутки (#26); с ним фото уступает высоту.
     ///   - mediaMinFraction: с `pinned` — нижняя граница фото, доля высоты области под шапкой.
     ///   - mediaMaxFraction: с `pinned` — верхняя граница фото, доля высоты области под шапкой.
+    ///   - minPanelPeek: с `pinned` — сколько панели оставить видимым над нижним краем, чтобы за неё можно было
+    ///     потянуть (фото и блок прокрутку не ловят). Пол `mediaMinFraction` сильнее: на низком экране с высоким
+    ///     блоком панель может уйти за край — тогда приложение опускает `mediaMinFraction`.
     ///   - media: фото вещи, коллаж образа — квадрат.
     public init(
         title: String? = nil,
@@ -65,6 +69,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         pinned: AnyView? = nil,
         mediaMinFraction: CGFloat = 0.5,
         mediaMaxFraction: CGFloat = 0.65,
+        minPanelPeek: CGFloat = 56,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -79,6 +84,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.pinned = pinned
         self.mediaMinFraction = mediaMinFraction
         self.mediaMaxFraction = mediaMaxFraction
+        self.minPanelPeek = minPanelPeek
         self.media = media()
         self.content = content()
     }
@@ -134,13 +140,13 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         }
     }
 
-    /// Сторона фото. Без `pinned` — во всю ширину минус поля (как было). С `pinned` — столько, чтобы фото, блок и
-    /// зазоры (20 над фото, 20 до блока, 12 после) поместились в область под шапкой, но не меньше
+    /// Сторона фото. Без `pinned` — во всю ширину минус поля (как было). С `pinned` — столько, чтобы фото, блок,
+    /// зазоры (20 над фото, 20 до блока, 12 после) и край панели `minPanelPeek` поместились в область под шапкой, но не меньше
     /// `mediaMinFraction` и не больше `mediaMaxFraction` её высоты.
     private func mediaSide(width: CGFloat, viewport: CGFloat) -> CGFloat {
         let full = max(width - 2 * gutter, 1)
         guard pinned != nil else { return full }
-        let available = viewport - YeetSpace.s20 - Self.pinnedGap - pinnedHeight - YeetSpace.s12
+        let available = viewport - YeetSpace.s20 - Self.pinnedGap - pinnedHeight - YeetSpace.s12 - minPanelPeek
         let fitted = min(max(available, viewport * mediaMinFraction), viewport * mediaMaxFraction)
         return max(min(full, fitted), 1)
     }
