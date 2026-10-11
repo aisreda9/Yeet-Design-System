@@ -59,6 +59,7 @@ public struct YeetOutfitPager: View {
     private let weather: AnyView?
     private let stamp: AnyView?
     private let skip: AnyView?
+    private let trailing: AnyView?
     private let disabled: Bool
     private let label: String
 
@@ -77,6 +78,9 @@ public struct YeetOutfitPager: View {
     ///   - skip: слот у левого нижнего угла (`YeetStamp(tone: .secondary)` «Не нравится»).
     ///   - onClick: тап по текущему образу (открыть карточку образа): приходит его индекс.
     ///   - disabled: выключить жест (например, пока открыта шторка).
+    ///   - trailing: слайд после последнего образа — страница той же стороны, что коллаж («Досмотрели все образы /
+    ///     Показать ещё», «Это все варианты»). Листается как образ; его индекс — `looks.count`. На нём слоты погоды и
+    ///     штампов прячутся, тап по нему не вызывает `onClick` — кнопки внутри слайда нажимаются сами.
     public init(
         looks: [YeetPagerLook],
         axis: Axis = .vertical,
@@ -88,7 +92,8 @@ public struct YeetOutfitPager: View {
         stamp: AnyView? = nil,
         skip: AnyView? = nil,
         disabled: Bool = false,
-        label: String = "Образы"
+        label: String = "Образы",
+        trailing: AnyView? = nil
     ) {
         self.looks = looks
         self.axis = axis
@@ -99,12 +104,14 @@ public struct YeetOutfitPager: View {
         self.weather = weather
         self.stamp = stamp
         self.skip = skip
+        self.trailing = trailing
         self.disabled = disabled
         self.label = label
         self._internalIndex = State(initialValue: index.wrappedValue)
     }
 
     /// Неуправляемый пейджер: начинает с `defaultIndex`, дальше листает сам и сообщает в `onIndexChange`.
+    /// `trailing` — как у управляемого.
     public init(
         looks: [YeetPagerLook],
         axis: Axis = .vertical,
@@ -116,7 +123,8 @@ public struct YeetOutfitPager: View {
         stamp: AnyView? = nil,
         skip: AnyView? = nil,
         disabled: Bool = false,
-        label: String = "Образы"
+        label: String = "Образы",
+        trailing: AnyView? = nil
     ) {
         self.looks = looks
         self.axis = axis
@@ -127,12 +135,16 @@ public struct YeetOutfitPager: View {
         self.weather = weather
         self.stamp = stamp
         self.skip = skip
+        self.trailing = trailing
         self.disabled = disabled
         self.label = label
         self._internalIndex = State(initialValue: defaultIndex)
     }
 
-    private var count: Int { looks.count }
+    /// Страниц: образы и слайд после них (`trailing`).
+    private var count: Int { looks.count + (trailing == nil ? 0 : 1) }
+    /// Текущая страница — слайд после образов.
+    private var onTrailing: Bool { trailing != nil && index == looks.count }
 
     private var index: Int {
         let raw = external?.wrappedValue ?? internalIndex
@@ -154,7 +166,13 @@ public struct YeetOutfitPager: View {
                     ForEach(Array(looks.enumerated()), id: \.element.id) { k, look in
                         lookView(look, at: k, side: side)
                     }
+                    if let trailing {
+                        trailingView(trailing, side: side)
+                    }
                     slots(side: side)
+                        .opacity(onTrailing ? 0 : 1)
+                        .allowsHitTesting(!onTrailing)
+                        .accessibilityHidden(onTrailing)
                 }
                 .frame(width: side, height: proxy.size.height, alignment: .topLeading)
             }
@@ -222,7 +240,7 @@ public struct YeetOutfitPager: View {
             .allowsHitTesting(neighbour || current)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(label))
-            .accessibilityValue(Text("\(k + 1) из \(count)" + (look.name.map { ": \($0)" } ?? "")))
+            .accessibilityValue(Text("\(k + 1) из \(looks.count)" + (look.name.map { ": \($0)" } ?? "")))
             .accessibilityAddTraits(current && onClick != nil ? .isButton : [])
             .accessibilityAction { if current, !disabled { onClick?(k) } }
             .accessibilityAdjustableAction { direction in
@@ -232,6 +250,35 @@ public struct YeetOutfitPager: View {
                 @unknown default: break
                 }
             }
+            .accessibilityHidden(!current && !(onTrailing && k == looks.count - 1))
+    }
+
+    /// Слайд после образов: та же раскладка, что у образа с индексом `looks.count` (превью снизу, когда соседний),
+    /// без обводки и без `onClick`. Текущий — содержимое доступно VoiceOver и нажимается; вернуться к образам VoiceOver
+    /// может через последний образ: на слайде он остаётся регулируемым элементом («N из N», смахивание вниз — к нему).
+    private func trailingView(_ content: AnyView, side: CGFloat) -> some View {
+        let k = looks.count
+        let place = placement(k, side: side)
+        let current = k == index
+        let neighbour = abs(k - index) == 1
+        let shape = RoundedRectangle(cornerRadius: YeetComponent.cardRadius / max(place.scale, 0.01), style: .continuous)
+        return content
+            .allowsHitTesting(current) // у превью кнопки слайда не нажимаются — тап листает к нему
+            .frame(width: side, height: side)
+            .background(YeetComponent.cardBg)
+            .clipShape(shape)
+            .contentShape(shape)
+            .onTapGesture {
+                guard neighbour, !disabled else { return }
+                YeetHaptic.select()
+                go(k)
+            }
+            .scaleEffect(place.scale, anchor: axis == .vertical ? .top : .center)
+            .offset(x: place.x, y: place.y)
+            .opacity(place.opacity)
+            .zIndex(current ? 1 : 0)
+            .allowsHitTesting(neighbour || current)
+            .accessibilityElement(children: .contain)
             .accessibilityHidden(!current)
     }
 
@@ -339,7 +386,9 @@ public struct YeetOutfitPager: View {
         }
         if changed {
             onIndexChange?(next)
-            UIAccessibility.post(notification: .announcement, argument: "Образ \(next + 1) из \(count)" + (looks[next].name.map { ": \($0)" } ?? ""))
+            if next < looks.count {
+                UIAccessibility.post(notification: .announcement, argument: "Образ \(next + 1) из \(looks.count)" + (looks[next].name.map { ": \($0)" } ?? ""))
+            }
         }
     }
 }
@@ -417,6 +466,8 @@ private struct OutfitPagerPreview: View {
     ]
 
     @State private var snapshotIndex = 0
+    @State private var surpriseIndex = 0
+    @State private var saved = false
     @State private var worn = false
 
     var body: some View {
@@ -429,6 +480,19 @@ private struct OutfitPagerPreview: View {
                     onClick: { _ in },
                     weather: AnyView(YeetWeatherCard(temperature: "20°", description: "Солнечно, ветер 14 км/ч", tilt: true)),
                     stamp: AnyView(YeetStamp(label: "Надеть", done: worn) { worn.toggle() })
+                )
+                // «Удиви меня» (Figma `1176:20319`): превью 150, «Не нравится» слева, «Сохранить» справа, после образов —
+                // слайд «Досмотрели все образы» (`trailing`)
+                YeetOutfitPager(
+                    looks: looks,
+                    preview: 150,
+                    index: $surpriseIndex,
+                    stamp: AnyView(YeetStamp(label: "Сохранить", done: saved) { saved.toggle() }),
+                    skip: AnyView(YeetStamp(label: "Не нравится", tone: .secondary) { surpriseIndex += 1 }),
+                    trailing: AnyView(
+                        YeetEmptyState(title: "Досмотрели все образы", description: "Соберём ещё из твоих вещей",
+                                       action: YeetEmptyStateAction(label: "Показать ещё", variant: .primary) { surpriseIndex = 0 })
+                    )
                 )
                 // один образ — без превью
                 YeetOutfitPager(looks: [snapshots[0]], defaultIndex: 0, onClick: { _ in })
