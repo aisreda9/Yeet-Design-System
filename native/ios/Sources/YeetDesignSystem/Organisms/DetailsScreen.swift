@@ -1,10 +1,5 @@
 import SwiftUI
 
-private struct YeetDetailsOffsetKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
-}
-
 /// Детали вещи и образа (React: `DetailsScreen` + `usePhotoCollapse`; Figma: Wardrobe / Item Details `1371:41024 → 1371:41076`,
 /// Outfit Details `1371:41156 → 1371:41329`, Animations «new things» `354:17405 → 354:17449`).
 ///
@@ -125,6 +120,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                     }
                 }
             }
+            // Без своей миниатюры (`thumb == nil`) в шапку встаёт само фото — слой с ним должен быть над шапкой
+            // (у `YeetHeader` `zIndex(1)`): иначе свёрнутое фото уходило ПОД шапку и миниатюры не было видно.
+            .zIndex(mediaOnTop && thumb == nil ? 2 : 0)
         }
         .background(YeetColor.bgCanvas.ignoresSafeArea())
         .overlay(alignment: .bottomTrailing) {
@@ -193,12 +191,16 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 YeetSheet(title: title, description: subtitle, type: .panel) { content }
                     .frame(minHeight: viewport + 120, alignment: .top)
             }
-            .background(GeometryReader { proxy in
-                Color.clear.preference(key: YeetDetailsOffsetKey.self, value: -proxy.frame(in: .named("yeet-details")).minY)
-            })
+            // 🔴 Смещение — `onGeometryChange`, а не `PreferenceKey` из фона содержимого: на iOS 26 ключ из
+            // фона внутри `ScrollView` при прокрутке НЕ обновлялся (одно значение 0 при появлении), и фото
+            // никогда не сворачивалось в миниатюру шапки. `onGeometryChange` доступен с iOS 16 (back-deploy).
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                -proxy.frame(in: .named("yeet-details")).minY
+            } action: { offset in
+                update(offset)
+            }
         }
         .coordinateSpace(name: "yeet-details")
-        .onPreferenceChange(YeetDetailsOffsetKey.self, perform: update)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom { bottom }
         }
