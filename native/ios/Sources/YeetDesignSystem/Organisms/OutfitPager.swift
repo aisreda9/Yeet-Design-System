@@ -9,12 +9,25 @@ public struct YeetPagerLook: Identifiable {
     public var label: String?
     /// Имя для VoiceOver: «Образ 2 из 5» + это имя.
     public var name: String?
+    /// Готовый образ вместо раскладки `items` (React-аналога пока нет, #33): снимок приложения, живой холст.
+    /// Вписывается в квадрат образа поверх фона; у превью соседей масштабируется вместе с плиткой.
+    public var media: AnyView?
+    /// Сплошная заливка плитки вместо `cardBg` с точками (белый холст образа у приложения, как у `YeetOutfitThumbnail`, #30).
+    /// С заливкой плитка получает обводку 1 pt `borderSubtle`, чтобы белое не сливалось с фоном экрана. `nil` — точечный фон. Для светлого холста в тёмной теме задайте `media` `.environment(\.colorScheme, .light)`.
+    public var background: Color?
 
-    public init(id: String, items: [YeetCollageItem], label: String? = nil, name: String? = nil) {
+    public init(id: String, items: [YeetCollageItem], label: String? = nil, name: String? = nil, background: Color? = nil) {
         self.id = id
         self.items = items
         self.label = label
         self.name = name
+        self.background = background
+    }
+
+    /// Образ готовой картинкой (снимок, холст) вместо раскладки вещей.
+    public init<Media: View>(id: String, label: String? = nil, name: String? = nil, background: Color? = nil, @ViewBuilder media: () -> Media) {
+        self.init(id: id, items: [], label: label, name: name, background: background)
+        self.media = AnyView(media())
     }
 }
 
@@ -27,10 +40,11 @@ public struct YeetPagerLook: Identifiable {
 /// **Жест** — `DragGesture`: начинается после `touchSlop` и закрепляется за доминирующей осью (движение поперёк отдаётся
 /// скроллу экрана). Дальше 30 % размера или бросок быстрее 500 pt/с — соседний образ; пауза пальца > 80 мс перед отпусканием —
 /// не бросок (`YeetVelocityTracker`). На первом и последнем образе — резинка. Хаптика `threshold` один раз на пороге.
-/// Тап по соседнему превью — к нему. При «Уменьшении движения» доводка мгновенная, палец по-прежнему ведёт 1 : 1.
+/// Тап по соседнему превью — к нему, по текущему образу — `onClick` (открыть образ). При «Уменьшении движения» доводка мгновенная, палец по-прежнему ведёт 1 : 1.
 ///
 /// **VoiceOver:** текущий образ — регулируемый элемент «Образы, 2 из 5: имя», смахивание вверх / вниз листает; скрытые образы не читаются.
 /// Управляемый (`index: $i`) или неуправляемый (`defaultIndex`, индекс хранится в `@State`).
+/// Пустой `looks` — пейджер ничего не рисует (экран показывает `YeetEmptyState`); один образ — без превью и без жеста.
 public struct YeetOutfitPager: View {
     /// Размер коллажа в макете.
     static let design: CGFloat = 353
@@ -41,6 +55,7 @@ public struct YeetOutfitPager: View {
     private let preview: CGFloat
     private let external: Binding<Int>?
     private let onIndexChange: ((Int) -> Void)?
+    private let onClick: ((Int) -> Void)?
     private let weather: AnyView?
     private let stamp: AnyView?
     private let skip: AnyView?
@@ -60,6 +75,7 @@ public struct YeetOutfitPager: View {
     ///   - weather: слот над левым верхним углом коллажа (`YeetWeatherCard(tilt:)`).
     ///   - stamp: слот у правого нижнего угла (`YeetStamp` «Надеть» / «Сохранить»).
     ///   - skip: слот у левого нижнего угла (`YeetStamp(tone: .secondary)` «Не нравится»).
+    ///   - onClick: тап по текущему образу (открыть карточку образа): приходит его индекс.
     ///   - disabled: выключить жест (например, пока открыта шторка).
     public init(
         looks: [YeetPagerLook],
@@ -67,6 +83,7 @@ public struct YeetOutfitPager: View {
         preview: CGFloat = 96,
         index: Binding<Int>,
         onIndexChange: ((Int) -> Void)? = nil,
+        onClick: ((Int) -> Void)? = nil,
         weather: AnyView? = nil,
         stamp: AnyView? = nil,
         skip: AnyView? = nil,
@@ -78,6 +95,7 @@ public struct YeetOutfitPager: View {
         self.preview = preview
         self.external = index
         self.onIndexChange = onIndexChange
+        self.onClick = onClick
         self.weather = weather
         self.stamp = stamp
         self.skip = skip
@@ -93,6 +111,7 @@ public struct YeetOutfitPager: View {
         preview: CGFloat = 96,
         defaultIndex: Int = 0,
         onIndexChange: ((Int) -> Void)? = nil,
+        onClick: ((Int) -> Void)? = nil,
         weather: AnyView? = nil,
         stamp: AnyView? = nil,
         skip: AnyView? = nil,
@@ -104,6 +123,7 @@ public struct YeetOutfitPager: View {
         self.preview = preview
         self.external = nil
         self.onIndexChange = onIndexChange
+        self.onClick = onClick
         self.weather = weather
         self.stamp = stamp
         self.skip = skip
@@ -123,6 +143,10 @@ public struct YeetOutfitPager: View {
     private var top: CGFloat { axis == .vertical ? preview + Self.gap : 0 }
 
     public var body: some View {
+        if !looks.isEmpty { pager }
+    }
+
+    private var pager: some View {
         YeetPagerSizing(extra: 2 * top) {
             GeometryReader { proxy in
                 let side = proxy.size.width
@@ -171,22 +195,36 @@ public struct YeetOutfitPager: View {
         let neighbour = abs(k - index) == 1
         // у превью радиус 20, как у миниатюры образа: до масштаба 20 / scale
         let radius = YeetComponent.cardRadius / max(place.scale, 0.01)
-        return YeetOutfitCollage(items: look.items, label: current ? look.label : nil)
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        return tile(look, current: current)
             .frame(width: side, height: side)
-            .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .clipShape(shape)
+            .overlay {
+                // своя заливка (белый холст) сливается с фоном экрана — обводка 1 pt, как у плитки образа в приложении
+                if look.background != nil {
+                    shape.strokeBorder(YeetColor.borderSubtle, lineWidth: 1 / max(place.scale, 0.01))
+                }
+            }
+            .contentShape(shape)
             .scaleEffect(place.scale, anchor: axis == .vertical ? .top : .center)
             .offset(x: place.x, y: place.y)
             .opacity(place.opacity)
             .zIndex(current ? 1 : 0)
             .onTapGesture {
-                guard neighbour, !disabled else { return }
-                YeetHaptic.select()
-                go(k)
+                guard !disabled else { return }
+                if current {
+                    onClick?(k)
+                } else if neighbour {
+                    YeetHaptic.select()
+                    go(k)
+                }
             }
             .allowsHitTesting(neighbour || current)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(label))
             .accessibilityValue(Text("\(k + 1) из \(count)" + (look.name.map { ": \($0)" } ?? "")))
+            .accessibilityAddTraits(current && onClick != nil ? .isButton : [])
+            .accessibilityAction { if current, !disabled { onClick?(k) } }
             .accessibilityAdjustableAction { direction in
                 switch direction {
                 case .increment: go(index + 1)
@@ -195,6 +233,33 @@ public struct YeetOutfitPager: View {
                 }
             }
             .accessibilityHidden(!current)
+    }
+
+    /// Плитка образа: коллаж из `items` (как раньше) либо `media` / `background` поверх той же геометрии.
+    @ViewBuilder
+    private func tile(_ look: YeetPagerLook, current: Bool) -> some View {
+        if look.media == nil && look.background == nil {
+            YeetOutfitCollage(items: look.items, label: current ? look.label : nil)
+        } else {
+            ZStack {
+                if let background = look.background {
+                    background
+                } else {
+                    YeetComponent.cardBg
+                    YeetDotPattern().padding(14)
+                }
+                if let media = look.media {
+                    media
+                } else {
+                    YeetCollageLayer(items: look.items)
+                }
+            }
+            .overlay(alignment: .topLeading) {
+                if current, let label = look.label {
+                    YeetBadge(label, variant: .secondary).padding(YeetSpace.s20)
+                }
+            }
+        }
     }
 
     /// Слоты поверх текущего коллажа: погода над левым верхним углом, штамп у правого нижнего, «Не нравится» — у левого.
@@ -334,9 +399,41 @@ private struct OutfitPagerPreview: View {
         look("d", "Спорт", [.green, .grey, .white]),
     ]
 
+    /// Снимок образа приложения: картинка на белом холсте (`background: .white`).
+    private static func snapshot(_ id: String, _ symbols: [String]) -> YeetPagerLook {
+        YeetPagerLook(id: id, name: "Снимок \(id)", background: .white) {
+            VStack(spacing: 12) {
+                ForEach(symbols, id: \.self) { Image(systemName: $0).resizable().scaledToFit().frame(height: 72) }
+            }
+            .foregroundStyle(Color(white: 0.25))
+            .environment(\.colorScheme, .light)
+        }
+    }
+
+    private let snapshots = [
+        snapshot("s1", ["tshirt", "shoe"]),
+        snapshot("s2", ["jacket", "bag"]),
+        snapshot("s3", ["hanger", "eyeglasses"]),
+    ]
+
+    @State private var snapshotIndex = 0
+    @State private var worn = false
+
     var body: some View {
         ScrollView {
             VStack(spacing: 40) {
+                // «Сегодня» (Figma `1173:16144`): снимки, погода наклоном, штамп «Надеть»
+                YeetOutfitPager(
+                    looks: snapshots,
+                    index: $snapshotIndex,
+                    onClick: { _ in },
+                    weather: AnyView(YeetWeatherCard(temperature: "20°", description: "Солнечно, ветер 14 км/ч", tilt: true)),
+                    stamp: AnyView(YeetStamp(label: "Надеть", done: worn) { worn.toggle() })
+                )
+                // один образ — без превью
+                YeetOutfitPager(looks: [snapshots[0]], defaultIndex: 0, onClick: { _ in })
+                // пусто — ничего
+                YeetOutfitPager(looks: [], defaultIndex: 0)
                 YeetOutfitPager(
                     looks: looks,
                     index: $index,
