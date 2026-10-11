@@ -234,6 +234,8 @@ public struct YeetHeader: View {
             YeetHeader(type: .large(title: "Гардероб", action: YeetHeaderAction(icon: .search, label: "Поиск")))
             YeetHeader(type: .large(title: "Образы", subtitle: "Сегодня +18°, солнечно", accent: YeetHeaderTextAction(label: "на каждый день")))
             YeetHeader(type: .bar(titleChip: "Архив вещей", actions: [YeetHeaderAction(icon: .more, label: "Ещё")]))
+            // Стилист: результат «Удиви меня» / «С чем носить» (`1176:20319`, `1176:20595`) — «‹», чип, «(i)»
+            YeetHeader(type: .bar(titleChip: "Удиви меня", onBack: {}, actions: [YeetHeaderAction(icon: .info, label: "Об этом инструменте")]))
             YeetHeader(type: .bar(titleChip: "Тбилиси", titleChipSub: "8-13 сент · 5 ночей"))
             YeetHeader(type: .bar(title: "Настройки"))
             YeetHeader(type: .back(title: "Вход", textAction: YeetHeaderTextAction(label: "Пропустить")))
