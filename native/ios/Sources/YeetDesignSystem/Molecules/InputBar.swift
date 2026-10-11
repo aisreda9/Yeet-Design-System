@@ -45,12 +45,17 @@ public struct YeetInputBar: View {
     private let trailing: YeetBarAction?
     private let send: YeetSendAction?
     private let size: YeetInputBarSize
+    private let lines: ClosedRange<Int>
+    @FocusState private var focused: Bool
     /// Клавиша «Найти» в поиске (`YeetHeader(.search(onSubmit:))`); у чата отправку делает `send`.
     private var submit: (() -> Void)?
 
     /// - Parameters:
     ///   - fieldIcon: иконка внутри поля. Для поиска — `search`, для чата — нет.
     ///   - send: чат со стилистом: кнопка отправки 44 внутри поля (primary, когда есть текст), поле 52 на подложке с тенью.
+    ///     В фокусе — обводка 1.5 `textAccent` внутри поля (Figma: input-bar · Focus / Typing, React `:focus-within`).
+    ///   - lines: сколько строк поле может занять: `1...1` — одна (по умолчанию, как раньше); `1...4` — чат растёт до
+    ///     четырёх строк, дальше прокручивается. При нескольких строках «Ввод» переносит строку, отправка — кнопкой.
     public init(
         placeholder: String,
         value: Binding<String>,
@@ -58,7 +63,8 @@ public struct YeetInputBar: View {
         leading: YeetBarAction? = nil,
         trailing: YeetBarAction? = nil,
         send: YeetSendAction? = nil,
-        size: YeetInputBarSize = .m
+        size: YeetInputBarSize = .m,
+        lines: ClosedRange<Int> = 1...1
     ) {
         self.placeholder = placeholder
         self._value = value
@@ -67,6 +73,7 @@ public struct YeetInputBar: View {
         self.trailing = trailing
         self.send = send
         self.size = size
+        self.lines = lines
     }
 
     /// Колбэк клавиши «Найти» — для шапки поиска внутри пакета; публичного API поля не меняет.
@@ -77,6 +84,8 @@ public struct YeetInputBar: View {
     }
 
     private var isChat: Bool { send != nil }
+    private var multiline: Bool { lines.upperBound > 1 }
+    private var height: CGFloat { isChat || size == .l ? 52 : 48 }
     private var buttonSize: YeetControlSize { size == .l ? .l : .m }
 
     public var body: some View {
@@ -99,16 +108,19 @@ public struct YeetInputBar: View {
     }
 
     private var field: some View {
-        HStack(spacing: YeetSpace.s8) {
+        HStack(alignment: multiline ? .bottom : .center, spacing: YeetSpace.s8) {
             if let fieldIcon {
                 YeetIcon(name: fieldIcon).foregroundStyle(YeetColor.textSecondary)
             }
-            TextField("", text: $value, prompt: Text(placeholder).foregroundColor(YeetColor.textSecondary))
+            textField
                 .yeetText(YeetType.body)
-                .lineLimit(1)
+                .focused($focused)
+                // несколько строк: первая строка по центру кнопки 44, следующие растут вниз
+                .padding(.vertical, multiline ? 12 : 0)
                 .foregroundStyle(YeetColor.textPrimary)
                 .tint(YeetColor.accent)
-                .submitLabel(isChat ? .send : .search)
+                // несколько строк: «Ввод» переносит строку — клавиша не обещает отправку
+                .submitLabel(multiline ? .return : (isChat ? .send : .search))
                 .onSubmit {
                     send?.onClick?()
                     submit?()
@@ -131,10 +143,33 @@ public struct YeetInputBar: View {
         }
         .padding(.leading, isChat ? YeetSpace.s20 : (size == .l ? YeetSpace.s16 : YeetSpace.s20))
         .padding(.trailing, isChat ? YeetSpace.s4 : YeetSpace.s20)
-        .frame(height: isChat || size == .l ? 52 : 48)
+        .padding(.vertical, multiline ? (height - 44) / 2 : 0) // строки растут вниз, кнопка 44 остаётся на 4 от низа
+        .frame(minHeight: height)
+        .frame(height: multiline ? nil : height)
         .frame(maxWidth: .infinity)
-        .background(Capsule().fill(isChat ? YeetColor.bgElevated : YeetComponent.inputBg))
+        .background(RoundedRectangle(cornerRadius: height / 2, style: .continuous).fill(isChat ? YeetColor.bgElevated : YeetComponent.inputBg))
+        .overlay {
+            if isChat && focused {
+                RoundedRectangle(cornerRadius: height / 2, style: .continuous)
+                    .strokeBorder(YeetColor.textAccent, lineWidth: 1.5)
+            }
+        }
         .yeetFloating(isChat)
+        .contentShape(RoundedRectangle(cornerRadius: height / 2, style: .continuous))
+        .onTapGesture { focused = true } // тап по полю мимо текста — тоже в поле
+    }
+
+    /// Одна строка — как раньше; несколько — растёт по вертикали до `lines.upperBound`.
+    @ViewBuilder
+    private var textField: some View {
+        let prompt = Text(placeholder).foregroundColor(YeetColor.textSecondary)
+        if multiline {
+            TextField("", text: $value, prompt: prompt, axis: .vertical)
+                .lineLimit(lines)
+        } else {
+            TextField("", text: $value, prompt: prompt)
+                .lineLimit(1)
+        }
     }
 
     private func sendButton(_ send: YeetSendAction) -> some View {
