@@ -169,10 +169,11 @@ public struct YeetOutfitPager: View {
                     if let trailing {
                         trailingView(trailing, side: side)
                     }
-                    slots(side: side)
-                        .opacity(onTrailing ? 0 : 1)
-                        .allowsHitTesting(!onTrailing)
-                        .accessibilityHidden(onTrailing)
+                    // на слайде после образов слотов нет совсем (не только прозрачны): не нажимаются и не читаются
+                    if !onTrailing {
+                        slots(side: side)
+                            .transition(.opacity)
+                    }
                 }
                 .frame(width: side, height: proxy.size.height, alignment: .topLeading)
             }
@@ -267,11 +268,15 @@ public struct YeetOutfitPager: View {
             .frame(width: side, height: side)
             .background(YeetComponent.cardBg)
             .clipShape(shape)
-            .contentShape(shape)
-            .onTapGesture {
-                guard neighbour, !disabled else { return }
-                YeetHaptic.select()
-                go(k)
+            .overlay {
+                // превью слайда: прозрачный слой листает к нему. У текущего слоя нет — жест на самом слайде делал его
+                // одним элементом VoiceOver с рамкой всей страницы, и тап по «кнопке» приходился мимо неё
+                if neighbour && !disabled {
+                    Color.clear
+                        .contentShape(shape)
+                        .onTapGesture { YeetHaptic.select(); go(k) }
+                        .accessibilityHidden(true)
+                }
             }
             .scaleEffect(place.scale, anchor: axis == .vertical ? .top : .center)
             .offset(x: place.x, y: place.y)
