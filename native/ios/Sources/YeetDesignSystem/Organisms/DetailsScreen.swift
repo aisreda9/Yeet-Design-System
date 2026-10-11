@@ -15,6 +15,12 @@ private struct YeetDetailsOffsetKey: PreferenceKey {
 ///   со своей миниатюрой (`thumb`) — фото гаснет, миниатюра встаёт в шапку вместо пилюли `titleChip`;
 /// - низ (`bottom`) и штамп (`stamp`) остаются на месте.
 /// При «Уменьшении движения» миниатюра появляется сразу. Фото опускается под панель, только когда долетело обратно.
+///
+/// **`pinned`** (#26) — блок между фото и панелью ВНЕ прокрутки (решение по фото, которое обязано быть видно без
+/// прокрутки). Фото уступает ему высоту: квадрат сжимается так, чтобы фото + блок помещались в экран, в пределах
+/// `mediaMinFraction`…`mediaMaxFraction` высоты области под шапкой. Панель начинается под блоком; при прокрутке она
+/// наезжает на фото, но не на блок: в свёрнутом состоянии блок поднимается под шапку и остаётся над панелью.
+/// Без `pinned` раскладка прежняя, пиксель в пиксель.
 public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// Порог сворачивания и возврата, pt.
     static var collapseAt: CGFloat { 24 }
@@ -27,12 +33,17 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let thumb: AnyView?
     private let bottom: AnyView?
     private let stamp: AnyView?
+    private let pinned: AnyView?
+    private let subtitle: String?
+    private let mediaMinFraction: CGFloat
+    private let mediaMaxFraction: CGFloat
     private let media: Media
     private let content: Content
 
     @State private var collapsed = false
     @State private var mediaOnTop = false
     @State private var headerHeight: CGFloat = 0
+    @State private var pinnedHeight: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// - Parameters:
@@ -42,6 +53,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - thumb: миниатюра 48 в шапке, когда фото свёрнуто. По умолчанию — само фото, уменьшенное до 48.
     ///   - bottom: закреплённый низ (`BottomBar`): панель уходит под него.
     ///   - stamp: штамп «Надеть» — поверх контента справа внизу, со скроллом не едет.
+    ///   - subtitle: строка под заголовком панели (Body `textSecondary`): «Все сезоны» (#39).
+    ///   - pinned: блок между фото и панелью вне прокрутки (#26); с ним фото уступает высоту.
+    ///   - mediaMinFraction: с `pinned` — нижняя граница фото, доля высоты области под шапкой.
+    ///   - mediaMaxFraction: с `pinned` — верхняя граница фото, доля высоты области под шапкой.
     ///   - media: фото вещи, коллаж образа — квадрат.
     public init(
         title: String? = nil,
@@ -51,6 +66,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         thumb: AnyView? = nil,
         bottom: AnyView? = nil,
         stamp: AnyView? = nil,
+        subtitle: String? = nil,
+        pinned: AnyView? = nil,
+        mediaMinFraction: CGFloat = 0.5,
+        mediaMaxFraction: CGFloat = 0.65,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -61,6 +80,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.thumb = thumb
         self.bottom = bottom
         self.stamp = stamp
+        self.subtitle = subtitle
+        self.pinned = pinned
+        self.mediaMinFraction = mediaMinFraction
+        self.mediaMaxFraction = mediaMaxFraction
         self.media = media()
         self.content = content()
     }
@@ -90,12 +113,16 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             })
             // слой ниже шапки в дереве рисуется поверх неё — так свёрнутое фото встаёт в шапку
             GeometryReader { proxy in
-                let side = max(proxy.size.width - 2 * gutter, 1)
+                let side = mediaSide(width: proxy.size.width, viewport: proxy.size.height)
                 ZStack(alignment: .top) {
                     mediaLayer(side: side, width: proxy.size.width)
                         .zIndex(mediaOnTop ? 2 : 0)
                     scroll(side: side, viewport: proxy.size.height)
                         .zIndex(1)
+                    if let pinned {
+                        pinnedLayer(pinned, side: side)
+                            .zIndex(3)
+                    }
                 }
             }
         }
@@ -107,6 +134,34 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                     .padding(.bottom, 28)
             }
         }
+    }
+
+    /// Сторона фото. Без `pinned` — во всю ширину минус поля (как было). С `pinned` — столько, чтобы фото, блок и
+    /// зазоры (20 над фото, 20 до блока, 12 после) поместились в область под шапкой, но не меньше
+    /// `mediaMinFraction` и не больше `mediaMaxFraction` её высоты.
+    private func mediaSide(width: CGFloat, viewport: CGFloat) -> CGFloat {
+        let full = max(width - 2 * gutter, 1)
+        guard pinned != nil else { return full }
+        let available = viewport - YeetSpace.s20 - Self.pinnedGap - pinnedHeight - YeetSpace.s12
+        let fitted = min(max(available, viewport * mediaMinFraction), viewport * mediaMaxFraction)
+        return max(min(full, fitted), 1)
+    }
+
+    /// Зазор между фото и блоком `pinned`.
+    private static var pinnedGap: CGFloat { YeetSpace.s20 }
+
+    /// Блок `pinned`: в покое под фото, в свёрнутом состоянии — под шапкой; фон экрана, панель уходит под него.
+    private func pinnedLayer(_ pinned: AnyView, side: CGFloat) -> some View {
+        pinned
+            .frame(maxWidth: .infinity)
+            .background(GeometryReader { proxy in
+                Color.clear
+                    .onAppear { pinnedHeight = proxy.size.height }
+                    .onChange(of: proxy.size.height) { pinnedHeight = $0 }
+            })
+            .padding(.bottom, YeetSpace.s12)
+            .background(YeetColor.bgCanvas)
+            .offset(y: collapsed ? 0 : YeetSpace.s20 + side + Self.pinnedGap)
     }
 
     /// Фото вне скролла: в покое под панелью, свёрнутое — миниатюра 48 в центре ряда кнопок шапки (сверху 8, ряд 48).
@@ -131,11 +186,11 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             VStack(spacing: 0) {
                 // место фото в потоке: схлопывается, и панель поднимается (остаток 25 = порог + 1)
                 Color.clear
-                    .frame(height: collapsed ? 25 : YeetSpace.s20 + side + YeetSpace.s20)
+                    .frame(height: spacerHeight(side: side))
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
                 // панель не короче экрана: свёрнутое состояние держится, даже если в ней мало полей
-                YeetSheet(title: title, type: .panel) { content }
+                YeetSheet(title: title, description: subtitle, type: .panel) { content }
                     .frame(minHeight: viewport + 120, alignment: .top)
             }
             .background(GeometryReader { proxy in
@@ -147,6 +202,14 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom { bottom }
         }
+    }
+
+    /// Место фото в потоке. Без `pinned` — как было: 20 + сторона + 20, свёрнуто — 25 (порог + 1). С `pinned` —
+    /// плюс блок и зазор под ним: панель начинается под блоком и в покое, и в свёрнутом состоянии.
+    private func spacerHeight(side: CGFloat) -> CGFloat {
+        let base = collapsed ? 25 : YeetSpace.s20 + side + YeetSpace.s20
+        guard pinned != nil else { return base }
+        return base + pinnedHeight + YeetSpace.s12
     }
 
     private func update(_ offset: CGFloat) {
@@ -196,6 +259,42 @@ private struct DetailsScreenPreview: View {
     }
 }
 
+/// С `pinned` (#26) и подзаголовком (#39): блок решения по фото между фото и панелью, два действия в шапке.
+private struct DetailsScreenPinnedPreview: View {
+    var body: some View {
+        YeetDetailsScreen(
+            title: "Белая рубашка",
+            actions: [YeetHeaderAction(icon: .more, label: "Ещё"), YeetHeaderAction(icon: .edit, label: "Изменить")],
+            subtitle: "Все сезоны",
+            pinned: AnyView(
+                VStack(alignment: .leading, spacing: YeetSpace.s12) {
+                    Text("Новое фото готово").yeetText(YeetType.body)
+                    HStack(spacing: YeetSpace.s8) {
+                        YeetButton("Оставить прежнее", variant: .tertiary, fullWidth: true) {}
+                        YeetButton("Подтвердить", fullWidth: true) {}
+                    }
+                }
+                .padding(.horizontal, YeetSpace.screenGutter)
+            ),
+            media: {
+                ZStack {
+                    YeetComponent.cardBg
+                    YeetItemArt(kind: .top, color: .white, size: 220)
+                }
+            },
+            content: {
+                YeetInputGroup {
+                    YeetField(label: "Категория", value: "Верх", trailingIcon: .chevronUpDown, onClick: {})
+                    YeetField(label: "Цвет", value: "Белый", colorDot: .white, trailingIcon: .chevronUpDown, onClick: {})
+                    YeetField(label: "Сезон", value: "Лето", trailingIcon: .chevronUpDown, onClick: {})
+                }
+            }
+        )
+    }
+}
+
+#Preview("DetailsScreen · pinned · SE") { DetailsScreenPinnedPreview().frame(height: 667) }
+#Preview("DetailsScreen · pinned · Dark") { DetailsScreenPinnedPreview().preferredColorScheme(.dark) }
 #Preview("DetailsScreen · Light") { DetailsScreenPreview().preferredColorScheme(.light) }
 #Preview("DetailsScreen · Dark") { DetailsScreenPreview().preferredColorScheme(.dark) }
 #endif
