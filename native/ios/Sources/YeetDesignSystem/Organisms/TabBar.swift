@@ -119,7 +119,8 @@ public struct YeetBottomNav: View {
             }
         }
         .padding(.horizontal, YeetSpace.screenGutter)
-        .padding(.bottom, YeetSpace.s20)
+        // 20 от края экрана, а не над безопасной зоной (`YeetBottomEdge`).
+        .yeetBottomEdgePadding()
         .animation(reduceMotion ? nil : YeetMotion.nav, value: fab)
         .background(alignment: .top) {
             VStack(spacing: 0) {
@@ -149,5 +150,6 @@ private struct BottomNavPreview: View {
     }
 }
 
-#Preview("TabBar / BottomNav") { BottomNavPreview() }
+#Preview("TabBar / BottomNav · Light") { BottomNavPreview().preferredColorScheme(.light) }
+#Preview("TabBar / BottomNav · Dark") { BottomNavPreview().preferredColorScheme(.dark) }
 #endif
