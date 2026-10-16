@@ -254,12 +254,16 @@ public struct YeetInputGroup<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) { content }
+        // Разделитель рисует каждое поле сверху; у первого его закрывает полоса фона группы. Полоса — ВНУТРИ стопки
+        // между полями (zIndex 0.5): выше обычных полей (0), но ниже поля в фокусе (1). Прежде она лежала поверх всей
+        // группы и съедала верхнюю сторону рамки фокуса у первого поля (дефект 173, P-0030.45.1).
+        VStack(spacing: 0) {
+            YeetComponent.inputBg.frame(height: 1).padding(.bottom, -1).zIndex(0.5).accessibilityHidden(true)
+            content
+        }
             .environment(\.yeetInputGroupSize, size)
             .frame(maxWidth: .infinity)
             .background(YeetComponent.inputBg)
-            // Разделитель рисует каждое поле сверху; у первого он закрыт полосой фона группы
-            .overlay(alignment: .top) { YeetComponent.inputBg.frame(height: 1).accessibilityHidden(true) }
             .clipShape(RoundedRectangle(cornerRadius: YeetRadius.lg, style: .continuous))
     }
 }
