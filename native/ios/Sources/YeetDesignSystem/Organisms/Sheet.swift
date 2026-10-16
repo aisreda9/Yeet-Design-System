@@ -518,7 +518,7 @@ public struct YeetDialog<Content: View>: View {
     @AccessibilityFocusState private var safeFocused: Bool
 
     /// - Parameters:
-    ///   - cancel: без `cancel` — уведомление с одной кнопкой `confirm` Tertiary на всю ширину («Ок!»).
+    ///   - cancel: без `cancel` — уведомление с одной кнопкой `confirm` **Primary** на всю ширину («Ок!», Figma `dialog` 962:3136).
     ///   - onCancel: отмена — при любом закрытии, кроме `confirm`: кнопка `cancel`, «escape», у нерискованного и свайп, и тап по затемнению.
     ///     В слое `.yeetDialog` / `.yeetOverlay` слой уходит сам, `onCancel` вызывается один раз.
     ///   - handle: хэндл (Figma: dialog · Show Handle). По умолчанию нет (D1).
@@ -553,7 +553,8 @@ public struct YeetDialog<Content: View>: View {
     private var cancelAll: (() -> Void)? { layer?.dismiss ?? onCancel }
 
     private var actions: [YeetFooterAction] {
-        guard let cancel else { return [YeetFooterAction(label: confirm, variant: .tertiary, onClick: onConfirm)] }
+        // Одна кнопка — Primary (Figma `dialog` 962:3136: «Ок!», «Понятно» — синие); с двумя — как было.
+        guard let cancel else { return [YeetFooterAction(label: confirm, variant: .primary, onClick: onConfirm)] }
         let safe = YeetFooterAction(label: cancel, variant: .primary, onClick: cancelAll)
         switch tone {
         case .default:
