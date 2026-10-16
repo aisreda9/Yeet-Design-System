@@ -148,12 +148,14 @@ public struct YeetInputBar: View {
         .frame(height: multiline ? nil : height)
         .frame(maxWidth: .infinity)
         .background(RoundedRectangle(cornerRadius: height / 2, style: .continuous).fill(isChat ? YeetColor.bgElevated : YeetComponent.inputBg))
+        // Фокус — обводка 1.5 `text-accent` внутрь и у чата, и у поиска (Figma `input-bar` 942:7282, Focus / Typing).
         .overlay {
-            if isChat && focused {
+            if focused {
                 RoundedRectangle(cornerRadius: height / 2, style: .continuous)
-                    .strokeBorder(YeetColor.textAccent, lineWidth: 1.5)
+                    .strokeBorder(YeetColor.textAccent, lineWidth: YeetBorderWidth.medium)
             }
         }
+        .yeetAnimation(YeetMotion.select, value: focused)
         .yeetFloating(isChat)
         .contentShape(RoundedRectangle(cornerRadius: height / 2, style: .continuous))
         .onTapGesture { focused = true } // тап по полю мимо текста — тоже в поле

@@ -38,6 +38,9 @@ public struct YeetField: View {
     private let onClick: (() -> Void)?
     @Environment(\.yeetInputGroupSize) private var groupSize
     @State private var revealed = false
+    /// Фокус поля ввода (Figma `input` State=Focus, 1182:20099). Внутренний: внешний `.focused(…)` вызова продолжает
+    /// работать — оба отражают один и тот же `TextField`.
+    @FocusState private var вФокусе: Bool
 
     /// - Parameters:
     ///   - label: лейбл слева (серый); в режиме ввода — плейсхолдер и подпись для VoiceOver.
@@ -114,9 +117,25 @@ public struct YeetField: View {
                 row
             }
         }
+        // В фокусе: обводка INSIDE 1.5 `text-accent`, радиус `lg` 20; обе линии у поля скрыты — своя сверху и линия
+        // следующего поля снизу (её закрывает полоса фона группы; поле в фокусе поднято над соседями).
         .overlay(alignment: .top) {
-            if groupSize != nil { YeetRowDivider() }
+            if groupSize != nil && !вФокусе { YeetRowDivider() }
         }
+        .overlay(alignment: .bottom) {
+            if groupSize != nil && вФокусе {
+                YeetComponent.inputBg.frame(height: 1).offset(y: 1).accessibilityHidden(true)
+            }
+        }
+        .overlay {
+            if вФокусе {
+                RoundedRectangle(cornerRadius: YeetRadius.lg, style: .continuous)
+                    .strokeBorder(YeetColor.textAccent, lineWidth: YeetBorderWidth.medium)
+                    .accessibilityHidden(true)
+            }
+        }
+        .zIndex(вФокусе ? 1 : 0)
+        .yeetAnimation(YeetMotion.select, value: вФокусе)
         .onChange(of: error) { hasError in
             if hasError { YeetHaptic.error() }
         }
@@ -177,6 +196,7 @@ public struct YeetField: View {
                 TextField("", text: input.text, prompt: prompt)
             }
         }
+        .focused($вФокусе)
         .keyboardType(input.keyboardType)
         .textContentType(input.textContentType)
         .foregroundStyle(contentColor)
