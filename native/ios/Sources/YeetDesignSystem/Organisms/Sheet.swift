@@ -627,7 +627,9 @@ enum YeetOverlayPresentation {
 public extension View {
     /// Модальный слой (React: `Overlay`): затемнение `bgOverlay` и прижатая к низу плавающая шторка.
     ///
-    /// **Место.** 16 от краёв экрана, снизу — `max(16, safe area)` (D3, #217), над клавиатурой — 16 (D4), сверху не выше статус-бара + 8 (D2).
+    /// **Место.** 16 от краёв экрана и **16 от нижнего края** (Figma `sheet` 962:3095, `dialog` 962:3136; на Face ID — внутри
+    /// зоны индикатора, как `YeetBottomEdge`): снизу `YeetBottomEdge.слойОтКрая` = `max(16, зона − 18)`; над клавиатурой —
+    /// 16 (D4: слой не заходит под клавиатуру, зона под ним 0); сверху не выше статус-бара + 8 (D2).
     /// **Движение.** Шторка выезжает на пружине без перелёта (D5), уходит быстрее (`YeetMotion.exit`).
     /// При «Уменьшении движения» — растворение вместо сдвига.
     /// **Закрытие** — один путь: свайп вниз (с хэндла, шапки, футера или непрокручиваемого тела; порог 30 % высоты
@@ -708,7 +710,7 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
                                 .onAppear { UIAccessibility.post(notification: .screenChanged, argument: nil) }
                                 .padding(.horizontal, YeetOverlayToken.inset)
                                 .padding(.top, proxy.safeAreaInsets.top + YeetOverlayToken.topGap)
-                                .padding(.bottom, max(YeetOverlayToken.inset, proxy.safeAreaInsets.bottom))
+                                .padding(.bottom, YeetBottomEdge.слойОтКрая(безопаснаяЗона: proxy.safeAreaInsets.bottom))
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                                 .transition(reduceMotion ? .opacity : .move(edge: .bottom))
                                 .zIndex(1)
