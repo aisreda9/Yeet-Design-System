@@ -40,6 +40,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     @State private var mediaOnTop = false
     @State private var headerHeight: CGFloat = 0
     @State private var pinnedHeight: CGFloat = 0
+    @State private var bottomHeight: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// - Parameters:
@@ -193,9 +194,12 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                     .frame(height: spacerHeight(side: side))
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
-                // панель не короче экрана: свёрнутое состояние держится, даже если в ней мало полей
+                // Панель не короче видимой области (над нижней кнопкой) + 8: свёрнутое состояние держится, даже
+                // если в ней мало полей, а подложка панели тянется до низа — без пустоты под коротким содержимым.
+                // Прежде `.frame(minHeight: viewport + 120)` стоял СНАРУЖИ панели: фон покрывал только содержимое
+                // (пустота посреди экрана), а запас 120 уводил верх панели под шапку (Garderob P-0030.49).
                 YeetSheet(title: title, description: subtitle, type: .panel) { content }
-                    .frame(minHeight: viewport + 120, alignment: .top)
+                    .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight))
             }
             // 🔴 Смещение — `onGeometryChange`, а не `PreferenceKey` из фона содержимого: на iOS 26 ключ из
             // фона внутри `ScrollView` при прокрутке НЕ обновлялся (одно значение 0 при появлении), и фото
@@ -208,8 +212,16 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         }
         .coordinateSpace(name: "yeet-details")
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let bottom { bottom }
+            if let bottom {
+                bottom.onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bottomHeight = $0 }
+            }
         }
+    }
+
+    /// Наименьшая высота панели: видимая область прокрутки (область под шапкой минус закреплённый низ) + 8. При
+    /// докрутке до конца коротко заполненная панель встаёт верхом под шапку (на 8 под неё), подложка — до низа.
+    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat) -> CGFloat {
+        max(0, viewport - bottom + 8)
     }
 
     /// Место фото в потоке. Без `pinned` — как было: 20 + сторона + 20, свёрнуто — 25 (порог + 1). С `pinned` —
