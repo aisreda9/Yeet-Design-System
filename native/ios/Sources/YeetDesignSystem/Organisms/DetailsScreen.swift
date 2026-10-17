@@ -29,6 +29,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let bottom: AnyView?
     private let stamp: AnyView?
     private let pinned: AnyView?
+    /// Элементы управления поверх фото (Garderob P-0030.53: «×» на фото, нажимаемый квадрат «Добавить фотографию»).
+    private let mediaControls: AnyView?
     private let subtitle: String?
     private let mediaMinFraction: CGFloat
     private let mediaMaxFraction: CGFloat
@@ -57,6 +59,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - minPanelPeek: с `pinned` — сколько панели оставить видимым над нижним краем, чтобы за неё можно было
     ///     потянуть (фото и блок прокрутку не ловят). Пол `mediaMinFraction` сильнее: на низком экране с высоким
     ///     блоком панель может уйти за край — тогда приложение опускает `mediaMinFraction`.
+    ///   - mediaControls: слой поверх фото — квадрат той же стороны. Фото лежит ПОД прокруткой, и касания по нему забирает
+    ///     она; этот слой живёт в самой прокрутке на месте фото, поэтому нажимается, а свайп по фото по-прежнему тянет
+    ///     панель. Уезжает вместе с содержимым (до 24 pt до сворачивания), в свёрнутом состоянии скрыт. `nil` — как было.
     ///   - media: фото вещи, коллаж образа — квадрат.
     public init(
         title: String? = nil,
@@ -71,6 +76,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         mediaMinFraction: CGFloat = 0.5,
         mediaMaxFraction: CGFloat = 0.65,
         minPanelPeek: CGFloat = 56,
+        mediaControls: AnyView? = nil,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -83,6 +89,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.stamp = stamp
         self.subtitle = subtitle
         self.pinned = pinned
+        self.mediaControls = mediaControls
         self.mediaMinFraction = mediaMinFraction
         self.mediaMaxFraction = mediaMaxFraction
         self.minPanelPeek = minPanelPeek
@@ -190,10 +197,19 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         ScrollView {
             VStack(spacing: 0) {
                 // место фото в потоке: схлопывается, и панель поднимается (остаток 25 = порог + 1)
-                Color.clear
-                    .frame(height: spacerHeight(side: side))
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
+                ZStack(alignment: .top) {
+                    Color.clear
+                        .frame(height: spacerHeight(side: side))
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                    if let mediaControls, !collapsed {
+                        mediaControls
+                            .frame(width: side, height: side)
+                            .padding(.top, YeetSpace.s20)
+                            .frame(maxWidth: .infinity)
+                            .transition(.opacity)
+                    }
+                }
                 // Панель не короче видимой области (над нижней кнопкой) + 8: свёрнутое состояние держится, даже
                 // если в ней мало полей, а подложка панели тянется до низа — без пустоты под коротким содержимым.
                 // Прежде `.frame(minHeight: viewport + 120)` стоял СНАРУЖИ панели: фон покрывал только содержимое
