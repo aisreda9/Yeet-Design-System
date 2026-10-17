@@ -117,8 +117,9 @@ public struct YeetCropFrame<Photo: View>: View {
                     cornerView(corner, frame: frame, size: size)
                 }
                 if let hint {
-                    HStack(spacing: 6) {
-                        YeetIcon(name: .fingersPinch, size: 16)
+                    // Hint Tone=On Photo (Figma `1183:20590`): иконка 24, зазор 8, Body (Garderob P-0030.50; было 16 / 6).
+                    HStack(spacing: YeetSpace.s8) {
+                        YeetIcon(name: .fingersPinch, size: 24)
                         Text(hint).yeetText(YeetType.body)
                     }
                     .foregroundStyle(YeetColor.textOnPhoto)
