@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Закреплённая нижняя кнопка (CTA) поверх контента (React: `BottomBar`): «Добавить», «Создать образ», «Переместить в гардероб».
 /// Главная кнопка Primary L на всю ширину, справа опционально — вторичное действие `IconButton` Secondary L, зазор 7.
-/// Поля — `screenGutter` по бокам и 20 снизу; подложка `bgCanvas` до низа экрана с полосой затухания 24 сверху.
+/// Поля — `screenGutter` по бокам и 20 от края экрана снизу (`YeetBottomEdge`); подложка `bgCanvas` до низа экрана с полосой затухания 24 сверху.
 /// Ставится в `.safeAreaInset(edge: .bottom)` экрана или в `YeetDetailsScreen(bottom:)`.
 public struct YeetBottomBar: View {
     private let label: String
@@ -30,7 +30,8 @@ public struct YeetBottomBar: View {
             }
         }
         .padding(.horizontal, YeetSpace.screenGutter)
-        .padding(.bottom, YeetSpace.s20)
+        // 20 от края экрана, а не над безопасной зоной (`YeetBottomEdge`).
+        .yeetBottomEdgePadding()
         .background(alignment: .top) {
             VStack(spacing: 0) {
                 LinearGradient(colors: [YeetColor.bgCanvas.opacity(0), YeetColor.bgCanvas], startPoint: .top, endPoint: .bottom)

@@ -17,9 +17,13 @@ import SwiftUI
 /// наезжает на фото, но не на блок: в свёрнутом состоянии блок поднимается под шапку и остаётся над панелью.
 /// Без `pinned` раскладка прежняя, пиксель в пиксель.
 public struct YeetDetailsScreen<Media: View, Content: View>: View {
-    /// Порог сворачивания и возврата, pt.
-    static var collapseAt: CGFloat { 24 }
-    static var expandAt: CGFloat { 8 }
+    /// Сворачивание (Garderob P-0030.54): фото едет вместе с прокруткой под шапку и сворачивается в миниатюру, когда от
+    /// него осталось `collapseVisible` pt; разворачивается, когда снова видно `expandVisible` pt (гистерезис — шапка не
+    /// дрожит на границе). Прежде фото сворачивалось уже после 24 pt прокрутки, место фото в прокрутке схлопывалось с
+    /// 20 + сторона + 20 до 25, и короткую панель приходилось растягивать на весь экран — поля уезжали под шапку, под
+    /// ними оставалась пустая панель (P-0030.49 п. 2 «не выше, чем нужно» так и не выполнялся).
+    static var collapseVisible: CGFloat { 24 }
+    static var expandVisible: CGFloat { 40 }
 
     private let title: String?
     private let titleChip: String?
@@ -29,6 +33,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let bottom: AnyView?
     private let stamp: AnyView?
     private let pinned: AnyView?
+    /// Элементы управления поверх фото (Garderob P-0030.53: «×» на фото, нажимаемый квадрат «Добавить фотографию»).
+    private let mediaControls: AnyView?
     private let subtitle: String?
     private let mediaMinFraction: CGFloat
     private let mediaMaxFraction: CGFloat
@@ -37,9 +43,12 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let content: Content
 
     @State private var collapsed = false
+    /// Смещение прокрутки, pt: фото в покое едет вместе с содержимым.
+    @State private var scrollOffset: CGFloat = 0
     @State private var mediaOnTop = false
     @State private var headerHeight: CGFloat = 0
     @State private var pinnedHeight: CGFloat = 0
+    @State private var bottomHeight: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// - Parameters:
@@ -56,6 +65,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - minPanelPeek: с `pinned` — сколько панели оставить видимым над нижним краем, чтобы за неё можно было
     ///     потянуть (фото и блок прокрутку не ловят). Пол `mediaMinFraction` сильнее: на низком экране с высоким
     ///     блоком панель может уйти за край — тогда приложение опускает `mediaMinFraction`.
+    ///   - mediaControls: слой поверх фото — квадрат той же стороны. Фото лежит ПОД прокруткой, и касания по нему забирает
+    ///     она; этот слой живёт в самой прокрутке на месте фото, поэтому нажимается, а свайп по фото по-прежнему тянет
+    ///     панель. Уезжает вместе с содержимым (до 24 pt до сворачивания), в свёрнутом состоянии скрыт. `nil` — как было.
     ///   - media: фото вещи, коллаж образа — квадрат.
     public init(
         title: String? = nil,
@@ -70,6 +82,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         mediaMinFraction: CGFloat = 0.5,
         mediaMaxFraction: CGFloat = 0.65,
         minPanelPeek: CGFloat = 56,
+        mediaControls: AnyView? = nil,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -82,6 +95,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.stamp = stamp
         self.subtitle = subtitle
         self.pinned = pinned
+        self.mediaControls = mediaControls
         self.mediaMinFraction = mediaMinFraction
         self.mediaMaxFraction = mediaMaxFraction
         self.minPanelPeek = minPanelPeek
@@ -165,7 +179,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             })
             .padding(.bottom, YeetSpace.s12)
             .background(YeetColor.bgCanvas)
-            .offset(y: collapsed ? 0 : YeetSpace.s20 + side + Self.pinnedGap)
+            .offset(y: collapsed ? 0 : YeetSpace.s20 + side + Self.pinnedGap - max(0, scrollOffset))
     }
 
     /// Фото вне скролла: в покое под панелью, свёрнутое — миниатюра 48 в центре ряда кнопок шапки (сверху 8, ряд 48).
@@ -177,7 +191,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             .frame(width: side, height: side)
             .clipShape(RoundedRectangle(cornerRadius: collapsed ? YeetRadius.md / k : YeetComponent.cardRadius, style: .continuous))
             .scaleEffect(collapsed ? k : 1, anchor: .topLeading)
-            .offset(x: collapsed ? dx : 0, y: collapsed ? dy : 0)
+            // в покое фото едет вместе с прокруткой (уходит под шапку), свёрнутое — миниатюра в шапке
+            .offset(x: collapsed ? dx : 0, y: collapsed ? dy : -max(0, scrollOffset))
             .opacity(collapsed && thumb != nil ? 0 : 1)
             .padding(.top, YeetSpace.s20)
             .frame(maxWidth: .infinity)
@@ -189,13 +204,27 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         ScrollView {
             VStack(spacing: 0) {
                 // место фото в потоке: схлопывается, и панель поднимается (остаток 25 = порог + 1)
-                Color.clear
-                    .frame(height: spacerHeight(side: side))
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
-                // панель не короче экрана: свёрнутое состояние держится, даже если в ней мало полей
+                ZStack(alignment: .top) {
+                    Color.clear
+                        .frame(height: spacerHeight(side: side))
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                    if let mediaControls, !collapsed {
+                        // слой нажатий — в самой прокрутке, поэтому едет вместе с фото
+                        mediaControls
+                            .frame(width: side, height: side)
+                            .padding(.top, YeetSpace.s20)
+                            .frame(maxWidth: .infinity)
+                            .transition(.opacity)
+                    }
+                }
+                // Панель не короче видимой области (над нижней кнопкой) + 8: свёрнутое состояние держится, даже
+                // если в ней мало полей, а подложка панели тянется до низа — без пустоты под коротким содержимым.
+                // Прежде `.frame(minHeight: viewport + 120)` стоял СНАРУЖИ панели: фон покрывал только содержимое
+                // (пустота посреди экрана), а запас 120 уводил верх панели под шапку (Garderob P-0030.49).
                 YeetSheet(title: title, description: subtitle, type: .panel) { content }
-                    .frame(minHeight: viewport + 120, alignment: .top)
+                    .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight,
+                                                                            spacer: spacerHeight(side: side)))
             }
             // 🔴 Смещение — `onGeometryChange`, а не `PreferenceKey` из фона содержимого: на iOS 26 ключ из
             // фона внутри `ScrollView` при прокрутке НЕ обновлялся (одно значение 0 при появлении), и фото
@@ -203,25 +232,38 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 -proxy.frame(in: .named("yeet-details")).minY
             } action: { offset in
-                update(offset)
+                scrollOffset = offset
+                update(offset, side: side)
             }
         }
         .coordinateSpace(name: "yeet-details")
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let bottom { bottom }
+            if let bottom {
+                bottom.onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bottomHeight = $0 }
+            }
         }
     }
 
-    /// Место фото в потоке. Без `pinned` — как было: 20 + сторона + 20, свёрнуто — 25 (порог + 1). С `pinned` —
-    /// плюс блок и зазор под ним: панель начинается под блоком и в покое, и в свёрнутом состоянии.
+    /// Наименьшая высота панели: от её места в покое (под фото) до закреплённого низа. Подложка тянется до низа в покое и
+    /// при любой прокрутке (при докрутке до конца низ панели = низ видимой области), а короткое содержимое не уезжает
+    /// выше, чем нужно, чтобы показать его целиком над нижней кнопкой: фото при этом уходит под шапку (P-0030.49 п. 2).
+    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat, spacer: CGFloat) -> CGFloat {
+        max(0, viewport - bottom - spacer)
+    }
+
+    /// Место фото в потоке — постоянное (20 + сторона + 20; с `pinned` — плюс блок и зазор): фото уходит под шапку
+    /// прокруткой, а не схлопыванием места, и панель не прыгает при сворачивании.
     private func spacerHeight(side: CGFloat) -> CGFloat {
-        let base = collapsed ? 25 : YeetSpace.s20 + side + YeetSpace.s20
+        let base = YeetSpace.s20 + side + YeetSpace.s20
         guard pinned != nil else { return base }
         return base + pinnedHeight + YeetSpace.s12
     }
 
-    private func update(_ offset: CGFloat) {
-        let next = collapsed ? offset > Self.expandAt : offset > Self.collapseAt
+    /// Видимая часть фото = 20 + сторона − смещение. Свернуть, когда осталось ≤ `collapseVisible`; развернуть, когда
+    /// снова видно ≥ `expandVisible`.
+    private func update(_ offset: CGFloat, side: CGFloat) {
+        let видно = YeetSpace.s20 + side - offset
+        let next = collapsed ? видно < Self.expandVisible : видно <= Self.collapseVisible
         guard next != collapsed else { return }
         if next { mediaOnTop = true }
         yeetWithAnimation(YeetMotion.collapse, reduceMotion: reduceMotion) { collapsed = next }

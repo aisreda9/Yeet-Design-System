@@ -45,6 +45,11 @@ public struct YeetPagerLook: Identifiable {
 /// **VoiceOver:** текущий образ — регулируемый элемент «Образы, 2 из 5: имя», смахивание вверх / вниз листает; скрытые образы не читаются.
 /// Управляемый (`index: $i`) или неуправляемый (`defaultIndex`, индекс хранится в `@State`).
 /// Пустой `looks` — пейджер ничего не рисует (экран показывает `YeetEmptyState`); один образ — без превью и без жеста.
+///
+/// **По кругу** (`loop: true`, от двух образов и без `trailing`): с первого назад — последний, с последнего вперёд — первый,
+/// превью соседей тоже по кругу (над первым — последний). Внутри — «виртуальный» индекс без границ: рисуются позиции
+/// −2…+2 вокруг него, ключ позиции — её виртуальный номер, образ — номер по модулю `looks.count`. Поэтому шаг через стык —
+/// тот же шаг на одну позицию (без прыжка и мигания); наружу (`index`, `onIndexChange`, VoiceOver) — настоящий индекс 0…N−1.
 public struct YeetOutfitPager: View {
     /// Размер коллажа в макете.
     static let design: CGFloat = 353
@@ -62,8 +67,11 @@ public struct YeetOutfitPager: View {
     private let trailing: AnyView?
     private let disabled: Bool
     private let label: String
+    private let loop: Bool
 
     @State private var internalIndex: Int
+    /// Виртуальный индекс ленты по кругу (без границ); его остаток по `looks.count` — настоящий индекс.
+    @State private var virtualIndex: Int
     @State private var drag: CGFloat = 0
     @State private var lockedAxis: Axis?
     @State private var crossed = false
@@ -81,6 +89,7 @@ public struct YeetOutfitPager: View {
     ///   - trailing: слайд после последнего образа — страница той же стороны, что коллаж («Досмотрели все образы /
     ///     Показать ещё», «Это все варианты»). Листается как образ; его индекс — `looks.count`. На нём слоты погоды и
     ///     штампов прячутся, тап по нему не вызывает `onClick` — кнопки внутри слайда нажимаются сами.
+    ///   - loop: листать по кругу (от двух образов; со слайдом `trailing` не действует). По умолчанию — нет.
     public init(
         looks: [YeetPagerLook],
         axis: Axis = .vertical,
@@ -93,6 +102,7 @@ public struct YeetOutfitPager: View {
         skip: AnyView? = nil,
         disabled: Bool = false,
         label: String = "Образы",
+        loop: Bool = false,
         trailing: AnyView? = nil
     ) {
         self.looks = looks
@@ -107,7 +117,9 @@ public struct YeetOutfitPager: View {
         self.trailing = trailing
         self.disabled = disabled
         self.label = label
+        self.loop = loop
         self._internalIndex = State(initialValue: index.wrappedValue)
+        self._virtualIndex = State(initialValue: index.wrappedValue)
     }
 
     /// Неуправляемый пейджер: начинает с `defaultIndex`, дальше листает сам и сообщает в `onIndexChange`.
@@ -124,6 +136,7 @@ public struct YeetOutfitPager: View {
         skip: AnyView? = nil,
         disabled: Bool = false,
         label: String = "Образы",
+        loop: Bool = false,
         trailing: AnyView? = nil
     ) {
         self.looks = looks
@@ -138,7 +151,9 @@ public struct YeetOutfitPager: View {
         self.trailing = trailing
         self.disabled = disabled
         self.label = label
+        self.loop = loop
         self._internalIndex = State(initialValue: defaultIndex)
+        self._virtualIndex = State(initialValue: defaultIndex)
     }
 
     /// Страниц: образы и слайд после них (`trailing`).
@@ -150,6 +165,14 @@ public struct YeetOutfitPager: View {
         let raw = external?.wrappedValue ?? internalIndex
         return min(max(raw, 0), max(count - 1, 0))
     }
+
+    /// Лента по кругу: просили, образов два и больше, слайда после них нет.
+    private var looping: Bool { loop && trailing == nil && looks.count >= 2 }
+
+    private func wrap(_ v: Int) -> Int { let n = max(looks.count, 1); return ((v % n) + n) % n }
+
+    /// Виртуальная позиция текущего образа. Индекс сменили снаружи (новая лента — к первому) — позиция = индекс.
+    private var virtual: Int { wrap(virtualIndex) == index ? virtualIndex : index }
 
     /// Верх текущего коллажа: в стопке под превью + 20.
     private var top: CGFloat { axis == .vertical ? preview + Self.gap : 0 }
@@ -163,8 +186,15 @@ public struct YeetOutfitPager: View {
             GeometryReader { proxy in
                 let side = proxy.size.width
                 ZStack(alignment: .topLeading) {
-                    ForEach(Array(looks.enumerated()), id: \.element.id) { k, look in
-                        lookView(look, at: k, side: side)
+                    if looping {
+                        // позиции −2…+2 вокруг текущей; при двух образах сосед сверху и снизу — один и тот же образ
+                        ForEach(Array((virtual - 2)...(virtual + 2)), id: \.self) { v in
+                            lookView(looks[wrap(v)], at: wrap(v), offset: v - virtual, side: side)
+                        }
+                    } else {
+                        ForEach(Array(looks.enumerated()), id: \.element.id) { k, look in
+                            lookView(look, at: k, offset: k - index, side: side)
+                        }
                     }
                     if let trailing {
                         trailingView(trailing, side: side)
@@ -193,8 +223,8 @@ public struct YeetOutfitPager: View {
         var opacity: Double = 1
     }
 
-    private func placement(_ k: Int, side: CGFloat) -> Placement {
-        let r = k - index
+    /// `r` — смещение от текущего образа (−1 — сосед сверху / слева).
+    private func placement(_ r: Int, side: CGFloat) -> Placement {
         if axis == .horizontal {
             return Placement(x: CGFloat(r) * (side + Self.gap) + drag)
         }
@@ -208,10 +238,10 @@ public struct YeetOutfitPager: View {
         }
     }
 
-    private func lookView(_ look: YeetPagerLook, at k: Int, side: CGFloat) -> some View {
-        let place = placement(k, side: side)
-        let current = k == index
-        let neighbour = abs(k - index) == 1
+    private func lookView(_ look: YeetPagerLook, at k: Int, offset r: Int, side: CGFloat) -> some View {
+        let place = placement(r, side: side)
+        let current = r == 0
+        let neighbour = abs(r) == 1
         // у превью радиус 20, как у миниатюры образа: до масштаба 20 / scale
         let radius = YeetComponent.cardRadius / max(place.scale, 0.01)
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
@@ -235,7 +265,7 @@ public struct YeetOutfitPager: View {
                     onClick?(k)
                 } else if neighbour {
                     YeetHaptic.select()
-                    go(k)
+                    step(r)
                 }
             }
             .allowsHitTesting(neighbour || current)
@@ -246,8 +276,8 @@ public struct YeetOutfitPager: View {
             .accessibilityAction { if current, !disabled { onClick?(k) } }
             .accessibilityAdjustableAction { direction in
                 switch direction {
-                case .increment: go(index + 1)
-                case .decrement: go(index - 1)
+                case .increment: step(1)
+                case .decrement: step(-1)
                 @unknown default: break
                 }
             }
@@ -259,7 +289,7 @@ public struct YeetOutfitPager: View {
     /// может через последний образ: на слайде он остаётся регулируемым элементом («N из N», смахивание вниз — к нему).
     private func trailingView(_ content: AnyView, side: CGFloat) -> some View {
         let k = looks.count
-        let place = placement(k, side: side)
+        let place = placement(k - index, side: side)
         let current = k == index
         let neighbour = abs(k - index) == 1
         let shape = RoundedRectangle(cornerRadius: YeetComponent.cardRadius / max(place.scale, 0.01), style: .continuous)
@@ -354,7 +384,7 @@ public struct YeetOutfitPager: View {
         guard lockedAxis == axis else { return } // жест поперёк — не наш
         tracker.add(value.location, at: value.time)
         let d = along(value.translation)
-        let edge = (d > 0 && index == 0) || (d < 0 && index == count - 1)
+        let edge = !looping && ((d > 0 && index == 0) || (d < 0 && index == count - 1))
         let isCrossed = !edge && abs(d) > Self.design * YeetGesture.swipeDistance
         if isCrossed && !crossed { YeetHaptic.threshold() } // один раз на пороге
         crossed = isCrossed
@@ -371,16 +401,32 @@ public struct YeetOutfitPager: View {
         tracker.reset()
         let d = along(value.translation)
         let flick = abs(v) > YeetGesture.swipeVelocity && (v > 0) == (d > 0)
-        let target = index + (d < 0 ? 1 : -1)
-        if (abs(d) > Self.design * YeetGesture.swipeDistance || flick) && (0..<count).contains(target) {
+        let delta = d < 0 ? 1 : -1
+        if (abs(d) > Self.design * YeetGesture.swipeDistance || flick) && (looping || (0..<count).contains(index + delta)) {
             if axis == .vertical { YeetHaptic.skip() } else { YeetHaptic.select() }
-            go(target)
+            step(delta)
         } else {
             yeetWithAnimation(settle, reduceMotion: reduceMotion) { drag = 0 }
         }
     }
 
     private var settle: Animation { axis == .vertical ? YeetMotion.swap : YeetMotion.page }
+
+    /// Шаг на `delta` позиций. По кругу — через виртуальный индекс (стык как обычный шаг), иначе — `go`.
+    private func step(_ delta: Int) {
+        guard looping else { go(index + delta); return }
+        let nextVirtual = virtual + delta
+        let next = wrap(nextVirtual)
+        yeetWithAnimation(settle, reduceMotion: reduceMotion) {
+            drag = 0
+            virtualIndex = nextVirtual
+            if let external { external.wrappedValue = next } else { internalIndex = next }
+        }
+        if next != index {
+            onIndexChange?(next)
+            UIAccessibility.post(notification: .announcement, argument: "Образ \(next + 1) из \(looks.count)" + (looks[next].name.map { ": \($0)" } ?? ""))
+        }
+    }
 
     private func go(_ next: Int) {
         guard (0..<count).contains(next) else { return }
@@ -478,13 +524,14 @@ private struct OutfitPagerPreview: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 40) {
-                // «Сегодня» (Figma `1173:16144`): снимки, погода наклоном, штамп «Надеть»
+                // «Сегодня» (Figma `1173:16144`): снимки, погода наклоном, штамп «Надеть»; по кругу
                 YeetOutfitPager(
                     looks: snapshots,
                     index: $snapshotIndex,
                     onClick: { _ in },
                     weather: AnyView(YeetWeatherCard(temperature: "20°", description: "Солнечно, ветер 14 км/ч", tilt: true)),
-                    stamp: AnyView(YeetStamp(label: "Надеть", done: worn) { worn.toggle() })
+                    stamp: AnyView(YeetStamp(label: "Надеть", done: worn) { worn.toggle() }),
+                    loop: true
                 )
                 // «Удиви меня» (Figma `1176:20319`): превью 150, «Не нравится» слева, «Сохранить» справа, после образов —
                 // слайд «Досмотрели все образы» (`trailing`)
