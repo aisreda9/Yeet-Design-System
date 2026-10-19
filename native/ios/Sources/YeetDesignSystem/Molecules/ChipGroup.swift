@@ -121,6 +121,7 @@ public struct YeetChipGroup: View {
     private let onToggle: ((String) -> Void)?
     private let onRemove: ((String) -> Void)?
     private let onAdd: (() -> Void)?
+    private let addLabel: String
     private let onEdit: ((String) -> Void)?
     private let onEditDone: ((String) -> Void)?
     private let wrap: Bool
@@ -134,6 +135,7 @@ public struct YeetChipGroup: View {
     ///   - onToggle: нажатие на чипс: приходит `id`.
     ///   - onRemove: крестик тега (`removable`): приходит `id`.
     ///   - onAdd: кнопка «+» (Primary 36) перед чипсами.
+    ///   - addLabel: имя «+» для VoiceOver — «Добавить тег», когда на экране есть своя «Добавить» (форма вещи).
     ///   - onEdit: ввод в редактируемом чипсе (`editing`): приходит весь текст. Без него поле только для чтения.
     ///   - onEditDone: «Готово» на клавиатуре или уход фокуса из редактируемого чипса: сохранить введённое.
     ///   - center: подсказки по центру (Поиск в сторах), только с `wrap`.
@@ -145,6 +147,7 @@ public struct YeetChipGroup: View {
         onToggle: ((String) -> Void)? = nil,
         onRemove: ((String) -> Void)? = nil,
         onAdd: (() -> Void)? = nil,
+        addLabel: String = "Добавить",
         onEdit: ((String) -> Void)? = nil,
         onEditDone: ((String) -> Void)? = nil,
         wrap: Bool = false,
@@ -157,6 +160,7 @@ public struct YeetChipGroup: View {
         self.onToggle = onToggle
         self.onRemove = onRemove
         self.onAdd = onAdd
+        self.addLabel = addLabel
         self.onEdit = onEdit
         self.onEditDone = onEditDone
         self.wrap = wrap
@@ -181,7 +185,7 @@ public struct YeetChipGroup: View {
     @ViewBuilder
     private var items: some View {
         if let onAdd {
-            YeetIconButton(icon: .plus, label: "Добавить", variant: .primary, size: .s, action: onAdd)
+            YeetIconButton(icon: .plus, label: addLabel, variant: .primary, size: .s, action: onAdd)
                 .sized(side: 36)
         }
         ForEach(chips) { chip in
