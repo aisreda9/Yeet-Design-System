@@ -30,16 +30,23 @@ public enum YeetTab: String, CaseIterable, Identifiable {
 
 /// Плавающий таб-бар (React: `TabBar`): 5 вкладок-иконок, под активной — пилюля `bgSubtle`, которая переезжает
 /// на пружине `YeetMotion.nav`. Неактивные иконки серые. React `active` + `onChange` → `Binding`.
+///
+/// Повторный тап по активной вкладке выбор не меняет и приходит в `onReselect` (Garderob P-0030.55): приложение делает
+/// то, что делала системная `TabView`, — стек вкладки к корню, у корня список наверх.
 public struct YeetTabBar: View {
     @Binding private var active: YeetTab
     private let initial: String
+    private let onReselect: ((YeetTab) -> Void)?
     @Namespace private var pill
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// - Parameter initial: буква аккаунта на вкладке «Профиль».
-    public init(active: Binding<YeetTab>, initial: String = "С") {
+    /// - Parameters:
+    ///   - initial: буква аккаунта на вкладке «Профиль».
+    ///   - onReselect: тап по уже активной вкладке; `nil` — такой тап ничего не делает (как было).
+    public init(active: Binding<YeetTab>, initial: String = "С", onReselect: ((YeetTab) -> Void)? = nil) {
         self._active = active
         self.initial = initial
+        self.onReselect = onReselect
     }
 
     public var body: some View {
@@ -60,7 +67,7 @@ public struct YeetTabBar: View {
     private func tabButton(_ tab: YeetTab) -> some View {
         let isActive = tab == active
         return Button {
-            guard !isActive else { return }
+            guard !isActive else { onReselect?(tab); return }
             YeetHaptic.select()
             withAnimation(reduceMotion ? nil : YeetMotion.nav) { active = tab }
         } label: {
@@ -100,19 +107,24 @@ public struct YeetBottomNav: View {
     private let fab: Bool
     private let onFab: (() -> Void)?
     private let initial: String
+    private let onReselect: ((YeetTab) -> Void)?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// - Parameter fab: «+» справа (Гардероб, Вишлист).
-    public init(active: Binding<YeetTab>, fab: Bool = false, onFab: (() -> Void)? = nil, initial: String = "С") {
+    /// - Parameters:
+    ///   - fab: «+» справа (Гардероб, Вишлист).
+    ///   - onReselect: тап по уже активной вкладке (см. `YeetTabBar`).
+    public init(active: Binding<YeetTab>, fab: Bool = false, onFab: (() -> Void)? = nil, initial: String = "С",
+                onReselect: ((YeetTab) -> Void)? = nil) {
         self._active = active
         self.fab = fab
         self.onFab = onFab
         self.initial = initial
+        self.onReselect = onReselect
     }
 
     public var body: some View {
         HStack(spacing: 7) {
-            YeetTabBar(active: $active, initial: initial)
+            YeetTabBar(active: $active, initial: initial, onReselect: onReselect)
             if fab {
                 YeetIconButton(icon: .plus, label: "Добавить", variant: .primary, size: .xl, floating: true) { onFab?() }
                     .transition(.scale(scale: 0.4).combined(with: .opacity))
