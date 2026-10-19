@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Детали вещи и образа (React: `DetailsScreen` + `usePhotoCollapse`; Figma: Wardrobe / Item Details `1371:41024 → 1371:41076`,
 /// Outfit Details `1371:41156 → 1371:41329`, Animations «new things» `354:17405 → 354:17449`).
@@ -49,6 +50,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     @State private var headerHeight: CGFloat = 0
     @State private var pinnedHeight: CGFloat = 0
     @State private var bottomHeight: CGFloat = 0
+    /// Верх закреплённого низа в координатах окна — до него поднимается поле в фокусе.
+    @State private var bottomTop: CGFloat = .infinity
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// - Parameters:
@@ -239,10 +242,25 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         .coordinateSpace(name: "yeet-details")
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom {
-                bottom.onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bottomHeight = $0 }
+                bottom
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bottomHeight = $0 }
+                    .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { bottomTop = $0 }
             }
         }
+        // Поле в фокусе — над закреплённым низом (Garderob P-0030.55). Низ встаёт над клавиатурой, а SwiftUI докручивает
+        // к полю, только когда его закрывает сама клавиатура: поле, видное над ней, но закрытое поднявшимся низом,
+        // оставалось под кнопкой («Название» на SE и 17 Pro). Способ закрепления (`safeAreaInset` / `safeAreaPadding` /
+        // `contentMargins`) этого не меняет — замер на стенде одинаковый. Поэтому, когда клавиатура встала, экран сам
+        // докручивает поле до верха низа.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
+            guard bottom != nil else { return }
+            YeetFocusedField.lift(above: bottomTop - Self.focusGap)
+        }
     }
+
+    /// Зазор от текста поля в фокусе до закреплённого низа. Первый ответчик — сам текст (`UITextField` ~22 pt), а не
+    /// строка поля: её нижний отступ (~20 у `YeetField`) входит в зазор, чтобы строка целиком была над низом.
+    static var focusGap: CGFloat { YeetSpace.s24 }
 
     /// Наименьшая высота панели: от её места в покое (под фото) до закреплённого низа. Подложка тянется до низа в покое и
     /// при любой прокрутке (при докрутке до конца низ панели = низ видимой области), а короткое содержимое не уезжает
@@ -274,6 +292,43 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             }
         }
     }
+}
+
+/// Поле ввода в фокусе (первый ответчик UIKit под SwiftUI `TextField`) и его прокрутка.
+@MainActor
+enum YeetFocusedField {
+    fileprivate static weak var found: UIResponder?
+
+    static func current() -> UIView? {
+        found = nil
+        UIApplication.shared.sendAction(#selector(UIResponder.yeetRememberFirstResponder), to: nil, from: nil, for: nil)
+        return found as? UIView
+    }
+
+    /// Насколько докрутить, чтобы низ поля встал на `limit` (координаты окна), при запасе прокрутки `room`.
+    static func lift(fieldBottom: CGFloat, limit: CGFloat, room: CGFloat) -> CGFloat {
+        guard fieldBottom > limit + 0.5 else { return 0 }
+        return min(fieldBottom - limit, max(0, room))
+    }
+
+    /// Докрутить ближайшую прокрутку поля в фокусе так, чтобы его низ был не ниже `limit`. Возвращает сдвиг.
+    @discardableResult
+    static func lift(above limit: CGFloat) -> CGFloat {
+        guard let field = current(), field.window != nil else { return 0 }
+        var view = field.superview
+        while let v = view, !(v is UIScrollView) { view = v.superview }
+        guard let scroll = view as? UIScrollView else { return 0 }
+        let bottom = field.convert(field.bounds, to: nil).maxY
+        let maxOffset = scroll.contentSize.height + scroll.adjustedContentInset.bottom - scroll.bounds.height
+        let delta = lift(fieldBottom: bottom, limit: limit, room: maxOffset - scroll.contentOffset.y)
+        guard delta > 0 else { return 0 }
+        scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: scroll.contentOffset.y + delta), animated: true)
+        return delta
+    }
+}
+
+extension UIResponder {
+    @MainActor @objc fileprivate func yeetRememberFirstResponder() { YeetFocusedField.found = self }
 }
 
 #if DEBUG

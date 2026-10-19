@@ -121,6 +121,7 @@ public struct YeetChipGroup: View {
     private let onToggle: ((String) -> Void)?
     private let onRemove: ((String) -> Void)?
     private let onAdd: (() -> Void)?
+    private let addLabel: String
     private let onEdit: ((String) -> Void)?
     private let onEditDone: ((String) -> Void)?
     private let wrap: Bool
@@ -134,6 +135,7 @@ public struct YeetChipGroup: View {
     ///   - onToggle: нажатие на чипс: приходит `id`.
     ///   - onRemove: крестик тега (`removable`): приходит `id`.
     ///   - onAdd: кнопка «+» (Primary 36) перед чипсами.
+    ///   - addLabel: имя «+» для VoiceOver — «Добавить тег», когда на экране есть своя «Добавить» (форма вещи).
     ///   - onEdit: ввод в редактируемом чипсе (`editing`): приходит весь текст. Без него поле только для чтения.
     ///   - onEditDone: «Готово» на клавиатуре или уход фокуса из редактируемого чипса: сохранить введённое.
     ///   - center: подсказки по центру (Поиск в сторах), только с `wrap`.
@@ -145,6 +147,7 @@ public struct YeetChipGroup: View {
         onToggle: ((String) -> Void)? = nil,
         onRemove: ((String) -> Void)? = nil,
         onAdd: (() -> Void)? = nil,
+        addLabel: String = "Добавить",
         onEdit: ((String) -> Void)? = nil,
         onEditDone: ((String) -> Void)? = nil,
         wrap: Bool = false,
@@ -157,6 +160,7 @@ public struct YeetChipGroup: View {
         self.onToggle = onToggle
         self.onRemove = onRemove
         self.onAdd = onAdd
+        self.addLabel = addLabel
         self.onEdit = onEdit
         self.onEditDone = onEditDone
         self.wrap = wrap
@@ -181,7 +185,7 @@ public struct YeetChipGroup: View {
     @ViewBuilder
     private var items: some View {
         if let onAdd {
-            YeetIconButton(icon: .plus, label: "Добавить", variant: .primary, size: .s, action: onAdd)
+            YeetIconButton(icon: .plus, label: addLabel, variant: .primary, size: .s, action: onAdd)
                 .sized(side: 36)
         }
         ForEach(chips) { chip in
@@ -231,22 +235,56 @@ public struct YeetChipGroup: View {
 /// Chip · State=Editing (React: `Chip.editing` в `ChipGroup`): поле по ширине текста в капсуле S `tertiary`,
 /// плейсхолдер серым, каретка акцентом; при появлении получает фокус. Справа — серый ⌄ (`dropdown`) или × (`removable`).
 /// Поля: слева 16; справа 16, с ⌄ — 12, с × — 8 до крестика (как у тега).
+///
+/// **Ввод (Garderob P-0030.55).** Текст и фокус живут в самом чипе; `onEdit` получает каждую правку (приложение может
+/// вернуть в `label` обрезанный текст — чип его примет). Одна сессия ввода — одно `onEditDone`:
+/// - Return («Готово») — сразу;
+/// - уход фокуса — только если фокус не вернулся за `refocusGrace` (перестройка экрана при быстром наборе роняет
+///   фокус на миг; прежде это коммитило первую букву, а остаток слова пропадал: «т1…т10» → «т», «т4», «т9»);
+/// - чип убран приложением, пока уход фокуса ждёт, — сразу, введённое не теряется;
+/// - × — отмена, без `onEditDone`.
+/// Запоздавший уход фокуса уже завершённой сессии ничего не коммитит. Новая сессия на каждое «+»: давать чипу ввода
+/// новое `value` (например, с номером), тогда у каждого ввода своё поле.
 struct YeetChipEditField: View {
     let chip: YeetChip
     let onEdit: ((String) -> Void)?
     let onEditDone: ((String) -> Void)?
     let onRemove: (() -> Void)?
     @FocusState private var focused: Bool
+    @State private var text: String
+    @State private var session = EditSession()
 
-    private var text: Binding<String> {
-        Binding(get: { chip.label }, set: { onEdit?($0) })
+    /// Сколько ждать возврата фокуса, прежде чем засчитать его уход.
+    static var refocusGrace: Duration { .milliseconds(350) }
+
+    /// Состояние сессии ввода — ссылкой: его читают отложенная задача ухода фокуса и `onDisappear` уже убранного чипа.
+    final class EditSession {
+        /// `onEditDone` отдан или ввод отменён — больше ничего не коммитить, пока фокус не вернётся.
+        var finished = false
+        /// Уход фокуса ждёт `refocusGrace`.
+        var pendingBlur = false
+    }
+
+    init(chip: YeetChip, onEdit: ((String) -> Void)?, onEditDone: ((String) -> Void)?, onRemove: (() -> Void)?) {
+        self.chip = chip
+        self.onEdit = onEdit
+        self.onEditDone = onEditDone
+        self.onRemove = onRemove
+        self._text = State(initialValue: chip.label)
+    }
+
+    private var binding: Binding<String> {
+        Binding(get: { text }, set: { new in
+            text = new
+            onEdit?(new)
+        })
     }
 
     private var name: String { chip.placeholder ?? "Название" }
 
     var body: some View {
         HStack(spacing: chip.dropdown && !chip.removable ? YeetSpace.s8 : 0) {
-            TextField("", text: text, prompt: Text(chip.placeholder ?? "").foregroundColor(YeetColor.textSecondary))
+            TextField("", text: binding, prompt: Text(chip.placeholder ?? "").foregroundColor(YeetColor.textSecondary))
                 .yeetText(YeetType.body)
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false)
@@ -255,12 +293,15 @@ struct YeetChipEditField: View {
                 .submitLabel(.done)
                 .focused($focused)
                 .disabled(onEdit == nil)
-                .onSubmit { onEditDone?(chip.label) }
+                .onSubmit { finish() }
                 .accessibilityLabel(Text(name))
                 .padding(.leading, YeetSpace.s16)
                 .padding(.trailing, chip.removable ? YeetSpace.s8 : (chip.dropdown ? 0 : YeetSpace.s16))
             if chip.removable {
-                Button { onRemove?() } label: {
+                Button {
+                    session.finished = true
+                    onRemove?()
+                } label: {
                     YeetIcon(name: .cross, size: 20)
                         .padding(.trailing, YeetSpace.s12)
                         .frame(minHeight: YeetControlSize.s.height)
@@ -268,7 +309,7 @@ struct YeetChipEditField: View {
                 }
                 .buttonStyle(YeetPressStyle())
                 .yeetHitArea(width: 32, height: YeetControlSize.s.height)
-                .accessibilityLabel(Text(chip.label.isEmpty ? "Удалить" : "Удалить: \(chip.label)"))
+                .accessibilityLabel(Text(text.isEmpty ? "Удалить" : "Удалить: \(text)"))
             } else if chip.dropdown {
                 YeetIcon(name: .chevronUpDown, size: 20)
                     .padding(.trailing, YeetSpace.s12)
@@ -283,9 +324,35 @@ struct YeetChipEditField: View {
         .yeetHitArea(height: YeetControlSize.s.height)
         .accessibilityElement(children: .contain)
         .onAppear { if onEdit != nil { focused = true } }
-        .onChange(of: focused) { isFocused in
-            if !isFocused { onEditDone?(chip.label) }
+        .onChange(of: chip.label) { label in
+            // приложение вернуло свой текст (обрезанный) — показать его
+            if label != text { text = label }
         }
+        .onChange(of: focused) { isFocused in
+            if isFocused {
+                session.finished = false
+                session.pendingBlur = false
+                return
+            }
+            guard !session.finished else { return }
+            session.pendingBlur = true
+            let current = session
+            Task { @MainActor in
+                try? await Task.sleep(for: Self.refocusGrace)
+                guard current.pendingBlur, !focused else { return }
+                finish()
+            }
+        }
+        .onDisappear {
+            if session.pendingBlur { finish() }
+        }
+    }
+
+    private func finish() {
+        session.pendingBlur = false
+        guard !session.finished else { return }
+        session.finished = true
+        onEditDone?(text)
     }
 }
 
