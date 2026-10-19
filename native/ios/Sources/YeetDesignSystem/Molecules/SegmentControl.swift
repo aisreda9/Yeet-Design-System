@@ -98,7 +98,8 @@ public struct YeetSegmentControl: View {
             .padding(.horizontal, iconOnly ? 0 : size.padding)
             .frame(maxWidth: fit ? nil : .infinity, maxHeight: .infinity)
             .frame(minWidth: iconOnly ? size.height - 8 : nil)
-            .foregroundStyle(iconOnly && !active ? YeetColor.textSecondary : YeetComponent.buttonGhostFg)
+            // Неактивный сегмент — `text-secondary` и у иконки, и у подписи (Figma `942:7195`); активный — основной цвет.
+            .foregroundStyle(active ? YeetComponent.buttonGhostFg : YeetColor.textSecondary)
             .background {
                 if active {
                     Capsule()

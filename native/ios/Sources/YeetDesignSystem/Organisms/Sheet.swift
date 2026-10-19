@@ -107,6 +107,19 @@ public enum YeetSheetType: String, CaseIterable, Identifiable {
     public var id: String { rawValue }
 }
 
+private struct YeetPanelMinHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+extension EnvironmentValues {
+    /// Наименьшая высота панели (`YeetSheet(type: .panel)`) — фон и тень панели покрывают её целиком. Задаёт
+    /// `YeetDetailsScreen`: панель деталей не короче видимой области, иначе под коротким содержимым была пустота.
+    var yeetPanelMinHeight: CGFloat {
+        get { self[YeetPanelMinHeightKey.self] }
+        set { self[YeetPanelMinHeightKey.self] = newValue }
+    }
+}
+
 /// Хэндл 48 × 4 по центру. Декоративный: закрытие для VoiceOver — жест «escape».
 struct YeetSheetHandle: View {
     var body: some View {
@@ -335,6 +348,7 @@ public struct YeetSheet<Content: View>: View {
     private let content: Content
 
     @Environment(\.yeetOverlayLayer) private var layer
+    @Environment(\.yeetPanelMinHeight) private var panelMinHeight
     @State private var registration = UUID()
 
     /// - Parameters:
@@ -442,6 +456,8 @@ public struct YeetSheet<Content: View>: View {
         .padding(.horizontal, YeetSpace.screenGutter)
         .padding(.bottom, YeetSpace.s20)
         .frame(maxWidth: .infinity, alignment: .leading)
+        // До фона: подложка тянется на всю заданную высоту (Garderob P-0030.49, дефект 176).
+        .frame(minHeight: panelMinHeight, alignment: .top)
         .foregroundStyle(YeetColor.textPrimary)
         .background(
             YeetRoundedCorners(topLeading: YeetComponent.sheetRadius, topTrailing: YeetComponent.sheetRadius)
@@ -518,7 +534,7 @@ public struct YeetDialog<Content: View>: View {
     @AccessibilityFocusState private var safeFocused: Bool
 
     /// - Parameters:
-    ///   - cancel: без `cancel` — уведомление с одной кнопкой `confirm` Tertiary на всю ширину («Ок!»).
+    ///   - cancel: без `cancel` — уведомление с одной кнопкой `confirm` **Primary** на всю ширину («Ок!», Figma `dialog` 962:3136).
     ///   - onCancel: отмена — при любом закрытии, кроме `confirm`: кнопка `cancel`, «escape», у нерискованного и свайп, и тап по затемнению.
     ///     В слое `.yeetDialog` / `.yeetOverlay` слой уходит сам, `onCancel` вызывается один раз.
     ///   - handle: хэндл (Figma: dialog · Show Handle). По умолчанию нет (D1).
@@ -553,7 +569,8 @@ public struct YeetDialog<Content: View>: View {
     private var cancelAll: (() -> Void)? { layer?.dismiss ?? onCancel }
 
     private var actions: [YeetFooterAction] {
-        guard let cancel else { return [YeetFooterAction(label: confirm, variant: .tertiary, onClick: onConfirm)] }
+        // Одна кнопка — Primary (Figma `dialog` 962:3136: «Ок!», «Понятно» — синие); с двумя — как было.
+        guard let cancel else { return [YeetFooterAction(label: confirm, variant: .primary, onClick: onConfirm)] }
         let safe = YeetFooterAction(label: cancel, variant: .primary, onClick: cancelAll)
         switch tone {
         case .default:

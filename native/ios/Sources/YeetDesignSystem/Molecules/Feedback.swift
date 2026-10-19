@@ -69,11 +69,11 @@ public extension AnyTransition {
 /// Кнопка пустого состояния (React: `EmptyState.action`).
 public struct YeetEmptyStateAction {
     public var label: String
-    /// «Добавить вещь» — `primary`, «Сбросить фильтры» — `tertiary` (по умолчанию).
+    /// По умолчанию — `primary` (Figma `empty-state` 968:3643, решение М3); второстепенное действие — `tertiary` явно.
     public var variant: YeetButtonStyle
     public var onClick: (() -> Void)?
 
-    public init(label: String, variant: YeetButtonStyle = .tertiary, onClick: (() -> Void)? = nil) {
+    public init(label: String, variant: YeetButtonStyle = .primary, onClick: (() -> Void)? = nil) {
         self.label = label
         self.variant = variant
         self.onClick = onClick
