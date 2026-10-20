@@ -135,7 +135,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 ZStack(alignment: .top) {
                     mediaLayer(side: side, width: proxy.size.width)
                         .zIndex(mediaOnTop ? 2 : 0)
-                    scroll(side: side, viewport: proxy.size.height)
+                    scroll(side: side, viewport: proxy.size.height, safeBottom: proxy.safeAreaInsets.bottom)
                         .zIndex(1)
                     if let pinned {
                         pinnedLayer(pinned, side: side)
@@ -203,7 +203,11 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             .accessibilityHidden(collapsed)
     }
 
-    private func scroll(side: CGFloat, viewport: CGFloat) -> some View {
+    /// Нижняя безопасная зона, под которую уходят прокрутка и подложка панели: только без закреплённого низа (Garderob
+    /// P-0030.69). С `bottom` её закрывает `safeAreaInset` низа — там всё по-прежнему, `0`.
+    private func зонаПодПанелью(_ safeBottom: CGFloat) -> CGFloat { bottom == nil ? safeBottom : 0 }
+
+    private func scroll(side: CGFloat, viewport: CGFloat, safeBottom: CGFloat) -> some View {
         ScrollView {
             VStack(spacing: 0) {
                 // место фото в потоке: схлопывается, и панель поднимается (остаток 25 = порог + 1)
@@ -225,9 +229,15 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 // если в ней мало полей, а подложка панели тянется до низа — без пустоты под коротким содержимым.
                 // Прежде `.frame(minHeight: viewport + 120)` стоял СНАРУЖИ панели: фон покрывал только содержимое
                 // (пустота посреди экрана), а запас 120 уводил верх панели под шапку (Garderob P-0030.49).
+                // 🔴 Без закреплённого низа (Garderob P-0030.69) — до самого края экрана: `viewport` (область под шапкой)
+                // нижнюю безопасную зону не включает, и при коротком содержимом подложка кончалась на её линии — ниже
+                // 34 pt пустого фона и тень панели (карточка купленной вещи после P-0030.66). Прокрутка уходит под
+                // зону, к высоте добавляется зона, а содержимому — нижний отступ на неё же: строка не под полосой «домой».
                 YeetSheet(title: title, description: subtitle, type: .panel) { content }
                     .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight,
-                                                                            spacer: spacerHeight(side: side)))
+                                                                            spacer: spacerHeight(side: side),
+                                                                            safeArea: зонаПодПанелью(safeBottom)))
+                    .environment(\.yeetPanelBottomInset, зонаПодПанелью(safeBottom))
             }
             // 🔴 Смещение — `onGeometryChange`, а не `PreferenceKey` из фона содержимого: на iOS 26 ключ из
             // фона внутри `ScrollView` при прокрутке НЕ обновлялся (одно значение 0 при появлении), и фото
@@ -240,6 +250,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             }
         }
         .coordinateSpace(name: "yeet-details")
+        .ignoresSafeArea(.container, edges: bottom == nil ? .bottom : [])
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom {
                 bottom
@@ -265,8 +276,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// Наименьшая высота панели: от её места в покое (под фото) до закреплённого низа. Подложка тянется до низа в покое и
     /// при любой прокрутке (при докрутке до конца низ панели = низ видимой области), а короткое содержимое не уезжает
     /// выше, чем нужно, чтобы показать его целиком над нижней кнопкой: фото при этом уходит под шапку (P-0030.49 п. 2).
-    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat, spacer: CGFloat) -> CGFloat {
-        max(0, viewport - bottom - spacer)
+    /// `safeArea` — нижняя безопасная зона, под которую уходит панель без закреплённого низа (Garderob P-0030.69); с низом — 0,
+    /// и формула прежняя.
+    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat, spacer: CGFloat, safeArea: CGFloat = 0) -> CGFloat {
+        max(0, viewport + safeArea - bottom - spacer)
     }
 
     /// Место фото в потоке — постоянное (20 + сторона + 20; с `pinned` — плюс блок и зазор): фото уходит под шапку

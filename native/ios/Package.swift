@@ -16,5 +16,10 @@ let package = Package(
             path: "Sources/YeetDesignSystem",
             resources: [.process("Resources")]
         ),
+        .testTarget(
+            name: "YeetDesignSystemTests",
+            dependencies: ["YeetDesignSystem"],
+            path: "Tests/YeetDesignSystemTests"
+        ),
     ]
 )
