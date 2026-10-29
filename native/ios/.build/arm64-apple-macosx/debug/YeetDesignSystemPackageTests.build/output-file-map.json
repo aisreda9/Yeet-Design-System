@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/master.swiftdeps"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.dia"
+  }
+}

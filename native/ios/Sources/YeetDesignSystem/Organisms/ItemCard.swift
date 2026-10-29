@@ -1,13 +1,13 @@
 import SwiftUI
 
 /// Категория вещи (React: тип `Garment`); иконка категории — одноимённая иконка ui-icons.
-/// `dress` — только iOS: в ui-icons и React его пока нет (#2), иллюстрация — временный силуэт `YeetDressSilhouette`.
+/// `dress` — только iOS: в ui-icons и React его пока нет (#2); иконка категории — `YeetGarmentIcon` (силуэт платья).
 public enum YeetGarment: String, CaseIterable, Identifiable {
     case top, bottom, outerwear, shoe, accessories, container, dress
 
     public var id: String { rawValue }
 
-    /// Иконка ui-icons. У `dress` своей нет (#2) — ближайшая `top`; иллюстрация вещи рисует силуэт платья.
+    /// Иконка ui-icons. У `dress` своей нет (#2) — ближайшая `top`; силуэт платья рисует `YeetGarmentIcon`.
     public var icon: YeetIconName {
         switch self {
         case .top: return .top
@@ -33,8 +33,8 @@ public enum YeetGarment: String, CaseIterable, Identifiable {
     }
 }
 
-/// Временный силуэт платья в координатах viewBox 24×24, в манере ui-icons (`top`, `bottom`): бретели, лиф, талия,
-/// расклешённая юбка. Заменить иконкой из Figma, когда дизайнер её нарисует (#2).
+/// Силуэт платья в координатах viewBox 24×24, в манере ui-icons (`top`, `bottom`): бретели, лиф, талия, расклешённая
+/// юбка. Рисуется только через `YeetGarmentIcon` (там же пометка «временно до глифа `dress`», #2).
 struct YeetDressSilhouette: Shape {
     func path(in rect: CGRect) -> Path {
         let s = min(rect.width, rect.height) / 24
@@ -83,14 +83,7 @@ public struct YeetItemArt: View {
                     .accessibilityHidden(alt.isEmpty)
             } else {
                 let strokeWidth = max(0.35, 1.3 * 24 / max(size, 1))
-                if kind == .dress {
-                    YeetDressSilhouette()
-                        .stroke(style: StrokeStyle(lineWidth: strokeWidth * size / 24, lineCap: .butt, lineJoin: .miter, miterLimit: 4))
-                        .frame(width: size, height: size)
-                        .accessibilityHidden(true)
-                } else {
-                    YeetIcon(name: kind.icon, size: size, strokeWidth: strokeWidth)
-                }
+                YeetGarmentIcon(kind, size: size, strokeWidth: strokeWidth)
                 if let color {
                     YeetColorDot(color: color, size: max(10, size / 7))
                         .padding(YeetSpace.s4)

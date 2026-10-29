@@ -1,0 +1,292 @@
+{
+  "": {
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/master.swiftdeps"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Avatar.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Badge.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Button.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/GarmentIcon.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Icon.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Link.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Stamp.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Foundation.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Gesture.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetIcons.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetWeather.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Account.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ChipGroup.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Feedback.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Field.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/FormField.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Hint.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/InputBar.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ListItem.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/PhotoTile.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/RadioList.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/SegmentControl.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/AccountsSheet.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomBar.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomEdge.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ChatBubble.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/CropFrame.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/DetailsScreen.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Header.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemCard.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemSlots.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitCollage.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitPager.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitThumbnail.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Sheet.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/StylistPromptCard.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/TabBar.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherBar.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherCard.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DerivedSources/resource_bundle_accessor.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.dia"
+  }
+}

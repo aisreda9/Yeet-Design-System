@@ -1,0 +1,1542 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.xctest/Contents/MacOS/YeetDesignSystemPackageTests",
+      "packagePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios",
+      "productName" : "YeetDesignSystemPackageTests"
+    }
+  ],
+  "copyCommands" : {
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Inter-Variable.ttf" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Fonts/Inter-Variable.ttf"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Inter-Variable.ttf"
+        }
+      ]
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/LICENSE-RobotoSlab.txt" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Fonts/LICENSE-RobotoSlab.txt"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/LICENSE-RobotoSlab.txt"
+        }
+      ]
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/OFL-Inter.txt" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Fonts/OFL-Inter.txt"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/OFL-Inter.txt"
+        }
+      ]
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/RobotoSlab-Variable.ttf" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Fonts/RobotoSlab-Variable.ttf"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/RobotoSlab-Variable.ttf"
+        }
+      ]
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Stylist.xcassets" : {
+      "inputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Stylist.xcassets"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Stylist.xcassets"
+        }
+      ]
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Weather.xcassets" : {
+      "inputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Resources/Weather.xcassets"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem_YeetDesignSystem.bundle/Weather.xcassets"
+        }
+      ]
+    }
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.YeetDesignSystem-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/sources",
+      "importPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Avatar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Badge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Button.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/GarmentIcon.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Icon.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Link.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Stamp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Foundation.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Gesture.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetIcons.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetWeather.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Account.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ChipGroup.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Feedback.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Field.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/FormField.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Hint.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/InputBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ListItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/PhotoTile.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/RadioList.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/SegmentControl.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/AccountsSheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomEdge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ChatBubble.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/CropFrame.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/DetailsScreen.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Header.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemSlots.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitCollage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitPager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitThumbnail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Sheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/StylistPromptCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/TabBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DerivedSources/resource_bundle_accessor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<YeetDesignSystem-arm64-apple-macosx26.0-debug.module-resources>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "YeetDesignSystem",
+      "moduleOutputPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystem.swiftmodule",
+      "objects" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+        "-module-cache-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/include/YeetDesignSystem-Swift.h",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ios"
+      ],
+      "outputFileMapPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystem.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Avatar.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Badge.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Button.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/GarmentIcon.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Icon.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Link.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Stamp.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Foundation.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Gesture.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetIcons.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetWeather.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Account.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ChipGroup.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Feedback.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Field.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/FormField.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Hint.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/InputBar.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ListItem.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/PhotoTile.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/RadioList.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/SegmentControl.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/AccountsSheet.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomBar.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomEdge.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ChatBubble.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/CropFrame.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/DetailsScreen.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Header.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemCard.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemSlots.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitCollage.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitPager.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitThumbnail.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Sheet.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/StylistPromptCard.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/TabBar.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherBar.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherCard.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DerivedSources/resource_bundle_accessor.swift"
+      ],
+      "tempsPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.YeetDesignSystemPackageTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/sources",
+      "importPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystemTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "YeetDesignSystemPackageTests",
+      "moduleOutputPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystemPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/include/YeetDesignSystemPackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ios"
+      ],
+      "outputFileMapPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystemPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.YeetDesignSystemTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/sources",
+      "importPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/DetailsPanelMinHeightTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/GarmentIconTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/InputBarAccentTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/PanelBottomPaddingTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystem.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "YeetDesignSystemTests",
+      "moduleOutputPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystemTests.swiftmodule",
+      "objects" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.swift.o",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ios"
+      ],
+      "outputFileMapPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules/YeetDesignSystemTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/DetailsPanelMinHeightTests.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/GarmentIconTests.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/InputBarAccentTests.swift",
+        "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/PanelBottomPaddingTests.swift"
+      ],
+      "tempsPath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "YeetDesignSystem" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "YeetDesignSystem",
+      "-package-name",
+      "ios",
+      "-c",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Avatar.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Badge.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Button.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/GarmentIcon.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Icon.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Link.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Stamp.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Foundation.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Gesture.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetIcons.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetWeather.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Account.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ChipGroup.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Feedback.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Field.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/FormField.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Hint.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/InputBar.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ListItem.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/PhotoTile.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/RadioList.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/SegmentControl.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/AccountsSheet.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomBar.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomEdge.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ChatBubble.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/CropFrame.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/DetailsScreen.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Header.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemCard.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemSlots.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitCollage.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitPager.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitThumbnail.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Sheet.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/StylistPromptCard.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/TabBar.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherBar.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherCard.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DerivedSources/resource_bundle_accessor.swift",
+      "-I",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+      "-module-cache-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/include/YeetDesignSystem-Swift.h",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ios",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "YeetDesignSystemPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "YeetDesignSystemPackageTests",
+      "-package-name",
+      "ios",
+      "-c",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/include/YeetDesignSystemPackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ios",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "YeetDesignSystemTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "YeetDesignSystemTests",
+      "-package-name",
+      "ios",
+      "-c",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/DetailsPanelMinHeightTests.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/GarmentIconTests.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/InputBarAccentTests.swift",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/PanelBottomPaddingTests.swift",
+      "-I",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ios",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "YeetDesignSystem" : [
+
+    ],
+    "YeetDesignSystemPackageTests" : [
+      "YeetDesignSystemTests",
+      "YeetDesignSystem"
+    ],
+    "YeetDesignSystemTests" : [
+      "YeetDesignSystem"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Avatar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Badge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Button.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/GarmentIcon.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Icon.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Link.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Atoms/Stamp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Foundation.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Foundation/Gesture.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetIcons.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetTokens.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Generated/YeetWeather.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Account.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ChipGroup.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Feedback.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Field.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/FormField.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/Hint.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/InputBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/ListItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/PhotoTile.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/RadioList.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Molecules/SegmentControl.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/AccountsSheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/BottomEdge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ChatBubble.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/CropFrame.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/DetailsScreen.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Header.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/ItemSlots.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitCollage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitPager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/OutfitThumbnail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/Sheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/StylistPromptCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/TabBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherBar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Sources/YeetDesignSystem/Organisms/WeatherCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DerivedSources/resource_bundle_accessor.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/sources"
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/sources"
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Account.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/AccountsSheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Avatar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Badge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/BottomEdge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Button.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChatBubble.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ChipGroup.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/CropFrame.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/DetailsScreen.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Feedback.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Field.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/FormField.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Foundation.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/GarmentIcon.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Gesture.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Header.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Hint.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Icon.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/InputBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ItemSlots.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Link.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/ListItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitCollage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitPager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/OutfitThumbnail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/PhotoTile.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/RadioList.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/SegmentControl.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Sheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/Stamp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/StylistPromptCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/TabBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherBar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/WeatherCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetIcons.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetTokens.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/YeetWeather.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystem.build/resource_bundle_accessor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/DetailsPanelMinHeightTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/GarmentIconTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/InputBarAccentTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/PanelBottomPaddingTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/sources"
+    },
+    "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

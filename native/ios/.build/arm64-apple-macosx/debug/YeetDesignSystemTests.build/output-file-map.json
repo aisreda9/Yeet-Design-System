@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/master.swiftdeps"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/DetailsPanelMinHeightTests.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/DetailsPanelMinHeightTests.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/GarmentIconTests.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/GarmentIconTests.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/InputBarAccentTests.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/InputBarAccentTests.dia"
+  },
+  "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/Tests/YeetDesignSystemTests/PanelBottomPaddingTests.swift": {
+    "dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.d",
+    "object": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.swift.o",
+    "swiftmodule": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.swiftdeps",
+    "diagnostics": "/Users/annabakajkina/Projects/Yeet-Design-System/native/ios/.build/arm64-apple-macosx/debug/YeetDesignSystemTests.build/PanelBottomPaddingTests.dia"
+  }
+}
