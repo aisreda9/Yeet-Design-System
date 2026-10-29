@@ -115,17 +115,29 @@ private struct YeetPanelBottomInsetKey: EnvironmentKey {
     static let defaultValue: CGFloat = 0
 }
 
-extension EnvironmentValues {
-    /// Нижний отступ панели сверх обычных 20 — нижняя безопасная зона, под которую панель уходит, когда у
-    /// `YeetDetailsScreen` нет закреплённого низа (Garderob P-0030.69): последняя строка не ложится под полосу «домой».
+private struct YeetPanelBottomGapKey: EnvironmentKey {
+    static let defaultValue: CGFloat = YeetSpace.s20
+}
+
+public extension EnvironmentValues {
+    /// Нижний отступ панели сверх зазора `yeetPanelBottomGap` — зона, под которую панель уходит: нижняя безопасная зона
+    /// у `YeetDetailsScreen` без закреплённого низа (Garderob P-0030.69), зона нижней навигации у дока, который лежит
+    /// под ней одной панелью (Garderob P-0030.77). Подложка панели тянется на эту зону, содержимое — над ней.
     var yeetPanelBottomInset: CGFloat {
         get { self[YeetPanelBottomInsetKey.self] }
         set { self[YeetPanelBottomInsetKey.self] = newValue }
     }
 
+    /// Зазор от содержимого панели до её низа (или до зоны `yeetPanelBottomInset`). По умолчанию 20 — футер и поля
+    /// панели деталей. Док с полем над нижней навигацией (Garderob P-0030.77, кадр `1173:18217`) ставит 8.
+    var yeetPanelBottomGap: CGFloat {
+        get { self[YeetPanelBottomGapKey.self] }
+        set { self[YeetPanelBottomGapKey.self] = newValue }
+    }
+
     /// Наименьшая высота панели (`YeetSheet(type: .panel)`) — фон и тень панели покрывают её целиком. Задаёт
     /// `YeetDetailsScreen`: панель деталей не короче видимой области, иначе под коротким содержимым была пустота.
-    var yeetPanelMinHeight: CGFloat {
+    internal var yeetPanelMinHeight: CGFloat {
         get { self[YeetPanelMinHeightKey.self] }
         set { self[YeetPanelMinHeightKey.self] = newValue }
     }
@@ -361,6 +373,7 @@ public struct YeetSheet<Content: View>: View {
     @Environment(\.yeetOverlayLayer) private var layer
     @Environment(\.yeetPanelMinHeight) private var panelMinHeight
     @Environment(\.yeetPanelBottomInset) private var panelBottomInset
+    @Environment(\.yeetPanelBottomGap) private var panelBottomGap
     @State private var registration = UUID()
 
     /// - Parameters:
@@ -451,6 +464,9 @@ public struct YeetSheet<Content: View>: View {
         return showHandle ? YeetSpace.s20 : 0
     }
 
+    /// Нижний отступ панели: зазор до низа + зона под панелью.
+    static func panelBottomPadding(gap: CGFloat, inset: CGFloat) -> CGFloat { gap + inset }
+
     /// Панель: хэндл → 20 → заголовок H2 → 16 (описание → 20) → контент → 20 → футер; во всю ширину, 32 сверху, с тенью.
     private var panel: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -466,7 +482,7 @@ public struct YeetSheet<Content: View>: View {
         }
         .padding(.top, showHandle ? YeetSpace.s8 : YeetSpace.s20)
         .padding(.horizontal, YeetSpace.screenGutter)
-        .padding(.bottom, YeetSpace.s20 + panelBottomInset)
+        .padding(.bottom, Self.panelBottomPadding(gap: panelBottomGap, inset: panelBottomInset))
         .frame(maxWidth: .infinity, alignment: .leading)
         // До фона: подложка тянется на всю заданную высоту (Garderob P-0030.49, дефект 176).
         .frame(minHeight: panelMinHeight, alignment: .top)
