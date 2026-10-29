@@ -46,6 +46,7 @@ public struct YeetInputBar: View {
     private let send: YeetSendAction?
     private let size: YeetInputBarSize
     private let lines: ClosedRange<Int>
+    private let accent: Bool
     @FocusState private var focused: Bool
     /// Клавиша «Найти» в поиске (`YeetHeader(.search(onSubmit:))`); у чата отправку делает `send`.
     private var submit: (() -> Void)?
@@ -56,6 +57,7 @@ public struct YeetInputBar: View {
     ///     В фокусе — обводка 1.5 `textAccent` внутри поля (Figma: input-bar · Focus / Typing, React `:focus-within`).
     ///   - lines: сколько строк поле может занять: `1...1` — одна (по умолчанию, как раньше); `1...4` — чат растёт до
     ///     четырёх строк, дальше прокручивается. При нескольких строках «Ввод» переносит строку, отправка — кнопкой.
+    ///   - accent: плейсхолдер и «↑» в покое — `textAccent` (поле-вход, Garderob P-0030.78). По умолчанию — как в ДС.
     public init(
         placeholder: String,
         value: Binding<String>,
@@ -64,7 +66,8 @@ public struct YeetInputBar: View {
         trailing: YeetBarAction? = nil,
         send: YeetSendAction? = nil,
         size: YeetInputBarSize = .m,
-        lines: ClosedRange<Int> = 1...1
+        lines: ClosedRange<Int> = 1...1,
+        accent: Bool = false
     ) {
         self.placeholder = placeholder
         self._value = value
@@ -74,7 +77,15 @@ public struct YeetInputBar: View {
         self.send = send
         self.size = size
         self.lines = lines
+        self.accent = accent
     }
+
+    /// Цвет плейсхолдера: по ДС — `textSecondary`; `accent` — `textAccent` (Garderob P-0030.78: поле-вход в чат на доке
+    /// Стилиста, акцент на блоке — отступление от ДС по решению владельца).
+    static func placeholderColor(accent: Bool) -> Color { accent ? YeetColor.textAccent : YeetColor.textSecondary }
+
+    /// Цвет «↑» без текста (кнопка неактивна): по ДС — `textSecondary`; `accent` — `textAccent`. С текстом — как было.
+    static func sendIdleColor(accent: Bool) -> Color { accent ? YeetColor.textAccent : YeetColor.textSecondary }
 
     /// Колбэк клавиши «Найти» — для шапки поиска внутри пакета; публичного API поля не меняет.
     func submitting(_ action: (() -> Void)?) -> YeetInputBar {
@@ -164,7 +175,7 @@ public struct YeetInputBar: View {
     /// Одна строка — как раньше; несколько — растёт по вертикали до `lines.upperBound`.
     @ViewBuilder
     private var textField: some View {
-        let prompt = Text(placeholder).foregroundColor(YeetColor.textSecondary)
+        let prompt = Text(placeholder).foregroundColor(Self.placeholderColor(accent: accent))
         if multiline {
             TextField("", text: $value, prompt: prompt, axis: .vertical)
                 .lineLimit(lines)
@@ -180,7 +191,7 @@ public struct YeetInputBar: View {
         return Button { send.onClick?() } label: {
             YeetIcon(name: .arrowUp, size: 20)
                 .frame(width: 44, height: 44)
-                .foregroundStyle(hasText ? style.foreground : YeetColor.textSecondary)
+                .foregroundStyle(hasText ? style.foreground : Self.sendIdleColor(accent: accent))
                 .background(Circle().fill(style.background))
                 .contentShape(Circle())
         }
