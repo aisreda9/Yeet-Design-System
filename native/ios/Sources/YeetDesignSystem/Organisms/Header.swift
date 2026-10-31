@@ -38,6 +38,7 @@ public enum YeetHeaderType {
     /// `title` — простым текстом по центру (Настройки); `titleChip` — пилюля, `titleChipSub` — её вторая строка («8-13 сент · 5 ночей»);
     /// `center` — свой центр (шаги создания образа: `YeetSegmentControl` S с иконками).
     case bar(title: String? = nil, titleChip: String? = nil, titleChipSub: String? = nil, center: AnyView? = nil, onBack: (() -> Void)? = nil, actions: [YeetHeaderAction] = [])
+    /// `onBack: nil` — без «‹» (ряд 48 и `textAction` справа остаются).
     case back(title: String, onBack: (() -> Void)? = nil, textAction: YeetHeaderTextAction? = nil)
     /// `onSubmit` — клавиша «Найти» на клавиатуре; `onPhotoSearch` — кнопка «Поиск по фото» справа;
     /// `onFilterToggle` — нажатие на фильтр, приходит `id` чипса (`value` или `label`), как `onToggle` у `YeetChipGroup`.
@@ -186,7 +187,11 @@ public struct YeetHeader: View {
     @ViewBuilder
     private func back(title: String, onBack: (() -> Void)?, textAction: YeetHeaderTextAction?) -> some View {
         HStack(spacing: YeetSpace.s8) {
-            YeetIconButton(icon: .chevronLeft, label: "Назад") { onBack?() }
+            // Без `onBack` «‹» нет (Garderob P-0030.84.1: «Первый образ» — вещь уже на сервере, назад вести нельзя);
+            // ряд 48 и действие справа остаются.
+            if let onBack {
+                YeetIconButton(icon: .chevronLeft, label: "Назад") { onBack() }
+            }
             Spacer(minLength: 0)
             if let textAction {
                 YeetButton(textAction.label, variant: Self.textActionVariant, size: .m) { textAction.onClick?() }
@@ -241,7 +246,8 @@ public struct YeetHeader: View {
             YeetHeader(type: .bar(titleChip: "Удиви меня", onBack: {}, actions: [YeetHeaderAction(icon: .info, label: "Об этом инструменте")]))
             YeetHeader(type: .bar(titleChip: "Тбилиси", titleChipSub: "8-13 сент · 5 ночей"))
             YeetHeader(type: .bar(title: "Настройки"))
-            YeetHeader(type: .back(title: "Вход", textAction: YeetHeaderTextAction(label: "Пропустить")))
+            YeetHeader(type: .back(title: "Вход", onBack: {}, textAction: YeetHeaderTextAction(label: "Пропустить")))
+            YeetHeader(type: .back(title: "Пример образа", textAction: YeetHeaderTextAction(label: "Пропустить")))
             YeetHeader(type: .search(query: .constant("Белая рубашка"), filters: [YeetChip(label: "Цена"), YeetChip(label: "Размер")]))
             YeetHeader(type: .search(
                 query: .constant(""),
