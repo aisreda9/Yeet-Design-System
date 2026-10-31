@@ -13,7 +13,7 @@ public struct YeetHeaderAction {
     }
 }
 
-/// Текстовое действие: вторая строка H1 акцентом (`accent`) или ghost-кнопка справа (`textAction`).
+/// Текстовое действие: вторая строка H1 акцентом (`accent`) или серая кнопка Tertiary справа (`textAction`).
 public struct YeetHeaderTextAction {
     public var label: String
     public var onClick: (() -> Void)?
@@ -74,6 +74,9 @@ public struct YeetHeader: View {
         }
         .zIndex(1)
     }
+
+    /// Текстовое действие `back` справа — серая Tertiary M 48 («Пропустить» онбординга, кадр `1173:21880`; было ghost).
+    static let textActionVariant: YeetButtonStyle = .tertiary
 
     private var bottomPadding: CGFloat {
         if case .back = type { return YeetSpace.s4 }
@@ -186,7 +189,7 @@ public struct YeetHeader: View {
             YeetIconButton(icon: .chevronLeft, label: "Назад") { onBack?() }
             Spacer(minLength: 0)
             if let textAction {
-                YeetButton(textAction.label, variant: .ghost, size: .m) { textAction.onClick?() }
+                YeetButton(textAction.label, variant: Self.textActionVariant, size: .m) { textAction.onClick?() }
             }
         }
         .frame(minHeight: 48)

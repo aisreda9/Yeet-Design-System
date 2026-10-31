@@ -22,8 +22,9 @@ public enum YeetBottomEdge {
     }
 }
 
-extension View {
+public extension View {
     /// Нижний отступ по `YeetBottomEdge` от фактической нижней безопасной зоны панели.
+    /// Публичный — для закреплённого низа со своей кнопкой (например, с `isLoading`, которого у `YeetBottomBar` нет).
     func yeetBottomEdgePadding() -> some View { modifier(BottomEdgePadding()) }
 }
 
