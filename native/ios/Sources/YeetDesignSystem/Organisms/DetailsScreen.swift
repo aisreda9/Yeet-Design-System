@@ -236,6 +236,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 YeetSheet(title: title, description: subtitle, type: .panel) { content }
                     .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight,
                                                                             spacer: spacerHeight(side: side),
+                                                                            collapse: Self.collapsedOffset(side: side),
                                                                             safeArea: зонаПодПанелью(safeBottom)))
                     .environment(\.yeetPanelBottomInset, зонаПодПанелью(safeBottom))
             }
@@ -250,6 +251,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             }
         }
         .coordinateSpace(name: "yeet-details")
+        // Два состояния (Garderob P-0030.90.1): отпущенная панель доезжает либо «в покое» (фото целиком), либо
+        // «свёрнуто» (фото в миниатюре шапки) — промежуточного положения, где фото срезано шапкой, нет.
+        .modifier(DetailsSnap(collapsed: Self.collapsedOffset(side: side)))
         .ignoresSafeArea(.container, edges: bottom == nil ? .bottom : [])
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom {
@@ -267,6 +271,11 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             guard bottom != nil else { return }
             YeetFocusedField.lift(above: bottomTop - Self.focusGap)
         }
+        // Клавиатура ушла — докрученная к полю панель возвращается в ближайшее из двух состояний (P-0030.90.1):
+        // программная докрутка мимо `scrollTargetBehavior`, и без этого фото оставалось срезанным шапкой.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            YeetFocusedField.snapLifted(collapsed: Self.collapsedOffset(side: side))
+        }
     }
 
     /// Зазор от текста поля в фокусе до закреплённого низа. Первый ответчик — сам текст (`UITextField` ~22 pt), а не
@@ -278,8 +287,25 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// выше, чем нужно, чтобы показать его целиком над нижней кнопкой: фото при этом уходит под шапку (P-0030.49 п. 2).
     /// `safeArea` — нижняя безопасная зона, под которую уходит панель без закреплённого низа (Garderob P-0030.69); с низом — 0,
     /// и формула прежняя.
-    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat, spacer: CGFloat, safeArea: CGFloat = 0) -> CGFloat {
-        max(0, viewport + safeArea - bottom - spacer)
+    ///
+    /// 🔴 Garderob P-0030.90.1 (решение владельца 01.11): панель поднимается до состояния «свёрнуто» при ЛЮБОМ содержимом —
+    /// прокрутки должно хватать до `collapse` (фото целиком под шапкой, в шапке миниатюра). Прежняя формула
+    /// (`viewport − низ − место фото`, P-0030.49 «не выше, чем нужно») при коротком содержимом останавливала прокрутку на
+    /// полпути: фото срезано шапкой, миниатюры нет. Теперь панель не короче `viewport − низ − (место фото − collapse)`;
+    /// без `pinned` это 20 под шапкой, с `pinned` — блок под шапкой и 12.
+    static func panelMinHeight(viewport: CGFloat, bottom: CGFloat, spacer: CGFloat, collapse: CGFloat,
+                               safeArea: CGFloat = 0) -> CGFloat {
+        max(0, viewport + safeArea - bottom - (spacer - collapse))
+    }
+
+    /// Смещение прокрутки в состоянии «свёрнуто»: фото (20 + сторона) целиком ушло под шапку.
+    static func collapsedOffset(side: CGFloat) -> CGFloat { YeetSpace.s20 + side }
+
+    /// Куда доезжает отпущенная панель: выше половины пути — «свёрнуто», ниже — «в покое»; дальше «свёрнуто» —
+    /// обычная прокрутка длинного содержимого.
+    static func snapTarget(_ offset: CGFloat, collapsed: CGFloat) -> CGFloat {
+        guard offset > 0, offset < collapsed else { return offset }
+        return offset < collapsed / 2 ? 0 : collapsed
     }
 
     /// Место фото в потоке — постоянное (20 + сторона + 20; с `pinned` — плюс блок и зазор): фото уходит под шапку
@@ -311,6 +337,18 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
 @MainActor
 enum YeetFocusedField {
     fileprivate static weak var found: UIResponder?
+    /// Прокрутка, которую докрутили к полю (`lift`) — её возвращаем в одно из двух состояний, когда клавиатура уходит.
+    private static weak var lifted: UIScrollView?
+
+    /// Вернуть докрученную к полю прокрутку в ближайшее из двух состояний `YeetDetailsScreen` (P-0030.90.1).
+    static func snapLifted(collapsed: CGFloat) {
+        guard let scroll = lifted else { return }
+        lifted = nil
+        let y = scroll.contentOffset.y + scroll.adjustedContentInset.top
+        let target = YeetDetailsScreen<EmptyView, EmptyView>.snapTarget(y, collapsed: collapsed)
+        guard abs(target - y) > 0.5 else { return }
+        scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: target - scroll.adjustedContentInset.top), animated: true)
+    }
 
     static func current() -> UIView? {
         found = nil
@@ -335,8 +373,31 @@ enum YeetFocusedField {
         let maxOffset = scroll.contentSize.height + scroll.adjustedContentInset.bottom - scroll.bounds.height
         let delta = lift(fieldBottom: bottom, limit: limit, room: maxOffset - scroll.contentOffset.y)
         guard delta > 0 else { return 0 }
+        lifted = scroll
         scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: scroll.contentOffset.y + delta), animated: true)
         return delta
+    }
+}
+
+/// Два состояния панели после жеста (iOS 17+, `scrollTargetBehavior`); на iOS 16 — как было.
+private struct DetailsSnap: ViewModifier {
+    let collapsed: CGFloat
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17, *) {
+            content.scrollTargetBehavior(DetailsSnapBehavior(collapsed: collapsed))
+        } else {
+            content
+        }
+    }
+}
+
+@available(iOS 17, *)
+private struct DetailsSnapBehavior: ScrollTargetBehavior {
+    let collapsed: CGFloat
+
+    func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
+        target.rect.origin.y = YeetDetailsScreen<EmptyView, EmptyView>.snapTarget(target.rect.minY, collapsed: collapsed)
     }
 }
 
