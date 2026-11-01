@@ -36,6 +36,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let pinned: AnyView?
     /// Элементы управления поверх фото (Garderob P-0030.53: «×» на фото, нажимаемый квадрат «Добавить фотографию»).
     private let mediaControls: AnyView?
+    /// Блок панели над заголовком (Garderob P-0030.91) — передаётся в `YeetSheet(header:)`.
+    private let panelHeader: AnyView?
     private let subtitle: String?
     private let mediaMinFraction: CGFloat
     private let mediaMaxFraction: CGFloat
@@ -71,6 +73,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - mediaControls: слой поверх фото — квадрат той же стороны. Фото лежит ПОД прокруткой, и касания по нему забирает
     ///     она; этот слой живёт в самой прокрутке на месте фото, поэтому нажимается, а свайп по фото по-прежнему тянет
     ///     панель. Уезжает вместе с содержимым (до 24 pt до сворачивания), в свёрнутом состоянии скрыт. `nil` — как было.
+    ///   - panelHeader: блок панели над её заголовком (Garderob P-0030.91: решение по улучшенному фото); `nil` — как было.
     ///   - media: фото вещи, коллаж образа — квадрат.
     public init(
         title: String? = nil,
@@ -86,9 +89,11 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         mediaMaxFraction: CGFloat = 0.65,
         minPanelPeek: CGFloat = 56,
         mediaControls: AnyView? = nil,
+        panelHeader: AnyView? = nil,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
+        self.panelHeader = panelHeader
         self.title = title
         self.titleChip = titleChip
         self.actions = actions
@@ -233,7 +238,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 // нижнюю безопасную зону не включает, и при коротком содержимом подложка кончалась на её линии — ниже
                 // 34 pt пустого фона и тень панели (карточка купленной вещи после P-0030.66). Прокрутка уходит под
                 // зону, к высоте добавляется зона, а содержимому — нижний отступ на неё же: строка не под полосой «домой».
-                YeetSheet(title: title, description: subtitle, type: .panel) { content }
+                YeetSheet(title: title, description: subtitle, type: .panel, header: panelHeader) { content }
                     .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight,
                                                                             spacer: spacerHeight(side: side),
                                                                             collapse: Self.collapsedOffset(side: side),

@@ -368,6 +368,8 @@ public struct YeetSheet<Content: View>: View {
     private let onClose: (() -> Void)?
     private let label: String?
     private let handle: Bool?
+    /// Блок панели НАД заголовком (Garderob P-0030.91): хэндл → 20 → блок → 24 → заголовок. Только `type: .panel`.
+    private let header: AnyView?
     private let content: Content
 
     @Environment(\.yeetOverlayLayer) private var layer
@@ -382,6 +384,8 @@ public struct YeetSheet<Content: View>: View {
     ///     В слое `.yeetOverlay` крестик, свайп, тап по затемнению и «escape» закрывают одним путём и вызывают `onClose` один раз.
     ///   - label: имя для VoiceOver, если у шторки нет заголовка (шторка источника фото, D10).
     ///   - handle: показывать хэндл (Figma: sheet · Show Handle). По умолчанию — да, если нет крестика.
+    ///   - header: блок панели над заголовком (только `.panel`, Garderob P-0030.91): решение по фото — первым под хэндлом,
+    ///     заголовок под ним через 24. `nil` — как было.
     public init(
         title: String? = nil,
         description: String? = nil,
@@ -390,8 +394,10 @@ public struct YeetSheet<Content: View>: View {
         onClose: (() -> Void)? = nil,
         label: String? = nil,
         handle: Bool? = nil,
+        header: AnyView? = nil,
         @ViewBuilder content: () -> Content
     ) {
+        self.header = header
         self.title = title
         self.description = description
         self.type = type
@@ -464,6 +470,9 @@ public struct YeetSheet<Content: View>: View {
         return showHandle ? YeetSpace.s20 : 0
     }
 
+    /// От блока над заголовком (`header`) до заголовка панели.
+    static var headerGap: CGFloat { YeetSpace.s24 }
+
     /// Нижний отступ панели: зазор до низа + зона под панелью.
     static func panelBottomPadding(gap: CGFloat, inset: CGFloat) -> CGFloat { gap + inset }
 
@@ -471,7 +480,8 @@ public struct YeetSheet<Content: View>: View {
     private var panel: some View {
         VStack(alignment: .leading, spacing: 0) {
             if showHandle { YeetSheetHandle() }
-            if hasHead { head.padding(.top, showHandle ? YeetSpace.s20 : 0) }
+            if let header { header.padding(.top, showHandle ? YeetSpace.s20 : 0) }
+            if hasHead { head.padding(.top, header != nil ? Self.headerGap : (showHandle ? YeetSpace.s20 : 0)) }
             if let description {
                 descriptionText(description).padding(.top, hasHead ? YeetSpace.s12 : 0)
             }
