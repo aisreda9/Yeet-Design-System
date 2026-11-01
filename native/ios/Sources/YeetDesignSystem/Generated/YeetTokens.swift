@@ -27,6 +27,7 @@ private func dynamic(_ light: UIColor, _ dark: UIColor, contrast contrastLight: 
 /// Примитивы палитры. В компонентах не используются — только через семантические `YeetColor`.
 public enum YeetPrimitive {
     public static let blue500 = Color(UIColor(hex: 0x0100F4, alpha: 1))
+    public static let navy500 = Color(UIColor(hex: 0x20265F, alpha: 1))
     public static let blue400 = Color(UIColor(hex: 0x4B4BFF, alpha: 1))
     public static let blue200 = Color(UIColor(hex: 0x8A8AFF, alpha: 1))
     public static let red600 = Color(UIColor(hex: 0xCC291B, alpha: 1))
@@ -72,12 +73,12 @@ public enum YeetColor {
     /// Статус-бар, логотип, подсказка и иконки поверх фото и тёмной камеры (Splash, Search / Photo / Crop) — белый в любой теме и бренде · Figma ui-colors/white
     public static let textOnPhoto = dynamic(UIColor(hex: 0xFFFFFF, alpha: 1), UIColor(hex: 0xFFFFFF, alpha: 1))
     /// Акцентный текст, выбранное · Figma ui-colors/blue-text
-    public static let textAccent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1), contrast: UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0xAAAAFF, alpha: 1))
+    public static let textAccent = dynamic(UIColor(hex: 0x20265F, alpha: 1), UIColor(hex: 0x8A8AFF, alpha: 1), contrast: UIColor(hex: 0x20265F, alpha: 1), UIColor(hex: 0xAAAAFF, alpha: 1))
     /// Ошибки, деструктивные действия · Figma ui-colors/red-text
     public static let textDanger = dynamic(UIColor(hex: 0xCC291B, alpha: 1), UIColor(hex: 0xFF6B5C, alpha: 1), contrast: UIColor(hex: 0xA22115, alpha: 1), UIColor(hex: 0xFF9489, alpha: 1))
     // Акцент, обратная связь, линии
     /// Главное действие, выбранное, фокус · Figma ui-colors/blue
-    public static let accent = dynamic(UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 1), contrast: UIColor(hex: 0x0100F4, alpha: 1), UIColor(hex: 0x5858FF, alpha: 1))
+    public static let accent = dynamic(UIColor(hex: 0x20265F, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 1), contrast: UIColor(hex: 0x20265F, alpha: 1), UIColor(hex: 0x5858FF, alpha: 1))
     /// Фон выбранного чипса (Soft) и сообщения пользователя. Light — сплошной #F1F4FF, а не прозрачный: на сером фоне не темнеет · Figma ui-colors/blue-10%
     public static let accentSoft = dynamic(UIColor(hex: 0xF1F4FF, alpha: 1), UIColor(hex: 0x4B4BFF, alpha: 0.2))
     /// Удаление, ошибка, бейдж скидки · Figma ui-colors/red

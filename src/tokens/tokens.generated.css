@@ -5,6 +5,7 @@
 
 :root {
   --yeet-blue-500: #0100f4;
+  --yeet-navy-500: #20265f;
   --yeet-blue-400: #4b4bff;
   --yeet-blue-200: #8a8aff;
   --yeet-red-600: #cc291b;
@@ -153,9 +154,9 @@
   --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
   --color-text-on-danger: var(--yeet-neutral-0); /* ui-colors/on-accent */
   --color-text-on-photo: var(--yeet-neutral-0); /* ui-colors/white */
-  --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
+  --color-text-accent: var(--yeet-navy-500); /* ui-colors/blue-text */
   --color-text-danger: var(--yeet-red-600); /* ui-colors/red-text */
-  --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
+  --color-accent: var(--yeet-navy-500); /* ui-colors/blue */
   --color-accent-soft: #f1f4ff; /* ui-colors/blue-10% */
   --color-danger: var(--yeet-red-600); /* ui-colors/red */
   --color-danger-soft: rgb(255 66 48 / 0.1); /* ui-colors/red-10% */
@@ -279,9 +280,9 @@
   [data-theme='light'] {
     --color-text-secondary: #545454; /* ui-colors/grey */
     --color-text-inverse-secondary: #a7b3bf; /* ui-colors/inverse-secondary */
-    --color-text-accent: var(--yeet-blue-500); /* ui-colors/blue-text */
+    --color-text-accent: var(--yeet-navy-500); /* ui-colors/blue-text */
     --color-text-danger: #a22115; /* ui-colors/red-text */
-    --color-accent: var(--yeet-blue-500); /* ui-colors/blue */
+    --color-accent: var(--yeet-navy-500); /* ui-colors/blue */
     --color-border-subtle: rgb(0 0 0 / 0.43); /* ui-colors/black-10% */
     --color-divider: rgb(0 0 0 / 0.43); /* ui-colors/divider */
     --focus-ring-width: 3px;
