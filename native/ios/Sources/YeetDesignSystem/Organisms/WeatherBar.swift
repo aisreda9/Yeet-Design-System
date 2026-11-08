@@ -17,14 +17,38 @@ public struct YeetWeatherBar: View {
         case unavailable(text: String, detail: String? = nil, actionTitle: String, action: () -> Void)
     }
 
+    /// Цвета плашки (Garderob P-0134). По умолчанию — как в макете: фон `bgElevated`, текст `textPrimary` / `textSecondary`,
+    /// крестик — `textInverse` на `bgInverse`. Форма, размеры и тень от цветов не зависят.
+    public struct Colors {
+        public var background: Color
+        public var text: Color
+        public var secondaryText: Color
+        public var closeForeground: Color
+        public var closeBackground: Color
+
+        public init(background: Color = YeetColor.bgElevated, text: Color = YeetColor.textPrimary,
+                    secondaryText: Color = YeetColor.textSecondary,
+                    closeForeground: Color = YeetColor.textInverse, closeBackground: Color = YeetColor.bgInverse) {
+            self.background = background
+            self.text = text
+            self.secondaryText = secondaryText
+            self.closeForeground = closeForeground
+            self.closeBackground = closeBackground
+        }
+
+        public static let standard = Colors()
+    }
+
     private let content: Content
+    private let colors: Colors
     private let onClose: (() -> Void)?
 
     /// Высота по кадру.
     public static let height: CGFloat = 64
 
-    public init(_ content: Content, onClose: (() -> Void)? = nil) {
+    public init(_ content: Content, colors: Colors = .standard, onClose: (() -> Void)? = nil) {
         self.content = content
+        self.colors = colors
         self.onClose = onClose
     }
 
@@ -33,14 +57,14 @@ public struct YeetWeatherBar: View {
             VStack(alignment: .leading, spacing: 0) {
                 switch content {
                 case let .calm(text, _, _, detail):
-                    строка(text, цвет: YeetColor.textPrimary)
-                    if let detail { строка(detail, цвет: YeetColor.textSecondary) }
+                    строка(text, цвет: colors.text)
+                    if let detail { строка(detail, цвет: colors.secondaryText) }
                 case let .alert(title, text, _, _):
-                    строка(title, цвет: YeetColor.textPrimary)
-                    строка(text, цвет: YeetColor.textSecondary)
+                    строка(title, цвет: colors.text)
+                    строка(text, цвет: colors.secondaryText)
                 case let .unavailable(text, detail, _, _):
-                    строка(text, цвет: YeetColor.textPrimary)
-                    if let detail { строка(detail, цвет: YeetColor.textSecondary) }
+                    строка(text, цвет: colors.text)
+                    if let detail { строка(detail, цвет: colors.secondaryText) }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,7 +75,7 @@ public struct YeetWeatherBar: View {
             case let .calm(_, icon, temperature, _), let .alert(_, _, icon, temperature):
                 HStack(spacing: YeetSpace.s8) {
                     YeetWeatherIcon(kind: icon, size: 32)
-                    Text(temperature).yeetText(YeetType.h2).foregroundStyle(YeetColor.textPrimary).lineLimit(1)
+                    Text(temperature).yeetText(YeetType.h2).foregroundStyle(colors.text).lineLimit(1)
                 }
                 .fixedSize()
                 .accessibilityHidden(true)
@@ -64,15 +88,15 @@ public struct YeetWeatherBar: View {
         .padding(.vertical, YeetSpace.s16)
         .frame(maxWidth: .infinity)
         .frame(height: Self.height)
-        .background(RoundedRectangle(cornerRadius: YeetRadius.bar, style: .continuous).fill(YeetColor.bgElevated))
+        .background(RoundedRectangle(cornerRadius: YeetRadius.bar, style: .continuous).fill(colors.background))
         .yeetFloatingShadow()
         .overlay(alignment: .topTrailing) {
             if let onClose {
                 Button(action: onClose) {
                     YeetIcon(name: .cross, size: 16)
-                        .foregroundStyle(YeetColor.textInverse)
+                        .foregroundStyle(colors.closeForeground)
                         .frame(width: 20, height: 20)
-                        .background(Circle().fill(YeetColor.bgInverse))
+                        .background(Circle().fill(colors.closeBackground))
                 }
                 .buttonStyle(.plain)
                 .yeetHitArea(width: 20, height: 20)

@@ -17,9 +17,12 @@ public struct YeetHeaderAction {
 public struct YeetHeaderTextAction {
     public var label: String
     public var onClick: (() -> Void)?
+    /// Цвет акцентной строки `large` (Garderob P-0134). `nil` — `textAccent`, как в макете.
+    public var color: Color?
 
-    public init(label: String, onClick: (() -> Void)? = nil) {
+    public init(label: String, color: Color? = nil, onClick: (() -> Void)? = nil) {
         self.label = label
+        self.color = color
         self.onClick = onClick
     }
 }
@@ -119,7 +122,7 @@ public struct YeetHeader: View {
                     Text(accent.label).yeetText(YeetType.h1).multilineTextAlignment(.leading)
                     YeetIcon(name: .chevronUpDown, size: 20)
                 }
-                .foregroundStyle(YeetColor.textAccent)
+                .foregroundStyle(accent.color ?? YeetColor.textAccent)
                 .contentShape(Rectangle())
             }
             .buttonStyle(YeetPressStyle())
