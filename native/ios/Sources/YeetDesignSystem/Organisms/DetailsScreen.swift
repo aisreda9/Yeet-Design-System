@@ -42,6 +42,8 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let mediaMinFraction: CGFloat
     private let mediaMaxFraction: CGFloat
     private let minPanelPeek: CGFloat
+    /// Пропорция фото «ширина / высота» (Garderob P-0147). `1` — квадрат, как было у всех экранов.
+    private let mediaAspect: CGFloat
     private let media: Media
     private let content: Content
 
@@ -74,7 +76,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///     она; этот слой живёт в самой прокрутке на месте фото, поэтому нажимается, а свайп по фото по-прежнему тянет
     ///     панель. Уезжает вместе с содержимым (до 24 pt до сворачивания), в свёрнутом состоянии скрыт. `nil` — как было.
     ///   - panelHeader: блок панели над её заголовком (Garderob P-0030.91: решение по улучшенному фото); `nil` — как было.
-    ///   - media: фото вещи, коллаж образа — квадрат.
+    ///   - mediaAspect: пропорция фото «ширина / высота» (Garderob P-0147: холст «Предпросмотра» выше квадрата). Ширина —
+    ///     как у квадрата (во всю ширину минус поля; с `pinned` — по `mediaMinFraction`…`mediaMaxFraction`, которые теперь
+    ///     ограничивают высоту), высота — ширина / `mediaAspect`. По умолчанию `1`: квадрат, раскладка прежняя.
+    ///   - media: фото вещи, коллаж образа — квадрат (или прямоугольник `mediaAspect`).
     public init(
         title: String? = nil,
         titleChip: String? = nil,
@@ -90,6 +95,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         minPanelPeek: CGFloat = 56,
         mediaControls: AnyView? = nil,
         panelHeader: AnyView? = nil,
+        mediaAspect: CGFloat = 1,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -107,6 +113,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.mediaMinFraction = mediaMinFraction
         self.mediaMaxFraction = mediaMaxFraction
         self.minPanelPeek = minPanelPeek
+        self.mediaAspect = mediaAspect > 0 ? mediaAspect : 1
         self.media = media()
         self.content = content()
     }
@@ -136,14 +143,14 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             })
             // слой ниже шапки в дереве рисуется поверх неё — так свёрнутое фото встаёт в шапку
             GeometryReader { proxy in
-                let side = mediaSide(width: proxy.size.width, viewport: proxy.size.height)
+                let size = mediaSize(width: proxy.size.width, viewport: proxy.size.height)
                 ZStack(alignment: .top) {
-                    mediaLayer(side: side, width: proxy.size.width)
+                    mediaLayer(size: size, width: proxy.size.width)
                         .zIndex(mediaOnTop ? 2 : 0)
-                    scroll(side: side, viewport: proxy.size.height, safeBottom: proxy.safeAreaInsets.bottom)
+                    scroll(size: size, viewport: proxy.size.height, safeBottom: proxy.safeAreaInsets.bottom)
                         .zIndex(1)
                     if let pinned {
-                        pinnedLayer(pinned, side: side)
+                        pinnedLayer(pinned, side: size.height)
                             .zIndex(3)
                     }
                 }
@@ -165,12 +172,23 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// Сторона фото. Без `pinned` — во всю ширину минус поля (как было). С `pinned` — столько, чтобы фото, блок,
     /// зазоры (20 над фото, 20 до блока, 12 после) и край панели `minPanelPeek` поместились в область под шапкой, но не меньше
     /// `mediaMinFraction` и не больше `mediaMaxFraction` её высоты.
-    private func mediaSide(width: CGFloat, viewport: CGFloat) -> CGFloat {
+    private func mediaSize(width: CGFloat, viewport: CGFloat) -> CGSize {
+        Self.mediaSize(width: width, viewport: viewport, gutter: gutter, aspect: mediaAspect,
+                       pinnedHeight: pinned == nil ? nil : pinnedHeight, minPanelPeek: minPanelPeek,
+                       minFraction: mediaMinFraction, maxFraction: mediaMaxFraction)
+    }
+
+    /// Размер фото (Garderob P-0147). При `aspect == 1` — квадрат прежней стороны, выражение для выражения. Высота
+    /// подчиняется тем же ограничениям, что прежде сторона; ширина = высота × `aspect`, но не шире экрана минус поля.
+    static func mediaSize(width: CGFloat, viewport: CGFloat, gutter: CGFloat, aspect: CGFloat, pinnedHeight: CGFloat?,
+                          minPanelPeek: CGFloat, minFraction: CGFloat, maxFraction: CGFloat) -> CGSize {
         let full = max(width - 2 * gutter, 1)
-        guard pinned != nil else { return full }
-        let available = viewport - YeetSpace.s20 - Self.pinnedGap - pinnedHeight - YeetSpace.s12 - minPanelPeek
-        let fitted = min(max(available, viewport * mediaMinFraction), viewport * mediaMaxFraction)
-        return max(min(full, fitted), 1)
+        let fullHeight = full / aspect
+        guard let pinnedHeight else { return CGSize(width: full, height: fullHeight) }
+        let available = viewport - YeetSpace.s20 - pinnedGap - pinnedHeight - YeetSpace.s12 - minPanelPeek
+        let fitted = min(max(available, viewport * minFraction), viewport * maxFraction)
+        let height = max(min(fullHeight, fitted), 1)
+        return CGSize(width: max(min(full, height * aspect), 1), height: height)
     }
 
     /// Зазор между фото и блоком `pinned`.
@@ -191,12 +209,13 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     }
 
     /// Фото вне скролла: в покое под панелью, свёрнутое — миниатюра 48 в центре ряда кнопок шапки (сверху 8, ряд 48).
-    private func mediaLayer(side: CGFloat, width: CGFloat) -> some View {
-        let k = 48 / side
-        let dx = width / 2 - 24 - gutter
+    private func mediaLayer(size: CGSize, width: CGFloat) -> some View {
+        // Миниатюра 48 по большей стороне; по горизонтали — по центру ряда (у квадрата это прежние 24).
+        let k = 48 / max(size.width, size.height)
+        let dx = width / 2 - size.width * k / 2 - gutter - (width - 2 * gutter - size.width) / 2
         let dy = -headerHeight + YeetSpace.s8 - YeetSpace.s20
         return media
-            .frame(width: side, height: side)
+            .frame(width: size.width, height: size.height)
             .clipShape(RoundedRectangle(cornerRadius: collapsed ? YeetRadius.md / k : YeetComponent.cardRadius, style: .continuous))
             .scaleEffect(collapsed ? k : 1, anchor: .topLeading)
             // в покое фото едет вместе с прокруткой (уходит под шапку), свёрнутое — миниатюра в шапке
@@ -212,8 +231,10 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// P-0030.69). С `bottom` её закрывает `safeAreaInset` низа — там всё по-прежнему, `0`.
     private func зонаПодПанелью(_ safeBottom: CGFloat) -> CGFloat { bottom == nil ? safeBottom : 0 }
 
-    private func scroll(side: CGFloat, viewport: CGFloat, safeBottom: CGFloat) -> some View {
-        ScrollView {
+    private func scroll(size: CGSize, viewport: CGFloat, safeBottom: CGFloat) -> some View {
+        // Всё вертикальное (место фото в потоке, сворачивание) — по высоте фото; у квадрата это прежняя сторона.
+        let side = size.height
+        return ScrollView {
             VStack(spacing: 0) {
                 // место фото в потоке: схлопывается, и панель поднимается (остаток 25 = порог + 1)
                 ZStack(alignment: .top) {
@@ -224,7 +245,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                     if let mediaControls, !collapsed {
                         // слой нажатий — в самой прокрутке, поэтому едет вместе с фото
                         mediaControls
-                            .frame(width: side, height: side)
+                            .frame(width: size.width, height: size.height)
                             .padding(.top, YeetSpace.s20)
                             .frame(maxWidth: .infinity)
                             .transition(.opacity)
