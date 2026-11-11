@@ -53,7 +53,10 @@ final class DetailsSnapTests: XCTestCase {
     func test_жестПодключён() throws {
         let корень = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let т = try String(contentsOf: корень.appendingPathComponent("Sources/YeetDesignSystem/Organisms/DetailsScreen.swift"), encoding: .utf8)
-        XCTAssertTrue(т.contains(".modifier(DetailsSnap(collapsed: Self.collapsedOffset(side: side)))"), "панель без двух состояний")
+        // P-0218: доводка выключается только параметром `collapsesMedia: false`; по умолчанию включена.
+        XCTAssertTrue(т.contains(".modifier(DetailsSnap(collapsed: Self.collapsedOffset(side: side), enabled: collapsesMedia))"),
+                      "панель без двух состояний")
+        XCTAssertTrue(т.contains("collapsesMedia: Bool = true,"), "по умолчанию — два состояния, как было")
         XCTAssertTrue(т.contains("YeetFocusedField.snapLifted(collapsed:"), "после клавиатуры панель не возвращается")
     }
 }

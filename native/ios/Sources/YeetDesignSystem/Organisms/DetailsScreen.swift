@@ -44,6 +44,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     private let minPanelPeek: CGFloat
     /// Пропорция фото «ширина / высота» (Garderob P-0147). `1` — квадрат, как было у всех экранов.
     private let mediaAspect: CGFloat
+    /// Сворачивание фото в миниатюру шапки (Garderob P-0218). `false` — обычная прокрутка: фото едет вместе с
+    /// содержимым без масштаба и миниатюры, нет доводки к двум состояниям, высота прокрутки = высота содержимого.
+    private let collapsesMedia: Bool
     private let media: Media
     private let content: Content
 
@@ -79,6 +82,11 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     ///   - mediaAspect: пропорция фото «ширина / высота» (Garderob P-0147: холст «Предпросмотра» выше квадрата). Ширина —
     ///     как у квадрата (во всю ширину минус поля; с `pinned` — по `mediaMinFraction`…`mediaMaxFraction`, которые теперь
     ///     ограничивают высоту), высота — ширина / `mediaAspect`. По умолчанию `1`: квадрат, раскладка прежняя.
+    ///   - collapsesMedia: `true` (по умолчанию) — как было: фото сворачивается в миниатюру шапки, панель доезжает до двух
+    ///     состояний и прокручивается до «свёрнуто» при любом содержимом. `false` (Garderob P-0218, карточка вещи) — фото
+    ///     прокручивается вместе с содержимым обычным образом (и на резинке сверху — без масштаба), миниатюры и доводки
+    ///     нет; панель тянется фоном до низа экрана, но прокрутки не добавляет: всё поместилось — прокрутки нет.
+    ///     Содержимое и фото уходят под нижний край шапки и обрезаются по нему.
     ///   - media: фото вещи, коллаж образа — квадрат (или прямоугольник `mediaAspect`).
     public init(
         title: String? = nil,
@@ -96,6 +104,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         mediaControls: AnyView? = nil,
         panelHeader: AnyView? = nil,
         mediaAspect: CGFloat = 1,
+        collapsesMedia: Bool = true,
         @ViewBuilder media: () -> Media,
         @ViewBuilder content: () -> Content
     ) {
@@ -114,6 +123,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         self.mediaMaxFraction = mediaMaxFraction
         self.minPanelPeek = minPanelPeek
         self.mediaAspect = mediaAspect > 0 ? mediaAspect : 1
+        self.collapsesMedia = collapsesMedia
         self.media = media()
         self.content = content()
     }
@@ -158,6 +168,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             // Без своей миниатюры (`thumb == nil`) в шапку встаёт само фото — слой с ним должен быть над шапкой
             // (у `YeetHeader` `zIndex(1)`): иначе свёрнутое фото уходило ПОД шапку и миниатюры не было видно.
             .zIndex(mediaOnTop && thumb == nil ? 2 : 0)
+            // P-0218: без сворачивания фото и содержимое уходят под шапку прокруткой — обрезать по её нижнему краю, а не
+            // рисовать поверх «‹» / «⋮». Вниз маска открыта: панель без закреплённого низа заходит под безопасную зону.
+            .modifier(DetailsTopClip(enabled: !collapsesMedia))
         }
         .background(YeetColor.bgCanvas.ignoresSafeArea())
         .overlay(alignment: .bottomTrailing) {
@@ -205,7 +218,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             })
             .padding(.bottom, YeetSpace.s12)
             .background(YeetColor.bgCanvas)
-            .offset(y: collapsed ? 0 : YeetSpace.s20 + side + Self.pinnedGap - max(0, scrollOffset))
+            .offset(y: collapsed ? 0 : YeetSpace.s20 + side + Self.pinnedGap + Self.mediaOffset(scrollOffset, collapses: collapsesMedia))
     }
 
     /// Фото вне скролла: в покое под панелью, свёрнутое — миниатюра 48 в центре ряда кнопок шапки (сверху 8, ряд 48).
@@ -219,7 +232,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
             .clipShape(RoundedRectangle(cornerRadius: collapsed ? YeetRadius.md / k : YeetComponent.cardRadius, style: .continuous))
             .scaleEffect(collapsed ? k : 1, anchor: .topLeading)
             // в покое фото едет вместе с прокруткой (уходит под шапку), свёрнутое — миниатюра в шапке
-            .offset(x: collapsed ? dx : 0, y: collapsed ? dy : -max(0, scrollOffset))
+            .offset(x: collapsed ? dx : 0, y: collapsed ? dy : Self.mediaOffset(scrollOffset, collapses: collapsesMedia))
             .opacity(collapsed && thumb != nil ? 0 : 1)
             .padding(.top, YeetSpace.s20)
             .frame(maxWidth: .infinity)
@@ -262,7 +275,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
                 YeetSheet(title: title, description: subtitle, type: .panel, header: panelHeader) { content }
                     .environment(\.yeetPanelMinHeight, Self.panelMinHeight(viewport: viewport, bottom: bottomHeight,
                                                                             spacer: spacerHeight(side: side),
-                                                                            collapse: Self.collapsedOffset(side: side),
+                                                                            collapse: Self.panelCollapse(side: side, collapses: collapsesMedia),
                                                                             safeArea: зонаПодПанелью(safeBottom)))
                     .environment(\.yeetPanelBottomInset, зонаПодПанелью(safeBottom))
             }
@@ -279,7 +292,9 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         .coordinateSpace(name: "yeet-details")
         // Два состояния (Garderob P-0030.90.1): отпущенная панель доезжает либо «в покое» (фото целиком), либо
         // «свёрнуто» (фото в миниатюре шапки) — промежуточного положения, где фото срезано шапкой, нет.
-        .modifier(DetailsSnap(collapsed: Self.collapsedOffset(side: side)))
+        .modifier(DetailsSnap(collapsed: Self.collapsedOffset(side: side), enabled: collapsesMedia))
+        // P-0218: без сворачивания короткое содержимое не прокручивается и не тянется резинкой.
+        .modifier(DetailsBounce(basedOnSize: !collapsesMedia))
         .ignoresSafeArea(.container, edges: bottom == nil ? .bottom : [])
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let bottom {
@@ -300,6 +315,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         // Клавиатура ушла — докрученная к полю панель возвращается в ближайшее из двух состояний (P-0030.90.1):
         // программная докрутка мимо `scrollTargetBehavior`, и без этого фото оставалось срезанным шапкой.
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            guard collapsesMedia else { return }
             YeetFocusedField.snapLifted(collapsed: Self.collapsedOffset(side: side))
         }
     }
@@ -324,6 +340,26 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
         max(0, viewport + safeArea - bottom - (spacer - collapse))
     }
 
+    /// Свёрнуто ли фото после смещения `offset` (гистерезис `collapseVisible` / `expandVisible`). Без сворачивания
+    /// (P-0218) — никогда.
+    static func nextCollapsed(offset: CGFloat, side: CGFloat, collapsed: Bool, collapses: Bool) -> Bool {
+        guard collapses else { return false }
+        let видно = YeetSpace.s20 + side - offset
+        return collapsed ? видно < expandVisible : видно <= collapseVisible
+    }
+
+    /// Сколько прокрутки панель добавляет сверх своего места, чтобы дойти до «свёрнуто» (P-0030.90.1). Без сворачивания
+    /// (P-0218) — 0: панель тянется фоном до низа, но прокрутки не добавляет.
+    static func panelCollapse(side: CGFloat, collapses: Bool) -> CGFloat {
+        collapses ? collapsedOffset(side: side) : 0
+    }
+
+    /// Сдвиг фото (и блока `pinned`) за прокруткой. Со сворачиванием резинка сверху фото не двигает (как было); без
+    /// него (P-0218) фото едет вместе с содержимым в обе стороны — не отстаёт от панели и не масштабируется.
+    static func mediaOffset(_ scrollOffset: CGFloat, collapses: Bool) -> CGFloat {
+        collapses ? -max(0, scrollOffset) : -scrollOffset
+    }
+
     /// Смещение прокрутки в состоянии «свёрнуто»: фото (20 + сторона) целиком ушло под шапку.
     static func collapsedOffset(side: CGFloat) -> CGFloat { YeetSpace.s20 + side }
 
@@ -345,8 +381,7 @@ public struct YeetDetailsScreen<Media: View, Content: View>: View {
     /// Видимая часть фото = 20 + сторона − смещение. Свернуть, когда осталось ≤ `collapseVisible`; развернуть, когда
     /// снова видно ≥ `expandVisible`.
     private func update(_ offset: CGFloat, side: CGFloat) {
-        let видно = YeetSpace.s20 + side - offset
-        let next = collapsed ? видно < Self.expandVisible : видно <= Self.collapseVisible
+        let next = Self.nextCollapsed(offset: offset, side: side, collapsed: collapsed, collapses: collapsesMedia)
         guard next != collapsed else { return }
         if next { mediaOnTop = true }
         yeetWithAnimation(YeetMotion.collapse, reduceMotion: reduceMotion) { collapsed = next }
@@ -408,10 +443,38 @@ enum YeetFocusedField {
 /// Два состояния панели после жеста (iOS 17+, `scrollTargetBehavior`); на iOS 16 — как было.
 private struct DetailsSnap: ViewModifier {
     let collapsed: CGFloat
+    var enabled = true
 
     func body(content: Content) -> some View {
-        if #available(iOS 17, *) {
+        if enabled, #available(iOS 17, *) {
             content.scrollTargetBehavior(DetailsSnapBehavior(collapsed: collapsed))
+        } else {
+            content
+        }
+    }
+}
+
+/// P-0218: обрезка по верхнему краю области под шапкой; вниз открыто (панель заходит под безопасную зону). Выключена —
+/// содержимое как было, без маски.
+private struct DetailsTopClip: ViewModifier {
+    let enabled: Bool
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content.mask(alignment: .top) { Rectangle().padding(.bottom, -10_000) }
+        } else {
+            content
+        }
+    }
+}
+
+/// P-0218: без сворачивания прокрутка только когда содержимое длиннее экрана (iOS 16.4+); иначе как было.
+private struct DetailsBounce: ViewModifier {
+    let basedOnSize: Bool
+
+    func body(content: Content) -> some View {
+        if basedOnSize, #available(iOS 16.4, *) {
+            content.scrollBounceBehavior(.basedOnSize, axes: .vertical)
         } else {
             content
         }
