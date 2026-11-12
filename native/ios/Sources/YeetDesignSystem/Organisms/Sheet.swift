@@ -9,6 +9,14 @@ enum YeetOverlayToken {
     static let radius: CGFloat = YeetRadius.overlay
     /// Отступ плавающей шторки от краёв экрана L / R / низ и от клавиатуры (D4).
     static let inset: CGFloat = YeetSpace.s16
+
+    /// Нижний отступ шторки (Garderob P-0240). Слой не игнорирует клавиатуру (D4), поэтому при открытой клавиатуре его
+    /// кадр УЖЕ кончается над ней, а `safeAreaInsets.bottom` всё равно сообщает её высоту. Отступ по этой высоте вычитал
+    /// клавиатуру второй раз: шторка с полем ввода сжималась в полосу у верха экрана. При клавиатуре — только `inset`;
+    /// без неё — как было: не меньше home indicator.
+    static func bottomPadding(safeBottom: CGFloat, keyboardShown: Bool) -> CGFloat {
+        keyboardShown ? inset : max(inset, safeBottom)
+    }
     /// Верх высокой шторки — под статус-баром + 8 (D2).
     static let topGap: CGFloat = YeetComponent.sheetTopGap
     /// Хэндл 48 × 4 (D8).
@@ -721,6 +729,8 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
     @State private var sheetHeight: CGFloat = 0
     @State private var pastThreshold = false
     @State private var tracker = YeetVelocityTracker()
+    /// Открыта ли клавиатура (P-0240): её высоту кадр слоя уже учёл — второй раз в отступ она не идёт.
+    @State private var keyboardShown = false
 
     private var threshold: CGFloat { max(sheetHeight, 1) * YeetGesture.swipeDistance }
 
@@ -763,7 +773,8 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
                                 .onAppear { UIAccessibility.post(notification: .screenChanged, argument: nil) }
                                 .padding(.horizontal, YeetOverlayToken.inset)
                                 .padding(.top, proxy.safeAreaInsets.top + YeetOverlayToken.topGap)
-                                .padding(.bottom, max(YeetOverlayToken.inset, proxy.safeAreaInsets.bottom))
+                                .padding(.bottom, YeetOverlayToken.bottomPadding(safeBottom: proxy.safeAreaInsets.bottom,
+                                                                                 keyboardShown: keyboardShown))
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                                 .transition(reduceMotion ? .opacity : .move(edge: .bottom))
                                 .zIndex(1)
@@ -774,6 +785,8 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
                 }
                 .ignoresSafeArea(.container)
             }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardShown = true }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardShown = false }
             .onChange(of: isPresented) { presented in
                 if presented {
                     dragOffset = 0
