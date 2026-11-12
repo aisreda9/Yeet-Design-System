@@ -17,6 +17,20 @@ enum YeetOverlayToken {
     static func bottomPadding(safeBottom: CGFloat, keyboardShown: Bool) -> CGFloat {
         keyboardShown ? inset : max(inset, safeBottom)
     }
+
+    /// Верхний отступ шторки (Garderob P-0240b). Без клавиатуры — как было: безопасная зона контейнера + `topGap`.
+    /// При клавиатуре шторка с длинным содержимым тянется до самого верха, а безопасная зона контейнера бывает нулевой
+    /// (слой в листе, растянутом под строку состояния), — заголовок и «×» уезжали под часы. Поэтому при клавиатуре
+    /// верх не выше безопасной зоны ОКНА + `inset`: высота шторки ≤ экран − верх. зона − 16 − клавиатура − 16,
+    /// содержимое прокручивается, заголовок закреплён.
+    /// - Parameters:
+    ///   - containerTop: `safeAreaInsets.top` слоя;
+    ///   - layerMinY: верх слоя в координатах окна;
+    ///   - windowTop: `safeAreaInsets.top` окна (строка состояния / остров).
+    static func topPadding(containerTop: CGFloat, layerMinY: CGFloat, windowTop: CGFloat, keyboardShown: Bool) -> CGFloat {
+        guard keyboardShown else { return containerTop + topGap }
+        return max(containerTop, windowTop - layerMinY) + inset
+    }
     /// Верх высокой шторки — под статус-баром + 8 (D2).
     static let topGap: CGFloat = YeetComponent.sheetTopGap
     /// Хэндл 48 × 4 (D8).
@@ -716,6 +730,14 @@ public extension View {
     }
 }
 
+/// Безопасная зона окна сверху (строка состояния / остров) — граница шторки при клавиатуре (P-0240b).
+enum YeetOverlayWindow {
+    @MainActor static var safeTop: CGFloat {
+        let окна = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows)
+        return (окна.first { $0.isKeyWindow } ?? окна.first)?.safeAreaInsets.top ?? 0
+    }
+}
+
 private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
     @Binding var isPresented: Bool
     let dismissOnTap: Bool
@@ -772,7 +794,10 @@ private struct YeetOverlayModifier<Sheet: View>: ViewModifier {
                                 .accessibilityAction(.escape) { dismiss() }
                                 .onAppear { UIAccessibility.post(notification: .screenChanged, argument: nil) }
                                 .padding(.horizontal, YeetOverlayToken.inset)
-                                .padding(.top, proxy.safeAreaInsets.top + YeetOverlayToken.topGap)
+                                .padding(.top, YeetOverlayToken.topPadding(containerTop: proxy.safeAreaInsets.top,
+                                                                           layerMinY: proxy.frame(in: .global).minY,
+                                                                           windowTop: YeetOverlayWindow.safeTop,
+                                                                           keyboardShown: keyboardShown))
                                 .padding(.bottom, YeetOverlayToken.bottomPadding(safeBottom: proxy.safeAreaInsets.bottom,
                                                                                  keyboardShown: keyboardShown))
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
