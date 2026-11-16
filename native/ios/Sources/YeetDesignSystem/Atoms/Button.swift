@@ -4,6 +4,9 @@ import SwiftUI
 /// Один `primary` на экран; удаление — всегда `destructive`.
 public enum YeetButtonStyle: String, CaseIterable, Identifiable {
     case primary, secondary, tertiary, inverse, ghost, soft, destructive
+    /// Контурная кнопка на акцентной (Primary) подложке: прозрачная, текст и рамка — цвет текста на акценте
+    /// (Garderob P-0266: «Позже» на плашке «Вышла новая версия» рядом с белой `inverse`).
+    case inverseOutline
 
     public var id: String { rawValue }
 
@@ -16,7 +19,13 @@ public enum YeetButtonStyle: String, CaseIterable, Identifiable {
         case .ghost: return YeetComponent.buttonGhostBg
         case .soft: return YeetComponent.buttonSoftBg
         case .destructive: return YeetComponent.buttonDestructiveBg
+        case .inverseOutline: return .clear
         }
+    }
+
+    /// Рамка капсулы; `nil` — без рамки (все варианты, кроме контурного).
+    public var border: Color? {
+        self == .inverseOutline ? YeetComponent.buttonPrimaryFg : nil
     }
 
     public var foreground: Color {
@@ -28,6 +37,7 @@ public enum YeetButtonStyle: String, CaseIterable, Identifiable {
         case .ghost: return YeetComponent.buttonGhostFg
         case .soft: return YeetComponent.buttonSoftFg
         case .destructive: return YeetComponent.buttonDestructiveFg
+        case .inverseOutline: return YeetComponent.buttonPrimaryFg
         }
     }
 }
@@ -138,6 +148,7 @@ public struct YeetButton<Label: View>: View {
             .frame(minHeight: size.height)
             .foregroundStyle(variant.foreground)
             .background(Capsule().fill(variant.background))
+            .overlay { if let border = variant.border { Capsule().strokeBorder(border, lineWidth: 1) } }
             .yeetFloating(floating)
             .contentShape(Capsule())
         }
